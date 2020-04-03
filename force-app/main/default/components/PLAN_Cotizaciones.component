@@ -1,0 +1,1953 @@
+<apex:component >
+    <!--hello-world></hello-world-->
+    <div ng-controller="cotizacionCtrl as cot" id="cotizacionCtrl" ng-init="cot.leerParams(sc.opportunity, sc.idCot)">
+
+        <!-- Performance calvarez -->
+        <uib-tabset active="cot.selectedTab" mng-if="sc.opportunity.Performance">
+            <uib-tab ng-repeat="cotizacion in cot.quotes track by $index" select="cot.seleccionaCotizacion(cotizacion)">
+                
+                <uib-tab-heading>
+                    <i class="fa fa-sitemap"></i> 
+                    <span ng-bind="cotizacion.Name"></span>
+                    <i class="fa fa-check-circle cot-actual animated fadeInUp ng-animate-disabled" ng-if="cotizacion.IsSyncing" uib-tooltip="Cotización vigente"></i>
+
+                    <a ng-dblclick="cot.seleccionaCotizacion(cotizacion, true)" uib-tooltip="Actualizar cotización" tooltip-placement="left" ng-if="cotizacion.Render && cotizacion.Id && !cotizacion.IsClone" ng-show="cot.selectedTab == $index">
+                        <i class="fa fa-spinner fa-fw" ng-class="{'fa-pulse': cotizacion.loading}"></i>
+                    </a>
+
+                </uib-tab-heading>
+
+                <div class="container" ng-if="cotizacion.Render">
+                    <form name="cotizacion.formCotiza" class="form-horizontal">
+                        <div class="row text-center" style="margin-bottom: 15px; color: #D86344;">
+                            <span ng-if = "cotizacion.ApprovalStatus__c == 'Pendiente'"><br/>Tu cotización requiere aprobación, consulte el historial de aprobación.</span>
+                        </div>
+                        <div class="row" description="Datos de la Cotización - Quote">
+                            <div class="col-sm-3">
+                                <ctc-form-group 
+                                    ctc-field="cot.schema.Quote.Familia__c" 
+                                    ctc-instance="cotizacion" 
+                                    ctc-form="cotizacion.formCotiza" 
+                                    ctc-opts="cot.schema.Quote.Familia__c.values"
+                                    ctc-label="'label'" 
+                                    ctc-params="{segmento: sc.user.Segmento__c,perfil: sc.user.profile}"
+                                    ctc-on-change="cot.getProductsByFamily"></ctc-form-group>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="row">
+                                    <div class="col-sm-9 text-right">
+                                        <ctc-form-group 
+                                            ctc-field="cot.schema.Quote.ContactId" 
+                                            ctc-instance="cotizacion" 
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-opts="cot.contacts"
+                                            ctc-label="'Name'"
+                                            ctc-hide-asterisk="false"
+                                            ctc-hide-errors="true"
+                                            ng-mouseup="cot.activateSaveButton()"
+                                            ></ctc-form-group>
+                                    </div>
+
+                                    <div class="col-sm-3 text-left">
+                                       <!-- <div class="btnb-group">
+                                            <button type="button" ng-disabled="cotizacion.disabled.BotonAgregarContacto" class="btnb btnb-primary btnb-sm" ng-click="cot.agregarContacto(sc.opportunity.Account, cot.schema, cotizacion, sc.opportunity)" uib-tooltip="Crear contacto">
+                                                <i class="fa fa-user-plus" />
+                                            </button>
+
+                                            <button type="button" ng-disabled="cot.loadingContacts || cotizacion.disabled.BotonCargarContactos" class="btnb btnb-success btnb-sm" ng-click="cot.actualizaContactos()" uib-tooltip="Actualizar contactos">
+                                                <i ng-if="cot.loadingContacts" class="fa fa-spinner fa-pulse fa-fw ng-animate-disabled"></i> 
+                                                <i class="fa fa-spinner ng-animate-disabled" ng-if="!cot.loadingContacts"/>
+                                            </button>
+                                        </div>-->
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div class="row">
+                                    <div class="col-sm-12 text-center">
+                                        <strong ng-bind="cot.schema.Quote.VigenciaCotizacion__c.label" ng-class="{'text-danger': cotizacion.formCotiza.VigenciaCotizacion__c.$invalid}"></strong>
+                                        <ul class="list-inline" ng-class="{'has-error': cotizacion.formCotiza.VigenciaCotizacion__c.$invalid}">
+                                            <i class="label label-danger  animated rubberBand ng-animate-disabled  msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza.VigenciaCotizacion__c.$invalid">Requerido</i>
+
+                                            <li ng-repeat="vigencia in cot.schema.Quote.VigenciaCotizacion__c.values">
+                                                <div class="radio">
+                                                    <label>
+                                                        <input ng-change="cot.activateSaveButton()" ng-required="true" ng-disabled="cotizacion.disabled.VigenciaCotizacion__c" type="radio" ng-model="cotizacion.VigenciaCotizacion__c" value="{{vigencia.value}}" name="VigenciaCotizacion__c"/> <span ng-bind="vigencia.label"/>
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 text-right">
+                                <div class="btnb-group">
+                                    <a ng-if="sc.opportunity.StageName == 'Cotización' && !cotizacion.IsClone && !cotizacion._otraFamilia" class="btnb btnb-info" uib-tooltip="Duplicar cotización" ng-click="cot.duplicarCotizacion(cotizacion, sc.productos)"> 
+                                        <i class="fa fa-clone"></i>
+                                    </a>
+                                    <a ng-if="cotizacion.Id && cotizacion.productos.length > 0 && !cotizacion.IsClone" class="btnb btnb-danger" ng-click="cot.visualizarPDF(cotizacion, sc.opportunity.Owner)" uib-tooltip="Ver PDF">
+                                        <span class="fa fa-file-pdf-o"></span>
+                                    </a>
+                                    <a ng-if="cotizacion.Id && !cotizacion.IsSyncing && sc.opportunity.StageName == 'Cotización' && !cotizacion.IsClone && !cotizacion._otraFamilia" class="btnb btnb-success" ng-click="cot.sincronizaCotizacion(cotizacion)" uib-tooltip="Sincronizar ésta cotización con la oportunidad" tooltip-append-to-body="true" >
+                                        <span class="fa fa-refresh"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <c:PLAN_Productos ></c:PLAN_Productos>
+
+                        <div class="row" ng-if="!cotizacion.productos || cotizacion.productos.length <= 0">
+                            <div class="col-sm-4 col-sm-offset-4 text-center">
+                                <div class="alert alert-danger">Debe agregar al menos un producto a la cotización.</div>
+                            </div>
+                        </div>
+
+                        <div class="btnSaveCot" ng-if="sc.opportunity.StageName == 'Cotización'">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <ctc-error ctc-body="cot.errors" ctc-class="cot.class"></ctc-error>
+                                </div>
+                                <div class="col-sm-2 col-sm-offset-2 text-right">
+                                    <button type="submit" ng-if="cotizacion.Editable && cotizacion.Editable2" ng-click="cot.preGuardado(cotizacion)" ng-disabled="cotizacion.guardando || cotizacion.formCotiza.$invalid || !cotizacion.productos || cotizacion.productos.length <= 0" class="btnb btnb-success btnb-block">
+                                        <span class="fa fa-spinner fa-pulse fa-fw ng-animate-disabled" ng-if="cotizacion.guardando"></span>
+                                        <span class="fa fa-save fa-fw"></span>
+                                        <span ng-bind="cotizacion.guardando ? 'Guardando' : 'Guardar'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </uib-tab>
+
+            <uib-tab-heading class="btn-add-cot" ng-if="sc.opportunity.StageName == 'Cotización'">
+                <a class="btnb btnb-success" uib-tooltip="Agregar cotización" ng-click="cot.agregarCotizacion({}, sc.opportunity.Account.contacts)">
+                    <span class="fa fa-plus" />
+                </a>
+            </uib-tab-heading>
+
+        </uib-tabset>
+        <c:PLAN_GenerarPDF ></c:PLAN_GenerarPDF>
+        <c:PLAN_SendApproval ></c:PLAN_SendApproval>
+        <c:PLAN_SincronizarCotizacion ></c:PLAN_SincronizarCotizacion>
+    </div>
+    <script type="text/javascript">
+
+
+            /*class HelloWorld extends HTMLElement {
+                constructor() {
+                  super()
+                }
+
+                connectedCallback() {
+                    this.innerHTML = '<h1>Hey, Hello World</h1>'
+                }
+            }
+            window.customElements.define('hello-world', HelloWorld)*/
+        (function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('cotizacionCtrl', CotizacionCtrl)
+
+            CotizacionCtrl.$inject = ['ctcUtils', '$timeout', '$uibModal', '$q', '$filter']
+            function CotizacionCtrl( ctcUtils, $timeout, $uibModal, $q, $filter ) {
+                var vm = this
+
+                vm.quotes = ctcUtils.app.cots || []
+                vm.selectedTab = ctcUtils.app.selectedTab
+                vm.schema = ctcUtils.app.schema || {}
+                vm.contacts = ctcUtils.app.contacts || []
+                vm.soluciones = ctcUtils.app.soluciones || []
+                vm.account = ctcUtils.app.account || []
+
+                console.log('ctcUtils: ', ctcUtils)
+
+                vm.cotizaciones = []
+                vm.tab = 0
+                vm.urlAddContact = ''
+                // vm.contacts = []
+                vm.loadingContacts = false
+                vm.AccountId = ''
+                vm.OpportunityId = ''
+                vm.OpportunityFamily = ''
+                vm.errors = []
+                vm.comisionServicio = 'Comisión por el servicio'
+                vm.classAction = 'alert-danger'
+                vm.conceptoAprobacion = ctcUtils.app.conceptoAprobacion;
+                vm.leerParams = function(opportunity, idCot) {
+                    vm.cotizaciones = opportunity.cots || []
+                    var hasIdCot = typeof idCot != 'undefined' && idCot.length > 0
+                    angular.forEach(vm.cotizaciones, function(v, k) {
+                        if(hasIdCot) {
+                            if(idCot && v.Id == idCot) {
+                                vm.tab = k
+                                v.render = true
+                            }
+
+                            //agrega calvarez 2-mar-2017, desactivar edición de cotizaciones no sincronizadas INICIO
+                            vm.desactivaCotizacion(v, !v.IsSyncing)
+                            //agrega calvarez 2-mar-2017, desactivar edición de cotizaciones no sincronizadas FIN
+
+                        } else if(v.IsSyncing) {
+                            vm.tab = k
+                            v.render = true
+                        }  
+                    })
+                    vm.AccountId = opportunity.Account.Id
+                    vm.OpportunityId = opportunity.Id
+                    vm.OpportunityFamily = opportunity.Familia__c
+                }
+
+                vm.activateSaveButton = function() {
+                    //Activate save button.
+                    ctcUtils.changeButtonStatus();
+                }
+                
+                vm.selectCot = function(cotizacion) {
+                    // console.log('on selectCot', arguments)
+                    vm.errors = []
+                    cotizacion.render = true
+                    var disabled = !cotizacion.IsSyncing
+                    if(!cotizacion.Id) {
+                        disabled = false
+                    }
+                    $timeout(function() {
+                        vm.desactivaCotizacion(cotizacion, disabled)
+                    }, 2500)
+                }
+
+                vm.verPDF = function(cot, prod){
+                    window.open('https://c.cs59.visual.force.com/apex/PDFCotizacion')
+                }
+
+
+                vm.iniciarSchema = function(schema) {
+                    if(schema.Quote && schema.Quote.ContactId) {
+                        schema.Quote.ContactId.type = 'picklist'
+                        schema.Quote.ContactId.label = 'Contacto'
+                    }
+                }
+
+                vm.actualizarModeloProductos = function(cotizacion) {
+                    var scope = angular.element($('#productosCtrl')).scope()
+                    if(scope && scope.prod) {
+                        scope.prod.leerCotizacion(cotizacion)
+                    }
+                }
+
+                vm.visualizarPDF = function( cotizacion, owner ) {
+
+                    console.log('visualizarPDF: ', arguments)
+
+
+                    var soluciones = []
+                    var idsQli = ''
+                    var idsProducts = ''
+
+                    var keyProducto = {}
+                    var codigos = {}
+                    var productCodes = {}
+                    var codigosTYC = {}
+                    var idsProductsUnico = {}
+                    var productosConcepto = {}
+
+                    var idUndefined = 0
+
+                    angular.forEach( cotizacion.productos, function( producto, index) {
+
+                        if( !producto.Product2Id__o || !producto.Id ) {
+                            idUndefined += 1
+                        }
+
+                        angular.forEach( producto.comparados, function( comparado, index_comparado ) {
+                            if( comparado.ProductoComparado__c__o && !comparado.Id ) {
+                                idUndefined += 1
+                            }
+                        })
+
+                        if( idsQli.length > 0 ) {
+                            idsQli += ', '
+                        }  
+                        idsQli += '\'' + producto.Id + '\''
+
+
+                        if( !idsProductsUnico.hasOwnProperty(producto.Product2Id) ) {
+                            idsProductsUnico[producto.Product2Id] = true
+                            if( idsProducts.length > 0 ) {
+                                idsProducts += ', '
+                            }  
+                            idsProducts += '\'' + producto.Product2Id + '\''
+                        }
+                        if( producto.Product2Id__o ) {
+                            productCodes[producto.Product2Id__o.ProductCode] = true
+                        }
+                    })
+
+
+                    if( idUndefined > 0 ) {
+                        ctcUtils.showError('Guardar la cotización para ver propuesta comercial')
+                    } else {
+                        ctcUtils.showProcess(true, 'Comprobando datos')
+                        // var soluciones = []
+                        var diferenciales = {}
+                        var conceptos = {}
+
+                        var totalSoluciones = 0
+                        var totalNoEncontrado = 0
+                        var contratos = {}
+
+                        
+                        
+                        
+                        ctcUtils.queryMod('SELECT Id,Quote.Opportunity.Contacto__r.Name, ComentariosCotizacion__c, Product2.Name,Product2.Family, Product2.ProductCode, Quote.Name, Quote.VigenciaCotizacion__c, Quote.Contact.Name, Quote.Contact.Puesto__c,Quote.Opportunity.Razon_social__c, Quote.Contact.Account.Name,Quote.Opportunity.Owner.Manager.Name, CantidadTarjetas__c, UnitPrice, FormaPago__c, OpcionesMetodoPago__c, TarjetaAsociada__c, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, OtroMetodoPago__c, (SELECT Id, ProductoCotizado__c, ProductoComparado__c, ProductoComparado__r.Name FROM Productos_Comparados__r) FROM QuoteLineItem WHERE Id IN(' + idsQli + ')')
+                        .then( function( res ) {
+                            console.log("VERRR::"+JSON.stringify(res));
+                            soluciones = res || []
+
+                            totalSoluciones = soluciones.length
+
+                            //console.log('QuoteLineItem:',soluciones)
+
+                            angular.forEach( soluciones, function( solucion, index ) {
+                                if( solucion.Productos_Comparados__r ) {
+                                    angular.forEach( solucion.Productos_Comparados__r, function( comparado, index_comparado ) {
+
+                                        if( !idsProductsUnico.hasOwnProperty(comparado.ProductoComparado__c) ) {
+                                            idsProductsUnico[comparado.ProductoComparado__c] = true
+                                            if( idsProducts.length > 0 ) {
+                                                idsProducts += ', '
+                                            }  
+                                            idsProducts += '\'' + comparado.ProductoComparado__c + '\''
+                                        }
+
+                                        if( idsQli.length > 0 ) {
+                                            idsQli += ', '
+                                        }  
+                                        idsQli += '\'' + comparado.Id + '\''
+                                        
+                                    })
+                                }  
+                            })
+                            return ctcUtils.query('SELECT Id, DepositoOperacional__c, FeeFijoVehiculo__c, PartidaPresupuesto__c FROM Contrato2__c WHERE PartidaPresupuesto__c IN(' + idsQli + ')')
+                        })
+                        .then( function( res ) {
+                            if( res && res.length > 0 ) {
+                                angular.forEach( res, function( contrato, index ) {
+                                    contratos[contrato.PartidaPresupuesto__c] = contrato
+                                })
+                            }
+
+                            return ctcUtils.query('SELECT Id, Concepto__c, PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, PartidaPresupuesto__c, ProductoComparadoID__c, EsProductoComparado__c,Concepto_Tipo_Cargo__c FROM ProductoConcepto__c WHERE  Concepto__c != null AND (PartidaPresupuesto__c IN(' + idsQli + ') OR ProductoComparadoID__c IN(' + idsQli + '))')
+                        })
+                        .then( function( res ) {
+
+                            //console.log('ProductoConcepto__c:',res)
+
+                            angular.forEach( res, function( productoCon, index ) {
+                                // Verificar si es producto cotizado ó es producto comparado
+                                var idSolucion = productoCon.PartidaPresupuesto__c ? productoCon.PartidaPresupuesto__c : (productoCon.ProductoComparadoID__c ? productoCon.ProductoComparadoID__c : '')
+
+                                if(idSolucion && idSolucion.length > 0 ) {
+                                    if( !productosConcepto.hasOwnProperty(idSolucion) ) {
+                                        productosConcepto[idSolucion] = []
+                                    }
+                                    productosConcepto[idSolucion].push(productoCon)
+                                } 
+                            })
+
+                            return ctcUtils.obtenerConceptosCaracteristicasPorProducto( idsProducts )
+                        })
+                        .then( function( res ) {
+                            // console.log('\n Resultado Temp: ', res)
+                            
+                            diferenciales   = res.caracteristicas || {}
+                            conceptos       = res.conceptos || {}
+                            angular.forEach( soluciones, function( solucion, index ) {
+                                var todosConceptos = []
+
+                                solucion.diferenciales = diferenciales.hasOwnProperty(solucion.Product2Id) ? diferenciales[solucion.Product2Id] : []
+                                solucion.conceptos = conceptos.hasOwnProperty(solucion.Product2Id) ? conceptos[solucion.Product2Id] : []
+                                solucion.productoConcepto = productosConcepto[solucion.Id] || []
+                                solucion.contrato = contratos[solucion.Id] || {}
+
+                                ctcUtils.defineConceptosKey( solucion )
+
+                                todosConceptos = todosConceptos.concat(solucion.conceptos)
+
+                                if( solucion.Productos_Comparados__r ) {
+                                    angular.forEach( solucion.Productos_Comparados__r, function( comparado, index_comparado ) {
+                                        comparado.conceptos = conceptos.hasOwnProperty(comparado.ProductoComparado__c) ? conceptos[comparado.ProductoComparado__c] : []
+                                        comparado.productoConcepto = productosConcepto[comparado.Id] || []
+                                        ctcUtils.defineConceptosKey( comparado )
+                                        todosConceptos = todosConceptos.concat(comparado.conceptos)
+                                    })
+                                }
+                                ctcUtils.obtenerConceptosUnicos(todosConceptos, solucion)
+                                ctcUtils.calculaComision( solucion, false )
+
+                                angular.forEach( todosConceptos, function( concepto, concepto_index ){
+                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                        //concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                    } else {
+                                        concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.PrecioFinal__c))
+                                    }
+                                })
+                            })
+
+
+                            // console.log('\n\n soluciones: ', soluciones)
+
+                            
+                            return ctcUtils.query('SELECT Id, Name, Codigos__c, ColorPrincipal__c,TextoPresentacion__c, ColorLetra__c, NombreLogotipo__c, Titulo__c, Subtitulo__c FROM PropuestaComercial__c')
+
+                        })
+                        .then( function( res ) {
+                            angular.forEach(res, function( propuesta, index ) {
+                                var tem = propuesta.Name.split('-');
+                                if(tem!=null&&tem.length>1){
+                                    propuesta.Name=tem[1];
+                                }else{
+                                    propuesta.Name=tem[0];
+                                }
+                                if( propuesta.Codigos__c && propuesta.Codigos__c.length > 0 ) {
+                                    var codesTemp = propuesta.Codigos__c.split('\,')
+                                    angular.forEach( codesTemp , function( code, index_code) {
+                                        if( !codigos.hasOwnProperty(code) ) {
+                                            codigos[code] = propuesta
+                                        }
+                                    })
+                                }  
+                            })
+                            if( owner.Segmento__c == 'Small' ) {
+                                return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c, AnexoA__c FROM PlantillaContrato__c WHERE CodigosTYC__c != null')
+                            }
+                        })
+                        .then( function( res ) {                            
+                            angular.forEach( res, function( tyc, index ) {
+                                console.log("VERRRTYC1::");
+                                if( tyc.CodigosTYC__c && tyc.CodigosTYC__c.length > 0 ) {
+                                    var codesTemp = tyc.CodigosTYC__c.split('\,')
+                                    angular.forEach( codesTemp , function( code, index_code) {
+                                        console.log("VERRRTYC2::"+code);
+                                        console.log("VERRRTYC3::"+JSON.stringify(productCodes));
+                                        if( !codigosTYC.hasOwnProperty(code) && productCodes.hasOwnProperty(code) ) {
+                                            codigosTYC[code] = tyc.Id
+                                        }
+                                    })
+                                }
+                            })
+
+                                console.log("VERRRTYC::"+JSON.stringify(codigosTYC));
+                            if( Object.keys(codigosTYC).length > 0 ) {
+                                var idsTYC = ''
+                                angular.forEach( Object.keys(codigosTYC), function( id, index ) {
+                                     if( idsTYC.length > 0 ) {
+                                        idsTYC += ', '
+                                     } 
+
+                                     idsTYC += '\'' + codigosTYC[id] + '\''
+                                })
+                                return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c, AnexoA__c FROM PlantillaContrato__c WHERE Id IN(' + idsTYC + ')')
+                            }
+
+                        })
+                        .then( function( res ) {
+
+                            console.log('result términos: ', res)
+                            var codigosTerminos = {}
+                            var codigosAnexoA = {}
+                            angular.forEach( res , function( tyc, index ) {
+                                codigosTerminos[tyc.Id] = ctcUtils.html(tyc.Contenido_del__c)
+                                codigosAnexoA[tyc.Id] = ctcUtils.html(tyc.AnexoA__c)
+                            })
+
+                            angular.forEach( soluciones, function( solucion, index ) {
+                                if( solucion.Product2 && solucion.Product2.ProductCode && codigosTYC[solucion.Product2.ProductCode] && codigosTerminos.hasOwnProperty(codigosTYC[solucion.Product2.ProductCode]) ) {
+                                    solucion.terminos = codigosTerminos[codigosTYC[solucion.Product2.ProductCode]]
+                                    solucion.anexoA = codigosAnexoA[codigosTYC[solucion.Product2.ProductCode]] || ''
+                                }
+
+                                if( solucion.Product2 && solucion.Product2.ProductCode && !codigos.hasOwnProperty(solucion.Product2.ProductCode) ) {
+                                    totalNoEncontrado += 1
+                                }
+
+                            })
+
+                            window.localStorage['soluciones'] = soluciones
+
+
+
+                           
+
+                            ctcUtils.showProcess(false, 'Comprobando datos')
+
+                            console.log('\n\n soluciones: ', soluciones, '\n codigos: ', codigos, '\n codigosTYC: ', codigosTYC, '\n codigosTerminos: ', codigosTerminos)
+
+                            $timeout( function() {
+
+                                if ( totalSoluciones == totalNoEncontrado ) {
+                                    ctcUtils.showError('Productos sin propuesta comercial', 'Propuesta comercial')
+                                } else {
+                                    // Abrir modal del componente
+                                    ctcUtils.openModal('generaPDF', {cotizacion: function () {return cotizacion }, owner: function () {return owner }, soluciones: function() { return soluciones}, codigos: function() { return codigos}}, 'lg')
+                                    .then( function( res ) {
+                                        console.log('cierra modal: ', res)
+                                    })
+                                }
+
+
+                            }, 600)
+
+                        })
+                        .catch( function ( err ) {
+                            ctcUtils.showProcess(false, 'Comprobando datos')
+                            ctcUtils.showError( err )
+                        })
+                    }
+
+
+
+
+
+
+
+                    /*ctcUtils.query('SELECT Id, Product2.Name, Product2.ProductCode, Quote.Name, Quote.VigenciaCotizacion__c, Quote.Contact.Name, Quote.Contact.Puesto__c, Quote.Contact.Account.Name, CantidadTarjetas__c, UnitPrice, FormaPago__c, OpcionesMetodoPago__c, TarjetaAsociada__c, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, OtroMetodoPago__c, (SELECT PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, Concepto__r.Name, Concepto__r.Importe__c, Concepto__r.TipoCargo__c, Concepto__r.NombreSistemas__c, Concepto__r.Orden__c FROM Productos_Concepto__r) FROM QuoteLineItem WHERE Id IN(' + idsQli + ')')
+                    .then( function( res ) {
+
+                        soluciones = res || []
+
+                        return ctcUtils.query('SELECT Id, CaracteristicasSolucion__c, Producto__c FROM Concepto__c WHERE Producto__c IN(' + idsProducts + ') AND RecordType.DeveloperName=\'CaracteristicasSolucion\' AND Activo__c=true')
+                    })
+                    .then( function( res ) {
+                        angular.forEach( res, function( caracteristica, index ) {
+                            if( !keyProducto.hasOwnProperty(caracteristica.Producto__c) ) {
+                                keyProducto[caracteristica.Producto__c] = []
+                            }
+                            keyProducto[caracteristica.Producto__c].push(caracteristica)
+                        })
+
+                        angular.forEach( soluciones, function( solucion, index ) {
+                            solucion.diferenciales = keyProducto.hasOwnProperty(solucion.Product2Id) ? keyProducto[solucion.Product2Id] : []
+                        })
+
+
+                        return ctcUtils.query('SELECT Name, Codigos__c FROM PropuestaComercial__c')
+
+
+
+                    })
+                    .then( function( res ) {
+
+                        angular.forEach(res, function( propuesta, index ) {
+                            if( propuesta.Codigos__c && propuesta.Codigos__c.length > 0 ) {
+                                var codesTemp = propuesta.Codigos__c.split('\,')
+                                angular.forEach( codesTemp , function( code, index_code) {
+                                    if( !codigos.hasOwnProperty(code) ) {
+                                        codigos[code] = propuesta.Name
+                                    }
+                                })
+                            }  
+                        })
+
+                        if( owner.Segmento__c == 'Small' ) {
+                            return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c FROM PlantillaContrato__c WHERE CodigosTYC__c != null')
+                        }
+                    })
+                    .then( function( res ) {
+                        angular.forEach( res, function( tyc, index ) {
+                            if( tyc.CodigosTYC__c && tyc.CodigosTYC__c.length > 0 ) {
+                                var codesTemp = tyc.CodigosTYC__c.split('\,')
+                                angular.forEach( codesTemp , function( code, index_code) {
+                                    if( !codigosTYC.hasOwnProperty(code) && productCodes.hasOwnProperty(code) ) {
+                                        codigosTYC[code] = tyc.Id
+                                    }
+                                })
+                            }
+                        })
+
+
+                        if( Object.keys(codigosTYC).length > 0 ) {
+                            var idsTYC = ''
+                            angular.forEach( Object.keys(codigosTYC), function( id, index ) {
+                                 if( idsTYC.length > 0 ) {
+                                    idsTYC += ', '
+                                 } 
+
+                                 idsTYC += '\'' + codigosTYC[id] + '\''
+                            })
+                            return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c FROM PlantillaContrato__c WHERE Id IN(' + idsTYC + ')')
+                        }
+
+                    })
+                    .then( function( res ) {
+
+                        console.log('result: ', res)
+                        var codigosTerminos = {}
+                        angular.forEach( res , function( tyc, index ) {
+                            codigosTerminos[tyc.Id] = ctcUtils.html(tyc.Contenido_del__c)
+                        })
+
+                        angular.forEach( soluciones, function( solucion, index ) {
+                            if( solucion.Product2 && solucion.Product2.ProductCode && codigosTYC[solucion.Product2.ProductCode] && codigosTerminos.hasOwnProperty(codigosTYC[solucion.Product2.ProductCode]) ) {
+                                solucion.terminos = codigosTerminos[codigosTYC[solucion.Product2.ProductCode]]
+                            }
+                        })
+
+
+
+                        ctcUtils.showProcess(false, 'Comprobando datos')
+
+                        console.log('\n\n soluciones: ', soluciones, '\n keyProducto: ', keyProducto, '\n codigos: ', codigos, '\n codigosTYC: ', codigosTYC, '\n codigosTerminos: ', codigosTerminos)
+
+                        $timeout( function() {
+                            // Abrir modal del componente
+                            ctcUtils.openModal('generaPDF', {cotizacion: function () {return cotizacion }, owner: function () {return owner }, soluciones: function() { return soluciones}, codigos: function() { return codigos}}, 'lg')
+                            .then( function( res ) {
+                                console.log('cierra modal: ', res)
+                            })
+                        }, 600)
+
+                    }).catch( function( err ) {
+
+                        ctcUtils.showProcess(false, 'Comprobando datos')
+
+                        ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                        ctcUtils.openModal('modalGenerico', {instance: function () {return err}, title: function() {return 'Ocurrió un error'}, subTitle: function() {return err }}, 'md')
+                        .then( function( res ) { }).catch( function( err ) { })
+                    })*/
+                }
+
+                vm.configuracionProductoConcepto = function(QuoteLineItems, cotizacion) {
+                    var pc = {upsert: [], remove: []}
+                    var unique = {}
+                    var CMS = 'Comisión por el servicio'
+
+                    angular.forEach(cotizacion.productos, function(producto, index){
+                        var idsProd2 = []
+                        if(producto.Name__o && producto.Name__o.Id) {
+                            idsProd2.push({Product2Id : producto.Name__o.Id})
+                        }
+
+                        angular.forEach(producto.productosComparar, function(prodComp, index1){
+                            if(prodComp && prodComp.Id && prodComp.Name__o && prodComp.Name__o.Id) {
+                                idsProd2.push({
+                                            Product2Id : prodComp.Name__o.Id,
+                                            PC: true, 
+                                            PC_Id: prodComp.Id
+                                        })
+                            }
+                        })
+
+                        angular.forEach(idsProd2, function(idProd2, key){
+                            if(producto.productoConceptoInstancias && producto.productoConceptoInstancias[idProd2.Product2Id]){
+
+                                angular.forEach(Object.keys(producto.productoConceptoInstancias[idProd2.Product2Id]), function(idConcepto, key2){
+
+                                    var productoConcepto = producto.productoConceptoInstancias[idProd2.Product2Id]
+                                    // console.log('\n\n productoConcepto: ', idConcepto, productoConcepto, producto.conceptosId[idConcepto].TipoCargo__c)
+                                    if(producto.conceptosId && producto.conceptosId[idConcepto] && producto.conceptosId[idConcepto].Render) {
+
+                                        var prod_concep = {Concepto__c: idConcepto, Notas__c: productoConcepto[idConcepto].Notas__c, PrecioFinal__c: productoConcepto[idConcepto].PrecioFinal__c, Bonificacion__c: productoConcepto[idConcepto].Bonificacion__c}
+                                        if(productoConcepto[idConcepto].hasOwnProperty('PrecioLista2__c')) {
+                                            prod_concep.PrecioLista2__c = productoConcepto[idConcepto].PrecioLista2__c
+                                        }
+                                        //agrega calvarez 14 mayo 2017
+                                        if(CMS == producto.conceptosId[idConcepto].TipoCargo__c) {
+                                            prod_concep.PrecioFinal__c = productoConcepto[idConcepto].PrecioFinal2__c
+                                            prod_concep.PrecioLista2__c = productoConcepto[idConcepto].PrecioFinal2__c
+                                        }
+
+                                        if(typeof prod_concep.Bonificacion__c == 'undefined' || prod_concep.Bonificacion__c == '') {
+                                            prod_concep.Bonificacion__c = null
+                                        }
+
+                                        if(productoConcepto[idConcepto].Id){
+                                            prod_concep.Id = productoConcepto[idConcepto].Id
+                                        }
+
+                                        if(idProd2.PC) {
+                                            prod_concep.EsProductoComparado__c = true
+                                            prod_concep.ProductoComparadoID__c = idProd2.PC_Id
+                                        } else {
+                                            prod_concep.PartidaPresupuesto__c = producto.Id
+                                        }
+                                        if(producto.conceptosId && producto.conceptosId[idConcepto]  && producto.conceptosId[idConcepto].TipoCargo__c == vm.comisionServicio) {
+                                            prod_concep.PrecioLista2__c = productoConcepto[idConcepto].PrecioLista2__c
+                                            //console.log('\n\n\n vm.comisionServicio: ', idConcepto, prod_concep, productoConcepto[idConcepto].ComisionLibre__c, '\n\n\n')
+                                        }
+
+                                        if(prod_concep.hasOwnProperty('Id') && !unique.hasOwnProperty(prod_concep.Id)) {
+                                            unique[prod_concep.Id] = true
+                                            pc.upsert.push(prod_concep)
+                                        }
+                                        if(!prod_concep.hasOwnProperty('Id')) {
+                                            pc.upsert.push(prod_concep)
+                                        }
+                                    } else if(productoConcepto[idConcepto].Id) {
+                                        pc.remove.push(productoConcepto[idConcepto].Id)
+                                        // console.log('DELETE ProductoConcepto__c', productoConcepto[idConcepto].Id)
+                                    }
+                                })
+
+                            }
+                        })
+                    })
+
+
+                    return pc
+                }
+
+                
+
+                vm.sincronizaCotizacion = function(cotizacion) {
+                    var modal = $uibModal.open({
+                        animation: true,
+                        keyboard: false,
+                        backdrop: 'static',
+                        templateUrl: 'sincronizarCotizacion.html',
+                        controller: 'sincronizarCotizacionCtrl',
+                        controllerAs: 'sc',
+                        size: 'md',
+                        resolve: {
+                            cotizacion: function () {
+                                return cotizacion
+                            }
+                        }
+                    })
+
+                    modal.result.then(function ( sincronizada ) {
+                        // console.log('ctcUtils.app.opportunity: ', ctcUtils.app.opportunity)
+                        if(vm.quotes && vm.quotes.length > 0) {
+                            angular.forEach(vm.quotes, function( cotizacion, index ) {
+                                cotizacion.IsSyncing = cotizacion.Id === sincronizada.Id
+                                cotizacion.Editable = cotizacion.IsSyncing && ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c !== "true"
+                                ctcUtils.bloquearCotizacion(cotizacion, !cotizacion.Editable)
+                            })
+                        }
+                        // console.log('sincronizada: ', cotizacion, '\n quotes: ', vm.quotes)
+                    }, function () {
+                        
+                    })
+                }
+
+                vm.confirmaSincronizarCotizacion = function(cotizacion) {
+                    //console.log('confirmaSincronizarCotizacion: ', cotizacion)
+                    if(cotizacion && cotizacion.Id) {
+                        var opportunity = {
+                            Id: cotizacion.OpportunityId,
+                            SyncedQuoteId: cotizacion.Id
+                        }
+
+                        ctcUtils.invoke('PLAN_CuentaService.upsertObjects', ['Opportunity', JSON.stringify([opportunity])])
+                        .then(function(result) {
+                            //console.log('success confirmaSincronizarCotizacion: ', result)
+                            if(result && angular.isArray(result) && result[0].success) {
+                                if(vm.cotizaciones && vm.cotizaciones.length > 0) {
+                                    angular.forEach(vm.cotizaciones, function(v, k) {
+                                        v.IsSyncing = v.Id === cotizacion.Id
+
+                                    })
+                                }
+                                
+                            }
+                        }).catch(function(err) {
+                            vm.errors = [err]
+                        })
+                    }
+                }
+
+                vm.desactivaCotizacion = function(v, disabled_) {
+                    // console.log('\n\n on desactivaCotizacion: ', disabled_)
+                    if(!v.hasOwnProperty('disabled')) {
+                        v.disabled = {}
+                    }
+                    v.disabled['ContactId'] = disabled_//productosComparar
+                    if(v.hasOwnProperty('productos') && angular.isArray(v.productos)) {
+                        angular.forEach(v.productos, function(v1, k1) {
+                            var disabled = disabled_
+                            if(!v1.hasOwnProperty('disabled')) {
+                                v1.disabled = {}
+                            }
+                            disabled = disabled ? disabled : (!(disabled) && !(v1.Etapa__c != 'Perdida' && v1.Etapa__c != 'Ganada'))
+                            v1.disabled['Name'] = disabled
+                            v1.disabled['CantidadTarjetas__c'] = disabled
+                            v1.disabled['Etapa__c'] = disabled
+                            v1.disabled['CantidadTarjetas__c'] = disabled
+                            v1.disabled['UnitPrice'] = disabled
+                            v1.disabled['ServiceDate'] = disabled
+                            v1.disabled['FormaPago__c'] = disabled
+                            v1.disabled['TipoAmex__c'] = disabled
+                            v1.disabled['NivelConsumo__c'] = disabled
+                            v1.disabled['OpcionesMetodoPago__c'] = disabled
+                            v1.disabled['TarjetaAsociada__c'] = disabled
+                            v1.disabled['ClabeInterbancaria__c'] = disabled
+                            v1.disabled['Bonificacion__c'] = disabled
+                            $timeout(function() {
+                                if(v1.hasOwnProperty('productoConceptoInstancias')) {
+                                    angular.forEach(Object.keys(v1.productoConceptoInstancias), function(v2, k2) {
+                                        angular.forEach(Object.keys(v1.productoConceptoInstancias[v2]), function(v3, k3) {
+                                            if(!v1.productoConceptoInstancias[v2][v3].hasOwnProperty('disabled')) {
+                                                v1.productoConceptoInstancias[v2][v3].disabled = {}
+                                            }
+                                            v1.productoConceptoInstancias[v2][v3].disabled['Bonificacion__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['Notas__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['PrecioLista__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['PrecioLista2__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['ComisionLibre__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['Obligatorio__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['PrecioFinal__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['PrecioFinal2__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['VigenciaDescuento__c'] = disabled
+                                            v1.productoConceptoInstancias[v2][v3].disabled['CantidadTarjetas__c'] = disabled
+
+                                        })
+                                    })
+                                }
+                                if(v1.hasOwnProperty('conceptosId')) {
+                                    angular.forEach(Object.keys(v1.conceptosId), function(v2, k2) {
+                                        if(!v1.conceptosId[v2].hasOwnProperty('disabled')) {
+                                            v1.conceptosId[v2].disabled = {}
+                                        }
+                                        v1.conceptosId[v2].disabled['Obligatorio__c'] = disabled
+                                    })
+                                }
+                                if(v1.hasOwnProperty('cols')) {
+                                    angular.forEach(v1.cols, function(v2, k2) {
+                                        if(!v2.instance.hasOwnProperty('disabled')) {
+                                            v2.instance.disabled = {}
+                                        }
+                                        v2.instance.disabled['Bonificacion__c'] = disabled
+                                    })
+                                }
+                                if(v1.hasOwnProperty('productosComparar') && angular.isArray(v1.productosComparar)) {
+                                    angular.forEach(v1.productosComparar, function(v2, k2) {
+                                        if(!v2.hasOwnProperty('disabled')) {
+                                            v2.disabled = {}
+                                        }
+                                        v2.disabled['Name'] = disabled
+                                    })
+                                }
+                            }, 1000)
+                        })
+                    }
+                }
+
+                /* Cotizador monofamilia calvarez 08/11/2017 */
+                vm.getProductsByFamily = function( model, instance, field, form, params ) {
+                    // console.log('getProductsByFamily: ', model, instance)
+
+                    // limpiar valores
+                    instance.soluciones = []
+                    if( instance.productos && instance.productos.length > 0 ) {
+                        angular.forEach(instance.productos, function( producto, _index ) {
+                            delete producto.Name__o
+                        })
+                    }
+
+                    if( model && model.value && params && params.segmento ) {
+                        var segmento = ''
+                        if(params.segmento == 'MLK') {
+                            segmento = '\'Medium\', ' + '\'Large\', ' + '\'Key\''
+                        } else {
+                            segmento = '\'' + params.segmento + '\''
+                        }
+                        var querySoql='';
+                        if(params.perfil=='BPfleet Sales'){
+                            querySoql='SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c,AplicaSegmento__c FROM Product2 WHERE Family= \'' + model.value + '\' AND IsActive=true AND ProductCode=\'30-B\' AND SegmentoVenta__c includes(' + segmento + ') ORDER BY Name ASC';
+                        }else{
+                            querySoql='SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c,AplicaSegmento__c FROM Product2 WHERE Family= \'' + model.value + '\' AND IsActive=true AND ProductCode!=\'30-B\' AND SegmentoVenta__c includes(' + segmento + ') ORDER BY Name ASC';
+                        }
+                        ctcUtils.query(querySoql)
+                        .then(function( res ) {
+                            instance.soluciones = res || []
+
+                            // si el resultado de consulta productos por familia es igual a 1 elemento, asigna el producto a QuoteLineItem
+                            if( instance.productos && instance.productos.length > 0 && instance.soluciones.length == 1 ) {
+                                angular.forEach(instance.productos, function( producto, _index ) {
+                                    producto.Name = instance.soluciones[0].Id
+                                })
+                            }
+                        }).catch(function( err ) {
+                            // console.log('error getProductsByFamily: ', err)
+                        })
+                    }
+                }
+
+                vm.procesaIds2Delete = function( ids, ids2Delete ) {
+                    var prefix = ctcUtils.localPrefix
+
+                    if( ids && ids.length > 0 ) {
+                        angular.forEach( ids, function( id, index ) {
+
+                            var prefixId = id.substring(0, 3)
+                            if(prefix.hasOwnProperty(prefixId) && !ids2Delete.unique.hasOwnProperty(id)) {
+                                ids2Delete.unique[id] = true
+                                if( !ids2Delete.hasOwnProperty(prefix[prefixId].name) ) {
+                                    ids2Delete[prefix[prefixId].name] = []
+                                }
+                                ids2Delete[prefix[prefixId].name].push(id)
+                            }
+                        })
+                    }
+                    
+                }
+
+                vm.guardaEscalonamientos = function( productos, idsQliClone ) {
+                    var ids = ''
+                    angular.forEach(Object.keys(idsQliClone), function( idQliClone, index) {
+                        if( ids.length > 0 ) {
+                            ids += ', '
+                        }  
+
+                        ids += '\'' + idQliClone + '\''
+                    })
+
+                    ctcUtils.query('SELECT Id, Escalonamiento__c, QuoteId, PricebookEntryId, Product2Id, Quantity, UnitPrice, ServiceDate, Etapa__c FROM QuoteLineItem WHERE Escalonamiento__c IN(' + ids + ')')
+                    .then(function( res ) {
+                        console.log('\n\n Escalonamientos to clone: ', res, '\n idsQliClone: ', idsQliClone, '\n Productos: ', productos)
+                        
+                        var qli2Save = []
+                        var qliParent2Save = {}
+
+                        angular.forEach( res , function( qli, index ) {
+                            var qliBase = productos[idsQliClone[qli.Escalonamiento__c]]
+                            var esc = {
+                                QuoteId: qliBase.QuoteId,
+                                Escalonamiento__c: qliBase.Id,
+                                PricebookEntryId: qliBase.PricebookEntryId,
+                                Escalonamiento1__c: true,
+                                Quantity : qli.Quantity,
+                                UnitPrice : qli.UnitPrice,
+                                Etapa__c: 'Cotización',
+                                Product2Id: qliBase.Product2Id,
+                                CantidadTarjetas__c: qliBase.CantidadTarjetas__c
+                            }
+
+                            if( qli.ServiceDate ) {
+                                var fecha = new Date(qli.ServiceDate) 
+                                esc.ServiceDate =  fecha.getFullYear() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getUTCDate()
+                            }
+
+                            qli2Save.push(esc)
+
+                            qliParent2Save[qliBase.Id] = true
+                        })
+
+                        if( qliParent2Save && Object.keys(qliParent2Save).length > 0 ) {
+                            angular.forEach(Object.keys(qliParent2Save), function( qliId, index ) {
+                                qli2Save.push({Id: qliId, Escalonamiento1__c: true})
+                            })
+                        }
+
+                        console.log('save qlis escalonamientos: ', qli2Save)
+
+                        return ctcUtils.upsert('QuoteLineItem', JSON.stringify(qli2Save))
+                    })
+                    .then( function( res ) {
+                        console.log('result upsert qlis escalonamientos: ', res)
+                    }).catch( function( err ) {
+                        console.log('error: ', error)
+                    })
+
+
+
+                    // escToSave.Escalonamiento__c = esc.Escalonamiento__c
+                    // escToSave.QuoteId = vm.producto.QuoteId
+                    // escToSave.PricebookEntryId = vm.producto.PricebookEntryId
+                    // escToSave.Product2Id = vm.producto.Product2Id
+                    // escToSave.Escalonamiento1__c = true
+                    // if( esc.ServiceDate ) {
+                    //     var fecha = esc.ServiceDate.split('/')
+                    //     escToSave.ServiceDate = fecha[2] + '-' + fecha[1] + '-' + fecha[0]
+                    // }
+
+
+                    // escToSave.Quantity = esc.Quantity
+                    // escToSave.CantidadTarjetas__c = vm.producto.CantidadTarjetas__c,
+                    // escToSave.UnitPrice = esc.UnitPrice
+                    // escToSave.QuoteId = vm.producto.QuoteId
+                    // escToSave.PricebookEntryId = vm.producto.PricebookEntryId
+                    // escToSave.Product2Id = vm.producto.Product2Id
+
+                }
+
+
+
+
+
+
+                /**
+                    * @author calvarez@ctconsulting.com.mx
+                    * @date 2016
+                    * @param cotizacion objeto Quote {Id: 'QuoteIdSalesforce'}
+                    * @param force Obliga a recargar los datos
+                    * @description Carga los QuoteLineItem -Pertidas de presupuesto- asociados a Quote -Cotización-
+                **/
+                vm.seleccionaCotizacion = function( cotizacion, force  ) {
+                    if( cotizacion.Id && ( !cotizacion.Render || force ) ) {
+                        if( force || !cotizacion.Render) {
+                            ctcUtils.showProcess(true, 'Cargando cotización')
+                        }
+                        cotizacion.loading = true
+                        cotizacion.productos = []
+                        cotizacion.VigenciaCotizacion__c = undefined
+                        cotizacion.ContactId = undefined
+
+                        var idsProductos = ''
+                        var idsProduct2 = ''
+                        var idsProduct2Unico = {}
+
+                        var productosConcepto = {}
+                        var productosComparados = {}
+                        var conceptosProducto = {}
+                        var caracteristicasProducto = {}
+                        var escalonamientosProducto = {}
+                        var contacts = angular.copy(vm.contacts)
+                        vm.contacts = []
+
+                        ctcUtils.query('SELECT Id, VigenciaCotizacion__c, ContactId, Contact.Name, OwnerId, Owner.UserRole.Name FROM Quote WHERE Id=\'' + cotizacion.Id + '\'')
+                        .then( function( res ) {
+
+                            var quote = res && res[0] ? res[0] : {}
+
+                            cotizacion.VigenciaCotizacion__c = quote.VigenciaCotizacion__c
+                            cotizacion.ContactId = quote.ContactId
+                            vm.contacts = contacts
+
+
+                            // cotizacion._readOnly = {
+                            //     ContactId: true
+                            // }
+
+
+
+                        // Obtener QuoteLinetItem - Partidas de presupuesto - asociadas a la oportunidad
+                        return ctcUtils.query('SELECT Id, CantidadTarjetas__c, NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
+                        })
+                        .then( function( res ) {
+                            // Recibe y asigna a productos los QuoteLineItems encontrados
+                            // console.log('QuoteLineItems asociados: ', res)
+                            if (res != null) {
+                                //Keep the already saved number of shipment addresses.
+                            	ctcUtils.app.dirEntregaOriginal = res[0].NumberOfShipments__c;
+                            }
+                            cotizacion.productos = res || []
+                            cotizacion.soluciones = ctcUtils.app.soluciones
+                            // cotizacion.Render = true
+                            cotizacion.tab = 0
+                            cotizacion._otraFamilia = false
+
+
+                            //Obtener ProductoComparado__c
+                            angular.forEach(cotizacion.productos, function( producto, index ) {
+
+                                if( producto.Product2 && producto.Product2.Family && producto.Product2.Family.toLowerCase() != ctcUtils.app.opportunity.Familia__c.toLowerCase() ) {
+                                    if( !cotizacion._otraFamilia ) {
+                                        cotizacion.soluciones = []
+                                        cotizacion._otraFamilia = true
+                                    }
+                                    cotizacion.soluciones.push(producto.Product2)
+                                }
+
+                                // Respaldar valores persistidos
+                                producto.Id_BK = angular.copy(producto.Id)
+                                producto.Product2Id_BK = angular.copy(producto.Product2Id)
+
+                                if(idsProductos.length > 0) {
+                                    idsProductos += ', '
+                                }
+                                idsProductos += '\'' + producto.Id + '\''
+
+                                // Obtener Product2Id almacenado en ProductoComparado__c
+                                if( !idsProduct2Unico.hasOwnProperty(producto.Product2Id) ) {
+                                    idsProduct2Unico[producto.Product2Id] = true
+                                    if(idsProduct2.length > 0) {
+                                        idsProduct2 += ', '
+                                    }
+                                    idsProduct2 += '\'' + producto.Product2Id + '\''
+                                }
+
+                                if( producto.FormaPago__c ) {
+                                    producto.DATA_OpcionesMetodoPago__c = ctcUtils.changeFieldSF('FormaPago__c', producto.FormaPago__c, 'OpcionesMetodoPago__c')
+                                }
+
+                                if( producto.TarjetaAsociada__c ) {
+                                    producto.TarjetaAsociada__c = parseFloat(producto.TarjetaAsociada__c)
+                                }
+                            })
+                            
+                            if( idsProductos && idsProductos.length > 0 ) {
+                                return ctcUtils.query('SELECT COUNT(Id) escalonamientos, SUM(UnitPrice) total, Escalonamiento__c FROM QuoteLineItem WHERE Escalonamiento__c IN('+ idsProductos + ') GROUP BY Escalonamiento__c')
+                            }
+                        })
+                        .then( function( res ) {
+                            // console.log('\n\n resultado Escalonamientos: ', res, '\n')
+
+                            angular.forEach( res, function( escalonamiento, index ) {
+                                // if( !escalonamientosProducto.hasOwnProperty(escalonamiento.Escalonamiento__c) ) {
+                                escalonamientosProducto[escalonamiento.Escalonamiento__c] = escalonamiento
+                                // }  
+                            })
+                            if( idsProductos && idsProductos.length > 0 ) {
+                                // Obtener Productos comparados
+                                return ctcUtils.query('SELECT Id, ProductoCotizado__c, ProductoComparado__c, ProductoComparado__r.Name, ProductoComparado__r.Family, ProductoComparado__r.Red__c, ProductoComparado__r.Uso__c, ProductoComparado__r.Formato__c, ProductoComparado__r.ProductCode FROM ProductoComparado__c WHERE ProductoCotizado__c IN(' + idsProductos + ')')
+                            }
+                        })
+                        .then( function( res ) {
+                            // Resultado Productos comparados
+                            // console.log('resultado comparados: ', res)
+                            var idUnicoComparado = {}
+                            angular.forEach( res, function( comparado, index ) {
+
+                                // Respaldar valores persistidos
+                                comparado.Id_BK = angular.copy(comparado.Id)
+                                comparado.Product2Id_BK = angular.copy(comparado.ProductoComparado__c)
+
+
+                                if( !productosComparados.hasOwnProperty(comparado.ProductoCotizado__c) ) {
+                                    productosComparados[comparado.ProductoCotizado__c] = []
+                                }  
+                                productosComparados[comparado.ProductoCotizado__c].push(comparado)
+                                // Obtener Ids de Productos comparados
+                                if( !idUnicoComparado.hasOwnProperty(comparado.Id) ) {
+                                    idUnicoComparado[comparado.Id] = true
+                                    if(idsProductos.length > 0) {
+                                        idsProductos += ', '
+                                    }
+                                    idsProductos += '\'' + comparado.Id + '\''
+
+                                    // Obtener Product2Id de almacenado en ProductoComparado__c
+                                    if( !idsProduct2Unico.hasOwnProperty(comparado.ProductoComparado__c) ) {
+                                        idsProduct2Unico[comparado.ProductoComparado__c] = true
+                                        if(idsProduct2.length > 0) {
+                                            idsProduct2 += ', '
+                                        }
+                                        idsProduct2 += '\'' + comparado.ProductoComparado__c + '\''
+                                    }
+                                }
+                            })
+                            if( idsProductos && idsProductos.length > 0 ) {
+                                return ctcUtils.query('SELECT Id, Concepto__c, PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, PartidaPresupuesto__c, ProductoComparadoID__c,Concepto_Tipo_Cargo__c FROM ProductoConcepto__c WHERE  Concepto__c != null AND (PartidaPresupuesto__c IN(' + idsProductos + ') OR ProductoComparadoID__c IN(' + idsProductos + '))')
+                            }
+                        })
+                        .then( function( res ) {
+                            //Separar ProductoConcepto__c por producto cotizado y producto comparado
+                            //Values to compare if an approved quote changes.
+                            ctcUtils.app.checkSecondApproval = false;
+                            ctcUtils.app.ComisionOriginal = 0;
+                            ctcUtils.app.EnvioRecurrenteOriginal = 0;
+                            ctcUtils.app.PrimerEnvioOriginal = 0;
+                            ctcUtils.app.StockOriginal = 0;
+                            ctcUtils.app.StockPrimerEnvioOriginal = 0;
+                            angular.forEach( res, function( productoCon, index ) {
+                                // Verificar si es producto cotizado ó es producto comparado
+                                var idSolucion = productoCon.PartidaPresupuesto__c ? productoCon.PartidaPresupuesto__c : (productoCon.ProductoComparadoID__c ? productoCon.ProductoComparadoID__c : '')
+
+                                if(idSolucion && idSolucion.length > 0 ) {
+                                    if( !productosConcepto.hasOwnProperty(idSolucion) ) {
+                                        productosConcepto[idSolucion] = []
+                                    }
+                                    productosConcepto[idSolucion].push(productoCon)
+                                }
+                                //Saving original concepts values.
+                                if (productoCon.PartidaPresupuesto__c != null) {
+                                    if (productoCon.Concepto_Tipo_Cargo__c == 'Comisión por el servicio') {
+                                        ctcUtils.app.ComisionOriginal = productoCon.PrecioFinal__c;
+                                        ctcUtils.app.checkSecondApproval = true;
+                                    } else if (productoCon.Concepto_Tipo_Cargo__c == 'Cargo por envío - Recurrente') {
+                                        ctcUtils.app.EnvioRecurrenteOriginal = productoCon.Bonificacion__c;
+                                        ctcUtils.app.checkSecondApproval = true;
+                                    } else if (productoCon.Concepto_Tipo_Cargo__c == 'Cargo del primer envío') {
+                                        ctcUtils.app.PrimerEnvioOriginal = productoCon.Bonificacion__c;
+                                        ctcUtils.app.checkSecondApproval = true;
+                                    } else if (productoCon.Concepto_Tipo_Cargo__c == 'Tarjeta titular / Stock') {
+                                        ctcUtils.app.StockOriginal = productoCon.Bonificacion__c;
+                                        ctcUtils.app.checkSecondApproval = true;
+                                    } else if (productoCon.Concepto_Tipo_Cargo__c == 'Tarjeta titular / Stock - primer envío') {
+                                        ctcUtils.app.StockPrimerEnvioOriginal = productoCon.Bonificacion__c;
+                                        ctcUtils.app.checkSecondApproval = true;
+                                    } 
+                                } 
+                            })
+
+                            // Obetner Conceptos y Caracteristicas por Product2Id
+                            if( idsProductos && idsProductos.length > 0 ) {
+                                return ctcUtils.obtenerConceptosCaracteristicasPorProducto( idsProduct2 )
+                            }
+                        })
+                        .then( function( res ) {
+
+                            // console.log('obtenerConceptosCaracteristicasPorProducto: ', res)
+
+                            var conceptos = res && res.conceptos ? res.conceptos : {}
+                            var caracteristicas = res && res.caracteristicas ? res.caracteristicas : {}
+
+                            // Asignar ProductoConcepto__c, ProductoComparado__c y Concepto__c a QuoteLineItem(Producto Cotizado)
+                            angular.forEach( cotizacion.productos, function( producto, index ) {
+
+                                var todosConceptos = []
+                                producto.comparados = productosComparados[producto.Id] || [{}]
+                                producto.conceptos = conceptos[producto.Product2Id] || []
+                                producto.caracteristicas = caracteristicas[producto.Product2Id] || []
+                                producto.productoConcepto = productosConcepto[producto.Id] || []
+                                producto.escalonamientos = escalonamientosProducto[producto.Id] || {}
+                                if( producto.escalonamientos.Escalonamiento__c ) {
+                                    producto.escalonamientos.total += producto.UnitPrice
+                                }
+                                if( cotizacion._otraFamilia ) {
+                                    producto.soluciones = []
+                                } else {
+                                    producto.soluciones = ctcUtils.obtenerSoluciones(producto.Product2Id, ctcUtils.app.soluciones)
+                                }
+
+                                ctcUtils.defineConceptosKey( producto )
+
+                                todosConceptos = todosConceptos.concat(producto.conceptos)
+
+                                // Asignar Concepto__c y ProductoConcepto__c a ProductoComparado__c
+                                angular.forEach( producto.comparados, function( comparado, comparado_index ) {
+
+                                    if( cotizacion._otraFamilia ) {
+                                        producto.soluciones.push(comparado.ProductoComparado__r)
+                                    }
+
+                                    comparado.conceptos = conceptos[comparado.ProductoComparado__c] || []
+                                    comparado.caracteristicas = caracteristicas[comparado.ProductoComparado__c] || []
+                                    comparado.productoConcepto = productosConcepto[comparado.Id] || []  
+
+                                    ctcUtils.defineConceptosKey( comparado )
+
+                                    todosConceptos = todosConceptos.concat(comparado.conceptos)
+
+                                    // Crear columnas por cada ProductoComparado__c
+                                    var nuevosCampos = [
+                                        angular.copy(ctcUtils.app.schema.Concepto__c.Importe__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.PrecioFinal__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.VigenciaDescuento__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.CantidadTarjetas__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Concepto_Tipo_Cargo__c)
+                                    ]
+                                    angular.forEach( nuevosCampos, function( nuevoCampo, nuevoCampo_index ) {
+                                        nuevoCampo.index = comparado_index
+                                    })
+
+                                    if( !producto.columnasComparado ) {
+                                        producto.columnasComparado = []
+                                    }
+                                    producto.columnasComparado = producto.columnasComparado.concat(nuevosCampos)
+                                })
+
+                                // Obtener conceptos únicos por QuoteLineItem y ProductoComparado__c
+                                ctcUtils.obtenerConceptosUnicos(todosConceptos, producto)
+                                //DYAMPI
+                                producto.Product2Id__o = {Id: producto.Product2.Family, ProductCode: producto.Product2.ProductCode,AplicaSegmento__c:producto.Product2.AplicaSegmento__c}
+
+                                ctcUtils.calculaComision( producto, false )
+                            })
+                            cotizacion.tab = 0
+
+                            cotizacion.Render = true
+                            cotizacion.loading = false
+                            
+                            if( cotizacion.productos.length < 1 ) {
+                                var nuevosCampos = [
+                                    angular.copy(ctcUtils.app.schema.Concepto__c.Importe__c),
+                                    angular.copy(ctcUtils.app.schema.ProductoConcepto__c.PrecioFinal__c),
+                                    angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c),
+                                    angular.copy(ctcUtils.app.schema.ProductoConcepto__c.VigenciaDescuento__c),
+                                    angular.copy(ctcUtils.app.schema.ProductoConcepto__c.CantidadTarjetas__c),
+                                    angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Concepto_Tipo_Cargo__c),
+                                ]
+                                angular.forEach( nuevosCampos, function( nuevoCampo, nuevoCampo_index ) {
+                                    nuevoCampo.index = 0
+                                })
+
+                                var contactId = ctcUtils.app.representante.Id ? ctcUtils.app.representante.Id : (ctcUtils.app.contacts && ctcUtils.app.contacts[0] ? ctcUtils.app.contacts[0].Id : undefined)
+
+                                cotizacion.productos.push({comparados:[{}], ServiceDate: ctcUtils.app.opportunity.CloseDateLong, columnasComparado: nuevosCampos})
+                            }
+
+                            if( ctcUtils.app.opportunity.StageName != 'Cotización' || ( ctcUtils.app.opportunity && ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c == 'true' ) || !cotizacion.IsSyncing || cotizacion._otraFamilia ) {
+                                cotizacion.Editable = false
+                                ctcUtils.bloquearCotizacion(cotizacion, true)
+
+                                /*if( ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c == 'true' && !ctcUtils.app.notified ) {
+                                    ctcUtils.app.notified = true
+                                    $timeout( function() {
+                                        ctcUtils.showError('Su cotización requiere de aprobación, favor de revisar el historial de aprobación para mayor detalle.', 'Cotización en proceso de aprobación')   
+                                    }, 300)
+                                }*/
+
+                            } else {
+                                cotizacion.Editable = true
+                            }
+
+                            ctcUtils.showProcess(false, 'Cargando cotización')
+
+                            console.log('\n\n Cotizacion seleccionada: ', cotizacion, '\n\n')
+                            // ctcUtils.cotizacionSoloLectura( cotizacion )
+                            // console.log('\n\n Cotizacion seleccionada: ', cotizacion, '\n productosConcepto: ', productosConcepto, '\n\n')
+
+                        }).catch( function( err ) {
+                            cotizacion.loading = false
+                            ctcUtils.showProcess(false, 'Cargando cotización')
+                            ctcUtils.showError( err )
+                        })
+                    } else {
+                        ctcUtils.showProcess(false, 'Cargando cotización')
+                    }
+                }
+
+                vm.agregarContacto = function() {
+                    ctcUtils.openModal('agregarContacto', {}, 'md')
+                    .then( function( res ) { 
+                        vm.actualizaContactos()
+                    }).catch( function( err ) {
+                        // ctcUtils.showError( err )
+                    })
+                }
+
+                vm.actualizaContactos = function() {
+                    vm.contacts = []
+                    ctcUtils.app.contacts = []
+                    var accountId = ctcUtils.app.account.Id || ''
+                    if( accountId && accountId.length > 0 ) {
+                        vm.loadingContacts = true
+                        ctcUtils.query('SELECT Id, FirstName, LastName, Name, Puesto__c, Funcion__c FROM Contact WHERE Id in (select ContactId from AccountContactRelation where AccountId=\'' + accountId + '\') ORDER BY Name ASC')
+                        .then(function( res ) {
+
+                            vm.contacts = res || []
+                            vm.loadingContacts = false
+
+                            ctcUtils.app.contacts = vm.contacts
+
+                            var representante = ctcUtils.filter(ctcUtils.app.contacts, {Funcion__c: 'Representante Legal'}) 
+                            representante = representante.length > 0 ? representante[0] : {}
+                            ctcUtils.app.representante = representante
+                            
+
+                        }).catch(function( err ) {
+                            ctcUtils.showError(err)
+                            vm.loadingContacts = false
+                        })
+                    }
+                }
+
+                vm.agregarCotizacion = function() {
+                    var add = {Render: true, Editable: true}
+                    var length = vm.quotes.length  + 1
+                    add.Name = length < 10 ? ('Cotización 00' + length) : ('Cotización 0' + length)
+                    // add.productos = [{Etapa__c: 'Cotización', render: true}]
+                    add.AccountId = vm.account.Id
+                    add.OpportunityId = ctcUtils.app.opportunity.Id
+                    add.Familia__c = ctcUtils.app.opportunity.Familia__c
+                    add.disabled = {Familia__c: true}
+
+                    var representante = ctcUtils.filter(vm.contacts, {Funcion__c: 'Representante Legal'})
+                    if( representante && representante.length > 0 ) {
+                        add.ContactId = representante[0].Id
+                    } else {
+                        add.ContactId = vm.contacts && vm.contacts.length > 0 ? vm.contacts[0].Id : undefined
+                    }
+
+                    var nuevosCampos = [
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Concepto_Tipo_Cargo__c),
+                        angular.copy(ctcUtils.app.schema.Concepto__c.Importe__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.PrecioFinal__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.VigenciaDescuento__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.CantidadTarjetas__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Concepto_Tipo_Cargo__c)
+                    ]
+                    angular.forEach( nuevosCampos, function( nuevoCampo, nuevoCampo_index ) {
+                        nuevoCampo.index = 0
+                    })
+                    add.productos = [
+                        {
+                            comparados:[{}], 
+                            ServiceDate: ctcUtils.app.opportunity.CloseDateLong, 
+                            columnasComparado: nuevosCampos
+                        }
+                    ]
+
+                    vm.quotes.push(add)
+                    $timeout(function() {
+                        vm.selectedTab = vm.quotes.length - 1
+                        // vm.cotSeleccionada = vm.quotes[vm.tab]
+                    }, 150)
+                }
+
+                vm.duplicarCotizacion = function( cotizacion ) {
+
+                    ctcUtils.removeConfig = {icon: 'fa fa-clone fa-fw', confirm: 'Duplicar cotización', cancel: 'Cancelar', showRemove: true, headerClass: 'modal-header-danger'}
+
+                    // ctcUtils.openModal('eliminarObjeto', {instance: function () {return cotizacion}, title: function() {return 'Duplicar cotización ' + cotizacion.Name}, subTitle: function() {return 'Duplicar cotización ' + cotizacion.Name + '?'}}, 'md')
+                    ctcUtils.openModal('modalGenerico', {instance: function () {return cotizacion}, title: function() {return 'Duplicar cotización ' + cotizacion.Name}, subTitle: function() {return 'Duplicar cotización ' + cotizacion.Name + '?'}}, 'md')
+                    .then( function() {
+                        ctcUtils.showProcess(true, 'Duplicando cotización')
+                        var length = ctcUtils.app.cots.length  + 1
+                        var clone = angular.copy(cotizacion)
+                        clone.Name = 'Cotización ' + (length > 9 ? '0': '00') + length
+                        clone.IsClone = true
+                        clone.Editable = true
+                        delete clone.formCotiza
+                        delete clone.IsSyncing
+
+                        angular.forEach( clone.productos , function( producto, index ) {
+                            producto.IsClone = true
+                            if( producto.conceptosKey ) {
+                                angular.forEach(Object.keys(producto.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                    var concepto = producto.conceptosKey[conceptoKey] || {}
+                                    concepto.IsClone = true
+                                })
+                            }
+
+                            angular.forEach( producto.comparados , function( comparado, index_comparado ) {  
+                                comparado.IsClone = true
+                                if( comparado.conceptosKey ) {
+                                    angular.forEach(Object.keys(comparado.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                        var concepto = comparado.conceptosKey[conceptoKey] || {}
+                                        concepto.IsClone = true
+                                    })
+                                }
+                            })
+                        })
+
+
+                        console.log('\n\n clone: ', clone, '\n\n')
+                        ctcUtils.bloquearCotizacion(clone, false)
+
+                        ctcUtils.app.cots.push(clone)
+                        $timeout( function() {
+                            ctcUtils.app.selectedTab = ctcUtils.app.cots.length - 1
+                            vm.selectedTab = ctcUtils.app.selectedTab
+                            $timeout( function() {
+                                ctcUtils.showProcess(false, 'Duplicando cotización')
+                            }, 300)
+                        }, 300)
+
+                    })
+
+
+                    /*var modal = $uibModal.open({
+                        animation: true,
+                        keyboard: false,
+                        backdrop: 'static',
+                        templateUrl: 'duplicarCotizacion.html',
+                        controller: 'DuplicarCotizacionCtrl',
+                        controllerAs: 'sc',
+                        size: 'md',
+                        resolve: {
+                            data: function () {
+                                return {cot : vm, cotizacion : cotizacion, productos: productos}
+                            }
+                        }
+                    })
+
+                    modal.result.then(function (instance) {
+                        console.log('finish clone: ', angular.copy(instance), '\n ctcUtils.app.selectedTab: ', ctcUtils.app.selectedTab, '\n vm.selectedTab: ', vm.selectedTab)
+                        vm.selectedTab = ctcUtils.app.selectedTab
+                        ctcUtils.bloquearCotizacion(instance, false)
+
+                        
+                    }, function () {
+                        
+                    })*/
+                }
+
+                /*
+                    * @author calvarez@ctconsulting.com.mx
+                    * @date 2016
+                    * @param cotizacion objeto Quote {Id: 'QuoteIdSalesforce'}
+                    * @description Guarda cambios de toda la cotizacion
+                */
+                vm.preGuardado = function(cotizacion) {
+                    var finalApprovalLevels = []
+                    if (ctcUtils.app.checkSecondApproval == true && ctcUtils.app.quoteRejected == false) {
+                        //If the quote has already been approved, it compares original values versus changed values.
+                        finalApprovalLevels.push(1);
+                    		angular.forEach( cotizacion.productos, function( producto, index ) {
+                                angular.forEach( producto.conceptosUnicos, function( productoCon, index ) {
+                                    if(productoCon.TipoCargo__c == 'Comisión por el servicio' && productoCon.PrecioFinal2__c < ctcUtils.app.ComisionOriginal && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
+                                    	finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                                    } else if (productoCon.TipoCargo__c == 'Cargo por envío - Recurrente' && (productoCon.Bonificacion__c > ctcUtils.app.EnvioRecurrenteOriginal || producto.NumberOfShipments__c > ctcUtils.app.dirEntregaOriginal && ctcUtils.app.approvalEnvioRecurrente != undefined)) {
+                                        finalApprovalLevels.push(ctcUtils.app.approvalEnvioRecurrente);
+                                    } else if (productoCon.TipoCargo__c == 'Cargo del primer envío' && productoCon.Bonificacion__c > ctcUtils.app.PrimerEnvioOriginal && ctcUtils.app.approvalPrimerEnvio != undefined) {
+                                       	finalApprovalLevels.push(ctcUtils.app.approvalPrimerEnvio);
+                                    } else if (productoCon.TipoCargo__c == 'Tarjeta titular / Stock' && productoCon.Bonificacion__c > ctcUtils.app.StockOriginal && ctcUtils.app.approvalStock != undefined) {
+                                        finalApprovalLevels.push(ctcUtils.app.approvalStock);
+                                    } else if (productoCon.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' && productoCon.Bonificacion__c > ctcUtils.app.StockPrimerEnvioOriginal && ctcUtils.app.approvalStockPrimerEnvio != undefined) {
+                                       	finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
+                                    }
+                                    
+                                })                            
+                            })
+                        
+                    } else {
+                        //If the quote is not approved, it follows the normal path without compare values.
+                        if(ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
+                        	finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                        }
+                        if(ctcUtils.app.approvalEnvioRecurrente != undefined) {
+                            finalApprovalLevels.push(ctcUtils.app.approvalEnvioRecurrente);
+                        }
+                        if(ctcUtils.app.approvalPrimerEnvio != undefined) {
+                            finalApprovalLevels.push(ctcUtils.app.approvalPrimerEnvio);
+                        }
+                        if(ctcUtils.app.approvalStock != undefined) {
+                            finalApprovalLevels.push(ctcUtils.app.approvalStock);
+                        }
+                        if(ctcUtils.app.approvalStockPrimerEnvio != undefined) {
+                            finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
+                        }
+                    }
+                    ctcUtils.app.finalApprovalLevel = Math.max(...finalApprovalLevels);
+                    //console.log('El nivel de aprobación final es: ' + ctcUtils.app.finalApprovalLevel);
+                    let approvalLevel = ctcUtils.app.finalApprovalLevel;
+                    if(approvalLevel == 0 || approvalLevel == 1) {
+                        vm.guardaCotizacion(cotizacion, null);
+                    } else{
+                        ctcUtils.openModal('SendApproval', {cotizacion: function () {return cotizacion }}, 'md');
+                    }   
+                }
+                
+                ctcUtils.guardaCotizacionConAprobacion = function(cotizacion, aprobacion) {
+                    //console.log('Guardando cotización con aprobación.')
+                    vm.guardaCotizacion(cotizacion, aprobacion);                
+                }
+                
+                vm.guardaCotizacion = function( cotizacion, aprobacion ) {
+                    cotizacion.guardando = true
+                    ctcUtils.showProcess(true, 'Guardando cotización')
+
+                    var opportunity = ctcUtils.app.opportunity || {}
+                    vm.class = ''
+                    vm.errors = []
+
+                    console.log('\n\n Cotización a guardar: ', cotizacion)
+                    var payload = {}
+                    var payloadIds2Delete = {
+                        QuoteLineItem           : [],
+                        ProductoConcepto__c     : [],
+                        ProductoComparado__c    : [],
+                        unique                  : {}
+                    }
+                    //id de la oportunidad que se va a guardar
+                    var payloadOpportunity = {
+                        Id          : opportunity.Id
+                    }
+
+                    //datos de cotizacion que se van a guardar 
+                    // Arma Quote a Guardar
+                    var payloadQuote = {
+                        ContactId               : cotizacion.ContactId,
+                        OpportunityId           : cotizacion.OpportunityId,
+                        // Name                    : cotizacion.Name,
+                        Familia__c              : cotizacion.Familia__c,
+                        VigenciaCotizacion__c   : cotizacion.VigenciaCotizacion__c
+                    }
+
+                    // Verificar que Quote tiene Id y IsClone == false ó IsClone no existe
+                    if( cotizacion.Id && !cotizacion.IsClone ) {
+                        payloadQuote.Id = cotizacion.Id
+                    }
+
+                    // Verificar si alguno de los ProductoConcepto__c ya estaba persistido pe ahora se deshabilitó
+                    if( !cotizacion.hasOwnProperty('Ids2Delete') ) {
+                        cotizacion.Ids2Delete = {}
+                    }
+                    angular.forEach( cotizacion.productos, function( producto, index ) {
+                        
+                        if( producto.conceptosKey ) {
+                            angular.forEach(Object.keys(producto.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                var concepto = producto.conceptosKey[conceptoKey]
+                                if( concepto.IdProductoConcepto__c && !concepto.Render ) {
+                                    cotizacion.Ids2Delete[concepto.IdProductoConcepto__c] = true
+                                    delete concepto.IdProductoConcepto__c
+                                }
+                            })
+                        }
+
+                        angular.forEach( producto.comparados, function( comparado, index_comparado ) {
+                            if( comparado.ProductoComparado__c && comparado.ProductoComparado__c__o && comparado.conceptosKey ) {
+                                angular.forEach(Object.keys(comparado.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                    var concepto = comparado.conceptosKey[conceptoKey]
+                                    if( concepto.IdProductoConcepto__c && !concepto.Render ) {
+                                        cotizacion.Ids2Delete[concepto.IdProductoConcepto__c] = true
+                                        delete concepto.IdProductoConcepto__c
+                                    }
+                                })
+                            }
+                        })
+                    })
+
+
+
+
+                    // Arma Ids a eliminar
+                    if( cotizacion.Ids2Delete ) {
+                        var prefix = ctcUtils.app.prefix || {}
+                        for(var id in cotizacion.Ids2Delete) {
+                            if(id != 'undefined') {
+                                var prefixId = id.substring(0, 3)
+                                if(prefix.hasOwnProperty(prefixId) && !payloadIds2Delete.unique.hasOwnProperty(id)) {
+                                    payloadIds2Delete.unique[id] = true
+                                    payloadIds2Delete[prefix[prefixId].name].push(id)
+                                }
+                            }
+                        }
+                    }
+
+                    // Arma QuoteLineItem, ProductoComparado__c y ProductoConcepto__c
+                    var payloadQuoteLineItem            = []
+                    var payloadProductoComparado__c     = []
+                    var payloadProductoConcepto__c      = []
+
+                    var payloadIndexProductoComparado   = {}
+                    var payloadIndexPConceptoCotizado   = {}
+                    var payloadIndexPConceptoComparado  = {}
+                    var payloadIdsConEscalonamiento     = {}
+
+                    var indexComparado = 0
+                    var indexPCCotizado = 0
+                    var indexPCComparado = 0
+                    var uniqueIdProductoConcepto = {}
+
+                    angular.forEach( cotizacion.productos, function( producto, index ) {
+
+                        producto.Total_Descuento__c = 0
+                        producto.Cantidad_Descuento__c = 0
+
+                        producto.Cantidad_Descuento_Positivo__c = 0
+                        producto.Total_Descuento_Positivo__c = 0
+
+                        if( producto.IsClone && producto.escalonamientos && producto.escalonamientos.Escalonamiento__c ) {
+                            payloadIdsConEscalonamiento[producto.Id] = index
+                        }
+
+                        //Arma ProductoConcepto__c de Producto Cotizado
+                        if( producto.conceptosKey ) {
+                            angular.forEach(Object.keys(producto.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                var concepto = producto.conceptosKey[conceptoKey]
+                                // if( concepto.SinEdicion__c || ( !concepto.SinEdicion__c && concepto.Render ) ) {
+                                if( concepto.Render ) {
+                                    var payloadConcepto = vm.guardaProductoConcepto(concepto, false)
+                                    if( !payloadConcepto.Id || ( payloadConcepto.Id && !uniqueIdProductoConcepto.hasOwnProperty(payloadConcepto.Id) ) ) {
+
+                                        uniqueIdProductoConcepto[payloadConcepto.Id] = true
+                                        payloadProductoConcepto__c.push(payloadConcepto)
+                                        payloadIndexPConceptoCotizado[indexPCCotizado++] = index
+
+                                        if( concepto && concepto.Bonificacion__c && !isNaN(concepto.Bonificacion__c) && isFinite(concepto.Bonificacion__c) && concepto.Bonificacion__c != 0 ) {
+                                            producto.Cantidad_Descuento__c += 1
+                                            producto.Total_Descuento__c += parseFloat(concepto.Bonificacion__c)
+                                        }
+
+                                        if( concepto && concepto.Bonificacion__c && ctcUtils.number(concepto.Bonificacion__c) > 0 ) {
+                                            producto.Cantidad_Descuento_Positivo__c += 1
+                                            producto.Total_Descuento_Positivo__c += ctcUtils.number(concepto.Bonificacion__c)
+                                        }
+
+                                    }
+                                }
+                            })
+                        }
+
+                        var payloadQLI = vm.guardaProductoCotizado(producto, opportunity.CloseDate)
+                        payloadQuoteLineItem.push(payloadQLI)
+
+                        // Arma ProductoComparado__c
+                        angular.forEach( producto.comparados, function( comparado, index_comparado ) {
+                            // console.log('comparado: ', comparado.ProductoComparado__c)
+                            if( comparado.ProductoComparado__c && comparado.ProductoComparado__c__o ) {
+                                var payloadComparado = vm.guardaProductoComparado(comparado)
+                                payloadProductoComparado__c.push(payloadComparado)
+                                payloadIndexProductoComparado[indexComparado] = index
+
+                                //Arma ProductoConcepto__c de Producto Comparado
+                                if( comparado.conceptosKey ) {
+                                    angular.forEach(Object.keys(comparado.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                        var concepto = comparado.conceptosKey[conceptoKey]
+                                        // if( concepto.SinEdicion__c || ( !concepto.SinEdicion__c && concepto.Render ) ) {
+                                        if( concepto.Render ) {
+                                            var payloadConcepto = vm.guardaProductoConcepto(concepto, true)
+                                            if( !payloadConcepto.Id || ( payloadConcepto.Id && !uniqueIdProductoConcepto.hasOwnProperty(payloadConcepto.Id) ) ) {
+                                                uniqueIdProductoConcepto[payloadConcepto.Id] = true
+                                                payloadProductoConcepto__c.push(payloadConcepto)
+                                                payloadIndexPConceptoComparado[indexPCComparado++] = indexComparado
+                                            }
+                                        }
+                                    })
+                                }
+                                indexComparado++
+                            }
+                        })
+
+
+                    })
+
+                    delete payloadIds2Delete.unique
+
+                    payload.Opportunity              = payloadOpportunity
+                    payload.Quote                    = payloadQuote
+                    payload.QuoteLineItem            = payloadQuoteLineItem
+                    payload.ProductoComparado__c     = payloadProductoComparado__c
+                    payload.IndexProductoComparado   = payloadIndexProductoComparado
+                    payload.ProductoConcepto__c      = payloadProductoConcepto__c
+                    payload.IndexPConceptoCotizado   = payloadIndexPConceptoCotizado
+                    payload.IndexPConceptoComparado  = payloadIndexPConceptoComparado
+                    payload.Ids2Delete               = payloadIds2Delete
+                    payload.IdsConEscalonamiento     = payloadIdsConEscalonamiento
+
+                    console.log('\n\n payload: ', payload, '\n\n')
+
+                    /*var isAppro=false
+                    
+                    angular.forEach( payload.ProductoConcepto__c, function( producto, index ){
+                        if(producto.Bonificacion__c>0&&producto.EsProductoComparado__c===false&&producto.Concepto_Tipo_Cargo__c==='Comisión por el servicio'){
+                            if(!confirm('La comisión por servicio capturada es menor a la tarifa recomendada. Da clic en Aceptar para Aprobación o Cancelar para continuar con la tarifa recomendada. ') ){
+                                 isAppro=true                                 
+                             }
+                        }
+                     })
+                    if(isAppro){
+                        ctcUtils.showProcess(false, 'Guardando cotización')
+                        cotizacion.guardando = false
+                        ctcUtils.showError( 'la cotizacion no fue guardada, debe cambiar la comision' )
+                        return
+                    }*/
+
+
+
+                    
+
+                    console.log('\n\n ya no estoy: ', payload, '\n\n')
+
+                    ctcUtils.remote('PLAN_CuentaService.guardaCotizacion')(JSON.stringify(payload),JSON.stringify(aprobacion))
+                    .then( function( res ) {
+                        
+                        var opportunity_update = res.SOQL_Opportunity
+                        if( res.error ) {
+                            vm.class = 'slds-theme--error'
+                            vm.errors = [res.error]
+
+                            if( opportunity_update ) {
+
+                                cotizacion.Editable = false
+                                ctcUtils.bloquearCotizacion(cotizacion, true)
+
+                            }
+
+                        } else {
+                            var isCreated = res.Upsert_Quote.created
+
+                            cotizacion.Id = res.Upsert_Quote.id
+                            cotizacion.Name = angular.isArray(res.Instance_Quote) ? res.Instance_Quote[0].Name : res.Instance_Quote.Name
+                            cotizacion.IsSyncing = angular.isArray(res.Instance_Quote) ? res.Instance_Quote[0].IsSyncing : res.Instance_Quote.IsSyncing
+
+                            
+
+                             if( opportunity_update ) {
+                                ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c = "true"
+                                
+                                vm.class = 'slds-theme--error'
+                                vm.errors = [cotizacion.Name + (isCreated ? ' creada.' : ' actualizada.') + ' Su cotización requiere de aprobación, favor de revisar el historial de aprobación para mayor detalle.']
+
+                                cotizacion.Editable = false
+                                ctcUtils.bloquearCotizacion(cotizacion, true)
+
+                            } else {
+                                //Deloperfreeeay 
+                                //mensajes de error para cuando se actualiza o se crea isCreated
+                                vm.class = 'slds-theme--success'
+                                vm.errors = [cotizacion.Name + (isCreated ? ' creada.' : ' actualizada.')]
+
+
+                                $timeout( function(){
+                                    vm.errors = []
+                                }, 6000)
+                            }
+
+                            if( isCreated ) {
+                                // angular.forEach( vm.quotes, function( cotizacion_existente, index_cotizacion_existente ) {
+                                //     cotizacion_existente.IsSyncing = cotizacion_existente.Id === cotizacion.Id
+                                //     // cotizacion_existente.Editable = cotizacion_existente.IsSyncing && ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c !== "true"
+                                //     ctcUtils.bloquearCotizacion(cotizacion, !cotizacion_existente.Editable && cotizacion_existente.IsSyncing )
+                                //     // console.log('\n\n\n cotizacion: ', cotizacion_existente.Name, '\n Datos:', angular.copy(v))
+                                // })
+
+                                if(vm.quotes && vm.quotes.length > 0) {
+                                    angular.forEach(vm.quotes, function( cotizacion_existente, index ) {
+                                        cotizacion_existente.IsSyncing = cotizacion_existente.Id === cotizacion.Id
+                                        cotizacion_existente.Editable = cotizacion_existente.IsSyncing && ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c !== "true"
+                                        ctcUtils.bloquearCotizacion(cotizacion_existente, !cotizacion_existente.Editable)
+                                    })
+                                }
+
+                            }
+
+                            var indexProductoComparado_sf = 0
+                            var indexProductoConcepto_sf = 0
+
+                            // Recupera y asigna Id de producto -QuoteLineItem- insertado ó actualizado
+                            var Upsert_QuoteLineItem        = res.Upsert_QuoteLineItem || []
+                            var Upsert_ProductoComparado__c = res.Upsert_ProductoComparado__c || []
+                            var Upsert_ProductoConcepto__c  = res.Upsert_ProductoConcepto__c || []
+                            var PricebookEntry = res.PricebookEntry || {}
+
+                            // console.log('Upsert_ProductoConcepto__c: ', Upsert_ProductoConcepto__c)
+
+                            angular.forEach( cotizacion.productos, function( producto, index ) {
+                                delete producto.IsClone
+                                producto.Id = Upsert_QuoteLineItem[index].id
+                                producto.PricebookEntryId = PricebookEntry[producto.Product2Id] ? PricebookEntry[producto.Product2Id].Id : undefined
+
+                                producto.Id_BK = angular.copy(producto.Id)
+                                producto.Product2Id_BK = angular.copy(producto.Product2Id)
+
+                                angular.forEach( Object.keys(producto.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                    var productoConcepto = producto.conceptosKey[conceptoKey]
+                                    delete productoConcepto.IsClone
+                                    if( productoConcepto && productoConcepto.Render ) {
+                                        // console.log('indexProductoConcepto_sf: ', indexProductoConcepto_sf)
+                                        productoConcepto.IdProductoConcepto__c = Upsert_ProductoConcepto__c[indexProductoConcepto_sf++].id
+                                    }
+                                })
+
+                                // Recupera y asigna Id de comparado -ProductoComparado__c- insertado ó actualizado
+                                angular.forEach( producto.comparados, function( comparado, index_comparado ) {
+                                    delete comparado.IsClone
+                                    if( comparado.ProductoComparado__c && comparado.ProductoComparado__c__o ) {
+                                        comparado.Id = Upsert_ProductoComparado__c[indexProductoComparado_sf++].id
+
+                                        comparado.Id_BK = angular.copy(comparado.Id)
+                                        comparado.Product2Id_BK = angular.copy(comparado.ProductoComparado__c)
+
+                                        angular.forEach( Object.keys(comparado.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                            var productoConcepto = comparado.conceptosKey[conceptoKey]
+                                            delete productoConcepto.IsClone
+                                            if( productoConcepto && productoConcepto.Render ) {
+                                                // console.log('indexProductoConcepto_sf comparado: ', indexProductoConcepto_sf)
+                                                productoConcepto.IdProductoConcepto__c = Upsert_ProductoConcepto__c[indexProductoConcepto_sf++].id
+                                            }
+                                        })
+                                    }
+                                })
+
+
+
+
+                            })
+
+
+                        }
+                        cotizacion.Ids2Delete = {}
+                        delete cotizacion.IsClone
+                        console.log('\n\n Response PLAN_CuentaService.guardaCotizacion: ', res, '\n\n cotizacion persistida: ', cotizacion, ' \n\n ' )
+
+                        // angular.forEach( ctcUtils.app., function(value, key){
+                            
+                        // });
+
+                        ctcUtils.showProcess(false, 'Guardando cotización')
+                        cotizacion.guardando = false
+
+                    }).catch( function( err ) {
+                        ctcUtils.showProcess(false, 'Guardando cotización')
+                        ctcUtils.showError( err )
+                        cotizacion.guardando = false
+                    })
+                }
+
+                vm.guardaProductoCotizado = function( producto, closeDate ) {
+                    var ret = {}
+                    ret.Product2Id                      = producto.Product2Id
+                    ret.ComentariosCotizacion__c        = producto.ComentariosCotizacion__c
+                    ret.CantidadTarjetas__c             = producto.CantidadTarjetas__c ? producto.CantidadTarjetas__c : 0
+                    ret.Quantity                        = 1,//Siempre es 
+                    ret.UnitPrice                       = producto.UnitPrice ? producto.UnitPrice : 0
+                    ret.FormaPago__c                    = producto.FormaPago__c ? producto.FormaPago__c : ''
+                    ret.OpcionesMetodoPago__c           = producto.DATA_OpcionesMetodoPago__c && producto.DATA_OpcionesMetodoPago__c.length > 0 ? producto.OpcionesMetodoPago__c : null
+                    ret.TarjetaAsociada__c              = producto.DATA_OpcionesMetodoPago__c && producto.DATA_OpcionesMetodoPago__c.length > 0 ? producto.TarjetaAsociada__c: null
+                    ret.ClabeInterbancaria__c           = producto.DATA_OpcionesMetodoPago__c && producto.DATA_OpcionesMetodoPago__c.length > 0 ? producto.ClabeInterbancaria__c : null
+                    ret.TipoAmex__c                     = producto.FormaPago__c == 'American Express' ? producto.TipoAmex__c : null
+                    ret.NivelConsumo__c                 = producto.FormaPago__c == 'American Express' ? producto.NivelConsumo__c : null
+                    ret.OtroMetodoPago__c               = producto.FormaPago__c == 'Otros' ? producto.OtroMetodoPago__c : null
+                    ret.Cantidad_Descuento__c           = producto.Cantidad_Descuento__c
+                    ret.Total_Descuento__c              = producto.Total_Descuento__c
+                    ret.Cantidad_Descuento_Positivo__c  = producto.Cantidad_Descuento_Positivo__c
+                    ret.Total_Descuento_Positivo__c     = producto.Total_Descuento_Positivo__c
+                    ret.NumberOfShipments__c            = producto.NumberOfShipments__c
+                    /*if((!producto.ServiceDate || !producto.Id ) || producto.IsClone ) {
+                        ret.ServiceDate = new Date(closeDate)
+                        ret.ServiceDate = ret.ServiceDate.getFullYear() + '-' + (ret.ServiceDate.getMonth() + 1) + '-' + ret.ServiceDate.getUTCDate()
+                    }*/
+                    if( producto.Id && !producto.IsClone ) {//verificar si ya tiene Id el producto cotizado
+                        ret.Id = producto.Id//El registro se actualizará
+                    }
+
+                    ret.Escalonamiento1__c = producto.escalonamientos != undefined && producto.escalonamientos.Escalonamiento__c != undefined
+
+                    return ret
+                }
+
+                vm.guardaProductoComparado = function( comparado ) {
+                    var ret = {}
+                    ret.ProductoComparado__c = comparado.ProductoComparado__c
+                    if( comparado.Id && !comparado.IsClone ) {
+                        ret.Id = comparado.Id
+                    }
+
+                    return ret
+                }
+
+                vm.guardaProductoConcepto = function( productoConcepto, esComparado ) {
+                    var ret = {}
+                    console.log('************'+productoConcepto.TipoCargo__c);
+                                        console.log('************'+productoConcepto.PrecioLista2__c);
+                    ret.Concepto__c             = productoConcepto.Id
+                    ret.Bonificacion__c         = productoConcepto.SinEdicion__c ? 0 : productoConcepto.Bonificacion__c
+                    ret.PrecioLista2__c         = productoConcepto.PrecioLista2__c ? productoConcepto.PrecioLista2__c : 0
+
+                    ret.Concepto_Tipo_Cargo__c  = productoConcepto.TipoCargo__c 
+                    ret.EsProductoComparado__c  = esComparado
+                    ret.CantidadTarjetas__c     = ret.Bonificacion__c  ? productoConcepto.CantidadTarjetas__c : 0
+
+                    if( productoConcepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                        ret.PrecioFinal__c      = productoConcepto.PrecioFinal2__c ? productoConcepto.PrecioFinal2__c : 0
+
+                    } else {
+                        ret.PrecioFinal__c      = productoConcepto.PrecioFinal__c ? productoConcepto.PrecioFinal__c : 0
+                    }
+
+                    if ( productoConcepto.VigenciaDescuento__c && ret.Bonificacion__c ) {
+                        var str = productoConcepto.VigenciaDescuento__c.split('\/')
+                        ret.VigenciaDescuento__c = str[2] + '-' + str[1] + '-' + str[0]
+                    } else {
+                        ret.VigenciaDescuento__c = null
+                    }
+
+                    if( productoConcepto.IdProductoConcepto__c && !productoConcepto.IsClone ) {
+                        ret.Id = productoConcepto.IdProductoConcepto__c
+                    }
+
+
+                    // ret.PartidaPresupuesto__c = idCotizado
+                    // ret.ProductoComparadoID__c = idComparado
+                    
+                    return ret
+                }
+
+            }
+        })()
+    </script>
+</apex:component>

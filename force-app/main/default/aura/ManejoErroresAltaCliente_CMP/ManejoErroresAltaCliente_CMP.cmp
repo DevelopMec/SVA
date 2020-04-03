@@ -1,0 +1,24 @@
+<aura:component >
+    <aura:attribute name="info" type="List" default="[{'subCuenta':'01-30-12345-123','errores':['Error 1 prueba de error con texto largo para visualización en vairas lineas, dependiendo del tamaño del diseño,Error 1 prueba de error con texto largo para visualización en vairas lineas, dependiendo del tamaño del diseño,Error 1 prueba de error con texto largo para visualización en vairas lineas, dependiendo del tamaño del diseño','Error 2','Error 3','Error 4']},{'subCuenta':'01-30-12345-124','errores':['Error 1','Error 2']},{'subCuenta':'01-30-12345-125','errores':['Error 1','Error 2']}]"/>
+    <div>
+        <aura:iteration items="{!v.info}" var="infoSub">
+            <div style="margin-top:10px;" class="demo-only demo-only--sizing slds-grid slds-wrap">
+                <div name="subTitulo" class="subCuentaClass slds-size_1-of-1">
+                    {!infoSub.subCuenta}
+                </div>
+                <aura:iteration items="{!infoSub.errores}" var="error" indexVar="index">
+                    <aura:if isTrue="{!index%2==0}">
+                        <div name="erroresList" class="izquierda errorClass" style="display:inline-block;">
+                            <lightning:dynamicIcon type="ellie" style="display:inline-block;margin-right:4px;"/>{!error}
+                        </div>
+                        <aura:set attribute="else">
+                            <div name="erroresList" class="derecha errorClass" style="display:inline-block;">
+                                <lightning:dynamicIcon type="ellie" style="display:inline-block;margin-right:4px;"/>{!error}
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </aura:iteration>
+            </div>
+        </aura:iteration>
+    </div>
+</aura:component>

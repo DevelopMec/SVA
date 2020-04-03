@@ -1,0 +1,26 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName" access="global">
+    <aura:attribute name="Legend" type="String" default="" description="Texto mostrado" />    
+    <aura:attribute name="perText" type="String" default="0%" description="Texto mostrado dentro del circulo(Se calcula automaticamente valor entero)" />
+    <aura:attribute name="cirDeg" type="String" default="0" description="calculo automatico" />
+    
+    <aura:attribute name="totalProgress" type="String" default="100" description="Progreso total" />
+    <aura:attribute name="actualProgress" type="String" default="0" description="progreso actual" />
+    
+    <aura:attribute name="theme" type="String" default="green" description="Color para el progreso: red, green, orange." />
+    <aura:attribute name="size" type="String" default="small" description="Tamaño de la barra circular: small, medium, big." />
+    
+    <aura:method name="fillBar" action="{!c.doInit}" access="PUBLIC"/>
+    <div class="clearFloats slds-align--absolute-center">        
+        <div class="{! ( v.cirDeg >
+                    179 ) ? 'container p50plus '+v.theme+' '+v.size : 'container '+v.theme +' '+v.size }">
+            <span>{!v.perText}</span>             
+            <div class="slice">                
+                <div class="bar" style="{! '-webkit-transform: rotate('+v.cirDeg+'deg); -moz-transform: rotate('+v.cirDeg+'deg); -ms-transform: rotate('+v.cirDeg+'deg); -o-transform: rotate('+v.cirDeg+'deg); transform: rotate('+v.cirDeg+'deg); -ms-transform: rotate('+v.cirDeg+'deg);'}"></div>                
+                <div class="fill"></div>
+            </div>
+        </div>
+    </div>
+    <div class="clearFloats slds-align--absolute-center legend"> 
+        {!v.Legend}
+    </div>
+</aura:component>

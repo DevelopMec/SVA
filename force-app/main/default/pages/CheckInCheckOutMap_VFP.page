@@ -1,0 +1,156 @@
+<apex:page applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" showHeader="false" sidebar="false" standardController="Event" standardStylesheets="false">
+	<html>
+		<head>
+			<meta charset="utf-8"/>
+			<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<style>
+				#map {
+					height: 300px;
+					width: 100%;
+				}
+			</style>
+			<script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"></script>
+			<apex:slds />
+		</head>
+		<body>
+			<apex:form id="form" style="display: none">
+				<apex:inputField value="{!Event.ValoracionCita__c}" required="true" id="SF_ValoracionCita__c"/>
+				<apex:inputField value="{!Event.ComentariosValoracion__c}" required="true" id="SF_ComentariosValoracion__c"/>
+			</apex:form>
+			
+			<div id="map"></div>
+			
+			<script type="text/javascript">
+				$(document).ready(function() {
+					//console.log("Entré");
+					sendToLC({ "action": "render", "status": "loaded", "vfHost": vfHost });
+				});
+				
+				var lexOrigin = 'https://{!$CurrentPage.parameters.lcHost}';
+				var data = {};
+				var vfHost = "{!LEFT($CurrentPage.URL,FIND('/',$CurrentPage.URL,9))}";
+				var coordinatesInitital = {}
+				
+				window.addEventListener("message", function(message) {
+					//console.log("VFP - Incoming message:", message);
+					message = message && message.data ? message.data : undefined;
+					if(message) {
+						var action = message.action || "Unknown";
+						//console.log("Action recieved from the LC:", action);
+						if (action == "loadGoogleMap") {
+							coordinatesInitital = message.coordinates || {}
+							var script = document.createElement("script");
+							script.async = true;
+							script.defer = true;
+							script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAXyFTetFpascee-eGm8zaXkXb6NYcgW_0&callback=initMap";
+							//document.getElementsByTagName("head")[0].appendChild(script);
+							document.getElementsByTagName("body")[0].appendChild(script);
+						} else if(action == "getDesiredPicklistValues") {
+							var desiredPicklistValues = changeFieldSF(message.field, message.value, message.fieldChild);
+							sendToLC({ "action": action, "status": "read", "vfHost": vfHost, "data": desiredPicklistValues });
+							//console.log("getDesiredPicklistValues, desiredPicklistValues:", desiredPicklistValues);
+						} else if (action == "getCurrentPositionData") {
+							//console.log("message:", message.coordinates, message.origin);
+							if (message.origin == "LoadEndLocation") {
+								showEndLocation(message.coordinates);
+							} else {
+								getPositionData(message.coordinates, message.origin);
+							}
+						}
+					} else {
+						//console.log("Error communicating with the LC");
+					}
+				}, false);
+				
+				function sendToLC(message) {
+					if(typeof(lexOrigin) != "undefined") {
+						parent.postMessage(message, lexOrigin);
+					}
+				}
+				
+				//sendToLC({ "action": "render", "status": "loaded", "vfHost": vfHost });
+				
+				var map = {};
+				var positionData = {};
+				
+				function initMap() {
+					/*if ("geolocation" in navigator) {
+						
+					} else {
+						
+					}*/
+					
+					// if (navigator.geolocation) {
+						//positionData.coordinates = { lat: 19.4326, lng: -99.1332 };
+						// navigator.geolocation.getCurrentPosition(function(position) {
+							//  positionData.coordinates = {
+							// 	lat: position.coords.latitude,
+							// 	lng: position.coords.longitude
+							// };
+							// map = new google.maps.Map(document.getElementById("map"), { zoom: 18, center: positionData.coordinates });
+							map = new google.maps.Map(document.getElementById("map"), { zoom: 18, center: coordinatesInitital });
+							// addMarker(positionData.coordinates);
+							addMarker(coordinatesInitital);
+							getPositionData(coordinatesInitital, "initMap");
+						// });
+					// } else {
+						//console.log("navigator.geolocation is not available.");
+					// }
+				}
+				
+				var marker = {};
+				var infoWindow = {};
+				
+				function addMarker(data) {
+					marker = new google.maps.Marker({
+						position: data.position,
+						//icon: icons[feature.type].icon,
+						map: map
+					});
+					var infoWindow = new google.maps.InfoWindow({
+						content: "Usted está aquí"
+					});
+					marker.addListener('click', function() {
+						infoWindow.open(map, marker);
+					});
+				}
+				
+				function getPositionData(coordinates, origin) {
+					positionData.coordinates = coordinates;
+					//addMarker({ position: coordinates, markerText: "Usted está aquí" });
+					marker.setPosition(coordinates);
+					map.setCenter(coordinates);
+					$.get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + coordinates.lat + ',' + coordinates.lng + '&key=AIzaSyAXyFTetFpascee-eGm8zaXkXb6NYcgW_0', function(response) {
+						positionData.address = response.results && response.results[0] && response.results[0]['address_components'] ? response.results[0]['address_components'] : "Error getting the address, try again.";
+						//console.log("Success getting the address, positionData.address:", positionData.address)
+						sendToLC({ "action": "currentPositionData", "status": "success", "vfHost": vfHost, "data": positionData, "origin": origin });
+					}).fail(function() {
+						positionData.address = "Error getting the address, try again.";
+						//console.log("Error getting the address, positionData.address:", positionData.address);
+						sendToLC({ "action": "currentPositionData", "status": "error", "vfHost": vfHost, "data": positionData, "origin": origin });
+					});
+				}
+				
+				function showEndLocation(coordinates) {
+					//console.log("showEndLocation, Entré");
+					marker.setPosition(coordinates);
+					map.setCenter(coordinates);
+				}
+				
+				function changeFieldSF(fieldName, value, fieldDependent) {
+					value = value || ""
+					fieldName = fieldName || ""
+					jQuery('[id*="SF_' + fieldName + '"]').val(value)
+					jQuery('[id*="SF_' + fieldName + '"]').trigger('change')
+					return getValues(fieldDependent)
+				}
+				
+				function getValues(fieldDependent) {
+					fieldDependent = fieldDependent || ""
+					return jQuery.map(jQuery('[id*="SF_' + fieldDependent + '"] option'), function(e) { return typeof e.value != 'undefined' && isNaN(e.value) && e.value != "__" && e.label != "" && e.value.length > 0 && e.label != '--None--' && e.label != '--Ninguno--' ? {label: e.label, value: e.value} : null})
+				}
+			</script>
+		</body>
+	</html>
+</apex:page>

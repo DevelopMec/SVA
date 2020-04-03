@@ -1,0 +1,5 @@
+<apex:page controller="TestInput" renderAs="pdf">
+    <apex:form rendered="true">
+        <img src="{!inp}"/>
+    </apex:form>
+</apex:page>

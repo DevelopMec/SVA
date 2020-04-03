@@ -1,0 +1,873 @@
+<apex:component controller="CON_ContractsContainer_CTRL" >
+
+
+<script type="text/javascript">
+    var contrato = {};
+    var dataSource;
+    var nombreProducto = '{!QuoteLineItem.Product2.Name}';
+    console.log('Nombre del producto: '+nombreProducto);
+    console.log('UserId: '+ '{!managerName}')
+    $(function() {
+         console.log('quoteId: '+ '{!QuoteLineItemId}' );
+        console.log('QuoteName: ' + '{!QuoteLineItem.Product2.Name}' );
+        //Product2.ProductCode
+        kendo.pdf.defineFont({
+            "DejaVu Sans"             : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans.ttf')}",
+            "DejaVu Sans|Bold"        : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Bold.ttf')}",
+            "DejaVu Sans|Bold|Italic" : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Oblique.ttf')}",
+            "DejaVu Sans|Italic"      : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Oblique.ttf')}",
+            "Helvetica"               : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Regular.ttf')}",
+            "Helvetica|Bold"          : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Bold.ttf')}",
+            "Helvetica|Bold|Italic"   : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-BoldItalic.ttf')}",
+            "Helvetica|Italic"        : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Italic.ttf')}",
+                                
+        });
+        
+
+    });
+
+    ( function( window ) {
+        "use strict"
+
+        window.generaPDF = function() {
+
+
+            /*ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Id, Name, AnexoA__c, AnexoB__c, AnexoC__c, AnexoD__c, AnexoE__c, Contenido_del__c FROM PlantillaContrato__c")
+            .then( function( res ) {
+                console.log(" success response: ", res) 
+                var templates = {}
+                for( var template of res ) {
+                    templates[ template.Name ] = {}
+                    for( var field of ['AnexoA__c', 'AnexoB__c', 'AnexoC__c', 'AnexoD__c', 'AnexoE__c', 'Contenido_del__c'])  {
+                        if( template[ field ] ) {
+                            var e = document.createElement('div');
+                            e.innerHTML = template[ field ];
+                            var textHtml = e.childNodes[0].nodeValue
+                            // templates[ template.Name ][ field ] = getExpresiones(textHtml)
+
+
+                            var ret = {};
+                            textHtml.split('\{').forEach( function( token, index ) {
+                                if ( token.indexOf('}') != - 1 ) {
+                                    ret['{' + token.substr(0, token.indexOf('}') + 1)] = ''
+                                } else if( token.indexOf(')') != - 1 ) {
+                                    // ret['{' + token.substr(0, token.indexOf(')') + 1)] = ''
+                                }
+                            })
+                            templates[ template.Name ][ field ] = ret;
+                        }
+                    }
+                }
+                console.log("templates: ", templates, JSON.stringify(templates))
+
+            }).catch( function( err ) {
+                console.log("error response: ", err)
+            })*/
+
+            console.log("ctcLightning: ", ctcLightning);
+            var contrato = {}
+            var dataSource = {}
+            var plantilla = {}
+            var query = ''
+            var nombreProducto = ''
+            var anexos = {}
+            var filiales = []
+            var entidadLegal = []
+            var contactos = []
+            var templateFiliales = ''
+            var templateConceptos = ''
+            var logoHeader = 'LogoEdenred.png'
+            var leyendaHeader = '<strong style="color: red">!Por definir!</strong>'
+            var top = '2cm'
+            var subHeader = ''
+            var fieldsDocs = { FM3__c: true, ActaConstitutivaCliente__c: true, RegistroPatronal__c : true, CURP__c: true, PoderNotarial__c: true, AltaSHCP__c: true, ComprobanteDomicilioCliente__c: true, IdentificacionOficialCliente__c: true, RFCDoc__c: true }
+            
+            ctcLightning.remote("CON_ContractsContainer_CTRL.getContrato")("{!QuoteLineItem.Id}")
+            .then( function( res ) {
+                contrato = res || {};
+                
+                console.log("\n\nContrato success: ", res, '\tAccountId: ', '{!AccountId}');
+
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Id, AccountId, Contact.Name, Contact.Email FROM AccountContactRelation WHERE AccountId ='{!AccountId}' AND Contact.Funcion__c IN('Quien administra Plataforma') ORDER BY CreatedDate ASC")
+            })
+            .then( function( res ) {
+                console.log("contacts: ", res)
+                for( var acc of res ) {
+                    var cnt = acc.Contact || {}
+                    contactos.push(cnt)
+                }
+                if( contrato.Entidad_Legal__c ) {
+                    return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Id, Calle__c, Ciudad__c, CodigoPostal__c, Colonia__c, DelegacionMunicipioFiscal__c, Direccion__c, Estado__c, NumeroExterior__c, NumeroInterior__c, Name, RazonSocial__c, FM3__c, ActaConstitutivaCliente__c, RegistroPatronal__c, CURP__c, PoderNotarial__c,AltaSHCP__c, ComprobanteDomicilioCliente__c, IdentificacionOficialCliente__c, RFCDoc__c, RecordType.Name FROM EntidadLegal__c WHERE Id='" + contrato.Entidad_Legal__c + "'")
+                }
+            })
+            .then( function( res ) {
+                entidadLegal = res && res.length > 0 ? res[0] : []
+                entidadLegal.TipoPersona__c = entidadLegal.RecordType && entidadLegal.RecordType.Name ? entidadLegal.RecordType.Name : ''
+
+                var tipo = entidadLegal.TipoPersona__c == 'Persona Moral' ? 'PM' : 'PF'
+                Object.keys( fieldsDocs ).forEach( ( field, index ) => {
+                    var aux = field.split('__')
+                    fieldsDocs[ field ] = aux[0] + '_' + tipo + '__c'
+                    if( entidadLegal.hasOwnProperty( field ) ) {
+                        entidadLegal[ fieldsDocs[ field ] ] = entidadLegal[ field ]
+                    }
+                })
+                
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Id, Contrato_2__c, Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c, Entidad_Cuenta__r.EntidadLegal__r.Direccion__c, Entidad_Cuenta__r.EntidadLegal__r.Name, Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name FROM ContratoFilial__c WHERE Contrato_2__c='" + contrato.Id + "'")
+            })
+            .then( function( res ) {
+                filiales = res || []
+                var idsEntidadCuenta = ''
+                for( var filial of filiales ) {
+                    if( idsEntidadCuenta.length > 0 ) {
+                        idsEntidadCuenta += ', '
+                    }
+                    idsEntidadCuenta += "\'" + filial.Entidad_Cuenta__c + "\'"
+                }
+
+                if( idsEntidadCuenta && idsEntidadCuenta.length > 0 ) {
+                    return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Id, (SELECT Id, Contacto__r.Name FROM Contactos_Entidad1__r ORDER BY CreatedDate ASC LIMIT 1) FROM EntidadCuenta__c WHERE Id IN(" + idsEntidadCuenta + ")")
+                }
+            })
+            .then( function( res ) {
+                var contactoEntidadCuenta = {}
+                var contactos = res || []
+                for( var contacto of contactos ) {
+                    contactoEntidadCuenta[contacto.Id] = contacto.Contactos_Entidad1__r && contacto.Contactos_Entidad1__r[0] && contacto.Contactos_Entidad1__r[0].Contacto__r ?  contacto.Contactos_Entidad1__r[0].Contacto__r : {}
+                }
+
+                for( var filial of filiales ) {
+                    filial.EntidadLegal__c = filial.Entidad_Cuenta__r && filial.Entidad_Cuenta__r.EntidadLegal__r ? filial.Entidad_Cuenta__r.EntidadLegal__r : {}
+                    filial.EntidadLegal__c.TipoPersona__c = filial.EntidadLegal__c.RecordType ? filial.EntidadLegal__c.RecordType.Name : ''
+                    delete filial.Entidad_Cuenta__r
+                    delete filial.EntidadLegal__c.RecordType
+                    filial.Contacto__c = contactoEntidadCuenta[filial.Entidad_Cuenta__c]
+                }
+                
+                console.log("filiales: ", filiales)
+
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Product2.ProductCode,Quote.Opportunity.Name,Quote.Opportunity.StageName,Quote.Opportunity.Owner.Name,Quote.OpportunityId,Quote.Opportunity.ActaConstitutivaCliente__c, Quote.Opportunity.CURP__c,Quote.Opportunity.CedulaRFC__c,Quote.Opportunity.ComprobanteDomicilioCliente__c,Quote.Opportunity.ComprobanteDomicilioFiscal__c, Quote.Opportunity.ConstanciaRFC__c, Quote.Opportunity.ConstanciaRFCCliente__c,Quote.Opportunity.IdentificacionOficialCliente__c,Quote.Opportunity.IdentificacionOficialVigente__c, Quote.Opportunity.PoderNotarial__c,Quote.Opportunity.RegistroPatronal__c, Quote.Opportunity.RegistroPatronalOPAM__c,Quote.Opportunity.Familia__c, Quote.Opportunity.Owner.Manager.Name,Quote.Owner.Name,Quote.AccountId,Quote.Account.RazonSocial__c,Quote.Account.Direccion__c,Quote.Account.RFC__c,Quote.Account.Owner.Name,Quote.Account.BillingAddress, Quote.Account.Sector__c,Quote.Account.TipoPersona__c,Quote.Contact.Email,Quote.Contact.CorreoAP__c,Quote.Contact.Name,Quote.Contact.Puesto__c,Quote.Contact.MobilePhone,Quote.Contact.Phone,Quote.Contact.AreaTrabajo__c,Quote.Account.Ciudad__c,Quote.Account.Calle__c,Quote.Account.NumeroExterior__c,Quote.Account.Colonia__c,Quote.Account.ColMpoCpEdo__c,Quote.Account.CodigoPostal__c FROM QuoteLineItem WHERE Id ='{!QuoteLineItem.Id}'")
+            })
+            .then( function( res ) {
+                console.log("res qli: ", res)
+                dataSource = res[0].Quote;
+                
+                var productoQLI=res[0].Id;
+                
+                dataSource.Product2 = res[0].Product2;
+                dataSource.FormaPago__c = '{!FormaPago}'
+                /***DYAMPI***/
+                if(dataSource.Product2!=null&&dataSource.Product2.Id!=null){
+                    
+                    ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Concepto_Tipo_Cargo__c,PrecioLista__c,Bonificacion__c,CantidadTarjetas__c,VigenciaDescuento__c,PrecioFinal__c FROM ProductoConcepto__c where Concepto_Tipo_Cargo__c!=\'Comisión por el servicio\' and PartidaPresupuesto__c=\'"+productoQLI+"\'")
+                    .then( function( result ) {
+                        var conceptos=result;
+                        templateConceptos='<table class="tableFilial">';
+                        templateConceptos=templateConceptos+'<thead>';                        
+                        templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th><th>Cantidad de Tarjetas</th><th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
+                        templateConceptos=templateConceptos+'</thead>';
+                        templateConceptos=templateConceptos+'</tbody>';
+                        for(var i=0;i<conceptos.length;i++){
+                            var dateV;
+                            var vig='';
+                            if(conceptos[i].VigenciaDescuento__c!=undefined){
+                                dateV = new Date(conceptos[i].VigenciaDescuento__c);
+                                var dia=dateV.getUTCDate().toString().length>1 ? dateV.getUTCDate()+'' : '0'+dateV.getUTCDate();
+                                var mes=(dateV.getUTCMonth() + 1).toString().length>1 ? (dateV.getUTCMonth() + 1)+'' : '0'+(dateV.getUTCMonth() + 1);
+                                vig=dia+'-'+mes+'-'+dateV.getUTCFullYear();
+                            }else{
+                                vig='';
+                            }
+                            
+                            var bon='';
+                            if(conceptos[i].Bonificacion__c ==0||conceptos[i].Bonificacion__c =='0'||conceptos[i].Bonificacion__c ==null){
+                                bon='N/A';
+                            }else{
+                                bon=conceptos[i].Bonificacion__c+'%';
+                            }
+                            var ct='';
+                            if(conceptos[i].CantidadTarjetas__c !=0&&conceptos[i].CantidadTarjetas__c !='0'&&conceptos[i].CantidadTarjetas__c !=null){
+                                ct=conceptos[i].CantidadTarjetas__c;
+                            }
+                            
+                            templateConceptos=templateConceptos+'<tr>';
+                            templateConceptos=templateConceptos+'<td>'+conceptos[i].Concepto_Tipo_Cargo__c+'</td>';
+                            templateConceptos=templateConceptos+'<td>$'+conceptos[i].PrecioLista__c+'</td>';
+                            templateConceptos=templateConceptos+'<td>'+ bon +'</td>';
+                            templateConceptos=templateConceptos+'<td>'+ct+'</td>';
+                            templateConceptos=templateConceptos+'<td>'+vig+'</td>';
+                            templateConceptos=templateConceptos+'<td>$'+conceptos[i].PrecioFinal__c+'</td>';
+                            templateConceptos=templateConceptos+'</tr>';
+                        }
+                        templateConceptos=templateConceptos+'</tbody></table>';
+                     });
+                }
+                /***********/
+                
+                if(contrato != null ) {
+                    if( contrato.Entidad_Legal__r && contrato.Entidad_Legal__r.RecordType ) {
+                        contrato.Entidad_Legal__r.TipoPersona__c = contrato.Entidad_Legal__r.RecordType.Name
+                    }
+                    dataSource.Contrato2__c = contrato;
+                }
+
+                dataSource.User = {};
+                dataSource.SaltoPagina = {};
+                dataSource.SaltoPagina.sPagina = '<div class="page-break"></div>';
+                dataSource.User.ManagerId = '{!managerName}';
+                dataSource.EntidadLegal__c = entidadLegal;
+				dataSource.Account.AdministradorPlataforma__c = contactos && contactos.length > 0 && contactos[0].Id ? contactos[0] : {}
+                if( !dataSource.Account.AdministradorPlataforma__c.Id ) {
+                    dataSource.Account.AdministradorPlataforma__c = contrato.Contacto__r || {}
+                }
+
+                console.log("dataSource 1: ", dataSource)
+
+                if( contrato.Tipo_de_Facturacion__c == 'Consumo' && contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Avanzado' && (dataSource.Product2.ProductCode == "30" || dataSource.Product2.ProductCode == "30-TC4") ) {
+                    nombreProducto = 'Contrato Ticket Car 3.0 Pospago'; 
+                    leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />
+                                    <p>DTCOM-001-04</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 03/05/2019</p>
+                                    <p>CONTRATO <strong>CLIENTES EDENRED</strong> TC PAGO POR CONSUMO JUR</p>
+                                    </div>`
+                    top = '3cm'
+
+                } else if( contrato.Tipo_de_Facturacion__c == 'Pedido' && contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Basico' && (dataSource.Product2.ProductCode == "30" || dataSource.Product2.ProductCode == "30-TC4") ){
+                    nombreProducto = 'Contrato Ticket Car 3.0 Basico'; //OK
+                    leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />
+                                    <p>TCBV030519</p>
+                                    <p><strong>DTCOM-002/ 19</strong></p>
+                                    </div>`
+                    top = '3cm'
+
+                } else if( contrato.Tipo_de_Facturacion__c == 'Pedido' && contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Avanzado' && (dataSource.Product2.ProductCode == "30" || dataSource.Product2.ProductCode == "30-TC4") ){
+                    nombreProducto = 'Contrato Ticket Car 3.0 Prepago';// Ok
+                    leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />
+                                    <p>DTCOM-001-03</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 03/05/2019</p>
+                                    <p>CONTRATO <strong>CLIENTES EDENRED</strong> TC PAGO POR PEDIDO JUR</p>
+                                    </div>`
+                    top = '3cm'
+                 
+                   }else if(contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Avanzado' && (dataSource.Product2.ProductCode == "30-B") || contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Basico' && (dataSource.Product2.ProductCode == "30-B") ){
+                       nombreProducto = 'Contrato Clientes BPfleet Prepago';// Ok
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCFLEET - 001 - 1</p>
+                        <p>FECHA DE ACTUALIZACIÓN 16/10/2019</p>
+                        <p>CONTRATO CLIENTES BPFLEET PAGO POR PEDIDO JUR</p>
+                        </div>`
+                         logoHeader = 'LogoEdenred.png'
+                        
+                    
+                    }else if(contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Avanzado' && (dataSource.Product2.ProductCode == "30-B") || contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Basico' && (dataSource.Product2.ProductCode == "30-B") ){
+                       nombreProducto = 'Contrato Clientes BPfleet Pospago';// Ok
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCFLEET - 001 - 1</p>
+                        <p>FECHA DE ACTUALIZACIÓN 15/10/2019</p>
+                        <p>CONTRATO CLIENTES BPFLEET PAGO POR CONSUMO JUR</p>
+                        </div>`
+                         logoHeader = 'LogoEdenred.png'
+                         
+                    }else if( dataSource.Product2.ProductCode == "12"  && dataSource.Opportunity.Familia__c == "Despensa" ) {
+                    nombreProducto = 'Contrato Vale Despensas Edenred -Banda';
+                    leyendaHeader = `<div class="leyendaHeader"><p>Fecha de actualización: 03/05/2019</p>
+                                    <p><strong>DTCOMBE-001-3</strong></p>
+                                    </div>`
+                    logoHeader =  'LogoValeDespensas.png'
+                    
+                } else if( dataSource.Product2.ProductCode == "32" && dataSource.Opportunity.Familia__c == "Despensa") {
+                    nombreProducto = 'Contrato Vale Despensas Edenred - Chip';
+                    leyendaHeader = `<div class="leyendaHeader"><p>Fecha de actualización: 03/05/2019</p>
+                                    <p><strong>DTCOMBE-001-1</strong></p>
+                                    </div>`
+                    logoHeader =  'LogoValeDespensas.png'
+                    
+                } else if( dataSource.Product2.ProductCode == "29" && dataSource.Opportunity.Familia__c == "Empresarial" ) {
+                    nombreProducto= "Contrato Empresarial Edenred";
+                    leyendaHeader = `<div class="leyendaHeader"><p><strong>DTCOMTE-001 -1 - 1</strong></p>
+                                    </div>`
+                    subHeader = 'CONTRATO CLIENTES <strong>EMPRESARIAL EDENRED</strong>'
+
+                } else if(((dataSource.Product2.ProductCode == "60-D") || (dataSource.Product2.ProductCode == "60-M") || (dataSource.Product2.ProductCode == "60-P")) && dataSource.Opportunity.Familia__c == "Combustible"){
+                    nombreProducto= "Contrato Clientes ECOVALE combustible";
+                    leyendaHeader = `<div class="leyendaHeader"><p>DTCOM-001-5</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 03/05/2019</p>
+                                    <p>CONTRATO DE CLIENTES OPAM GASOLINA JUR</p>
+                                    </div>`
+                    logoHeader =  'LogoEcovaleCombustible.png'
+                    
+                } else if(((dataSource.Product2.ProductCode == "41") || (dataSource.Product2.ProductCode == "51") || (dataSource.Product2.ProductCode == "61") || (dataSource.Product2.ProductCode == "71") || (dataSource.Product2.ProductCode == "81") || (dataSource.Product2.ProductCode == "91") || (dataSource.Product2.ProductCode == "18") || (dataSource.Product2.ProductCode == "38") || (dataSource.Product2.ProductCode == "48") || (dataSource.Product2.ProductCode == "58") || (dataSource.Product2.ProductCode == "14") || (dataSource.Product2.ProductCode == "34")) && ((dataSource.Opportunity.Familia__c == "Ticket Restaurante") || (dataSource.Opportunity.Familia__c == "Regalo") || (dataSource.Opportunity.Familia__c == "Vestimenta"))){
+                    nombreProducto= "Contrato Clientes Multiproducto";
+                    leyendaHeader = `<div class="leyendaHeader"><p>DTCOMBE-001-11</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 03/05/2019</p>
+                                    <p>CONTRATO CLIENTES COMIDA/REGALO//VESTIMENTA/RED MÁXIMA/JUR</p>
+                                    </div>`
+
+                } else if(((dataSource.Product2.ProductCode == "39") || (dataSource.Product2.ProductCode == "39-C")) && (dataSource.Opportunity.Familia__c == "Ayuda Social")){
+                    if(dataSource.Account.hasOwnProperty("Sector__c")){
+                        if(dataSource.Account.Sector__c == "Privado"){
+                            nombreProducto= "Contrato Plus Edenred Banda"
+                            leyendaHeader = `<div class="leyendaHeader"><p>CONTRATO CLIENTES PLUS EDENRED 03/05/2019</p>
+                                    <p>DTCOMTP-001-01</p>
+                                    </div>`
+                        }
+                        else if(dataSource.Account.Sector__c == "Público"){
+                            nombreProducto = "Contrato Plus Edenred Chip"; 
+                            leyendaHeader = `<div class="leyendaHeader"><p>CONTRATO CLIENTES PLUS EDENRED 03/05/2019</p>
+                                    <p>DTCOMTP-001-02</p>
+                                    </div>`
+                        }
+                    }
+
+                } else if(((dataSource.Product2.ProductCode == "52-C") || (dataSource.Product2.ProductCode == "62-C") || (dataSource.Product2.ProductCode == "69-C")) && dataSource.Opportunity.Familia__c == "Despensa"){
+                    nombreProducto = "Contrato Clientes ECOVALE Despensa";
+                    leyendaHeader = `<div class="leyendaHeader"><p>Fecha de actualización: 03/05/2019</p>
+                                    <p><strong>DTCOMBE-001-3</strong></p>
+                                    </div>`
+                    logoHeader =  'LogoEcoValeDespensas.png'
+                                    
+                } else if(((dataSource.Product2.ProductCode == "1") || (dataSource.Product2.ProductCode == "9")) && ((dataSource.Opportunity.Familia__c == "Ticket Restaurante") || (dataSource.Opportunity.Familia__c == "Despensa"))){
+                    nombreProducto= "Contrato Clientes TVBE Papel";
+                    leyendaHeader = `<div class="leyendaHeader"><p><strong>Fecha de actualización: 03/05/2019</strong></p>
+                                    <p>DTCOMBE-001-02</p><br>
+                                    </div>`
+
+                } else if((dataSource.Product2.ProductCode == "3") && (dataSource.Opportunity.Familia__c == "Combustible")){
+                    nombreProducto = "Contrato Clientes TV Combustible Papel";
+                    leyendaHeader = `<div class="leyendaHeader">
+                                    <p><strong>TVGV-01012017</strong></p>
+                                    <p>DTCOM-002/ 6 </p>
+                                    </div>`
+
+                } else if(dataSource.Product2.ProductCode == "31" ) {
+                    if( contrato.Entidad_Legal__r && contrato.Entidad_Legal__r.TipoPersona__c && contrato.Tipo_de_Facturacion__c ) {
+                        
+                        top = '3.2cm'
+                        var tipoPersona = contrato.Entidad_Legal__r.TipoPersona__c || ''
+                        if( tipoPersona =='Persona Moral' && contrato.Tipo_de_Facturacion__c == 'Pedido' ) {
+                            nombreProducto = "Contrato Clientes Mantenimiento Pedido PM"//OK
+                            leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2 logoEdenred3" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoMantenimiento_Fleet.png")}" />
+                                    <p>DTCOM-001-04</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 24/01/18</p>
+                                    <p>CONTRATO <strong>CLIENTES MANTENIMIENTO EDENRED</strong> PAGO POR PEDIDO JUR</p>
+                                    <p>SERVICIOS Y SOLUCIONES EMPRESARIALES TICKET EDENRED, S.A. DE C.V.</p>
+                                    </div>`
+
+                        } else if( tipoPersona == 'Persona Física' && contrato.Tipo_de_Facturacion__c == 'Pedido' ) {
+                            nombreProducto = "Contrato Clientes Mantenimiento Pedido PF"
+                            leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2 logoEdenred3" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoMantenimiento_Fleet.png")}" />
+                                    <p>DTCOM-001-04</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 24/01/18</p>
+                                    <p>CONTRATO <strong>CLIENTES MANTENIMIENTO EDENRED</strong> PAGO POR PEDIDO JUR</p>
+                                    <p>SERVICIOS Y SOLUCIONES EMPRESARIALES TICKET EDENRED, S.A. DE C.V.</p>
+                                    </div>`
+
+                        } else if( tipoPersona =='Persona Moral' && contrato.Tipo_de_Facturacion__c == 'Consumo' ) {
+                            nombreProducto = "Contrato Clientes Mantenimiento Consumo PM"//OK
+                            leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoMantenimiento_Fleet.png")}" />
+                                    <p>DTCOM-001-04</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 24/01/18</p>
+                                    <p>CONTRATO <strong>CLIENTES MANTENIMIENTO EDENRED</strong> PAGO POR CONSUMO JUR</p>
+                                    <p>SERVICIOS Y SOLUCIONES EMPRESARIALES TICKET EDENRED, S.A. DE C.V.</p>
+                                    </div>`
+
+                        } else if( tipoPersona =='Persona Física' && contrato.Tipo_de_Facturacion__c == 'Consumo' ) {
+                            nombreProducto = "Contrato Clientes Mantenimiento Consumo PF"
+                            leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoMantenimiento_Fleet.png")}" />
+                                    <p>DTCOM-001-04</p>
+                                    <p>FECHA DE ACTUALIZACIÓN 24/01/18</p>
+                                    <p>CONTRATO <strong>CLIENTES MANTENIMIENTO EDENRED</strong> PAGO POR CONSUMO JUR</p>
+                                    <p>SERVICIOS Y SOLUCIONES EMPRESARIALES TICKET EDENRED, S.A. DE C.V.</p>
+                                    </div>`
+
+                        } else {
+                            return Promise.reject(new Error('Para la adecuada generación del contrato es necesario asociar una Entidad Legal y Tipo de Facturación'))
+                        }
+                    } else {
+                        return Promise.reject(new Error('Para la adecuada generación del contrato es necesario asociar una Entidad Legal y Tipo de Facturación'))
+                    }
+                } else if(dataSource.Product2.ProductCode == "32-CH"){
+                    nombreProducto = "Contrato Vale Despensa Chedraui";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        	<p>FECHA DE ACTUALIZACIÓN 01/02/2019</p>
+                                    <p>DTCOM - 001 - 1</p>
+                                    </div>`
+                     logoHeader =  'LogoValeDespensas.png'
+                }else if(dataSource.Product2.ProductCode == "32-W"){
+                    nombreProducto = "Contrato Vale Despensa Walmart";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        	<p>FECHA DE ACTUALIZACIÓN 01/02/2019</p>
+                                    <p>DTCOM - 001/1.1</p>
+                                    </div>`
+                     logoHeader =  'LogoValeDespensas.png'
+                }else if(dataSource.Product2.ProductCode == "48-CH"){
+                    nombreProducto = "Contrato Regalo Edenred Chedraui";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        	<p>FECHA DE ACTUALIZACIÓN 01/02/2019</p>
+                                    <p>DTCOM - 001 - 1</p>
+                                    </div>`
+                     logoHeader =  'LogoRegaloEdenred.png'
+                }else if(dataSource.Product2.ProductCode == "48-W"){
+                    nombreProducto = "Contrato Regalo Edenred Walmart";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCOM - 001 - 11.1</p>
+                        <p>FECHA DE ACTUALIZACIÓN 01/02/2019</p>
+                        <p>CONTRATO CLIENTES REGALO WALMART/JUR</p>
+                    </div>`
+                     logoHeader =  'LogoRegaloEdenred.png'
+                }else if(dataSource.Product2.ProductCode == "30-G"){
+                    nombreProducto = "Contrato Ticket Car G500 Fleet";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCOM - 001 - 03</p>
+                        <p>FECHA DE ACTUALIZACIÓN 31/01/19</p>
+                        <p>CONTRATO CLIENTES EDENRED TC PAGO POR PEDIDO JUR</p>
+                    </div>`
+                     logoHeader =  'LogoTicketCar.png'
+                }else if(dataSource.Product2.ProductCode == "30-E"){
+                    nombreProducto = "Contrato Ticket Car Element";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCOM - 001 - 03</p>
+                        <p>FECHA DE ACTUALIZACIÓN 31/01/19</p>
+                        <p>CONTRATO CLIENTES EDENRED TC PAGO POR PEDIDO JUR</p>
+                    </div>`
+                     logoHeader =  'LogoTicketCar.png'
+                }else if(dataSource.Product2.ProductCode == "30-S"){
+                    nombreProducto = "Contrato Ticket Car Servifacil";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCOM - 001 - 20</p>
+                        <p>FECHA DE ACTUALIZACIÓN 31/01/2019</p>
+                        <p>CONTRATO CLIENTES SERVIFAC PAGO POR PEDIDO JUR</p>
+                    </div>`
+                     logoHeader =  'LogoTicketCar.png'
+                }/*else if(dataSource.Product2.ProductCode == "30-B"){
+                    nombreProducto = "Contrato Clientes BPfleet";
+                    leyendaHeader = `<div class="leyendaHeader" >
+                        <p>DTCFLEET - 001 - 1</p>
+                        <p>FECHA DE ACTUALIZACIÓN 13/05/2019</p>
+                        <p>CONTRATO CLIENTES BPFLEET PAGO POR PEDIDO JUR</p>
+                        </div>`
+                         logoHeader = 'LogoEdenred.png'
+                }*/else {
+                    //nombreProducto = '{!QuoteLineItem.Product2.Name}';
+                    nombreProducto = 'Contrato '+'{!QuoteLineItem.Product2.Name}';
+                    return Promise.reject(new Error('Los criterios definidos no son adecuados para la generación del contrato, favor de revisar'))
+                }
+                query = "select Activo__c, AnexoA__c, AnexoB__c, AnexoC__c, AnexoD__c, AnexoE__c,  CamposAnexoA__c, CamposAnexoB__c, CamposAnexoC__c, CamposAnexoD__c, CodigosTYC__c, Contenido_del__c, Contratos_Ticket_Despensa__c, CreatedById, CreatedDate, Dias_habiles_para_entrega_de_tarjetas__c, Horas_de_anticipacion_para_dispersion_de__c, Horas_de_dispersion_de_saldos__c, Id, IsDeleted, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, RecordTypeId, Seccion1__c, Seccion2__c, Seccion3__c, Seccion4__c, Seccion5__c, Seccion6__c, SystemModstamp, Tipo_Contrato__c, UsoMarcaLogotipo__c, UsoProgramaOrganismoGubernamental__c,Logocontrato__c from PlantillaContrato__c WHERE Name = '" + nombreProducto + "' ";
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")(query)
+            })
+            .then( function( res ) {
+                plantilla = res && res.length > 0 ? res[0] : {};
+                console.log('Plantilla: ', plantilla);
+                // query = "select CuentaActiva_Text__c, AnualidadTarjeta__c, Bonificacion__c, Cargo__c, CargoConsecutivo__c, CargoCuentaActiva__c, CargoporEnvio__c, CargoTAG__c, ComisionFijaAS__c, ComisionFijaAsignacionSaldo__c, ComisionServicio__c, ComisionServicios__c, Contraprestacion__c, CreatedById, CreatedDate, CuentaActiva__c, CuentaAutoconsumo__c, CuotaAdscripcion__c, CuotaAnual__c, CuotaDispersion__c, CuotaLitros__c, Datos_Anexo__c, DescuentoEquivalente__c, EmisionTarjetas__c, EnvioTarjetas__c, Etiqueta__c, FechaContrato__c, Fianza__c, FormaPago__c, Id, IdContrato__c, ImplementacionInscripcion__c, IsDeleted, LastModifiedById, LastModifiedDate, Mensualidad__c, MensualidadAutoconsumo__c, MontoDO__c, Name, NombreCliente__c, NombreTitular__c, NumeroTarjeta__c, OwnerId, PeriodoFacturacion__c, PresenciaVehicular__c, RecordTypeId, Renovacion__c, RenovacionTarjeta__c, RenovacionTarjetaTexto__c, ReposicionTarjeta__c, ReposicionTarjetaLetra__c, Solucion__c, SystemModstamp, TarjetaAdicional__c, TarjetaAdicionalTexto__c, TarjetaTitular__c, TarjetaTitularTexto__c, TipoAnexo__c, Transacciones__c, TransferenciaReferenciada__c, Vigencia__c, VigenciaTarjetas__c, VigenciaVehicular__c  from Anexo__c where IdContrato__c = '" + contrato.Id + "'";
+                query = "SELECT AnualidadTarjeta__c, Bonificacion__c, CargoConsecutivo__c, CargoCuentaActiva__c, CargoRefactura__c, CargoTAG__c, Cargo__c, Cargo_por_env_o_letra__c,"     +
+                               "CargoporEnvio__c, Cargos_por_Asignaci_n_de_Saldo__c, Cargos_por_Asignaci_n_de_Saldo_letra__c, ComisionFijaAS__c, ComisionFijaAsignacionSaldo__c,"         +
+                               "ComisionServicio__c, ComisionServicios__c, Contraprestacion_Letra__c, Contraprestacion__c, CreatedById, CreatedDate, CuentaActiva__c,"                    +  
+                               "CuentaAutoconsumo__c, CuotaAdscripcion__c, CuotaAnual__c, CuotaAutoconsumo__c, CuotaDispersionLetra__c, CuotaDispersion__c, CuotaInscripcionLetra__c,"    + 
+                               "CuotaLitros__c, Cuota_por_cuenta_activa__c, Cuota_por_cuenta_activa_letra__c, Cuota_por_env_o__c, Cuota_por_env_o_letra__c, Datos_Anexo__c, "             + 
+                               "DescuentoEquivalente__c, Detalle__c, EmisionTarjetas__c, EnvioTarjetas__c, Etiqueta__c, FechaContrato__c, Fianza__c, FijoVehiculo__c, FormaPago__c,"      +
+                               "Gestor_propietario_de_Opp__c, Id, IdContrato__c, ImplementacionInscripcion__c, IsDeleted, LastModifiedById, LastModifiedDate, MensualidadAutoconsumo__c," + 
+                               "Mensualidad__c, MontoDO__c, Name, NombreCliente__c, NombreTitular__c, NumeroTarjeta__c, OwnerId, PeriodoFacturacion__c, Porcentaje__c,"                   +
+                               "PresenciaVehicular__c, Propietario_de_la_oportunidad__c, Raz_n_social__c, RecordTypeId, RenovacionTarjetaTexto__c, RenovacionTarjeta__c, Renovacion__c,"  + 
+                               "RentaPlataforma__c, ReposicionTarjetaLetra__c, ReposicionTarjeta__c, Representante_legal_Edenred__c, Representante_legal_cliente__c, Solucion__c, "       +
+                               "SystemModstamp, TarjetaAdicionalTexto__c, TarjetaAdicional__c, TarjetaTitularTexto__c, TarjetaTitular__c, TipoAnexo__c, Transacciones__c,"                +
+                               "TransferenciaReferenciada__c, VigenciaTarjetas__c, VigenciaVehicular__c, Vigencia__c, Implementacion_Text__c, CuotaImplementacionLetra_Text__c,"          +
+                               "CuotaMensualidad_Text__c, CuotaMensualidadLetra_Text__c, CuentaActiva_Text__c, CuotaAnualidadLetra_Text__c, CuotaAdscripcionPyme_Text__c,"                + 
+                               "CuotaAdscripcionPymeLetra_Text__c, CuotaAdscripcionGrande_Text__c, CuotaAdscripcionGrandeLetra_Text__c, CargoEnvio_Text__c, CargoEnvioLetra_Text__c,"     +
+                               "CuotaImplementacion_Text__c, AnualidadGrande_Text__c, AnualidadGrandeLetra_Text__c, AnualidadPyme_Text__c, AnualidadPymeLetra_Text__c,"                   +
+                               "CuotaInscripcion_Text__c, CuotaInscripcionLetra_Text__c, CargoRefacturacionLetra_Text__c FROM Anexo__c where IdContrato__c = '" + contrato.Id + "'";
+                var e = document.createElement('div');
+                e.innerHTML = plantilla.Contenido_del__c;
+                plantilla.Contenido_del__c = e.childNodes[0].nodeValue;
+                
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/font-family: Calibri;/g, 'font-family: Helvetica;');
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/‐/g, '-');
+
+                console.log("dataSource: ", dataSource)
+
+                // Agregar aquí filiales - calvarez 4/04/2018
+                
+                if( filiales.length > 0 ) {
+                    var strFilial = ""
+                    for( var filial of filiales ) {
+                        var nombreFilial = filial.EntidadLegal__c.RazonSocial__c || ''
+
+                        filial.EntidadLegal__c.Direccion__c = filial.EntidadLegal__c.Direccion__c && filial.EntidadLegal__c.Direccion__c != ', , , , , ,' ? filial.EntidadLegal__c.Direccion__c : ''
+                        filial.EntidadLegal__c.Name = filial.EntidadLegal__c.Name || ''
+                        // filial.Contacto__c.Name = filial.Contacto__c.Name || ''
+                        var representanteLegal = contrato.Contacto__r && contrato.Contacto__r.Name ? contrato.Contacto__r.Name : ''
+
+                        // strFilial += '<tr> <td>FILIAL</td> <td>' +  nombreFilial + '</td> <td>' + filial.EntidadLegal__c.Direccion__c + '</td> <td>' + filial.EntidadLegal__c.Name + '</td> <td>' + filial.Contacto__c.Name + '</td> <td></td> </tr>'
+                        strFilial += '<tr> <td>FILIAL</td> <td>' +  nombreFilial + '</td> <td>' + filial.EntidadLegal__c.Direccion__c + '</td> <td>' + filial.EntidadLegal__c.Name + '</td> <td>' + representanteLegal + '</td> <td></td> </tr>'
+
+                    }
+                    templateFiliales = '<table class="tableFilial"><thead> <tr> <th rowspan="2">Entidad</th> <th rowspan="2" style="width: 20%">Razón social</th> <th rowspan="2">Domicilio fiscal</th> <th rowspan="2" style="width: 20%">RFC</th> <th rowspan="1" colspan="2" style="width: 40%">Representante legal</th> </tr> <tr> <th style="width: 15%">Nombre</th> <th style="width: 25%">Firma</th> </tr> </thead> <tbody>' + strFilial + '</tbody> </table>';
+
+                    // console.log("strFilial: ", strFilial, "\ntemplateFiliales", templateFiliales)
+                    // plantilla.Contenido_del__c += templateFiliales
+                }
+                // plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(filiales\)/g, templateFiliales);
+                
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")(query)
+            })
+            .then( function( res ) {
+                anexos = res && res.length > 0 ? res[0] : {};
+                dataSource.Anexo__c = anexos;
+                plantilla.Contenido_del__c = replaceStr(plantilla.Contenido_del__c, dataSource);
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!filiales\)/g, templateFiliales);
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+
+                $('#contentPdf').html('');
+                $('#contentPdf').append(plantilla.Contenido_del__c);
+                
+                if(plantilla.AnexoA__c != undefined) {
+                    console.log("ANEXOA!::");
+                    plantilla.AnexoA__c = html(plantilla.AnexoA__c, dataSource);
+                    plantilla.AnexoA__c = plantilla.AnexoA__c.replace(/\(\!filiales\)/g, templateFiliales);
+                    plantilla.AnexoA__c = plantilla.AnexoA__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                    //plantilla.AnexoA__c = plantilla.AnexoA__c.replace('<table class="ql-table-blob">', '<table class="tableFilial">');
+                    plantilla.AnexoA__c = plantilla.AnexoA__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+                    $('#contentPdf').append('<div class="page-break"></div>' + plantilla.AnexoA__c);
+
+                }
+                if(plantilla.AnexoB__c != undefined) {
+                    plantilla.AnexoB__c = html(plantilla.AnexoB__c,dataSource);
+                    plantilla.AnexoB__c = plantilla.AnexoB__c.replace(/\(\!filiales\)/g, templateFiliales);
+                    plantilla.AnexoB__c = plantilla.AnexoB__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                    //plantilla.AnexoB__c = plantilla.AnexoB__c.replace('<table class="ql-table-blob">', '<table class="tableFilial">');
+                    plantilla.AnexoB__c = plantilla.AnexoB__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+                    $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoB__c);
+                }
+                if(plantilla.AnexoC__c != undefined){
+                    
+                    plantilla.AnexoC__c = html(plantilla.AnexoC__c,dataSource);
+                    plantilla.AnexoC__c = plantilla.AnexoC__c.replace(/\(\!filiales\)/g, templateFiliales);
+                    plantilla.AnexoC__c = plantilla.AnexoC__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                    plantilla.AnexoC__c = plantilla.AnexoC__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+                    $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoC__c);
+                }
+                if(plantilla.AnexoD__c != undefined && dataSource.FormaPago__c == 'American Express' ){
+                    plantilla.AnexoD__c = html(plantilla.AnexoD__c,dataSource);
+                    plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/\(\!filiales\)/g, templateFiliales);
+                    plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                    plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+                    $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoD__c);
+
+                }
+                if(plantilla.AnexoE__c != undefined){
+                    plantilla.AnexoE__c = html(plantilla.AnexoE__c,dataSource);
+                    plantilla.AnexoE__c = plantilla.AnexoE__c.replace(/\(\!filiales\)/g, templateFiliales);
+                    plantilla.AnexoE__c = plantilla.AnexoE__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                    plantilla.AnexoE__c = plantilla.AnexoE__c.replace(/\(\!saltoPagina\)/g, '<div class="page-break"></div>');
+                    plantilla.AnexoE__c = plantilla.AnexoE__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+                    $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoE__c);
+
+                }
+                var logo;
+                if(plantilla.Logocontrato__c == undefined || plantilla.Logocontrato__c == null){
+                    logo = '    <div class = "logoTC"></div>';
+                }
+                else{
+                    logo = '    <img class = "logoTC" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/'+plantilla.Logocontrato__c+'")}" />'
+                }
+                if( subHeader && subHeader.length > 0 ) {
+                    logo +=  '<div class = "logoTC2">' + subHeader + '</div>'
+                }
+
+                var templateHtml = '<div class="page-template">'+
+                            '<div class="header">'+
+                            '   <img class = "logoEdenred" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/' + logoHeader + '")}" />'+
+                    logo + leyendaHeader
+                //'   <div class="headerText"><p>FECHA DE ACTUALIZACIÓN 19/08/16</p>CONTRATO CLIENTES EDENRED TC PAGO POR CONSUMO JUR<p></p></div>'+
+                //          '   <div class="headerText2"><p>DTCOM-001-04</p></div> ' +
+                            '</div>';
+                var waterMark = false
+                if( contrato.EtapaContrato__c != undefined && contrato.EtapaContrato__c == 'Finalizado' ) {
+                    waterMark = false;
+                } else {
+                    waterMark = true;
+                }
+
+                if( waterMark ) {
+                    templateHtml += '<div class="watermark">Borrador</div>';
+                } else {
+                    templateHtml += '</div>';
+                }
+                
+
+                if( templateHtml != '' ) {
+                    kendo.drawing.drawDOM($('#pdfTemplate'), {
+                        paperSize: "A4",
+                        margin: {left: "1cm", top: top, right: "1cm", bottom: "1.5cm"},
+                        forcePageBreak: ".page-break",
+                        multiPage: true,
+                        template: templateHtml,
+                        scale: 0.8})
+                    .then(function( group ) {
+                        kendo.drawing.pdf.toDataURL(group, function(a) {
+                            var data = a.replace('data:application/pdf;base64,', '')
+                            var url = "";
+                            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.CON_ContractsContainer_CTRL.guardaPDFBase64}','{!QuoteLineItem.Id}',data, function( result, event ){
+                                console.log('PdfGuardado', result);
+                                hidePDFSpinner();
+                                url = '/servlet/servlet.FileDownload?file=' + result.Upsert_Attachment.Id + '#view=FitH';
+                                window.open(url)
+                            });
+                        });
+                        return kendo.drawing.exportPDF(group, {});
+                     }).done(function ( data ) {
+                        
+                    });
+                         
+                }
+            }).catch( function( err ) {
+
+                console.log("ctcLightning error: ", err);
+                var toast = $A.get('e.force:showToast')
+                toast.setParams({type: 'error', message: err.message})
+                toast.fire()
+                hidePDFSpinner();
+
+            })
+        }
+    })( window )
+
+    function getExpresiones(html){
+        var ret = {};
+        html.split('\{\!').forEach( function(token, index) {
+            if ( token.indexOf('}') != - 1) {
+                ret[token.substr(0, token.indexOf('}'))] = ''
+            }
+        })
+        return ret;
+    }
+
+    function replaceStr( textHml, datasource ) {
+        textHml = textHml.replace(/<img src\=\"https\:\/\/\:0\/\">/g, '<p></p>');
+        textHml = textHml.replace(/<img src="\/\/\:0"><\/img>/g, '<p></p>');
+        var expresiones = getExpresiones(textHml)
+        console.log("expresiones: ", expresiones)
+        Object.keys(expresiones).forEach(function(expresion, index) {
+            var path = expresion.split('\.');
+            var data = '';
+            var valor = ctcLightning.path(expresion, datasource)
+            if( expresion.indexOf('FechaContrato__c') != -1 && valor ) {
+                valor = getDate( valor )
+            }
+            if( valor == undefined ) {
+                valor = ''
+            }
+                
+            if( typeof(valor) == 'boolean') {
+                if( valor ) {
+                    valor = '<span class="fa fa-check-square-o"></span>';
+                } else {
+                    valor = '<span class="fa fa-square-o"></span>';
+                }
+            }
+            
+            if( expresion && expresion.indexOf('IMG__c') != -1 ) {
+                var resource = 'IMGTARJETASECOVALE/' + expresion.substring(expresion.indexOf('/') + 1, expresion.length)
+                valor = '<img class="imgInternaEcovale" src="{!URLFOR($Resource.TarjetasContratoEcovale, "' + resource + '" )}" />'
+                
+                console.log('valor: ', valor);
+                //valor = '<img src="{!URLFOR(' + resource + ')}" />'
+            }
+
+            expresiones[expresion] = valor;
+        })
+
+        Object.keys(expresiones).forEach(function( expresion, index ) {
+            var reg = new RegExp( '\{\!' + expresion + '\}', 'g')
+            textHml = textHml.replace(reg, expresiones[expresion] )
+        })
+        return textHml;
+    }
+
+    function html( textHtml, dataSource ) {
+        var e = document.createElement('div');
+        e.innerHTML = textHtml;
+        textHtml = e.childNodes[0].nodeValue;
+                    
+        textHtml= textHtml.replace(/font-family: Calibri;/g, 'font-family: Helvetica;');
+        textHtml= textHtml.replace(/font-family: Arial;/g, 'font-family: Helvetica;');
+        textHtml= textHtml.replace(/<ul/g, '<p');
+        textHtml= textHtml.replace(/<u/g, '<p');
+        textHtml= textHtml.replace(/<\/u/g, '</p');
+        textHtml= textHtml.replace(/<\/ul/g, '</p');
+        textHtml= textHtml.replace(/<li/g, '<p');
+        textHtml= textHtml.replace(/<\/li/g, '</p');
+        textHtml = textHtml.replace(/‐/g, '-');
+        textHtml = textHtml.replace(/<img src\=\"https\:\/\/\:0\/\">/g, '<p></p>');
+        textHtml = textHtml.replace(/<img src="\/\/\:0"><\/img>/g, '<p></p>');
+        textHtml = replaceStr(textHtml, dataSource);
+
+        return textHtml;
+    }
+
+    function getDate( dateSF ) {
+        var a = new Date(dateSF);
+        var months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        var year = a.getFullYear();
+        var month = months[a.getMonth()];
+        var date = a.getDate();
+        var hour = a.getHours();
+        var min = a.getMinutes();
+        var sec = a.getSeconds();
+        var date = date + ' de ' + month + ' del ' + year  ;
+        return date;
+    }
+
+    function isDate( date ) {
+        return (new Date(date) !== "Invalid Date" && !isNaN(new Date(date)) ) ? true : false;
+    }
+
+
+</script>
+<style type="text/css"> 
+    .ql-table-blob{
+        border-collapse: collapse;
+        border-color: black;
+    } 
+    .page-template {
+        position: absolute;
+        width:100%;
+        top: 0;
+        left: 0;
+     }
+    .page-template .watermark {
+        font-weight: bold;
+        font-size: 600%;
+        text-align: center;
+        margin-top: 70%;
+        color: #424242;
+        opacity: 0.1;
+        transform: rotate(-55deg) scale(1.7, 1.5);
+    }
+    #pdfTemplateContenedor{
+        width:100%;
+        font-size: 9pt;
+        height: 1px;
+        max-height: 1px;
+        overflow: scroll;
+        font-family: "Helvetica" !important;
+        text-align: justify;
+    }
+    .page-template .header{
+    		position:absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            text-align: right;
+            font-size: 12px;
+            height: 200px;
+            margin-bottom: 2cm;
+            /*border-bottom: 1px solid #888;*/
+        }
+        .header .logoEdenred{
+            position: absolute;
+            left: 5px;
+            top: 0px;
+            height: 30px;
+        }
+        .header .logoTC{
+            position: absolute;
+            left: 280px;
+            top: 0px;
+            height: 30px;
+        }
+    	.header .logoTC2{
+            position: absolute;
+            left: 250px;
+            top: 0px;
+            height: 30px;
+            font-size: 6pt;
+        }
+        .header .headerText{
+            font-size: 4pt;
+            position: absolute;
+            left: 380px;
+            top: 0px;
+            height: 20px;
+        }
+        .header .headerText2{
+            font-size: 4pt;
+            position: absolute;
+            left: 600px;
+            top: 0px;
+            height: 20px;
+        }
+        #generaPDFButton{
+            opacity: 0.0;
+        }
+        .tablas {
+            border-collapse: collapse;
+        }
+        .tableFilial {
+            border-collapse: collapse;
+            border-spacing: 0;
+            /*border: 1px solid black;*/
+        }
+        .tableFilial > thead > tr > th, .tableFilial > tbody > tr > td {
+            border: 1px solid black;
+            height: 16pt;
+        }
+
+        .pdfTemplateContenedor table {
+            color: black !important;
+        }
+    .leyendaHeader {
+            /*text-align: right;*/
+            font-size: 5pt;
+            position: absolute;
+            right: 5px;
+            top: 0px;
+            height: 20px;
+            line-height: 70%;
+        }
+        .headerContratos {
+            border-style: solid;
+        }
+    .logoEdenred2 {
+            /*position: absolute;*/
+            left: 5px;
+            top: 0px;
+            height: 30px;
+        }
+    .logoEdenred3 {
+            height: 40px;
+        }
+    .imgInternaEcovale {
+        height: 80px;
+    }
+    
+</style>
+    <apex:attribute name="QuoteLineItem" type="QuoteLineItem" required="true" description="QuoteLineItem" id="QuoteLineItem" />
+    <apex:attribute name="QuoteLineItemId" type="String" required="true" description="Id de QuoteLineItem" id="QuoteLineItemId" />
+    <apex:attribute name="QuoteLineItemName" type="String" required="false" description="Nombre de QuoteLineItem"/>
+    <apex:attribute name="AccountId" type="String" required="false" description="Id de la cuenta"/>
+    <apex:attribute name="FormaPago" type="String" required="false" description="Forma de pago"/>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    </head>
+    
+    <!-- <div ng-controller="ticketPagoPorConsumo as ppc" id="ticketPagoPorConsumo"> -->
+        <div id="pdfTemplateContenedor">
+            <div id='pdfTemplate'>
+                <div id="contentPdf">
+                    
+                </div>
+            </div>
+        </div>
+    
+        <button id="generaPDFButton" type="submit" class="btn btn-primary buscar" onclick="generaPDF()" >Muestra PDF</button>
+    <!-- </div> -->
+    
+</apex:component>

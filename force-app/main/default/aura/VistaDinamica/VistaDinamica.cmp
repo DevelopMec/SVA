@@ -1,0 +1,321 @@
+<aura:component controller="Vista_DinamicaController" implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="selectedValue" type="String" default='Familia' />
+    <aura:attribute name="records" type="List" />
+    <aura:attribute name="familias" type="List" />
+    <aura:attribute name="entidades" type="List" />
+    <aura:attribute name="ejecutivos" type="List" />
+    <aura:attribute name="Contratofilial" type="List" />    
+    <aura:attribute name="showAll" type="Boolean" default="false" />  
+    <aura:attribute name="activosButtonVariant" type="String" default="brand" /> 
+    <aura:attribute name="allButtonVariant" type="String" default="neutral" />  
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:card iconName="standard:account" title="Soluciones Contratadas">  
+        <div class="slds-clearfix">
+            <div class="slds-float_right slds-m-right_large">                
+                <div class="slds-card slds-media">   
+                    <lightning:buttonGroup>
+                        <lightning:button label="Activos" onclick="{!c.showActives}" variant="{!v.activosButtonVariant}"/>
+                        <lightning:button label="Todos" onclick="{!c.showAll}" variant="{!v.allButtonVariant}"/>
+                    </lightning:buttonGroup>
+                </div>
+                                    <div class="slds-card slds-media">   
+
+                    <lightning:select aura:id="filtro" name="picklistValues" label="Filtro" onchange="{!c.myAction}" value="{!v.selectedValue}">                
+                        <option value="Familia">Solución</option>
+                        <option value="RFC">Entidad Legal</option>
+                        <option value="Ejecutivo">Ejecutivo Comercial</option>
+                    </lightning:select>  
+                </div>
+            </div>
+        </div>                        
+        <br/>    
+        <div class="slds-m-left--x-large">            
+            <aura:iteration items="{!v.familias}" var="imagen" indexVar="i">                
+                    <img src="{!imagen.Imagen}" alt="texto" class="logofamilia" style="height:40px;"/>            
+            </aura:iteration>
+        </div> 
+        <br/>
+                
+        <aura:if isTrue="{!v.selectedValue == 'Familia'}">                                      
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-left_medium slds-p-right_medium">
+                    <ul class="slds-list_vertical slds-has-dividers_top-space ctcListEntidadLegal">                        
+                        <aura:iteration items="{!v.familias}" var="categoria" indexVar="key">                            
+                            <li>                                
+                                <div class="slds-section slds-is-open">
+                                    <h3 class="slds-section__title slds-theme_shade">
+                                        <span class="slds-truncate slds-p-horizontal_small" title="Section Title" onclick="{!c.viewUrl}">{!categoria.familyOrRFC}</span>
+                                    </h3>
+                                </div>
+                            </li> 
+                            
+                            <aura:iteration items="{!categoria.listacontrato}" var="codigo">
+                                <li class="slds-list__item">
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">                                            
+                                            <lightning:icon iconName='standard:account' size='small' title='Entidad Legal'></lightning:icon>                                                                                               
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <div class="slds-grid">
+                                                <h3 class="slds-text-heading_small slds-m-bottom_xx-small">
+                                                    <!-- <lightning:button label="{!codigo.Id}" onclick="{!c.viewUrl}" value="{!codigo.Id}" title="{!codigo.Id}" aura:id="{!codigo.Id}" variant="base"></lightning:button>-->
+                                                    <a href="{!'/' +  codigo.Id}" id="the_link" target="_blank">{!codigo.Name}
+                                                    </a>
+                                                </h3>
+                                            </div>  
+                                            <br/>
+                                            <div class="slds-grid slds-gutters_x-large">                                                
+                                                <span class="slds-list__item slds-size_1-of-4">                                                    
+                                                    Producto: {!codigo.Producto__r.IDInterno__c}
+                                                </span>												                                                                                                                                              
+                                                <!--<span class="slds-list__item slds-size_1-of-4">
+                                                    Familia: {!codigo.Producto__r.Family} 
+                                                </span>   -->                                             
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Razón Social: {!codigo.Razon_Social__c}
+                                                </span>
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    RFC: <a href="{!'/' +  codigo.Entidad_Cuenta__c}" id="the_link" target="_blank">{!codigo.RFC__c}</a>                                                                                                         
+                                                </span>
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Fecha de último pedido : {!codigo.Last_order_date__c}
+                                                </span>
+                                            </div>  
+                                            <br/>
+                                            <div class="slds-grid slds-gutters_x-large">                                                                                               
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Monto del ultimo pedido :                                                                                                                                                                                                          
+                                                    <ui:outputCurrency value="{!codigo.Amount_last_order__c}" format="$##,##,###,###.00"/>
+                                                </span>                                                                                              
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Frecuencia : {!codigo.Frecuency__c}
+                                                </span>
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Ejecutivo Asignado : {!codigo.Owner.Name}
+                                                </span>
+
+                                                <span class="slds-list__item slds-size_2-of-4">
+                                                    Estatus de la subcuenta :                                                       
+                                                    <!--<aura:if isTrue="{!codigo.isActive__c}">-->
+                                                    <aura:if isTrue="{!codigo.Status__c == 'Activo'}">
+                                                        <lightning:icon iconName='action:approval' size='xx-small' title='True' />
+                                                    </aura:if>                                                    
+                                                    <aura:if isTrue="{!codigo.Status__c == 'Inactivo'}">
+                                                        <lightning:icon iconName='action:close' size='xx-small' title='False'/>
+                                                    </aura:if>  
+                                                    <aura:if isTrue="{!codigo.Status__c == 'Nuevo'}">
+														<img src="{!$Resource.ContratoFilialStatusNew}"/>
+                                                    </aura:if>                                                     
+                                                </span> 
+                                            </div>
+                                            <br/>                                            
+                                        </div>
+                                    </div>
+                                </li>
+                            </aura:iteration>
+                            
+                        </aura:iteration>
+                    </ul>
+                </div>                
+                <!--<lightning:spinner aura:id="spinner" variant="brand" size="large"/>-->
+            </p>
+        </aura:if>
+        
+        
+        <aura:if isTrue="{!v.selectedValue == 'RFC'}">            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-left_medium slds-p-right_medium">
+                    <ul class="slds-list_vertical slds-has-dividers_top-space ctcListEntidadLegal">
+                        <aura:iteration items="{!v.entidades}" var="entidad" indexVar="i">                                                                                                                
+                            <li>
+                                <div class="slds-section slds-is-open">
+                                    <h3 class="slds-section__title slds-theme_shade">                                        
+                                        <a href="{!'/' +  entidad.RFCId}" id="the_link" target="_blank">
+                                            {!entidad.RFCName}   
+                                        </a>                                                                                
+                                         - {!entidad.RazonName}                                                            
+                                    </h3>
+                                </div>
+                            </li>                                 
+                            <aura:iteration items="{!entidad.setProducto}" var="familia"> 
+                                <div class="slds-grid">
+                                    <span class="slds-list__item">
+                                        <img src="{!familia.Imagen}" alt="texto" class="logofamilia" style="height:40px;"/>
+                                    </span>
+                                    
+                                    <aura:if isTrue="{!familia.StatusRFCSolucion}">
+                                        <span class="slds-list__item">
+                                            <img src="{!$Resource.AccountActive}" alt="texto" class="logofamilia" style="height:39px;"/>
+                                        </span>
+                                        <aura:set attribute="else">
+                                            <span class="slds-list__item">
+                                                <img src="{!$Resource.AccountInactive}" alt="texto" class="logofamilia" style="height:39px;"/>
+                                            </span>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>                                 
+                                <aura:iteration items="{!familia.listacontrato}" var="codigo" indexVar="j">                                                                                                
+                                    <div class="slds-clearfix">
+                                        <div class="slds-float_right">
+                                            <aura:if isTrue="{!codigo.Entidad_Cuenta__r.Status__c == 'Alerta'}">                                            
+                                                <lightning:icon iconName='utility:warning' size='medium' title='alerta'/>                                             
+                                            </aura:if>
+                                            <aura:if isTrue="{!codigo.Entidad_Cuenta__r.Status__c == 'Amenaza'}">                                            
+                                                <lightning:icon iconName='utility:warning' size='medium' title='alerta'/>                                                                                                                                                    
+                                            </aura:if> 
+                                        </div>   
+                                    </div>                                                                
+                                    <li class="slds-list__item">
+                                        <div class="slds-media">                                        
+                                            <div class="slds-media__figure">                                                                                        
+                                                <lightning:icon iconName='standard:account' size='small' title='Entidad Legal'></lightning:icon>                                                    
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <div class="slds-grid">
+                                                    <h3 class="slds-text-heading_small slds-m-bottom_xx-small">                                                                                                      
+                                                        <a href="{!'/' +  codigo.Id}" id="the_link" target="_blank">{!codigo.Name}</a>                                                    
+                                                    </h3>
+                                                </div> 
+                                                <br/>
+                                                <div class="slds-grid slds-gutters_x-large">
+                                                    <span class="slds-list__item slds-size_1-of-4">                                                        
+                                                        Producto: {!codigo.Producto__r.IDInterno__c}
+                                                    </span>  
+                                                    <span class="slds-list__item slds-size_1-of-4">
+                                                        Solución: {!codigo.Producto__r.Family}                                                    
+                                                    </span>                                                    
+                                                    <span class="slds-list__item slds-size_1-of-4">
+                                                        Fecha de último pedido : {!codigo.Last_order_date__c}
+                                                    </span>
+                                                    <span class="slds-list__item slds-size_1-of-4">
+                                                        Monto del ultimo pedido : 
+                                                        <ui:outputCurrency value="{!codigo.Amount_last_order__c}" format="$##,##,###,###.00"/>
+                                                    </span> 
+                                                </div>
+                                                <br/>
+                                                <div class="slds-grid slds-gutters_x-large">                                                                                                                                                   
+                                                    <span class="slds-list__item slds-size_1-of-4">
+                                                        Frecuencia : {!codigo.Frecuency__c}
+                                                    </span>
+                                                    <span class="slds-list__item slds-size_1-of-4">
+                                                    Ejecutivo Asignado : {!codigo.Owner.Name}
+                                                </span>
+                                                    <span class="slds-list__item slds-size_2-of-4">
+                                                        Estatus de la subcuenta :                                                    
+                                                        <aura:if isTrue="{!codigo.Status__c == 'Activo'}">
+                                                            <lightning:icon iconName='action:approval' size='xx-small' title='True' />
+                                                        </aura:if>                                                    
+                                                        <aura:if isTrue="{!codigo.Status__c == 'Inactivo'}">
+                                                            <lightning:icon iconName='action:close' size='xx-small' title='False'/>
+                                                        </aura:if>  
+                                                        <aura:if isTrue="{!codigo.Status__c == 'Nuevo'}">
+															<img src="{!$Resource.ContratoFilialStatusNew}"/>
+                                                        </aura:if>  
+                                                    </span>  
+                                                </div>
+                                                <br/>                                                                                         
+                                            </div>
+                                        </div>
+                                    </li>
+                                </aura:iteration>                                                              
+                            </aura:iteration>                                                                                                                
+                        </aura:iteration>
+                    </ul>
+                </div>
+            </p>
+        </aura:if>  
+        
+        <aura:if isTrue="{!v.selectedValue == 'Ejecutivo'}">            
+            <p class="slds-p-horizontal_small">
+                <div class="slds-p-left_medium slds-p-right_medium">
+                    <ul class="slds-list_vertical slds-has-dividers_top-space ctcListEntidadLegal">
+                        <aura:iteration items="{!v.ejecutivos}" var="ejecutivo" indexVar="i">                                                                                                                
+                            <li>
+                                <div class="slds-section slds-is-open">
+                                    <h3 class="slds-section__title slds-theme_shade">                                                                                                                      
+                                          {!ejecutivo.NombreEjecutivo}                                                            
+                                    </h3>
+                                </div>
+                            </li>                                 
+                            <aura:iteration items="{!ejecutivo.setProducto}" var="familia"> 
+                                <div class="slds-grid">
+                                    <span class="slds-list__item slds-size_1-of-4">
+                                        <img src="{!familia.Imagen}" alt="texto" class="logofamilia" style="height:40px;"/>
+                                    </span>
+                                </div>                                 
+                                <aura:iteration items="{!familia.listacontrato}" var="codigo" indexVar="j">                                                                                                
+                                    <div class="slds-clearfix">
+                                        <div class="slds-float_right">
+                                            <aura:if isTrue="{!codigo.Entidad_Cuenta__r.Status__c == 'Alerta'}">                                            
+                                                <lightning:icon iconName='utility:warning' size='medium' title='alerta'/>                                             
+                                            </aura:if>
+                                            <aura:if isTrue="{!codigo.Entidad_Cuenta__r.Status__c == 'Amenaza'}">                                            
+                                                <lightning:icon iconName='utility:warning' size='medium' title='alerta'/>                                                                                                                                                    
+                                            </aura:if> 
+                                        </div>   
+                                    </div>                                                                
+                                    <li class="slds-list__item">
+                                        <div class="slds-media">                                        
+                                            <div class="slds-media__figure">                                                                                        
+                                                <lightning:icon iconName='standard:account' size='small' title='Entidad Legal'></lightning:icon>                                                    
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <div class="slds-grid">
+                                                    <h3 class="slds-text-heading_small slds-m-bottom_xx-small">                                                                                                      
+                                                        <a href="{!'/' +  codigo.Id}" id="the_link" target="_blank">{!codigo.Name}</a>                                                    
+                                                    </h3>
+                                                </div> 
+                                                <br/>
+                                                <div class="slds-grid">                                                
+                                                <span class="slds-list__item slds-size_1-of-4">                                                    
+                                                    Producto: {!codigo.Producto__r.IDInterno__c}
+                                                </span>												                                                                                                                                              
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Solución: {!codigo.Producto__r.Family} 
+                                                </span>                                              
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Razón Social: {!codigo.Razon_Social__c}
+                                                </span>
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    RFC: <a href="{!'/' +  codigo.Entidad_Cuenta__c}" id="the_link" target="_blank">{!codigo.RFC__c}</a>                                                                                                         
+                                                </span>                                              
+                                            </div>  
+                                            <br/>
+                                            <div class="slds-grid"> 
+                                                 <span class="slds-list__item slds-size_1-of-4">
+                                                    Fecha de último pedido : {!codigo.Last_order_date__c}
+                                                </span>
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Monto del ultimo pedido :                                                                                                                                                                                                          
+                                                    <ui:outputCurrency value="{!codigo.Amount_last_order__c}" format="$##,##,###,###.00"/>
+                                                </span>                                                                                              
+                                                <span class="slds-list__item slds-size_1-of-4">
+                                                    Frecuencia : {!codigo.Frecuency__c}
+                                                </span>
+                                                <span class="slds-list__item slds-size_2-of-4">
+                                                    Estatus de la subcuenta :                                                       
+                                                    <aura:if isTrue="{!codigo.Status__c == 'Activo'}">
+                                                        <lightning:icon iconName='action:approval' size='xx-small' title='True' />
+                                                    </aura:if>                                                    
+                                                    <aura:if isTrue="{!codigo.Status__c == 'Inactivo'}">
+                                                        <lightning:icon iconName='action:close' size='xx-small' title='False'/>
+                                                    </aura:if>  
+                                                    <aura:if isTrue="{!codigo.Status__c == 'Nuevo'}">
+														<img src="{!$Resource.ContratoFilialStatusNew}"/>
+                                                    </aura:if>                                                  
+                                                </span> 
+                                            </div>
+                                                <br/>                                                                                         
+                                            </div>
+                                        </div>
+                                    </li>
+                                </aura:iteration>                                                              
+                            </aura:iteration>                                                                                                                
+                        </aura:iteration>
+                    </ul>
+                </div>
+            </p>
+        </aura:if>       
+    </lightning:card>    
+</aura:component>

@@ -1,0 +1,33 @@
+<aura:component >
+    <aura:attribute name="accountAffiliates" type="List" description="Afiliados relacionados a la cuenta"/>    
+    <aura:attribute name="accountGroupers"   type="List" description="Agrupadores de la cuenta"/>    
+    
+    
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col  slds-size_1-of-2 fieldLabel slds-border_bottom slds-border_right"><span>Agrupador</span></div>
+        <div class="slds-col slds-size_1-of-2 fieldLabel slds-border_bottom slds-border_left"><span>Afiliado</span></div>
+        
+        <aura:iteration items="{!v.accountGroupers}" var="grouper" indexVar="index">
+            <div class="slds-col slds-size_2-of-2 groupValue slds-border_bottom slds-border_right slds-border_top"><span>{!grouper.Name}</span></div>
+            
+            <aura:iteration items="{!v.accountAffiliates}" var="affiliate" indexVar="affIndex">
+                
+                <aura:if isTrue="{! affiliate.Grouper__c == grouper.Id }">
+                    <div class="slds-col slds-size_2-of-2 fieldValue  slds-border_left"><lightning:formattedUrl value="{!'/'+ affiliate.Id }"  label="{!affiliate.Name}" target="_blank" tooltip="Ver afiliado"/></div>
+                </aura:if>
+                
+            </aura:iteration>
+            
+        </aura:iteration>
+    </div>
+    
+    <div class="slds-grid slds-wrap slds-border_top slds-m-top_medium">        
+        <div class="slds-col  slds-size_2-of-2 fieldLabel slds-border_bottom slds-border_right"><span>Afiliados sin agrupar</span></div>
+        <aura:iteration items="{!v.accountAffiliates}" var="affiliate" indexVar="index">
+            <aura:if isTrue="{! empty(affiliate.Grouper__c)}">
+                <div class="slds-col slds-size_1-of-2 affWithout  slds-border_left"><lightning:formattedUrl value="{!'/'+ affiliate.Id }"  label="{!affiliate.Name}" tooltip="Ver afiliado"/></div>
+            </aura:if>
+        </aura:iteration>
+    </div>
+    
+</aura:component>

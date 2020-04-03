@@ -1,0 +1,148 @@
+<aura:component controller="Notificacion_SolicitudPausaOT_CONT" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global">
+    <aura:attribute name="datos" type="List"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="pendiente" type="boolean" default="false"/>
+    <aura:attribute name="pausaaceptada" type="boolean" />
+    <aura:attribute name="pausarechaza" type="boolean" />
+    <aura:attribute name="vista" type="boolean" />
+    <aura:attribute name="vistarechazo" type="boolean" />
+    <aura:attribute name="perfil" type="String" />
+    <aura:attribute name="dueno" type="String" />
+    <aura:attribute name="gestor" type="String" />
+    <aura:attribute name="comentarioacp" type="String"/>
+    <aura:attribute name="status" type="String"/>
+    <!--aura:attribute name="mostrarAlerta" type="boolean" default="false"/>
+     <aura:attribute name="mostrarAlertaEj" type="boolean" default="false"/>
+    <aura:attribute name="deshabilitarSR" type="boolean" default="false"/>
+    <aura:attribute name="deshabilitarPO" type="boolean" default="false"/-->
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    
+    <!--lightning:notificationsLibrary aura:id="notifLib"/>
+    <aura:if isTrue="{!v.mostrarAlerta}">
+            <ui:message class="snackbar" title="Error" severity="error" closable="true">
+                Ingrese un motivo para poder solicitar la pausa de la Orden de trabajo
+            </ui:message>
+    </aura:if>
+    <aura:if isTrue="{!v.mostrarAlertaEj}">
+            <ui:message class="snackbar" title="Error" severity="error" closable="true">
+                Ingrese un comentario para solicitar la revisión
+            </ui:message>
+    </aura:if-->
+    <div style="position:relative" class="container">
+        <lightning:spinner aura:id="spinner" alternativeText="Loading" size="large" />
+        <aura:if isTrue="{!v.spin}">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+        <aura:if isTrue="{!!or(v.vista,v.vistarechazo)}"> 
+        <aura:if isTrue="{!!v.pendiente}">
+            <aura:if isTrue="{!or(v.perfil=='Coordinador de implementación',or(v.perfil=='Implementación',v.perfil=='Administrador del sistema'))}">
+                <div>                   
+                    
+                    <lightning:combobox class="slds-m-around_small" aura:id="motivo" label="Motivo:" placeholder="Seleccione un motivo" options="{!v.datos}"/>
+                    <!--lightning:dualListbox name="motivos"
+                                           aura:id="motivos"
+                                           required="true"
+                                           class="slds-m-around_small"
+                                           label= "Motivos para solicitar la pausa" 
+                                           sourceLabel="Motivos disponibles" 
+                                           selectedLabel="Motivos seleccionados" 
+                                           options="{!v.datos}" /-->
+                    <lightning:textarea class="slds-m-around_small" aura:id="comentarios" name="comentarios" label="Comentarios para el ejecutivo" placeholder="Escriba aqui sus comentarios..."/>
+                    <br/>
+                    <lightning:button class="slds-m-around_small" label="Solicitar pausa" variant="brand" onclick="{!c.solicitarPausa}"/>
+                </div> 
+                <aura:set attribute="else">
+                    <div>
+                        <center>
+                            <img src="{!$Resource.astro}" width="200" height="100" />
+                           <!--<div style="margin-top:3%;" class="slds-text-heading_large">La orden de trabajo ya tiene solicitud de pausa.</div>-->
+                        </center>
+                    </div>
+                </aura:set>
+            </aura:if>             
+        </aura:if>      
+        <aura:if isTrue="{!v.pendiente}">
+            <aura:if isTrue="{!or(v.perfil=='Gestor Distant Sales',or(v.perfil=='Ventas_Exp_Reportes',or(v.perfil=='Jefe Comercial FS',or(v.perfil=='Gerente Comercial FS',v.perfil=='Administrador del sistema'))))}" >
+                <div>
+                    <lightning:textarea class="slds-m-around_small" aura:id="comentariosEjecutivo" label="Comentarios para el implementador(Solo al solicitar revisión)" placeholder="Escriba aqui sus comentarios..."/>
+                </div>
+                <br/>
+                <center>
+                    <div class="slds-p-right_xx-large" style="display:inline-block;">
+                        <lightning:button class="slds-m-around_small" label="Solicitar revisión" variant="brand" onclick="{!c.solicitarRevision}"/>
+                    </div>
+                    <div style="display:inline-block;">
+                        <lightning:button class="slds-m-around_small" label="Aceptar pausa" variant="brand" onclick="{!c.aceptar}"/>
+                    </div>
+                    <div style="display:inline-block;">
+                        <lightning:button class="slds-m-around_small" label="Rechazar pausa" variant="brand" onclick="{!c.rechazar}"/>
+                    </div>                   
+                </center>
+                <aura:set attribute="else">
+                    <div>
+                        <center>
+                            <img src="{!$Resource.astro}" width="200" height="100" />
+                            <div style="margin-top:3%;" class="slds-text-heading_large">La orden de trabajo ya tiene solicitud de pausa.</div>
+                        </center>
+                    </div>
+                </aura:set>
+            </aura:if>
+        </aura:if>  
+        </aura:if>
+        <aura:if isTrue="{!v.vista}"> 
+            <aura:if isTrue="{!or(v.perfil=='Coordinador de implementación',or(v.perfil=='Gerente de Implementación',v.perfil=='Administrador del sistema'))}">
+                <aura:if isTrue="{!v.pausaaceptada}">
+                    <div>
+                        <lightning:input name="input2" label="Comentarios Aceptacio OT" value="{!v.comentarioacp}"/>
+                    </div>
+                    <br/>
+                    <center>
+                        <div style="display:inline-block;">
+                            <lightning:button class="slds-m-around_small" label="Ok" variant="brand" onclick="{!c.pausar}"/>
+                        </div>                   
+                    </center>                    
+                </aura:if> 
+                <aura:set attribute="else">                  
+                    <div>
+                        <center>
+                            <img src="{!$Resource.astro}" width="200" height="100" />
+                            <div style="margin-top:3%;" class="slds-text-heading_large">Se mando para ok de aceptacion. </div>
+                        </center>
+                    </div>
+                </aura:set>  
+            </aura:if>            
+        </aura:if>
+        <aura:if isTrue="{!v.vistarechazo}"> 
+                <aura:if isTrue="{!or(v.perfil=='Coordinador de implementación',or(v.perfil=='Gerente de Implementación',v.perfil=='Administrador del sistema'))}">
+                    <aura:if isTrue="{!v.pausarechaza}">  
+                        <div>
+                            <lightning:input name="input2" label="Comentarios Rechazo OT" value="{!v.comentarioacp}"/>
+                        </div>
+                        <br/>
+                        <center>
+                            <div style="display:inline-block;">
+                                <lightning:button class="slds-m-around_small" label="Ok" variant="brand" onclick="{!c.okrechazo}"/>
+                            </div>                   
+                        </center>
+                    </aura:if> 
+                    <aura:set attribute="else">                  
+                        <div>
+                            <center>
+                                <img src="{!$Resource.astro}" width="200" height="100" />
+                                <div style="margin-top:3%;" class="slds-text-heading_large">Se mando para OK de rechazo. </div>
+                            </center>
+                        </div>
+                    </aura:set> 
+                </aura:if>
+            </aura:if>
+        <aura:set attribute="else">                  
+            <div>
+                <center>
+                    <img src="{!$Resource.astro}" width="200" height="100" />
+                    <div style="margin-top:3%;" class="slds-text-heading_large">Se Finalizo el proceso </div>
+                </center>
+            </div>
+        </aura:set> 
+    </div>
+</aura:component>

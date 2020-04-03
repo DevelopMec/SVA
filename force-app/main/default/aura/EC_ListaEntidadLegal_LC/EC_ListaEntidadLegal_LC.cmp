@@ -1,0 +1,370 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="EC_ListaEntidadLegal_LC_Ctrl">
+	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js'
+    						)}"
+    						afterScriptsLoaded="{!c.init}"
+    				/>
+
+    <aura:attribute name="app_ctc" type="Map" default="{}"/>
+    <aura:handler event="c:EC_ActualizaEntidadLegal_LE" action="{!c.init}" />
+    
+    <!-- <aura:handler name="change" value="{!v.app_ctc.instance.CodigoPostal__c__o}" action="{!c.selectCodigoPostal}" /> -->
+    <aura:handler name="Event_Selected" event="c:EC_SeleccionaCodigoPostal_LE" action="{!c.selectCodigoPostal}" />
+    
+    <!-- DV -->
+    <aura:attribute name="options" type="String[]"/>    
+    <aura:attribute name="selectedValue" type="String"/>
+    <aura:attribute name="idPersonaFisica" type="String"/>
+    <!-- DV -->
+
+    <!--DIREC-->
+    <aura:attribute name="listDireccionesCuenta" type="List"/>
+    <aura:attribute name="dirSelect" type="String"/>
+    <lightning:quickActionAPI aura:id="quickActionAPI" />
+    <aura:attribute type="boolean" name="spin" default="false"/>
+    <!--DIREC-->
+    
+	<lightning:card iconName="standard:account">
+
+        <aura:set attribute="title">
+            <h2>
+                <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Entidades legales">
+                    <span class="slds-text-heading_small">RFC y Documentación ({!v.app_ctc.entidadesLegales.length})</span>
+                </a>
+            </h2>
+        </aura:set>
+        
+        <aura:set attribute="actions">
+            <lightning:button label="Agregar" onclick="{!c.editRecord}" value="0"/>
+        </aura:set>
+
+        <p class="slds-p-horizontal_small">
+            <div class="slds-p-left_medium slds-p-right_medium">
+                <ul class="slds-list_vertical slds-has-dividers_top-space ctcListEntidadLegal">
+                    <aura:iteration items="{!v.app_ctc.entidadesLegales}" var="entidad" indexVar="i">
+                        <li class="slds-list__item">
+                            <div class="slds-media">
+                                <div class="slds-media__body">
+                                    <div class="slds-grid">
+
+                                        <h3 class="slds-text-heading_small slds-m-bottom_xx-small">
+                                            <lightning:button label="{!entidad.RazonSocial__c}" onclick="{!c.viewRecord}" value="{!entidad.Id}" variant="base"/>
+                                        </h3>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span class="ctcElEstatus">
+                                            {!entidad.Estatus__c}
+                                        </span>
+
+                                        <lightning:buttonIcon iconName="utility:user" class="slds-col_bump-left" variant="bare" alternativeText="Contactos" onclick="{!c.editContacts}" value="{!entidad.EntidadCuenta__c}"/>
+                                        
+                                        <lightning:buttonIcon iconName="utility:file" class="slds-col_bump-left" variant="bare" alternativeText="Documentos" onclick="{!c.editDocuments}" value="{!entidad.Id}"/>
+                                        
+                                        <lightning:buttonIcon iconName="utility:edit" class="slds-col_bump-left" variant="bare" alternativeText="Editar" onclick="{!c.editRecord}" value="{!entidad.EntidadCuenta__c}"/>
+                                        
+                                       <!-- <lightning:buttonIcon iconName="utility:delete" class="slds-col_bump-left" variant="bare" alternativeText="Eliminar" onclick="{!c.showRemove}" value="{!entidad.EntidadCuenta__c}"/>-->
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                    </div>
+                                    <div aura:id="propertyDetails" class="slds-m-top_small-calvarez">
+                                        <ul class="slds-grid slds-wrap">
+                                            <li class="slds-list__item slds-size_7-of-12">
+                                                <span class="slds-text-color_weak slds-m-right_small">RFC:</span> {!entidad.Name}
+                                            </li>
+                                            <li class="slds-list__item slds-size_5-of-12">
+                                                <span class="slds-text-color_weak slds-m-right_small">Tipo:</span> {!entidad.Type}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </aura:iteration>
+                </ul>
+            </div>
+        </p>
+		
+		<lightning:spinner aura:id="spinner" variant="brand" size="large"/>
+
+    </lightning:card>
+
+    <!-- Edit dialog  -->
+    <div aura:id="editDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="panel slds-modal" style="margin-top: 130px">
+        <div class="modal-container slds-modal__container">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.closeRecord}">
+                    <lightning:icon iconName="utility:close" variant="bare" ></lightning:icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading_medium">{!v.app_ctc.instance.action}</h2>
+            </div>
+            <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+
+                <aura:if isTrue="{!v.app_ctc.instance.render}">
+                    <div class="slds-form slds-form_stacked" style="position:relative;">
+
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Información</span>
+                                <aura:if isTrue="{!v.app_ctc.instance.disabled == true}">
+                                    <div class="slds-text-color_error">No es editable, está asociada con Contrato.</div>
+                                </aura:if>
+                            </h3>
+                        </div>
+
+                        <lightning:layout multipleRows="true">
+                            
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:select name="select" label="Tipo" required="{!v.app_ctc.schema.EntidadLegal__c.RecordTypeId.required}" value="{!v.app_ctc.instance.EntidadLegal.RecordTypeId}" disabled="{!v.app_ctc.instance.disabled}" onchange="{!c.tipoSociedad}" >
+                                    <aura:iteration items="{!v.app_ctc.instance.recordTypesList}" var="tipo">
+                                        <option value="{!tipo.Id}" text="{!tipo.Name}" selected="{!tipo.selected}"></option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.Name.label}" required="{!v.app_ctc.schema.EntidadLegal__c.Name.required}" value="{!v.app_ctc.instance.EntidadLegal.Name}" onblur="{! c.validateRFC }" name="{!v.app_ctc.schema.EntidadLegal__c.Name.name}" messageWhenBadInput="tes" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium ctcAlignRight">
+                                <aura:if isTrue="{!v.app_ctc.instance.rfcDisponible}">
+                                    <lightning:button variant="destructive" label="RFC ya registrado, utilizar?" onclick="{! c.useRFC }" />
+                                </aura:if>
+
+                                <aura:if isTrue="{!v.app_ctc.instance.rfcNodisponible}">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error ctcAlert" role="alert">
+                                        <h2>{!v.app_ctc.instance.rfcNodisponibleMsg}</h2>
+                                    </div>
+                                </aura:if>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.RazonSocial__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.RazonSocial__c.required}" value="{!v.app_ctc.instance.EntidadLegal.RazonSocial__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+                            
+                            <!-- DV -->
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:select name="mySelect" aura:id="mySelect" disabled="{!v.idPersonaFisica == '01261000000j33mAAA'}" label="{!v.app_ctc.schema.EntidadLegal__c.TipoSociedad_PL__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.TipoSociedad_PL__c.required}" value = "{!v.selectedValue}">
+                                    <aura:iteration items="{!v.options}" var="opt">
+                                        <option text="{!opt.label}" value="{!opt.value}"/>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </lightning:layoutItem>
+                            <!-- DV -->
+
+
+                        </lightning:layout>
+                            
+
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Dirección</span>
+                            </h3>
+                        </div>
+                        
+                        <!--DYAMPI-->
+                        <aura:if isTrue="{!v.spin}">
+                            <div>
+                                <lightning:spinner alternativeText="Loading" size="large" />
+                            </div>                            
+                        </aura:if>
+                        <div>
+                            <lightning:combobox disabled="{!v.app_ctc.instance.disabled}" class="slds-m-around_x-small" aura:id="direccion" label="Dirección" value="{!v.app_ctc.instance.EntidadLegal.Address__c}" placeholder="Seleccione una dirección" options="{!v.listDireccionesCuenta}" onchange=""/>
+                            <aura:if isTrue="{!!v.app_ctc.instance.disabled}">
+                                <div style="display:inline;">
+                                    <lightning:button class="slds-m-around_x-small" label="Refrescar direcciones" variant="bare" onclick="{!c.refrescarDirecciones}"/>
+                                    <lightning:button class="slds-m-around_x-small derecha" label="Crear Dirección" variant="brand" onclick="{!c.crearDirecc}"/>                                
+                                </div>
+                            </aura:if>
+                        </div>
+                        
+                        <!--lightning:layout multipleRows="true">  
+                             <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" type="toggle"  label="{!v.app_ctc.schema.EntidadLegal__c.Direccion_Cuenta__c.label}" checked="{!v.app_ctc.instance.EntidadLegal.Direccion_Cuenta__c}"
+                                onchange="{!c.getDireccion}" />
+                            </lightning:layoutItem>
+
+                            
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField"  label="{!v.app_ctc.schema.EntidadLegal__c.Calle__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.Calle__c.required}" value="{!v.app_ctc.instance.EntidadLegal.Calle__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.NumeroExterior__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.NumeroExterior__c.required}" value="{!v.app_ctc.instance.EntidadLegal.NumeroExterior__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.NumeroInterior__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.NumeroInterior__c.required}" value="{!v.app_ctc.instance.EntidadLegal.NumeroInterior__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem  aura:id="buscador" flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.CodigoPostal__c.label}" required="false" value="{!v.app_ctc.instance.EntidadLegal.CodigoPostal__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+
+                                <c:EC_BuscarObjeto_LC    field="{!v.app_ctc.schema.Direccion__c.CodigoPostal__c}" instance="{!v.app_ctc.instance}" auraAction="c.buscarDireccion" params="{!v.params}" renderProperties="Name" selectedProperty="CodigoPostal__c" hasError="{!v.app_ctc.hasError}" messageError="Valor requerido" paramSearch="codigoPostal" minLength="3" fireEvent="EC_SeleccionaCodigoPostal_LE"></c:EC_BuscarObjeto_LC>
+                            </lightning:layoutItem>
+
+                             <lightning:layoutItem aura:id="fake" flexibility="auto" size="6" class="slds-hide">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.CodigoPostal__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.CodigoPostal__c.required}" value="{!v.app_ctc.instance.EntidadLegal.CodigoPostal__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.Colonia__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.Colonia__c.required}" value="{!v.app_ctc.instance.EntidadLegal.Colonia__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.DelegacionMunicipioFiscal__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.DelegacionMunicipioFiscal__c.required}" value="{!v.app_ctc.instance.EntidadLegal.DelegacionMunicipioFiscal__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.Ciudad__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.Ciudad__c.required}" value="{!v.app_ctc.instance.EntidadLegal.Ciudad__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+                            <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                                <lightning:input aura:id="inputField" label="{!v.app_ctc.schema.EntidadLegal__c.Estado__c.label}" required="{!v.app_ctc.schema.EntidadLegal__c.Estado__c.required}" value="{!v.app_ctc.instance.EntidadLegal.Estado__c}" disabled="{!v.app_ctc.instance.disabled}"/>
+                            </lightning:layoutItem>
+
+
+                        </lightning:layout-->
+
+                    </div>
+                </aura:if>
+            </div>
+            <div class="slds-modal__footer">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem flexibility="auto" size="7" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <aura:if isTrue="{!v.app_ctc.instance.errors.length > 0}">
+                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error ctcAlert" role="alert">
+                                <ul>
+                                    <aura:iteration items="{!v.app_ctc.instance.errors}" var="error" indexVar="i">
+                                        <li>{!error}</li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" size="5" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeRecord}">
+                            <aura:if isTrue="{!v.app_ctc.instance.disabled == true}">
+                                Cerrar
+                            </aura:if>
+                            <aura:if isTrue="{!v.app_ctc.instance.disabled == false}">
+                                Cancelar
+                            </aura:if>
+                        </button>
+                        
+                        <aura:if isTrue="{!v.app_ctc.instance.disabled == false}">
+                            <button class="slds-button slds-button_brand" onclick="{!c.saveRecord}" disabled="{!v.app_ctc.instance.hasError__}">Guardar</button>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Contacts  -->
+    <div aura:id="editContactos" role="dialog" tabindex="-1" aria-labelledby="header43" class="panel slds-modal">
+        <div class="modal-container slds-modal__container">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.closeContacts}">
+                    <lightning:icon iconName="utility:close" variant="bare" ></lightning:icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading_medium">{!v.app_ctc.instance.action}</h2>
+            </div>
+            <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+                <aura:if isTrue="{!v.app_ctc.instance.renderContacts}">
+                    <c:EC_EntidadContacto_LC recordId="{!v.app_ctc.instance.Id}"/>
+                </aura:if>
+            </div>
+
+            <div class="slds-modal__footer">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem flexibility="auto" size="7" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <aura:if isTrue="{!v.app_ctc.instance.errors.length > 0}">
+                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error ctcAlert" role="alert">
+                                <aura:iteration items="{!v.app_ctc.instance.errors}" var="error" indexVar="i">
+                                    <h2>{!error}</h2>
+                                </aura:iteration>
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" size="5" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeContacts}">Cerrar</button>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Documents  -->
+    <div aura:id="editDocumentos" role="dialog" tabindex="-1" aria-labelledby="header43" class="panel slds-modal">
+        <div class="modal-container slds-modal__container">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.closeDocuments}">
+                    <lightning:icon iconName="utility:close" variant="bare" ></lightning:icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading_medium">{!v.app_ctc.instance.action}</h2>
+            </div>
+            <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+                <aura:if isTrue="{!v.app_ctc.instance.renderDocuments}">
+                    <c:EC_CargaDeArchivos_LC recordId="{!v.app_ctc.instance.Id}"/>
+                </aura:if>
+            </div>
+
+            <div class="slds-modal__footer">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem flexibility="auto" size="7" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <aura:if isTrue="{!v.app_ctc.instance.errors.length > 0}">
+                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error ctcAlert" role="alert">
+                                <aura:iteration items="{!v.app_ctc.instance.errors}" var="error" indexVar="i">
+                                    <h2>{!error}</h2>
+                                </aura:iteration>
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" size="5" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeDocuments}">Cerrar</button>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove EntidadCuenta__c -->
+    <div aura:id="removeDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.closeRemove}">
+                    <lightning:icon iconName="utility:close" variant="bare" ></lightning:icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading_medium">{!v.app_ctc.instance.action}?</h2>
+            </div>
+
+            <div class="slds-modal__content ">
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                        <aura:if isTrue="{!v.app_ctc.instance.errors.length > 0}">
+                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error ctcAlert" role="alert">
+                                <aura:iteration items="{!v.app_ctc.instance.errors}" var="error" indexVar="i">
+                                    <h2>{!error}</h2>
+                                </aura:iteration>
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <br/>
+            </div>
+
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick="{!c.closeRemove}">Cancelar</button>
+                <button class="slds-button slds-button_destructive" onclick="{!c.confirmRemove}">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div aura:id="overlay" class="modal-glass slds-backdrop fadein"></div>
+
+</aura:component>

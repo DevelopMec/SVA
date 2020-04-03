@@ -1,0 +1,56 @@
+<apex:component >
+    <script type="text/ng-template" id="modalGenericoCuenta.html">
+        <div class="modal-header {{sc.config.headerClass}}" id="modalGenericoCuenta">
+            <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">
+            	<span class="{{sc.config.icon}}"></span>
+            	<span ng-bind="sc.title"></span>
+            </h4>
+        </div>
+        <div class="modal-body">
+			<p ng-bind-html="sc.subTitle"></p>
+        </div>
+        <div class="modal-footer">
+            <center>
+                <button type="button" class="btnb btnb-danger" ng-click="sc.confirmaEliminar()" ng-if="sc.config.showRemove">
+                    <span class="{{sc.config.icon}}"></span>
+                    {{sc.config.confirm}}
+                </button>
+                <button type="button" ng-disabled="sc.processing" class="btnb btnb-default" ng-click="sc.close()">
+                    <span class="fa fa-mail-reply fa-fw"></span>
+                    {{sc.config.cancel}}
+                </button>
+            </center>
+            
+        </div>
+    </script>
+
+    <script type="text/javascript">
+        (function() {
+            'use sctrict'
+            angular.module('appEdenred')
+            .controller('modalGenericoCuentaCtrl', ModalGenericoCuentaCtrl)
+
+            ModalGenericoCuentaCtrl.$inject = ['ctcUtils', '$uibModal', '$uibModalInstance','$window', 'instance', 'title', 'subTitle']
+
+            function ModalGenericoCuentaCtrl(ctcUtils, $uibModal, $uibModalInstance,$window, instance, title, subTitle) {
+            	 console.log('ModalGenericoCuentaCtrl: ', arguments)
+                var vm = this
+                vm.instance = instance || {}
+                vm.title =  title || 'Eliminar objeto'
+                vm.subTitle =  subTitle || 'Eliminar objeto?'
+                vm.config = ctcUtils.removeConfig || {icon: 'fa fa-trash fa-fw', confirm: 'Eliminar', cancel: 'Cancelar', showRemove: true, headerClass: 'modal-header-danger'}
+
+                vm.confirmaEliminar = function() {
+                    $uibModalInstance.close(vm.instance)
+                }
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                    $window.location.reload()
+                    console.log('$uibModalInstance: ', $uibModalInstance)
+                }
+            }
+        })()    
+    </script>
+</apex:component>

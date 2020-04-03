@@ -1,0 +1,53 @@
+<apex:page standardController="Opportunity" extensions="GenerarCSVSController" action="{!GenerarArchivos}">
+    <!--JQUERY-->
+    <apex:includeScript value="{!URLFOR($Resource.jquery)}" />
+    <!--JQUERYUI-->
+    <apex:includeScript value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.min.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.css')}" />
+    <!--BOOTSTRAP-->
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap,'dist/js/bootstrap.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap,'dist/css/bootstrap.css')}" />
+    <div class="container bs-docs-container" id="contenedorPrincipal">
+        <div class="row">
+                <div class="col-md-12">
+                    <section class="section">
+                        <c:Panel title="Descarga de archivos" idCollapse="panelGeneral"  id="info" idParent="panelParent" expanded="true">
+                        	<c:PageMessages closableErrors="true"/>
+                            <!-- <table class="table table-bordered table-striped table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                        	Archivo
+                                        </th>
+                                        <th>
+                                        	Estatus
+                                        </th>
+                                        <th>
+                                        	Descarga
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <apex:repeat value="{!listaArchivos}" var="archivo">
+                                    	<tr>
+                                        	<td>{!archivo.archivo.Name}</td>
+                                            <td>{!archivo.mensaje}</td>
+                                            <td>
+                                                <apex:outputLink value="/servlet/servlet.FileDownload?file={!archivo.archivo.Id}" id="descarga" rendered="{!archivo.mensaje = 'OK'}">Ver</apex:outputLink>
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                </tbody>
+                            </table>
+-->			                    <button type="button" onclick="redireccionar('/{!oportunidad.Id}')" id="regresar" class="btn btn-primary">Regresar</button>
+                        </c:Panel>
+                    </section>
+                </div>
+            <script>
+                function redireccionar(direccion){
+                    window.location.href=""+direccion;
+                }
+            </script>
+        </div>
+    </div>
+</apex:page>

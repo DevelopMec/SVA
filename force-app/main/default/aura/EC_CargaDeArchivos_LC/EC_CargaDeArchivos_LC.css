@@ -1,0 +1,24 @@
+.THIS input[type=file] {
+    
+    display: none;
+}
+
+.THIS .label-edit-file {
+	cursor: pointer;
+}
+
+.THIS .icon-edit-file .slds-icon {
+	fill: #0070d2; 
+}
+
+.THIS .doc-buttons-position {
+	display: grid;
+}
+.THIS .fileUploadEdenred .slds-file-selector__dropzone {
+    position: relative !important;
+    left: 25px !important;
+    top: -18px !important;
+}
+.THIS .fileUploadEdenred .slds-file-selector__text {
+    display: none !important;
+}

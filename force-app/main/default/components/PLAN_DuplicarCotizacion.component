@@ -1,0 +1,218 @@
+<apex:component >
+    <script type="text/ng-template" id="duplicarCotizacion.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+            <!-- <h4 class="modal-title">Escalonamiento</h4> -->
+        </div>
+        <div class="modal-body">
+            <center><strong>¿Duplicar <span ng-bind="sc.data.cotizacion.Name"/>?</strong></center>
+        </div>
+        <div class="modal-footer">
+            <center>
+                <button type="button" ng-disabled="sc.processing" class="btnb btnb-success" ng-click="sc.duplicarCotizacion(sc.data.productos)">
+                    <span class="fa fa-save fa-fw"></span>
+                    Duplicar
+                </button>
+                <button type="button" ng-disabled="sc.processing" class="btnb btnb-default" ng-click="sc.close()">
+                    <span class="fa fa-mail-reply fa-fw"></span>
+                    Cerrar
+                </button>
+            </center>
+            
+        </div>
+    </script>
+
+    <script type="text/javascript">
+        (function() {
+            'use sctrict'
+            angular.module('appEdenred')
+            .controller('DuplicarCotizacionCtrl', DuplicarCotizacionCtrl)
+
+            DuplicarCotizacionCtrl.$inject = ['ctcUtils', '$uibModal', '$uibModalInstance', 'data', '$compile', '$timeout']
+
+            function DuplicarCotizacionCtrl(ctcUtils, $uibModal, $uibModalInstance, data, $compile, $timeout) {
+                var vm = this
+                vm.data = data || {}
+
+                console.log('in DuplicarCotizacionCtrl: ', vm)
+
+                vm.duplicarCotizacion = function(productos){
+
+                    var length = vm.data.cot.cotizaciones.length  + 1
+                    var add = {}
+                    if(vm.data.cotizacion && vm.data.cotizacion.Name) {
+                        add = angular.copy(vm.data.cotizacion)
+                        
+                        //console.log('add before delete', add)
+                        vm.clearAttributes(add)
+                        //ctcUtils.clear(add, 'disabled', true)
+                        //console.log('add after delete', add)
+                        delete add.eliminados
+                        delete add.Type
+                        
+                        add.Name = 'Cotización 00' + length
+                        if(add.productos) {
+                            angular.forEach(add.productos, function(v, k) {
+                                if(v.Name__o && v.Name__o.Family) {
+                                    v.Family = angular.copy(v.Name__o.Family)
+
+                                    v.Red__c = angular.copy(v.Name__o.Red__c)
+                                    v.Uso__c = angular.copy(v.Name__o.Uso__c)
+                                    v.Formato__c = angular.copy(v.Name__o.Formato__c)
+                                    v.Name = angular.copy(v.Name__o.Id)
+                                    v.Etapa__c = 'Cotización'
+
+                                    var uniqueF = {}
+                                    var uniqueU = {}
+                                    var uniqueF = {}
+                                    v['Red__c_opts'] = []
+                                    v['Uso__c_opts'] = []
+                                    v['Formato__c_opts'] = []
+                                    v['Products2'] = []
+                                    angular.forEach(productos, function(item, key) {
+
+                                        //Red__c
+                                        if(item.Family == v.Family && (item.Red__c == 'Abierta'||item.Red__c == 'Cerrada') && !uniqueF[item.Red__c]) {
+                                            uniqueF[item.Red__c] = true
+                                            v['Red__c_opts'].push({label: item.Red__c, value: item.Red__c})
+                                        }
+
+                                        //Uso__c
+                                        if(item.Family == v.Family && item.Red__c == v.Red__c && item.Uso__c && !uniqueU[item.Uso__c]){
+                                            uniqueU[item.Uso__c] = true
+                                            v['Uso__c_opts'].push({label: item.Uso__c, value: item.Uso__c})
+                                        }
+
+                                        //Formato__c
+                                        if(item.Family == v.Family && item.Red__c == v.Red__c && item.Uso__c == v.Uso__c && item.Formato__c && !uniqueF[item.Formato__c]){
+                                            uniqueF[item.Formato__c] = true
+                                            v['Formato__c_opts'].push({label: item.Formato__c, value: item.Formato__c})
+                                        }
+
+                                        //Producto
+                                        if(item.Family == v.Family && item.Red__c == v.Red__c && item.Uso__c == v.Uso__c && item.Formato__c == v.Formato__c){
+                                            v['Products2'].push(item)
+                                        }
+
+                                    })
+
+                                    delete v.Name__o
+                                    delete v.Family__o
+                                }
+                            })
+                        }
+
+                        //calvarez 24 feb 2017
+                        /*delete add.Id
+                        angular.forEach(add.productos, function(v, k) {
+                            delete v.Id  
+                        })*/
+                    } else {
+                        add = {Name: 'Cotización 00' + length, Type: 'Simple'}
+                    }
+                    vm.data.cot.cotizaciones.push(add)
+                    $timeout(function() {
+                        /*var ctrl = angular.element($('#productosCtrl')).scope()
+                        if(ctrl && ctrl.prod) {
+                            angular.forEach(add.productos, function(v, k) {
+                                ctrl.prod.selectFamilia(v.Family__o, v, {}, {}, productos)
+                            })
+                        }*/
+                        vm.data.cot.tab = vm.data.cot.cotizaciones.length - 1
+                        vm.close()
+                    }, 500)
+
+                }
+
+                vm.clearAttributes = function(cotizacion) {
+                    delete cotizacion.Id
+                    delete cotizacion.IdElement
+                    delete cotizacion.idsProductos
+                    delete cotizacion.QuoteNumber
+                    delete cotizacion.Status
+                    delete cotizacion.IsSyncing
+
+                    delete cotizacion.formCotiza
+                    if(cotizacion.ContactId__o && cotizacion.ContactId__o.Id) {
+                        cotizacion.ContactId = cotizacion.ContactId__o.Id
+                        delete cotizacion.ContactId__o
+                    } else {
+                        delete cotizacion.ContactId
+                    }
+
+                    angular.forEach(cotizacion.productos, function(prod, index){
+                        delete prod.Id
+                        delete prod.IdElement
+                        delete prod.QuoteId
+                        delete prod.total
+                        delete prod.disabled
+
+                        //console.log('prod: ', prod)
+                        angular.forEach(prod.productosComparar, function(prodComp, index1){
+                            delete prodComp.Id
+                            delete prodComp.IdElement
+                            //delete prodComp.Name
+                            delete prodComp.ProductoComparado__c
+                            delete prodComp.ProductoCotizado__c
+                            delete prodComp.ProductoCotizado__r
+                            delete prodComp.disabled
+
+                            if(prodComp.Name__o && prodComp.Name__o.Id) {
+                                prodComp.Name = prodComp.Name__o.Id
+                                //delete prodComp.Name__o
+                            }
+                        })
+                        if(prod.productoConceptoInstancias) {
+                            angular.forEach(Object.keys(prod.productoConceptoInstancias), function(idProduct2, index1) {
+                                if(prod.productoConceptoInstancias[idProduct2]) {
+                                    angular.forEach(Object.keys(prod.productoConceptoInstancias[idProduct2]), function(idConcepto, index2) {
+                                        var productoConcepto = prod.productoConceptoInstancias[idProduct2]
+
+                                        delete productoConcepto[idConcepto].Id
+                                        delete productoConcepto[idConcepto].IdElement
+                                        delete productoConcepto[idConcepto].PartidaPresupuesto__c
+                                        delete productoConcepto[idConcepto].disabled
+                                    })
+                                }
+                            })
+                        }
+
+                        if(prod.conceptosId) {
+                            angular.forEach(Object.keys(prod.conceptosId), function(v2, k2) {
+                                delete prod.conceptosId[v2].disabled
+                            })
+                        }
+
+                        if(prod.cols) {
+                            angular.forEach(prod.cols, function(v2, k2) {
+                                delete v2.instance.disabled
+                            })
+                        }
+
+                        prod.Etapas__opts = [{label: 'Cotización', value: 'Cotización'}]
+
+                        if(prod.Red__c__o && prod.Red__c__o.value) {
+                            prod.Red__c = prod.Red__c__o.value
+                            //delete prod.Red__c__o.value
+                        }
+                        if(prod.Uso__c__o && prod.Uso__c__o.value) {
+                            prod.Uso__c = prod.Uso__c__o.value
+                            //delete prod.Uso__c__o.value
+                        }
+                        if(prod.Formato__c__o && prod.Formato__c__o.value) {
+                            prod.Formato__c = prod.Formato__c__o.value
+                            //delete prod.Formato__c__o.value
+                        }
+                    })
+                }
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+
+            }
+        })()    
+
+
+    </script>
+</apex:component>

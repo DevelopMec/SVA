@@ -1,0 +1,405 @@
+<aura:component controller="SearchDuplicates" implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    
+    <aura:attribute name="dataEL" type="Object"/>
+    <aura:attribute name="dataAccount" type="Object"/>
+    <aura:attribute name="dataOpportunity" type="Object"/>
+     <aura:attribute name="dataContact" type="Object"/>
+    <aura:attribute name="dataLead" type="Object"/>
+    <aura:attribute name="isLoad" type="Boolean" default="false"/>
+    <aura:attribute name="body" type="string" default="null"/>
+    
+    
+    
+    <lightning:card title="Búsqueda Avanzada" iconName="standard:account">
+        <p class="slds-p-horizontal_small">
+            Ingresa los valores por los cuales quieres realizar la busqueda.
+        </p>
+    
+   
+        <div class="c-container">
+           <div onkeyup="{!c.search}">
+            <lightning:layout verticalAlign="center" class="x-large">
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="custom-box">
+                        <lightning:input  type="text" aura:id="RazonSocial" name="input1" label="Nombre del Prospecto, Nombre del Grupo o Razón Social" />
+                    </div>
+                </lightning:layoutItem>
+               
+                
+            </lightning:layout>
+        </div>
+        <div class="c-container">
+            <lightning:layout verticalAlign="center" class="x-large">
+
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="custom-box">
+                        <lightning:input type="text" aura:id="idGrupo" name="Número de Grupo" label="Número de Grupo" />
+                    </div>
+                </lightning:layoutItem>    
+
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <div class="custom-box">
+                        <lightning:input type="text" aura:id="RFC" name="input1" label="RFC" />
+                    </div>
+                </lightning:layoutItem>            
+                
+            </lightning:layout>
+           </div>
+        </div>
+
+        
+
+        <div class="slds-align_absolute-center" style="height: 5rem;">
+            <lightning:button  variant="brand" label="Buscar" title="Neutral action" onclick="{! c.Buscar }"/>
+        </div>
+
+
+
+        <aura:if isTrue="{!v.isLoad}">
+            <div class="exampleHolder">
+                <lightning:spinner alternativeText="Loading" size="large" />
+            </div>
+        </aura:if>
+
+        </lightning:card>
+
+        <aura:if isTrue="{!v.dataLead != null}">
+            <br></br>
+         <lightning:card title="Prospectos" variant="Narrow">
+            <div class="c-container divScroll">
+                <lightning:layout verticalAlign="center" class="x-large">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer" >
+                        <thead>
+                            <tr class="slds-text-title_caps">   
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre">Compañia</div>
+                                </th>  
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre">Nombre</div>
+                                </th>                        
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Familia">Familia</div>
+                                </th>
+                                 <th scope="col">
+                                    <div class="slds-truncate" title="Segmento">Segmento</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Segmento">Estatus</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Segmento">Ultima fecha de actividad</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Propietario</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Gestor</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>   
+                            <aura:iteration items="{!v.dataLead}" var="account">
+                                <tr>   
+                                     <td data-label="Cuenta">
+                                        <div class="slds-truncate" >{! account.Company }</div>
+                                    </td>  
+                                    <td data-label="Cuenta">
+                                        <div class="slds-truncate" >{! account.Name }</div>
+                                    </td>                                    
+                                    <td data-label="Grupo AS400">
+                                        <div class="slds-truncate" >{!account.CategoriaSolucion__c}</div>
+                                    </td>
+                                    <td data-label="Segmento">
+                                        <div class="slds-truncate" >{!account.Segmento2__c}</div>
+                                    </td>
+                                    <td data-label="Segmento">
+                                        <div class="slds-truncate" >{!account.Status}</div>
+                                    </td>
+                                    <td data-label="Segmento">
+                                        <div class="slds-truncate" ><ui:outputDate value="{!account.FechaUltimaActividad__c}"/></div>
+                                    </td>
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Name}</div>
+                                    </td>
+                                    <td data-label="Gestor">
+                                        <div class="slds-truncate" >{!account.Owner.Name}</div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </lightning:layout>
+            </div>
+             </lightning:card>
+        </aura:if>
+   
+
+
+        <aura:if isTrue="{!v.dataAccount != null}">
+            <br></br>
+             <lightning:card title="Cuentas" variant="Narrow">
+            <div class="c-container divScroll">
+                <lightning:layout verticalAlign="center" class="x-large">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">                          
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Razon Social">Nombre</div>
+                                </th>                        
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Grupo AS400">Número de Grupo</div>
+                                </th>
+                                 <th scope="col">
+                                    <div class="slds-truncate" title="Grupo AS400">Segmento</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Propietario</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Gestor</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Segmento">Ultima fecha de actividad</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Colaboración</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.dataAccount}" var="account">
+                                <tr>                                 
+                                    <td data-label="Cuenta">
+                                        <div class="slds-truncate" >{! account.Name }</div>
+                                    </td>                                    
+                                    <td data-label="Grupo AS400">
+                                        <div class="slds-truncate" >{!account.CodigoClienteAS400__c}</div>
+                                    </td>
+                                    <td data-label="Segmento">
+                                        <div class="slds-truncate" >{!account.Segmento2__c}</div>
+                                    </td>
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Name}</div>
+                                    </td>
+                                    <td data-label="Gestor">
+                                        <div class="slds-truncate" >{!account.Owner.Manager.Name}</div>
+                                    </td>
+                                     <td data-label="Segmento">
+                                        <div class="slds-truncate" ><ui:outputDate value="{!account.FechaUltimaActividad__c}"/></div>
+                                    </td>
+                                    <td data-label="Gestor">
+                                        <aura:if isTrue="{!account.ClienteComplejo__c }">
+                                        	<lightning:button tabindex="{!account.Id}" variant="Neutral" label="Colaboración" iconName="utility:change_owner" iconPosition="left"  onclick="{!c.searchAccount}"/>
+                                        </aura:if>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </lightning:layout>
+                 </div>
+            </lightning:card>
+    </aura:if>
+    
+    
+    
+    <aura:if isTrue="{!v.dataEL != null}">
+        <br></br>
+        <lightning:card title="Entidades Legales" variant="Narrow">
+            <div class="c-container divScroll">
+                <lightning:layout verticalAlign="center" class="x-large">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="RFC">RFC</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Razon Social">Razón Social</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Cuenta">Cuenta</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Grupo AS400">Número de Grupo</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Propietario</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.dataEL}" var="account">
+                                <tr>
+                                    <td scope="row" data-label="RFC">
+                                        <div class="slds-truncate" >{!account.Name}</div>
+                                    </td>
+                                    <td data-label="Razón Social">
+                                        <div class="slds-truncate" >{!account.RazonSocial__c}</div>
+                                    </td>
+                                    <td data-label="Cuenta">
+                                        <div class="slds-truncate" >{!account.Cuenta__r.Name}</div>
+                                    </td>                                    
+                                    <td data-label="Grupo AS400">
+                                        <div class="slds-truncate" >{!account.Cuenta__r.CodigoClienteAS400__c}</div>
+                                    </td>
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Name}</div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </lightning:layout>
+            </div>
+        </lightning:card>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.dataOpportunity != null}">
+        <br></br>
+        <lightning:card title="Oportunidades" variant="Narrow">
+            <div class="c-container divScroll">
+                <lightning:layout verticalAlign="center" class="x-large">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre de la oportunidad">Nombre de la oportunidad</div>
+                                </th>
+                                 <th scope="col">
+                                    <div class="slds-truncate" title="Segmento">Ultima fecha de actividad</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre de la Cuenta">Nombre de la Cuenta</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Segmento">Número de Grupo</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Grupo AS400">Segmento</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Propietario</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Gestor</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.dataOpportunity}" var="account">
+                                <tr>
+                                    <th scope="row" data-label="Name">
+                                        <div class="slds-truncate" >{!account.Name}</div>
+                                    </th>
+                                    <td data-label="Segment">
+                                        <div class="slds-truncate" ><ui:outputDate value="{!account.FechaUltimaActividad__c}"/></div>
+                                    </td>
+                                    <td data-label="Razón Social">
+                                        <div class="slds-truncate" >{!account.Account.Name}</div>
+                                    </td>
+                                    <td data-label="Grupo AS400">
+                                        <div class="slds-truncate" >{!account.Account.CodigoClienteAS400__c}</div>
+                                    </td>
+                                    <td data-label="Segmento">
+                                        <div class="slds-truncate" >{!account.Account.Segmento2__c}</div>
+                                    </td>                                    
+                                    
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Name}</div>
+                                    </td>
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Manager.Name}</div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </lightning:layout>
+            </div>
+        </lightning:card>
+    </aura:if>
+    
+    
+    
+    <aura:if isTrue="{!v.dataContact != null}">
+        <br></br>
+        <lightning:card title="Contactos" variant="Narrow">
+            <div class="c-container divScroll">
+                <lightning:layout verticalAlign="center" class="x-large">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre de la oportunidad">Nombre</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre de la oportunidad">Función</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Grupo AS400">Nombre de la Cuenta</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nombre de la Cuenta">Número de Grupo</div>
+                                </th>
+                                
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Propietario</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Propietario">Gestor</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.dataContact}" var="account">
+                                <tr>
+                                    <th scope="row" data-label="RFC">
+                                        <div class="slds-truncate" >{!account.Name}</div>
+                                    </th>
+                                    <td data-label="Razón Social">
+                                        <div class="slds-truncate" >{!account.Funcion__c}</div>
+                                    </td>
+                                    <td data-label="Razón Social">
+                                        <div class="slds-truncate" >{!account.Account.Name}</div>
+                                    </td>                              
+                                    <td data-label="Grupo AS400">
+                                        <div class="slds-truncate" >{!account.Account.CodigoClienteAS400__c}</div>
+                                    </td>
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Name}</div>
+                                    </td>
+                                    <td data-label="Propietario">
+                                        <div class="slds-truncate" >{!account.Owner.Manager.Name}</div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </lightning:layout>
+            </div>
+        </lightning:card>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.body != null}">        
+        <div class="demo-only" style="height: 640px;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Colaboración</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        {!v.body}
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeModal}">Cerrar</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+</aura:component>

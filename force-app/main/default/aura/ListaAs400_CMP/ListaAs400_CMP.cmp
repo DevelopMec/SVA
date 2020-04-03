@@ -1,0 +1,63 @@
+<aura:component controller="ListaAs400_CONT" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="contratosFiliales" type="List"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <lightning:card footer="">
+        <lightning:spinner aura:id="spinner" size="large" />
+        <aura:set attribute="title">
+            <lightning:icon iconName="standard:person_account"/>
+            Sub Cuentas
+        </aura:set>
+        <div class="slds-p-around_medium">
+            <!--div class="slds-align_absolute-center slds-p-bottom_medium">
+                <lightning:icon class="slds-p-right_small" iconName="utility:info" size="medium" alternativeText="Información" />
+                <div class="slds-text-heading_medium">Información</div>
+            </div-->
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <th class="columna celda">
+                            <lightning:icon style="display:inline-block;margin-right:0.5em;" iconName="custom:custom63" size="small"/>
+                            <div style="display:inline-block;font-size:14px;margin-bottom:10px;" class="slds-text-heading_small">
+                                Código AS400/Id. OPAM
+                            </div>
+                        </th>
+                        <th class="columna celda">
+                            <lightning:icon style="display:inline-block;margin-right:0.5em;" iconName="custom:custom18" size="small"/>
+                            <div style="display:inline-block;font-size:14px;margin-bottom:10px;" class="slds-text-heading_small">
+                                RFC
+                            </div>
+                        </th>
+                        <th class="columna celda">
+                            <lightning:icon style="display:inline-block;margin-right:0.5em;" iconName="custom:custom16" size="small"/>
+                            <div style="display:inline-block;font-size:14px;margin-bottom:10px;" class="slds-text-heading_small">
+                                Razón Social
+                            </div>
+                        </th>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.contratosFiliales}" var="contrato">
+                            <tr>
+                                <td class="celda">
+                                    <div class="slds-text-heading_small slds-p-around_xx-small" style="font-size:12px;">
+                                        {!contrato.CodigoAS400__c}
+                                    </div>
+                                </td>
+                                <td class="celda">
+                                    <div class="slds-text-heading_small slds-p-around_xx-small" style="font-size:12px;">
+                                        {!contrato.Entidad_Cuenta__r.EntidadLegal__r.Name}
+                                    </div>
+                                </td>
+                                <td class="celda">
+                                    <div class="slds-text-heading_small" style="font-size:12px;">
+                                        {!contrato.Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c}
+                                    </div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </lightning:card>
+</aura:component>

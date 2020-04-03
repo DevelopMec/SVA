@@ -1,0 +1,16 @@
+<aura:component controller="ActualizaSegmento" implements="force:lightningQuickAction,force:hasRecordId">
+    <!-- Id of the Account the page hosting this component is showing -->
+    <aura:attribute name="recordId" type="Id" />
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <div style='width:100%; text-align: center'>
+    	Está seguro de que desea actualizar el segmento de esta cuenta?
+        <br></br><br></br>
+    </div>
+    <div style='width:100%; text-align: center'>
+        <lightning:button variant="base" label="Aceptar" aura:id="btnProcess" onclick="{! c.CallUpdateSegment }" />   
+        <ui:spinner aura:id="spinner" />
+   </div>
+</aura:component>

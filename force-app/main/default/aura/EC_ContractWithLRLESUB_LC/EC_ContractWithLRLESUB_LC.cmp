@@ -1,0 +1,279 @@
+<aura:component controller="CON_ContractsContainer_CTRL">
+	
+	<!-- Handlers -->
+	<aura:handler name="init" value="{!this}" action="{!c.invokeInit}"/>
+	<aura:handler name="change" value="{!v.isDataSaved}" action="{!c.refreshThisView}"/>
+	<!-- /Handlers -->
+	
+	<!-- Display Information -->
+	<aura:attribute name="legalEntitiesOriginal" type="Object[]" default="[]"/>
+	<aura:attribute name="legalEntitiesCopy" type="Object[]" default="[]"/>
+	<aura:attribute name="selectedLegalEntity" type="Object"/>
+	<aura:attribute name="subsidiaries" type="Object[]" default="[]"/>
+	<aura:attribute name="subsidiariesCopy" type="Object[]" default="[]"/>
+	<aura:attribute name="selectedSubsidiaries" type="Object[]" default="[]"/>
+	<aura:attribute name="mainLegalRepresentative" type="String"/>
+	<aura:attribute name="errorMessage" type="String" default=""/>
+	<!-- /Display Information -->
+	
+	<!-- Logical Flags -->
+	<aura:attribute name="isDataReady" type="Boolean" default="false"/>
+	<aura:attribute name="isDataSaved" type="Boolean"/>
+	<aura:attribute name="showModal" type="Boolean" default="false"/>
+	<aura:attribute name="finishButtonFlag" type="Boolean"/>
+	<aura:attribute name="saveButtonFlag" type="Boolean"/>
+	<aura:attribute name="emailButtonFlag" type="Boolean"/>
+	<aura:attribute name="pdfButtonFlag" type="Boolean"/>
+	<aura:attribute name="isMouseOnLegalEntities" type="Boolean" default="false"/>
+	<aura:attribute name="isMouseOnSubsidiaries" type="Boolean" default="false"/>
+	<aura:attribute name="isLERequired" type="Boolean"/>
+	<aura:attribute name="isLRRequired" type="Boolean"/>
+	<!-- /Logical Flags -->
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="accountId" type="Id" default=""/>
+	<aura:attribute name="opportunityId" type="Id" default=""/>
+	<aura:attribute name="dataToSave" type="Object"/>
+	<aura:attribute name="selectedLegalEntityId" type="Id" default=""/>
+	<aura:attribute name="selectedSubsidiaryId" type="Id" default=""/>
+	<aura:attribute name="selectedLegalRepresentativeId" type="Id"/>
+	<aura:attribute name="persistedSubsidiaries" type="Object[]"/>
+	<aura:attribute name="isContractFinalized" type="Boolean"/>
+	<!-- /Utility Attributes -->
+	<aura:attribute name="direccionesFiscales" type="List"/>
+	<aura:attribute name="direccionSelec" type="String"/>
+	 
+	<!-- Body Component -->
+	<lightning:card title="Estructura de Cuentas" class="slds-m-around_x-small">
+		<aura:if isTrue="{!v.isDataReady}">
+			<!-- Legal Entities Section -->
+			<div class="slds-section slds-is-open slds-m-horizontal_large">
+				<h3 class="slds-section__title slds-theme_shade">
+					<span class="slds-truncate slds-p-horizontal_small">Entidad Legal</span>
+				</h3>
+				<div aria-hidden="false" class="slds-section__content">
+					<lightning:layout horizontalAlign="center" class="slds-m-vertical_medium">
+						<lightning:layoutItem size="3" padding="horizontal-medium">
+							<!-- Listbox Component -->
+							<!-- {!v.isMouseOnLegalEntities} -->
+							<div class="slds-combobox_container">
+								<div class="slds-combobox" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+									<lightning:input aura:id="legal-entities" disabled="{!v.isContractFinalized}" label="Buscar Entidad Legal" class="slds-combobox__input" onchange="{!c.handleLegalEntitySearch}" onfocus="{!c.handleShowHideLEListbox}" onblur="{!c.handleShowHideLEListbox}" autocomplete="off"/>
+									<div role="listbox" onmouseenter="{!c.handleMouseOnLegalEntities}" onmouseleave="{!c.handleMouseOutsideLegalEntities}">
+										<ul aura:id="legal-entities-listbox" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-hide selected-subsidiaries-scroller-wrapper" role="presentation" onclick="{!c.handleSelectedLegalEntity}">
+											<aura:if isTrue="{!v.legalEntitiesCopy.length > 0}">
+												<aura:iteration items="{!v.legalEntitiesCopy}" var="legalEntity" indexVar="index">
+													<li role="presentation" class="slds-listbox__item" onclick="{!c.handleShowHideLEListbox}">
+														<!-- <div id="{!legalEntity.Id}" title="{!legalEntity.Name}" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+															<span class="slds-media__figure">
+																<lightning:icon iconName="standard:contract_line_item"/>
+															</span>
+															<span class="slds-media__body">
+																<span class="slds-listbox__option-text slds-listbox__option-text_entity">{!legalEntity.Nombre__c ? legalEntity.Nombre__c : 'Sin Nombre'}</span>
+																<span class="slds-listbox__option-meta slds-listbox__option-meta_entity">{!legalEntity.Name}</span>
+															</span>
+														</div> -->
+														<!-- {!legalEntity.Nombre__c + ' - ' + legalEntity.Name} -->
+														<div id="{!legalEntity.Id}" title="{!legalEntity.RazonSocial__c}" class="slds-listbox__option slds-listbox__option-entity slds-listbox__option_has-meta slds-p-around_x-small" role="option">
+															<!-- {!legalEntity.Name + ' - ' + (legalEntity.Nombre__c ? legalEntity.Nombre__c : 'Sin Nombre')} -->
+															{!legalEntity.RazonSocial__c}
+														</div>
+													</li>
+												</aura:iteration>
+												<aura:set attribute="else">
+													<li role="presentation" class="slds-listbox__item">
+														<div class="slds-listbox__option slds-listbox__option-entity slds-listbox__option_has-meta slds-p-around_x-small" role="option">
+															No hay Entidades Legales que mostrar
+														</div>
+													</li>
+												</aura:set>
+											</aura:if>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<!-- Listbox Component -->
+						</lightning:layoutItem>
+						<lightning:layoutItem size="9" padding="horizontal-medium">
+							<table class="slds-table slds-table_bordered slds-table_cell-buffer">
+								<thead>
+									<tr class="slds-text-title_caps">
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="Tipo de Persona">Tipo de Persona</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="Nombre">Razón Social</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="RFC">RFC</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="Representante Legal">Representantes Legales</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<div class="slds-truncate" title="{!v.selectedLegalEntity.RecordType.Name}">{!v.selectedLegalEntity.RecordType.Name}</div>
+										</td>
+										<td>
+											<!-- <div class="slds-truncate" title="{!v.selectedLegalEntity.Name}">{!v.selectedLegalEntity.Name}</div> -->
+											<div class="slds-truncate" title="{!v.selectedLegalEntity.RazonSocial__c}">{!v.selectedLegalEntity.RazonSocial__c}</div>
+										</td>
+										<td>
+											<div class="slds-truncate" title="{!v.selectedLegalEntity.Name}">{!v.selectedLegalEntity.Name}</div>
+										</td>
+										<td>
+											<aura:if isTrue="{!v.selectedLegalEntity.legalRepresentatives.length > 0}">
+												<div class="{!v.isLRRequired ? 'slds-form-element slds-has-error' : ''}">
+													<lightning:combobox variant="label-hidden" disabled="{!v.isContractFinalized}" required="{!v.isLRRequired}" messageWhenValueMissing="El campo no puede quedar vacío" label="Representante Legal" placeholder="Selecciona una Opción" options="{!v.selectedLegalEntity.legalRepresentatives}" value="{!v.selectedLegalRepresentativeId}" onchange="{!c.handleSelectedLrFromLe}"/>
+												</div>
+												<aura:set attribute="else">
+													<div class="slds-truncate">Sin Representantes Legales</div>
+												</aura:set>
+											</aura:if>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="slds-p-around_large">
+								
+									<lightning:combobox options="{!v.direccionesFiscales}" label="Direcciones Fiscales" placeholder="Seleccione una opción" disabled="{!v.isContractFinalized}" onchange="{!c.handleDirFiscales}" value="{!v.direccionSelec}"/>
+																
+							</div>
+						</lightning:layoutItem>
+					</lightning:layout>
+				</div>
+			</div>
+			<!-- /Legal Entities Section -->
+			<!-- Subsidiaries Section -->
+			<div class="slds-section slds-is-open slds-m-horizontal_large">
+				<h3 class="slds-section__title slds-theme_shade">
+					<span class="slds-truncate slds-p-horizontal_small">Filiales</span>
+				</h3>
+				<lightning:layout horizontalAlign="center" verticalAlign="end" class="slds-m-top_medium">
+					<lightning:layoutItem size="3" padding="horizontal-medium">
+						<!-- Listbox Component -->
+						<!-- {!v.isMouseOnSubsidiaries} -->
+						<div class="slds-combobox_container">
+							<div class="slds-combobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+								<lightning:input aura:id="subsidiaries" disabled="{!v.isContractFinalized}" label="Buscar Filial" onchange="{!c.handleSubsidiarySearch}" onfocus="{!c.handleShowHideSubListbox}" onblur="{!c.handleShowHideSubListbox}" autocomplete="off"/>
+								<div role="listbox" onmouseenter="{!c.handleMouseOnSubsidiaries}" onmouseleave="{!c.handleMouseOutsideSubsidiaries}">
+									<ul aura:id="subsidiaries-listbox" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-hide slds-has-dividers_top-space selected-subsidiaries-scroller-wrapper" role="presentation" onclick="{!c.handleSelectedSubsidiary}">
+										<aura:if isTrue="{!v.subsidiariesCopy.length > 0}">
+											<aura:iteration items="{!v.subsidiariesCopy}" var="subsidiary" indexVar="index">
+												<li role="presentation" class="slds-listbox__item" onclick="{!c.handleShowHideSubListbox}">
+													<div id="{!subsidiary.Id}" title="{!subsidiary.RazonSocial__c}" class="slds-listbox__option slds-listbox__option-entity slds-listbox__option_has-meta slds-p-around_x-small" role="option">
+														<!-- {!subsidiary.Name + ' - ' + (subsidiary.Nombre__c ? subsidiary.Nombre__c : 'Sin Nombre')} -->
+														{!subsidiary.RazonSocial__c}
+													</div>
+												</li>
+											</aura:iteration>
+											<aura:set attribute="else">
+												<li role="presentation" class="slds-listbox__item">
+													<div class="slds-listbox__option slds-listbox__option-entity slds-listbox__option_has-meta slds-p-around_x-small" role="option">
+														No hay Filiales que mostrar
+													</div>
+												</li>
+											</aura:set>
+										</aura:if>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<!-- Listbox Component -->
+					</lightning:layoutItem>
+					<lightning:layoutItem size="1" padding="horizontal-medium">
+						<aura:if isTrue="{!!v.isContractFinalized}">
+							<lightning:buttonIcon iconName="utility:add" alternativeText="Agregar Filial" onclick="{!c.addSelectedSubsidiary}"/>
+						</aura:if>
+					</lightning:layoutItem>
+				</lightning:layout>
+				<lightning:layout horizontalAlign="center" class="slds-m-top_medium">
+					<lightning:layoutItem size="12">
+						<div class="selected-subsidiaries-scroller-wrapper">
+							<table class="slds-table slds-table_bordered slds-table_cell-buffer">
+								<thead>
+									<tr class="slds-text-title_caps">
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="Tipo de Persona">Tipo de Persona</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="Nombre">Razón Social</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="RFC">RFC</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate" title="Representante Legal">Representantes Legales</div>
+										</th>
+										<th scope="col" class="td-width">
+											<div class="slds-truncate slds-align_absolute-center" title="Quitar">Quitar</div>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<aura:if isTrue="{!v.selectedSubsidiaries.length > 0}">
+										<!-- <div class="subsidiaries-scroll-wrapper"> -->
+										<aura:iteration items="{!v.selectedSubsidiaries}" var="subsidiary">
+											<tr>
+												<td>
+													<div class="slds-truncate" title="{!subsidiary.RecordType.Name}">{!subsidiary.RecordType.Name}</div>
+												</td>
+												<td>
+													<div class="slds-truncate" title="{!subsidiary.RazonSocial__c}">{!subsidiary.RazonSocial__c}</div>
+												</td>
+												<td>
+													<div class="slds-truncate" title="{!subsidiary.Name}">{!subsidiary.Name}</div>
+												</td>
+												<td>
+													<!-- <aura:if isTrue="{!subsidiary.legalRepresentatives.length > 0}">
+														<div class="slds-truncate" title="{!subsidiary.mainLegalRepresentative.label}">
+															{!subsidiary.mainLegalRepresentative.label + ((subsidiary.legalRepresentatives.length - 1) > 0 ? ' (+' + (subsidiary.legalRepresentatives.length - 1) + ')' : '')}
+														</div>
+														<aura:set attribute="else">
+															<div class="slds-truncate">Sin Representantes Legales</div>
+														</aura:set>
+													</aura:if> -->
+													<div class="slds-truncate" title="{!v.mainLegalRepresentative}">{!v.mainLegalRepresentative}</div>
+												</td>
+												<td>
+													<lightning:buttonIcon iconName="utility:dash" alternativeText="Quitar Filial" name="{!subsidiary.Id}" class="slds-align_absolute-center" onclick="{!c.handleDeselectedSubsidiary}"/>
+												</td>
+											</tr>
+										</aura:iteration>
+										<!-- </div> -->
+										<aura:set attribute="else">
+											<tr>
+												<td colspan="5">
+													<div class="slds-text-body_regular slds-align_absolute-center">
+														No se ha seleccionado ninguna Filial
+													</div>
+												</td>
+											</tr>
+										</aura:set>
+									</aura:if>
+								</tbody>
+							</table>
+						</div>
+					</lightning:layoutItem>
+				</lightning:layout>
+			</div>
+			<!-- /Subsidiaries Section -->
+			<!-- Show spinner while the data is getting ready -->
+			<aura:set attribute="else">
+				<aura:if isTrue="{!v.errorMessage == ''}">
+					<div class="slds-p-vertical_large spinner-relative-position">
+						<lightning:spinner variant="brand" size="medium" alternativeText="Cargando Información de Estructura de Cuentas" class="slds-m-horizontal_medium"/>
+					</div>
+					<aura:set attribute="else">
+						<div class="slds-truncate slds-text-heading_small slds-text-align_center">{!v.errorMessage}</div>
+					</aura:set>
+				</aura:if>
+			</aura:set>
+			<!-- /Show spinner while the data is getting ready -->
+		</aura:if>
+	</lightning:card>
+	<!-- /Body Component -->
+</aura:component>

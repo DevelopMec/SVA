@@ -1,0 +1,66 @@
+<aura:component controller="RFC_SolutionAssignmentCtrl" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:attribute name="contratosList" type="List" default='[]'/>
+    <aura:attribute name="hasEditPermission" type="Boolean" default='false'/>
+    <aura:attribute name="isEditing" type="Boolean" default="false"/>
+    <aura:attribute name="objectAPIName" type="String" default="User"/>
+    <aura:attribute name="iconName" type="String" default="standard:user"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:card iconName="standard:account" title="Asignación por RFC-Solución">  
+        
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-p-left_x-small slds-p-right_x-small">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="RFCSolución">RFC-Solución</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="EjecutivoAsignado">Ejecutivo Asignado</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.contratosList}" var="contrato">
+                    <tr class="slds-hint-parent">
+                        <td data-label="RFC-Solución">
+                            <aura:if isTrue="{!contrato.Producto__r.Family == 'Despensa' || contrato.Producto__r.Family == 'Ticket Restaurante' || contrato.Producto__r.Family == 'Regalo' || contrato.Producto__r.Family == 'Vestimenta' || contrato.Producto__r.Family == 'Ayuda social'}">
+                                <div class="slds-truncate" title="RFCSolución">{!contrato.Entidad_Cuenta__r.Name} - Benefits</div>
+                                <aura:set attribute="else">
+                                    <div class="slds-truncate" title="RFCSolución">{!contrato.Entidad_Cuenta__r.Name} - {!contrato.Producto__r.Family}</div>
+                                </aura:set>
+                            </aura:if> 
+                        </td>
+                        <td data-label="Ejecutivo asignado">
+                            <aura:if isTrue="{!v.isEditing}">
+                                <c:CustomLookup selectedRecord="{!contrato.Owner}" objectAPIName="{!v.objectAPIName}" IconName="{!v.iconName}"/>
+                                <aura:set attribute="else">
+                                    <div class="customPadding">
+                                        <div class="slds-truncate" title="EjecutivoAsignado">{!contrato.Owner.Name}</div>
+                                    </div>
+                                </aura:set>
+                            </aura:if> 
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <div class="slds-grid slds-grid_align-end slds-gutters slds-p-around_x-small">
+            <aura:if isTrue="{!and(v.hasEditPermission, v.isEditing == false)}">
+                <div class="slds-col">
+                    <lightning:button label="Editar" onclick="{!c.handleEditClick}" iconName="utility:edit" iconPosition="right" variant="brand" />
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!and(v.hasEditPermission, v.isEditing)}">
+                <div class="slds-col">
+                    <lightning:button label="Cancelar" onclick="{!c.handleCancelClick}" iconName="utility:back" iconPosition="right" variant="destructive-text" />
+                </div>
+                <div class="slds-col">
+                    <lightning:button label="Guardar" onclick="{!c.handleSaveClick}" iconName="utility:retail_execution" iconPosition="right" variant="success" />
+                </div>
+            </aura:if>
+        </div>
+    </lightning:card>    
+    
+</aura:component>

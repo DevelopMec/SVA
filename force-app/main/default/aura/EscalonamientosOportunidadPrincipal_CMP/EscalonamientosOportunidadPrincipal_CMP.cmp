@@ -1,0 +1,35 @@
+<aura:component controller="EscalonamientosOportunidad_CONT" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="etapa" type="String"/>
+    <aura:attribute name="productos" type="List"/>
+    <aura:attribute name="productosIn" type="List"/>
+    <aura:attribute name="tieneEscalonamiento" type="boolean" default="false"/>
+    <aura:attribute name="editar" type="boolean" default="false"/>
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:handler name="edicionShow" event="c:MostrarEdicion" action="{!c.editarInfo}"/>
+    
+    <aura:if isTrue="{!v.tieneEscalonamiento}">
+        <div style="position:relative;">
+            <aura:if isTrue="{!v.spin}"> 
+                <lightning:spinner aura:id="spinner" size="large" />
+            </aura:if>
+            <aura:if isTrue="{!v.editar}">    
+                <div class="demo-only" >
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Editar escalonamientos</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <c:EscalonamientosOportunidad_CMP etapa="{!v.etapa}" tieneEscalonamiento="true" productos="{!v.productos}" productosIn="{!v.productosIn}" editar="true"/>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </div>
+            </aura:if>
+            <c:EscalonamientosOportunidad_CMP tieneEscalonamiento="true" productos="{!v.productos}" productosIn="{!v.productosIn}" editar="false"/>    
+        </div>
+    </aura:if>
+</aura:component>

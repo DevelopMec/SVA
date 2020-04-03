@@ -1,0 +1,216 @@
+<apex:component >
+	<apex:attribute id="nombre" name="nombre" description="Nombre del componente del pdf" type="String"/>
+	<apex:attribute id="fecha" name="fecha" description="Fecha actual" type="String"/>
+	<apex:attribute id="imagen" name="imagen" description="Url de la imágen que contendrá el componente" type="String"/>
+	<apex:attribute id="estilo" name="estilo" description="Estilo que se aplicará al componente" type="String"/>
+	<apex:attribute id="height" name="height" description="Alto del componente." type="String"/>
+	<apex:attribute id="width" name="width" description="Ancho del compontente" type="String"/>
+	<apex:attribute id="ejecutivoName" name="ejecutivoName" description="Ancho del compontente" type="String"/>
+	<apex:attribute id="ejecutivoEmail" name="ejecutivoEmail" description="Ancho del compontente" type="String"/>
+	<apex:attribute id="ejecutivoTelefono" name="ejecutivoTelefono" description="Ancho del compontente" type="String"/>
+	
+	<!-- Cabecera de PDF -->
+	<apex:outputPanel layout="block" rendered="{!nombre=='cabecera'}" styleClass="{!IF(estilo!=null,estilo,'')}">
+		<apex:image url="{!imagen}"></apex:image>
+	</apex:outputPanel>
+	
+	<!-- Check Mark -->
+	<apex:outputPanel layout="none" rendered="{!nombre=='checkmark'}">
+		<apex:image alt="check" url="{!URLFOR($Resource.pdfImages,'check_mark.png')}" height="{!height}"/>
+	</apex:outputPanel>
+	
+	<!-- Forma de pago y vigencia -->
+	<apex:outputPanel rendered="{!nombre=='formaPagoYVigencia'}" layout="none">
+		<div class="formaPagoYVigencia">
+			<table>
+				<tr>
+					<th>Forma de pago del pedido:</th>
+					<th class="derecha">Vigencia de propuesta: 7 dias</th>
+				</tr>
+				<tr>
+					<td>
+					Depósito bancario / transferencia electrónica<br />
+					Pago con American Express (Solo Ticket Regalo)
+					</td>
+					<td class="derecha">
+						<p>
+							La contraprestación mínima por el servicio será de 3 SMGV($219.12M.N.)<br />
+							si la comisión es inferior a ese monto<br />
+							Los costos no incluyen IVA.<br />
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</apex:outputPanel>
+	
+	<!-- Documentación para contratar -->
+	<apex:outputPanel rendered="{!nombre=='documentacionContratar'}"
+		layout="none">
+		<h3>Documentación para contratar</h3>
+		<div class="documentacionContratar">
+			<table>
+				<tr>
+					<th>PERSONA FISICA</th>
+					<th>PERSONA MORAL</th>
+				</tr>
+				<tr>
+					<td>
+						<ol>
+							<li>Identificación oficial (Credencial de Elector, Cartilla
+								o Pasaporte)</li>
+							<li>Cédula de Inscripción en el R.F.C.</li>
+							<li>Alta en la S.H.C.P.</li>
+							<li>Comprobante de Domicilio Fiscal(no mayor a 3 meses)</li>
+							<li>CURP</li>
+						</ol>
+					</td>
+					<td>
+						<ol>
+							<li>Acta Constitutiva</li>
+							<li>Poder notarial</li>
+							<li>Identificación Oficial Apoderado</li>
+							<li>Cédula de inscripción en el R.F.C.</li>
+							<li>Comprobante de Domicilio Fiscal(no mayor a 3 meses)</li>
+						</ol>
+					</td>
+				</tr>
+			</table>
+			<p>Además de esta documentación es necesario llenar en su
+				totalidad con firma y rúbrica del representante legal en todas las
+				páginas los siguientes documentos:</p>
+			<ul>
+				<li>Alta del cliente</li>
+				<li>Contrato de servicio</li>
+				<li>Identificación del cliente.</li>
+			</ul>
+			<p class="izquierda">
+				Sin más por el momento, esperamos vernos favorecidos con tu decisión,<br/>
+				<strong>Saludos coordiales.</strong>
+			</p>
+			<!--  
+			<p>
+				Se sugiere antes de iniciar el servicio, leer los manuales que están
+				a disposición en nuestra <a
+					href="https://sso.edenred.com.mx/SSOV280/Account/LogOn">página
+					web</a>
+			</p>
+			-->
+		</div>
+	</apex:outputPanel>
+	
+	<!-- Sección de Firmas -->
+	<apex:outputPanel rendered="{! nombre == 'firmas'}" layout="none">
+		<div class="firmas">
+        	<table>
+        		<tr>
+        			<td class="izquierda">
+        				Por <Strong>Edenred México S.A de C.V.</Strong>
+        				<br/><br/><br/><br/><br/><br/>
+        				_______________________________<br/>
+        				Nombre y firma del apoderado
+        			</td>
+        			<td class="derecha">
+        				Por: <strong>_________________________________</strong>
+        				<br/><br/><br/><br/><br/><br/>
+        				_______________________________<br/>
+        				Nombre y firma del apoderado
+        			</td>
+        		</tr>
+        	</table>
+        </div>
+	</apex:outputPanel>
+	
+	<!-- Formulario para contacto e información de la empresa -->
+	<apex:outputPanel rendered="{!nombre == 'infoContacto'}" layout="none">
+		<div class="infoContacto">
+        	<table>
+        		<tr>
+        			<td class="formulario">
+        				<strong>Ejecutivo</strong>
+        				<div class="formEjecutivoCampo">&nbsp;{!ejecutivoName}</div>
+        				<strong>Mail</strong>
+        				<div class="formEjecutivoCampo">&nbsp;{!ejecutivoEmail}</div>
+        				<strong>Teléfono</strong>
+        				<div class="formEjecutivoCampo">&nbsp;{!ejecutivoTelefono}</div>
+        			</td>
+        			<td class="infoEmpresa">
+        				<div>
+        					<apex:image url="{!URLFOR($Resource.pdfImages,'contacto.png')}" width="7.5mm"/>
+        					(55) 52628889
+        					<br/>
+        					<!--a href="mailto:Telemarketing-Mx@edenred.com.mx">
+        						Telemarketing-Mx@edenred.com.mx
+        					</a><br/-->
+        					<a href="http://www.edenred.com.mx">www.edenred.com.mx</a>
+        				</div>
+        			</td>
+        		</tr>
+        	</table>
+        </div>
+	</apex:outputPanel>
+	
+	<!-- Footer del documento -->
+	<apex:outputPanel rendered="{!nombre == 'footer'}" layout="none">
+        <p class="izquierda"><strong>Da clic en el ícono para conocer otras soluciones.</strong></p>
+        <div class="iconosProductos">
+        	<table>
+        		<tr>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'despensa.jpg')}"></apex:image><br/>
+        				<apex:outputLink styleClass="linkProducto linkDS" value="http://www.edenred.mx/soluciones/ticketvaledespensas/Paginas/default.aspx">
+        						DESPENSA
+        				</apex:outputLink>
+        			</td>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'combustible.jpg')}"/><br/>
+        				<apex:outputLink styleClass="linkProducto linkCM" value="http://www.edenred.mx/soluciones/ticketcar/Paginas/default.aspx">
+        					COMBUSTIBLE
+        				</apex:outputLink>
+        			</td>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'viaticos.jpg')}"/><br/>
+        				<apex:outputLink styleClass="linkProducto linkVT" value="http://www.edenred.mx/soluciones/ticketempresarial/Paginas/default.aspx">
+        					EMPRESARIAL
+        				</apex:outputLink>
+        			</td>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'regalos.jpg')}"/><br/>
+        				<apex:outputLink styleClass="linkProducto linkRG" value="http://www.edenred.mx/soluciones/ticketregalo/Paginas/default.aspx">
+        					REGALO
+        				</apex:outputLink>
+        			</td>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'restaurate.jpg')}"/><br/>
+        				<apex:outputLink styleClass="linkProducto linkRS" value="http://www.edenred.mx/soluciones/ticketrestaurante/Paginas/default.aspx">
+        					TICKET RESTAURANTE
+        				</apex:outputLink>
+        			</td>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'uniforme.jpg')}"/><br/>
+        				<apex:outputLink styleClass="linkProducto linkUN" value="http://www.edenred.mx/soluciones/ticketuniforme/Paginas/default.aspx">
+        					UNIFORME
+        				</apex:outputLink>
+        			</td>
+        			<td>
+        				<apex:image styleClass="iconoProducto" url="{!URLFOR($Resource.pdfImages,'mantenimiento.png')}"/><br/>
+        				<apex:outputLink styleClass="linkProducto linkMANT" value="http://www.edenred.mx/soluciones/ticketuniforme/Paginas/default.aspx">
+        					MANTENIMIENTO
+        				</apex:outputLink>
+        			</td>
+        		</tr>
+        		<tr>
+        			<td colspan="6">
+        				<strong>
+        					<apex:image styleClass="iconoMarca" url="{!URLFOR($Resource.pdfImages,'ticket.jpg')}" /> 
+        					y 
+        					<apex:image styleClass="iconoMarca" url="{!URLFOR($Resource.pdfImages,'ecovale.jpg')}" /> 
+        					Son marcas registradas de 
+        					<apex:image styleClass="iconoMarca" url="{!URLFOR($Resource.pdfImages,'edenred.jpg')}" />
+        				</strong>
+        			</td>
+        		</tr>
+        	</table>
+        </div>
+	</apex:outputPanel>
+</apex:component>

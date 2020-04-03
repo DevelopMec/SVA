@@ -1,0 +1,28 @@
+<apex:page showHeader="true" sidebar="true" standardController="Opportunity" >
+    <apex:pageBlock mode="view">
+        <apex:pageBlockTable value="{!Opportunity.Quotes}" var="quote" id="hola">
+            <apex:column headerValue="Número de cotización">
+                <apex:outputLink target="_blank" value="/apex/PLAN_Cuenta?id={!Opportunity.Id}&q={!quote.Id}">{!quote.QuoteNumber}</apex:outputLink>
+            </apex:column>
+            <apex:column headerValue="Nombre de cotización">
+                <apex:outputLink target="_blank" value="/apex/PLAN_Cuenta?id={!Opportunity.Id}&q={!quote.Id}">{!quote.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!quote.IsSyncing}"/>
+            <apex:column value="{!quote.ExpirationDate}"/>
+            <apex:column value="{!quote.GrandTotal}"/>
+            <apex:column breakBefore="{!quote.id}"/>
+            <apex:column headerValue="Contacto">
+                <apex:outputLink target="_blank" value="/{!quote.ContactId}">{!quote.Contact.Name}</apex:outputLink>
+            </apex:column>
+            <apex:column headerValue="Creado por">
+                <apex:outputLink target="_blank" value="/{!quote.CreatedById}">{!quote.CreatedBy.Name}</apex:outputLink>, 
+                <apex:outputText value="{0, date, dd'/'MM'/'YYYY HH:mm}">
+                    <apex:param value="{!quote.CreatedDate}" /> 
+                </apex:outputText>
+            </apex:column>
+        </apex:pageBlockTable>
+        <script type="text/javascript">
+            console.log('Quotes: ', '{!Opportunity.Quotes}')
+        </script>
+    </apex:pageBlock>
+</apex:page>

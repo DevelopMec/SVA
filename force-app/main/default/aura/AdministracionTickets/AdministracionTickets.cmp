@@ -1,0 +1,71 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" controller="AsignacionesTicketsLiberacion_CONT">
+    <aura:attribute name="ticketsRiesgo" type="Object"/>
+    <aura:attribute name="resultTR" type="Object"/>
+    <aura:attribute name="resultMSS" type="Object"/>
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    <aura:attribute name="verTickets" type="boolean" default="false"/>
+    <aura:attribute name="verResultTR" type="boolean" default="false"/>
+    <aura:attribute name="verResultMSS" type="boolean" default="false"/>
+    <aura:attribute name="columns" type="List" default="[
+            {label: 'Id del Caso', fieldName: 'idCaso', type: 'text'},
+            {label: 'Estatus', fieldName: 'estatus', type: 'text'},
+            {label: 'Errores', fieldName: 'errores', type: 'text'},
+            {label: 'Campos', fieldName: 'campos', type: 'text'}
+        ]"/>
+    <aura:attribute name="columns2" type="List" default="[
+            {label: 'Id del Caso', fieldName: 'idCaso', type: 'text'},
+            {label: 'Número de Caso', fieldName: 'numeroCaso', type: 'text'},
+            {label: 'Motivo', fieldName: 'motivo', type: 'text'},
+            {label: 'Sub Motivo', fieldName: 'subMotivo', type: 'text'},
+            {label: 'Sub Estatus', fieldName: 'subEstatus', type: 'text'},
+            {label: 'Errores', fieldName: 'errores', type: 'text'}
+        ]"/>
+    
+	<lightning:card >
+        <aura:if isTrue="{!v.spin}">
+            <lightning:spinner size="large"/>
+        </aura:if>
+        <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-p-around_medium">
+            <div class="slds-size_1-of-3">
+                <lightning:button variant="brand" disabled="false" label="Tikets en Riesgo" onclick="{!c.ticketsRiesgo}"/>
+            </div>
+            <div class="slds-size_1-of-3">
+                <lightning:button variant="brand" disabled="true" label="Asignar tipo de registro" onclick="{!c.setTipoRegistro}"/>
+            </div>
+            <div class="slds-size_1-of-3">
+                <lightning:button variant="brand" disabled="true" label="Asignar motivo, Sub Motivo, Sub Estatus" onclick="{!c.setMotivoSubMotivo}"/>
+            </div>
+        </div>
+        <div class="slds-p-around_medium">
+            <aura:if isTrue="{!v.verTickets}">
+                TICKET EN RIESGO: {!v.ticketsRiesgo.length}
+                <div style="height: 300px">
+                    <lightning:datatable
+                                         keyField="id"
+                                         data="{!v.ticketsRiesgo}"
+                                         columns="{!v.columns2}"
+                                         hideCheckboxColumn="true"/>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.verResultTR}">
+                <div style="height: 300px">
+                    <lightning:datatable
+                                         keyField="id"
+                                         data="{!v.resultTR}"
+                                         columns="{!v.columns}"
+                                         hideCheckboxColumn="true"/>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.verResultMSS}">
+                RESULTADO: {!v.resultMSS.length}
+                <div style="height: 300px">
+                    <lightning:datatable
+                                         keyField="id"
+                                         data="{!v.resultMSS}"
+                                         columns="{!v.columns}"
+                                         hideCheckboxColumn="true"/>
+                </div>
+            </aura:if>
+        </div>
+    </lightning:card>
+</aura:component>

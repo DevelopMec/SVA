@@ -1,0 +1,21 @@
+.THIS .bold {
+    font-weight: bold;
+}
+.THIS .black {
+    color: black;
+}
+.THIS .blue {
+    color: #006DCC !important;
+}
+.THIS .greenCircle .slds-icon-text-default {
+    fill : #76A797 !important;
+}
+.THIS .yellowCircle .slds-icon-text-default {
+    fill : #EAC282 !important;
+}
+.THIS .redCircle .slds-icon-text-default {
+    fill : #D86344 !important;
+}
+.THIS .grayCircle .slds-icon-text-default {
+    fill : #505050 !important;
+}

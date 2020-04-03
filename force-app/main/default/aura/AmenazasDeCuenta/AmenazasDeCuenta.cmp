@@ -1,0 +1,17 @@
+<aura:component controller="AmenazasDeCuentaController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+	<aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="listAmenazas" type="Object[]"/>
+    <aura:handler name="init" value="{! this}" action="{!c.muestraAmenazas}"/>
+    
+    <lightning:card iconName="custom:custom91" title="Amenazas">
+        <div class="slds-p-left_medium slds-p-right_medium">
+            <ul class="slds-list_vertical slds-has-dividers_top-space">
+                <aura:iteration items="{!v.listAmenazas}" var="item">
+                    <li class="slds-list__item">
+                        <c:Amenaza amenaza="{!item}"/>
+                    </li>
+                </aura:iteration>
+            </ul>
+        </div>
+    </lightning:card>    
+</aura:component>

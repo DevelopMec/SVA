@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT">
+	<aura:attribute name="isCCVisible" type="Boolean"/>
+	<aura:attribute name="onlyReadAnnexAFields" type="Object"/>
+	<aura:attribute name="legalRepresentativeData" type="Object"/>
+</aura:event>

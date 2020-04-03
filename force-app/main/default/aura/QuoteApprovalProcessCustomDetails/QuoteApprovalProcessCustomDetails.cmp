@@ -1,0 +1,236 @@
+<!--
+    
+    - Developer Name : Cindy Hernández
+    
+    -->
+
+<aura:component controller="QuoteApprovalProcessCustomDetailsCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="quote" type="Object"/>
+    <aura:attribute name="submitterComment" type="String"/>
+    <aura:attribute name="lastComments" type="List"/>
+    <aura:attribute name="conceptos" type="List"/>
+    <aura:attribute name="elapsedTime" type="Decimal"/>
+    <aura:attribute name="isQuote" type="Boolean"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.isQuote}">
+        <lightning:card title="Más detalles">
+            <div class="slds-m-around_medium">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                    <div class="slds-col slds-size_1-of-3">
+                        <span>Segmento:<br/> <aura:unescapedHtml value="{!v.quote.Opportunity.Account.Segmento_Logo__c}"/></span>
+                    </div> 
+                    <div class="slds-col slds-size_1-of-3">
+                        <span>BU:<br/> <aura:unescapedHtml value="{!v.quote.Opportunity.Account.Busines__c}"/></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <span>Canal:<br/> <aura:unescapedHtml value="{!v.quote.Opportunity.Account.Ejecutivo_Logo__c}"/></span>
+                    </div>
+                 </div>
+                <span class="bold">Volumen de la cuenta: <span class = "blue">{!v.quote.Opportunity.Account.Sum_turnover_volume__c}</span></span>
+                <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                    <div class="slds-col slds-size_1-of-2">
+                        <span>Sector: <span class = "blue">{!v.quote.Opportunity.Account.Sector__c}</span></span><br/>
+                        <span>Giro: <span class = "blue">{!v.quote.Opportunity.Account.Giro__c}</span></span><br/>
+                        <span>Días transcurridos de la opp: <span class = "blue">{!v.quote.Opportunity.Elapsed_days__c} días</span></span><br/>
+                        <span class="bold">Tiempo Transcurrido: {!v.elapsedTime} días</span>
+                    </div> 
+                    <div class="slds-col slds-size_1-of-2">
+                        <span>Tipo de oportunidad: <span class = "blue">{!v.quote.Opportunity.RecordType.Name}</span></span><br/>
+                        <span>Fecha estimada de compra: <lightning:formattedDateTime class = "blue" value="{!v.quote.Opportunity.CloseDate}" day="2-digit"  month="2-digit" year="numeric" timeZone="UTC"/></span><br/>
+                        <span>Soluciones White Label: <span class = "blue">{!v.quote.Opportunity.Maquilador__c}</span></span><br/>
+                        <span>Gestor: <span class = "blue">{!v.quote.Opportunity.Gestor__c}</span></span><br/>
+                    </div>
+                </div>
+                <aura:if isTrue="{!v.submitterComment}">
+                    <div class="slds-text-title_bold slds-m-bottom_medium">
+                        <p>Comentarios del emisor {!v.quote.Owner.Name}: <span class="blue">{!v.submitterComment}</span></p>
+                    </div>  
+                </aura:if>
+                <aura:if isTrue="{!v.lastComments}">
+                    <div class="slds-text-title_bold slds-m-top_medium">
+                        Comentarios de aprobadores anteriores
+                    </div>
+                    <ui:scrollerWrapper>
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate black" title="Opportunity Name">Aprobador</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate black" title="Opportunity Name">Comentario</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.lastComments}" var="item" indexVar="index">
+                                    <tr class="slds-hint-parent">
+                                        <th data-label="Aprobador" scope="row">
+                                            <div class="slds-truncate bold" title="Cloudhub">{!index+1}&nbsp;{!item.Actor.Name}</div>
+                                        </th>
+                                        <td data-label="Comentario">
+                                            <div class="slds-truncate" title="Cloudhub">{!item.Comments}</div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </ui:scrollerWrapper>
+                </aura:if>
+                <div class="slds-text-title_bold slds-m-top_medium">
+                    Productos Cotización
+                </div>
+                <ui:scrollerWrapper>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Product Name">Nombre del producto</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Coverage">Cobertura</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Usage">Uso</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Security">Seguridad</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Number of cards">Cantidad de tarjetas o chequeras</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Emission volume">Volumen de emisión</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Close Date">Fecha estimada de compra</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Delivery addresses">Direcciones de Entrega</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Competitor">Competidor</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.quote.QuoteLineItems}" var="item">
+                                <tr class="slds-hint-parent">
+                                    <th data-label="Nombre del producto" scope="row">
+                                        <div class="slds-truncate" title="Product Name">{!item.Product2.Name}</div>
+                                    </th>
+                                    <td data-label="Cobertura">
+                                        <div class="slds-truncate" title="Coverage">{!item.Product2.Red__c}</div>
+                                    </td>
+                                    <td data-label="Uso">
+                                        <div class="slds-truncate" title="Usage">{!item.Product2.Uso__c}</div>
+                                    </td>
+                                    <td data-label="Seguridad">
+                                        <div class="slds-truncate" title="Security">{!item.Product2.Formato__c}</div>
+                                    </td>
+                                    <td data-label="Cantidad de tarjetas o chequeras">
+                                        <div class="slds-truncate" title="Number of cards">{!item.CantidadTarjetas__c}</div>
+                                    </td>
+                                    <td data-label="Volumen de emisión">
+                                        $ <lightning:formattedNumber value="{!item.UnitPrice}" maximumFractionDigits="2" minimumFractionDigits="2"/>
+                                    </td>
+                                    <td data-label="Fecha estimada de compra">
+                                        <div class="slds-truncate" title="Close date"><lightning:formattedDateTime value="{!item.ServiceDate}" day="2-digit"  month="2-digit" year="numeric" timeZone="UTC"/></div>
+                                    </td>
+                                    <td data-label="Número de envíos">
+                                        <div class="slds-truncate" title="Delivery addresses">{!v.quote.NumberOfShipments__c}</div>
+                                    </td>
+                                    <td data-label="Competidor">
+                                        <div class="slds-truncate" title="Competitor">{!v.quote.Opportunity.Competidor__c}</div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </ui:scrollerWrapper>
+                <div class="slds-text-title_bold slds-m-top_medium">
+                    Costos Cotización
+                </div>
+                <ui:scrollerWrapper>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Concept">Concepto</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Suggested price">Precio sugerido</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Final price">Costo final</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Discount">% Descuento</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Validity by date">Vigencia por Fecha</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Validity by cards">Vigencia por Tarjetas</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Approval level">Nivel de aprobación</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.conceptos}" var="item">
+                                <tr class="slds-hint-parent">
+                                    <th data-label="Concepto" scope="row">
+                                        <div class="slds-truncate" title="Concept">{!item.Concepto__r.TipoCargo__c}</div>
+                                    </th>
+                                    <td data-label="Precio sugerido">
+                                        <aura:if isTrue="{!item.Concepto__r.TipoCargo__c == 'Comisión por el servicio'}">
+                                            <lightning:formattedNumber value="{!item.PrecioLista__c}" maximumFractionDigits="2" minimumFractionDigits="2"/> %
+                                            <aura:set attribute="else">
+                                                $ <lightning:formattedNumber value="{!item.PrecioLista__c}" maximumFractionDigits="2" minimumFractionDigits="2"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </td>
+                                    <td data-label="Costo final">
+                                        <aura:if isTrue="{!item.Concepto__r.TipoCargo__c == 'Comisión por el servicio'}">
+                                            <lightning:formattedNumber value="{!item.PrecioFinal__c}" maximumFractionDigits="2" minimumFractionDigits="2"/> %
+                                            <aura:set attribute="else">
+                                                $ <lightning:formattedNumber value="{!item.PrecioFinal__c}" maximumFractionDigits="2" minimumFractionDigits="2"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </td>
+                                    <td data-label="% Descuento">
+                                        <lightning:formattedNumber value="{!item.Bonificacion__c}" maximumFractionDigits="2" minimumFractionDigits="2"/> %
+                                    </td>
+                                    <td data-label="Vigencia por Fecha">
+                                        <div class="slds-truncate" title="Validity by date"><lightning:formattedDateTime value="{!item.VigenciaDescuento__c}" day="2-digit"  month="2-digit" year="numeric" timeZone="UTC"/></div>
+                                    </td>
+                                    <td data-label="Vigencia por Tarjetas">
+                                        <div class="slds-truncate" title="Validity by cards">{!item.CantidadTarjetas__c}</div>
+                                    </td>
+                                    <td data-label="Nivel de aprobación">
+                                        <aura:if isTrue="{!item.ApprovalLevel__c == 1}">
+    										<lightning:icon iconName="utility:record" size="x-small" class="slds-align_absolute-center greenCircle"/>
+                                        </aura:if>
+                                        <aura:if isTrue="{!item.ApprovalLevel__c == 2}">
+    										<lightning:icon iconName="utility:record" size="x-small" class="slds-align_absolute-center yellowCircle"/>
+                                        </aura:if>   
+                                        <aura:if isTrue="{!item.ApprovalLevel__c == 3}">
+    										<lightning:icon iconName="utility:record" size="x-small" class="slds-align_absolute-center redCircle"/>
+                                        </aura:if>   
+                                        <aura:if isTrue="{!item.ApprovalLevel__c == 4}">
+    										<lightning:icon iconName="utility:record" size="x-small" class="slds-align_absolute-center grayCircle"/>
+                                        </aura:if>   
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table></ui:scrollerWrapper>
+            </div>
+        </lightning:card> 
+    </aura:if>
+</aura:component>

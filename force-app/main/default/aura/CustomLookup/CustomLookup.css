@@ -1,0 +1,15 @@
+.THIS .p {
+    border-style: none;
+    color: Black;
+}
+
+.THIS .n {
+    color: Black;
+    font-size: 20px;
+}
+
+
+
+.THIS .uiInput--input { 
+    min-height: 0;
+}

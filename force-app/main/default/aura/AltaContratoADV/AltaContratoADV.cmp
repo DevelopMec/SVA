@@ -1,0 +1,84 @@
+<aura:component controller="AltaContrato_CONT">
+    <aura:attribute name="dependencias" type="Map"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="entidadSel" type="Object"/>
+    <aura:attribute name="representantes" type="List"/>
+    <aura:attribute name="secciones" type="List"/>
+    <aura:attribute name="entidadesFiliales" type="List"/>
+    <aura:attribute name="filialesAdd" type="List"/>
+    <aura:attribute name="direcciones" type="List"/>
+    <aura:attribute name="recordId" type="String" default=""/>
+    
+    
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="saved" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="cargo" type="Boolean" default="false" />
+    
+    <aura:registerEvent name="hideSpin" type="c:CON_ADVContainderHideSpin"/>
+    
+    <aura:method name="iniciar" action="{!c.getInfoHeader}" 
+                 description="inicio"> 
+        <aura:attribute name="idQli" type="String" default=""/>
+    </aura:method>
+    <!--aura:handler name="init" value="{!this}" action="{!c.getInfoHeader}"/-->
+    <div style="position:relative;">
+        <aura:if isTrue="{!v.showSpinner}">
+            <div class="slds-p-vertical_large spinner-obsolute-position spinner-container">
+                <lightning:spinner size="medium" variant="brand" alternativeText="-"/>
+            </div>
+        </aura:if>
+        <div name="titulo" style="margin-bottom:1em;">
+            <div class="slds-m-top_medium">
+                <img style="display:block;margin-left:auto;margin-right:5%;" src="{!$Resource.CotizacionesPDF + '/Encabezados/'+v.data.headerData.Product2.ProductLogo__c}" width="200" height="100" />
+            </div>
+            <center>
+                <span class="titulo">Contrato {!v.data.headerData.Product2.Name}</span>
+            </center>
+        </div>
+        <aura:iteration items="{!v.secciones}" var="seccion" indexVar="indice">
+            <div name="seccionFacturacion" class="slds-m-around_medium">                            
+                <div class="seccionDiv">
+                    <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                        {!seccion.nombreSeccion}
+                    </h2>
+                </div>
+                <div class="slds-m-around_medium">
+                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="display:inline-block;vertical-align:middle;">
+                        <aura:iteration items="{!seccion.listaCampos}" var="campo" indexVar="indiceCampo">
+                            <div class="{!if(campo.ocultar,'slds-hide','slds-show '+if(seccion.sizeSecc>6,'slds-size_1-of-6','slds-size_1-of-'+seccion.sizeSecc))}" style="display:inline-block;vertical-align:middle;">
+                                <aura:if isTrue="{!campo.tipo=='PICKLIST'}">
+                                    <lightning:combobox disabled="true" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" id="{!seccion.nombreSeccion+';'+indice}" name="{!campo.api+';'+indiceCampo}" label="{!campo.etiqueta}" value="{!campo.value}" placeholder="Seleccione una opción" options="{!campo.listaValores}" onchange="{!c.handleChange}"/>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!campo.tipo=='MULTIPICKLIST'}">
+                                            
+                                            <ui:inputSelect disabled="true" required="{!campo.requerido}" label="{!campo.etiqueta}" multiple="true" value="{!campo.value}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small slds-select','slds-m-around_small slds-select')}">                                                                   
+                                                <aura:iteration items="{!campo.listaValores}" var="it">
+                                                    <ui:inputSelectOption label="{!it.label}" text="{!it.value}"/>
+                                                </aura:iteration>
+                                            </ui:inputSelect>
+                                            
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!campo.tipo=='CURRENCY'}">
+                                                    <lightning:input disabled="true" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" type="number" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!campo.tipo=='BOOLEAN'}">
+                                                            <lightning:input disabled="true" class="slds-m-around_small" id="{!seccion.nombreSeccion+';'+indice}" style="display:inline-block;vertical-align:middle;" type="checkbox" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" checked="{!campo.value}" onchange="{!c.handleChange}"/>
+                                                            <aura:set attribute="else">
+                                                                <lightning:input disabled="true" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" style="display:inline-block;vertical-align:middle;" type="{!campo.tipo}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </aura:iteration>
+                    </div>
+                </div>
+            </div>
+        </aura:iteration>
+    </div>
+</aura:component>

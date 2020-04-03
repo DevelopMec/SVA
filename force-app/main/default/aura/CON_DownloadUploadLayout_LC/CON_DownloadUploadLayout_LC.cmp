@@ -1,0 +1,36 @@
+<aura:component controller="CON_ContractsContainer_CTRL">
+	
+	<!-- Handlers -->
+	<!-- <aura:handler name="change" value="{!v.field}" action="{!c.deleteLayout}"/> -->
+	<!-- Handlers -->
+	
+	<!-- Registered Events -->
+	<aura:registerEvent name="invokeSaveMethod" type="c:CON_InvokeSaveMethod_EVENT"/>
+	<!-- Registered Events -->
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="opportunityId" type="Id"/>
+	<aura:attribute name="accountId" type="Id"/>
+	<aura:attribute name="productCode" type="String" default=""/>
+	<aura:attribute name="field" type="Map"/>
+	<aura:attribute name="layoutId" type="Id" default=""/>
+	<aura:attribute name="contentDocument" type="Object" default="{ Id: '', Title: '' }"/>
+	<!-- Utility Attributes -->
+	
+	<!-- Logical Flags -->
+    <aura:attribute name="isSpinnerVisible" type="Boolean" default="false"/>    
+    <aura:attribute name="obligatorio" type="Boolean" default="false"/>  
+	<!-- Logical Flags -->
+	
+	<lightning:card title="{!v.field.label}">
+		<aura:if isTrue="{!v.isSpinnerVisible}">
+			<lightning:spinner size="medium" variant="brand" alternativeText="Cargando el Archivo"/>
+		</aura:if>
+		<lightning:buttonGroup class="slds-align_absolute-center">
+			<lightning:button variant="brand" title="Descargar Layout" label="Descargar" name="{!v.field.name}" class="download-button-align" onclick="{!c.downloadLayout}"/>
+			<!-- <lightning:input aura:id="uploadInput" label="Cargar" type="file" title="Cargar Layout" name="{!v.field.name}" multiple="false" accept=".xlsx, .xls" onchange="{!c.uploadLayout}"/> -->
+			<lightning:input aura:id="uploadInput" label="Cargar" type="file" title="Cargar Layout" name="{!v.field.name}" multiple="false" accept=".xlsx, .xls" onchange="{!c.handleUploadLayout}"/>
+		</lightning:buttonGroup>
+	</lightning:card>
+	
+</aura:component>

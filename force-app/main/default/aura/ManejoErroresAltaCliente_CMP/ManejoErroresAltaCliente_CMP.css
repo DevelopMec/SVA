@@ -1,0 +1,26 @@
+.THIS .subCuentaClass{
+    font-weight:bold;
+    font-size:20px;
+    color:gray;
+}
+.THIS .errorClass{
+    font-size:15px;
+    text-align:justify;
+    color:#909294;
+}
+.THIS .titulo{
+    font-size:25px;
+    color:#04509A;
+}
+.THIS .izquierda{
+    width:50%; 
+    display:table-cell;
+    border-right: 1px solid black;
+    padding:10px
+}
+.THIS .derecha{
+    display:table-cell;
+    vertical-align:top;  
+    width:50%;
+    padding:10px
+}

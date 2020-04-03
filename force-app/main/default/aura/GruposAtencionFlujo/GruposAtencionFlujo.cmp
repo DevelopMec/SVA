@@ -1,0 +1,77 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="GruposAtencionFlujo_CONT">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    <aura:attribute name="showModal" type="boolean" default="false"/>
+    <aura:attribute name="Comentarios" type="String"/>
+    <aura:attribute name="tiposDeCasos" type="List"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:card iconName="action:new_group">
+        <aura:set attribute="title">
+            Grupo de atención
+            <lightning:buttonIcon iconName="utility:replace"  class="derecha" alternativeText="Cambiar tipo de Caso" onclick="{!c.cerrarAbrirModal}"/>
+        </aura:set>
+        <aura:if isTrue="{!v.showModal}">
+            
+            <div>
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.cerrarAbrirModal}" variant="bare-inverse" size="large"/>
+                            <h2 id="casoModalHeading" class="slds-text-heading_medium slds-hyphenate">Tipo de caso</h2>
+                        </header>
+                        <div style="height:15em;" class="slds-modal__content slds-p-around_medium" id="casoModalBody">
+                            <form class="slds-form--stacked">  
+                                <lightning:comboBox label="Tipo de Caso" aura:id="tipoCaso" options="{!v.tiposDeCasos}"/>
+                            </form>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button onclick="{!c.cerrarAbrirModal}" variant="neutral" label="Cancelar"/>
+                            <lightning:button onclick="{!c.cambiarTipo}" name="rechazo" variant="brand" label="Aceptar"/> 
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.spin}">
+            <lightning:spinner size="large"/>
+        </aura:if>
+        <center>
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                <div class="slds-size_1-of-2">
+                    <lightning:button variant="neutral" label="Rechazar" onclick="{!c.openModal}"/>
+                </div>
+                <div class="slds-size_1-of-2">
+                    <lightning:button variant="neutral" name="escalar" label="Siguiente" onclick="{!c.escalacionRechazo}"/>
+                </div>
+            </div>        
+        </center>
+        <div>
+            <section aura:id="casoModal" role="dialog" tabindex="-1" aria-labelledby="casoModalHeading" aria-modal="true" aria-describedby="casoModalBody" class="slds-modal">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeModal}" variant="bare-inverse" size="large"/>
+                        <h2 id="casoModalHeading" class="slds-text-heading_medium slds-hyphenate">Motivo de rechazo</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="casoModalBody">
+                        <form class="slds-form--stacked">  
+                            <lightning:textarea aura:id="textArea" 
+                                                label="Comentarios"
+                                                name="comentarios"
+                                                value="{!v.Comentarios}"
+                                                messageWhenValueMissing="Por favor agregue un comentario"
+                                                required ="true" 
+                                                />
+                        </form>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button onclick="{!c.closeModal}" variant="neutral" label="Cancelar"/>
+                        <lightning:button onclick="{!c.escalacionRechazo}" name="rechazo" variant="brand" label="Aceptar"/> 
+                    </footer>
+                </div>
+            </section>
+            <div aura:id="casoModalBackdrop" class="slds-backdrop"></div>
+        </div> 
+    </lightning:card>
+</aura:component>

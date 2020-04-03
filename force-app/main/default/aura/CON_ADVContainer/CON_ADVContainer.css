@@ -1,0 +1,87 @@
+.THIS .slds-modal__container{
+    max-width: 70rem !important;
+    width:80% !important;
+}
+.THIS .titulo{
+    font-size:25px;
+    color:#04509A;
+}
+.THIS .as400Size{
+    width: 50%;
+}
+.THIS .tableFontSize{
+    font-size: 11px;
+}
+.THIS .contract-container-border {
+	border: 5px solid #0070D2;
+	border-radius: 16px;
+	background-color: white;
+}
+
+.THIS .separador{
+	width: 100%;
+	height: 6px;
+	background-color: #0070d2;
+	margin-top: 20px;
+    margin-bottom: 20px;
+}
+.THIS .dividerTable{
+	background-color: #0070d2;
+	color: white;
+}
+
+.THIS .button-group-container {
+	position: fixed;
+	bottom: 2.5%;
+	right: 1.5%;
+	border: 1px solid #F9F9FA;
+	border-radius: 16px;
+}
+
+.THIS .finish-button .slds-icon {
+	/*background-color: green;*/
+	fill: green;
+}
+
+.THIS .save-button .slds-icon {
+	/*background-color: #FFFFFF;*/
+	fill: blue;
+}
+
+.THIS .send-button .slds-icon {
+	/*background-color: orange;*/
+	fill: red;
+}
+
+.THIS .pdf-button .slds-icon {
+	/*background-color: red;*/
+	fill: red;
+}
+
+.THIS .button-size {
+	height: 48px;
+	width: 48px;
+}
+
+.THIS .slds-button:focus {
+	/*outline: 0;
+	border: 0;*/
+	color: #FFFFFF;
+	box-shadow: none;
+}
+
+.THIS button[disabled] {
+	cursor: not-allowed;
+}
+
+.THIS .slds-button_icon-border-filled[disabled]:hover {
+	background-color: #FFFFFF;
+}
+
+.THIS button[disabled] .slds-icon {
+	fill: gray;
+}
+.THIS .frameImg{
+	margin-top: 15px;
+	
+}

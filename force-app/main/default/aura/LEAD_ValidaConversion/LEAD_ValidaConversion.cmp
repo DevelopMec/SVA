@@ -1,0 +1,43 @@
+<aura:component implements="flexipage:availableForRecordHome,force:lightningQuickAction,force:hasRecordId" controller="CON_ContractsContainer_CTRL">
+    <aura:attribute name="app_ctc" type="Map" default="{}"/>
+    <aura:attribute name="bodyRender" type="Object[]" default="[]"/>
+    <aura:attribute name="objectToAttributes" type="Object[]" default="[]"/>
+    <aura:attribute name="objectToRender" type="Map" default="{}"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="contrato" type="Contrato2__c" />
+    
+    <ltng:require scripts="{!join(',', $Resource.CTC_BASE + '/lightning/ctcLightning.js'
+    						)}" 
+					styles="{!join(',', $Resource.kendoui + '/css/kendo.default.min.css',
+    									$Resource.kendoui + '/css/kendo.common.min.css'
+    						)}" 
+    				afterScriptsLoaded="{!c.init}"/>
+
+    <ui:button label="uno" aura:id="test"></ui:button>
+
+    <div class="slds-grid slds-gutters">
+		<div class="slds-col">
+			1.- <br/>
+			{!v.objectToRender.Frecuencia_de_Pedido__c.element}
+		</div>
+
+		<div class="slds-col">
+			2.- <br/>
+			{!v.objectToRender.Personalizacion_de_Tarjetas__c.element}
+		</div>
+
+		<div class="slds-col">
+			{!v.objectToRender.Nombre_de_Personalizacion__c.element}
+		</div>
+
+		<div class="slds-col">
+			{!v.objectToRender.prueba.element}
+		</div>
+	</div>
+
+    <div aura:id="appContainer">
+        {!v.objectToAttributes}
+        {!v.bodyRender}
+    </div>
+    
+</aura:component>

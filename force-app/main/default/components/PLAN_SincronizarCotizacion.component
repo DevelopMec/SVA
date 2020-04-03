@@ -1,0 +1,69 @@
+<apex:component >
+    <script type="text/ng-template" id="sincronizarCotizacion.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+            <!-- <h4 class="modal-title">Escalonamiento</h4> -->
+        </div>
+        <div class="modal-body">
+            <center><strong>Sincronizar <span ng-bind="sc.cotizacion.Name"/>?</strong></center>
+            <ctc-error ctc-body="sc.errors"></ctc-error>
+        </div>
+        <div class="modal-footer">
+        	<center>
+        		<button type="button" ng-disabled="sc.processing" class="btnb btnb-success" ng-click="sc.sincronizarConfirmar()">
+                    <span ng-if="sc.processing" class="fa fa-spinner fa-pulse fa-fw ng-animate-disabled"></span>
+	                <span class="fa fa-save fa-fw"></span>
+                    <span ng-if="!sc.processing">Confirmar</span>
+                    <span ng-if="sc.processing">Sincronizando</span>
+	                
+	            </button>
+        		<button type="button" ng-disabled="sc.processing" class="btnb btnb-default" ng-click="sc.close()">
+	                <span class="fa fa-mail-reply fa-fw"></span>
+	                Cerrar
+	            </button>
+        	</center>
+            
+        </div>
+    </script>
+
+    <script type="text/javascript">
+        (function() {
+            'use sctrict'
+            angular.module('appEdenred')
+            .controller('sincronizarCotizacionCtrl', SincronizarCotizacionCtrl)
+
+            SincronizarCotizacionCtrl.$inject = ['ctcUtils', '$uibModal', '$uibModalInstance', 'cotizacion']
+
+            function SincronizarCotizacionCtrl(ctcUtils, $uibModal, $uibModalInstance, cotizacion) {
+                var vm = this
+                vm.cotizacion = cotizacion || {}
+                vm.processing = false
+                vm.errors = []
+                vm.sincronizarConfirmar = function() {
+                    vm.processing = true
+                    vm.errors = []
+                    var opportunity = {
+                        Id: vm.cotizacion.OpportunityId,
+                        SyncedQuoteId: vm.cotizacion.Id
+                    }
+                    ctcUtils.upsert('Opportunity', JSON.stringify([opportunity]))
+                    .then(function(res) {
+                        vm.processing = false
+                        $uibModalInstance.close(cotizacion)
+                    }).catch(function(err) {
+                        vm.processing = false
+                        vm.errors = [err]
+                    })
+                }
+
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+
+            }
+        })()    
+
+
+    </script>
+</apex:component>

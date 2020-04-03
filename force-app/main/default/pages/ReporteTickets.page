@@ -1,0 +1,15 @@
+<apex:page standardController="Case" lightningStylesheets="true">
+    <style>
+        #parentDiv .slds-icon_container .slds-icon {
+        width:15px;
+        height:15px;
+        fill:#31A8F3;
+        }
+        #parentDiv .slds-icon_container .slds-assistive-text {
+        display: none;
+        }
+    </style>
+    <div id="parentDiv">
+        <analytics:reportChart reportId="00O4M000004Ra2uUAC" showRefreshButton="true" size="small" filter="[{column:'Case.IdCuenta__c',operator:'equals',value:'{!Case.IdCuenta__c}'}]"></analytics:reportChart>
+    </div>
+</apex:page>

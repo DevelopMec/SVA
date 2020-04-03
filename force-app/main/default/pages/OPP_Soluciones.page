@@ -1,0 +1,171 @@
+<apex:page standardController="Opportunity" extensions="PLAN_CuentaService" showHeader="false" sidebar="false" applyBodyTag="false" docType="html-5.0">
+	<head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/bootstrap.min.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/animate.css')}"/>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.css')}"/>
+
+        <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/bootstrap/js/bootstrap.min.js')}"/>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/ui-bootstrap-tpls-2.2.0.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular-animate.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular-sanitize.min.js')}"></script>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/css/ctc_main.css')}"/>
+
+
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/datatables/datatables.min.js')}"></script>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/datatables/datatables.min.css')}"/>
+        
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.module.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.factory.js')}"/>
+
+        <title>Bienvenido .:Plan de cuenta:.</title>
+    </head>
+    <body>
+		<!--apex:relatedList list="OpportunityLineItems" title="Soluciones"/-->
+		<div class="container" ng-app="appEdenred" ng-controller="solucionesCtrl as sc" id="solucionesCtrl">
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th ng-bind="'{!$ObjectType.Product2.fields.Name.label}'"></th>
+							<th ng-bind="'{!$ObjectType.Product2.fields.Family.label}'"></th>
+							<th ng-bind="'{!$ObjectType.Product2.fields.Red__c.label}'"></th>
+							<th ng-bind="'{!$ObjectType.Product2.fields.Uso__c.label}'"></th>
+							<th ng-bind="'{!$ObjectType.Product2.fields.Formato__c.label}'"></th>
+							<th ng-bind="'{!$ObjectType.OpportunityLineItem.fields.Etapa__c.label}'"></th>
+							<th ng-bind="'{!$ObjectType.OpportunityLineItem.fields.CantidadTarjetas__c.label}'"></th>
+							<th ng-bind="'{!$ObjectType.OpportunityLineItem.fields.UnitPrice.label}'"></th>
+							<th ng-bind="'{!$ObjectType.OpportunityLineItem.fields.ServiceDate.label}'"></th>
+							<th ng-bind="'{!$ObjectType.OpportunityLineItem.fields.Escalonamiento__c.label}'"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="oli in sc.soluciones" id="trsol_{{oli.Id}}">
+							<td>
+								<!--a href="/apex/PLAN_Cuenta?id={!Opportunity.SyncedQuote}" target="_blank" ng-bind="oli.Name"></a-->
+								<a href="/{{oli.Id}}" target="_blank" ng-bind="oli.Name"></a>
+							</td>
+							<td ng-bind="oli.Family"></td>
+							<td ng-bind="oli.Red__c"></td>
+							<td ng-bind="oli.Uso__c"></td>
+							<td ng-bind="oli.Formato__c"></td>
+							<td ng-bind="oli.Etapa__c"></td>
+							<td ng-bind="oli.CantidadTarjetas__c | number: 0"></td>
+							<td ng-bind="oli.UnitPrice | currency: '$': 2"></td>
+							<td ng-bind="oli.ServiceDate | date: 'dd/MM/yyyy': 'UTC'"></td>
+							<td class="text-center">
+								<span ng-if="oli.Escalonamiento__c == 'true'" class="fa fa-check"></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<script type="text/javascript">
+			(function() {
+				'use strict'
+				var instances = []
+				<apex:repeat value="{!Opportunity.OpportunityLineItems}" var="oli"> 
+					var obj = {
+						Id: '{!oli.Id}', 
+						Family: '{!oli.Product2.Family}', 
+						Name: '{!oli.Product2.Name}', 
+						Red__c: '{!oli.Product2.Red__c}', 
+						Uso__c: '{!oli.Product2.Uso__c}', 
+						Formato__c: '{!oli.Product2.Formato__c}',
+						Escalonamiento__c: '{!oli.Escalonamiento__c}',
+						Etapa__c: '{!oli.Etapa__c}',
+						MotivoEtapa__c: '{!oli.MotivoEtapa__c}',
+						CantidadTarjetas__c: '{!oli.CantidadTarjetas__c}',
+						UnitPrice: '{!oli.UnitPrice}',
+						ServiceDate: new Date('{!oli.ServiceDate}').getTime(),
+						FormaPago__c: '{!oli.FormaPago__c}',
+						PartidaPresupuesto__c: '{!oli.PartidaPresupuesto__c}',
+					}
+					instances.push(obj)
+				</apex:repeat> 
+				//console.log('instance: ', instances)
+
+				angular.module('appEdenred' , ['ctc.module', 'ui.bootstrap', 'ngAnimate', 'ngSanitize'])
+				.controller('solucionesCtrl', SolucionesCtrl) 
+				SolucionesCtrl.$inject = ['ctcUtils']
+
+				function SolucionesCtrl(ctcUtils) {
+					var vm = this
+					vm.soluciones = instances || []
+
+					vm.getComparados = function() {
+						if(vm.soluciones && angular.isArray(vm.soluciones)) {
+							var ids = ''
+							var unique = {}
+							angular.forEach(vm.soluciones, function(v, k) {
+								if(v.PartidaPresupuesto__c && !unique.hasOwnProperty(v.PartidaPresupuesto__c)) {
+									unique[v.PartidaPresupuesto__c] = true
+									if(ids.length > 0) {
+										ids += ', '
+									}
+									ids += '\'' + v.PartidaPresupuesto__c + '\''
+								}
+							})
+							//console.log('ids: ', ids)
+							if(ids.length > 0) {
+								ctcUtils.remote('PLAN_CuentaService.query')('SELECT Id, ProductoComparado__r.Name, ProductoCotizado__c FROM ProductoComparado__c WHERE ProductoCotizado__c IN(' + ids + ')')
+								.then(function(res) {
+									//console.log('success: ', res)
+									if(res && res.length > 0) {
+										angular.forEach(vm.soluciones, function(v, k) {
+											angular.forEach(res, function(v1, k1) {
+												if(v1.ProductoCotizado__c == v.PartidaPresupuesto__c) {
+													if(!v.Comparados) {
+														v.Comparados = []
+													}
+													v.Comparados.push({Id: v1.Id, Name: v1.ProductoComparado__r.Name, ProductoComparado__c: v1.ProductoComparado__c})
+												}
+											})
+											//vm.renderComparado(v)
+										})
+										//console.log('final vm.soluciones: ', vm.soluciones)
+									}
+								}).catch(function(err) {
+									//console.log('err: ', err)
+								})
+							}
+						}
+					}
+
+					vm.renderComparado = function(instance) {
+						//console.log('renderComparado: ', instance)
+						if(instance && instance.Comparados && instance.Comparados.length > 0) {
+							var txt = 'Comparado con:'
+							angular.forEach(instance.Comparados, function(v, k) {
+								var tr = jQuery('[id="trsol_' + instance.Id + '"]:last')
+								var html = '<tr id="trsol_' + instance.Id + '"><td class="text-right">' + txt + '</td><th colspan="9"><i> <a href="/' + v.ProductoComparado__c + '" target="_blank">' + v.Name + '</a></i></th></tr>'
+								if(tr && tr.length > 0) {
+									tr.after(html)
+                                }
+                                txt = ''
+							})
+						}
+					}
+
+					vm.getComparados()
+				}
+
+			})()
+		</script>
+		<style type="text/css">
+			.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+				/*padding: 2px;*/
+			}
+		</style>
+    </body>
+</apex:page>

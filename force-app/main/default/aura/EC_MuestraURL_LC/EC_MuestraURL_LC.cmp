@@ -1,0 +1,24 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="LightningService_CTRL">
+	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js'
+    						)}"
+    						afterScriptsLoaded="{!c.init}"
+    				/>
+	<aura:attribute name="app_ctc" type="Map" default="{}"/>
+
+	<aura:if isTrue="{!v.app_ctc.instance.renderUrl}">
+		<lightning:card iconName="standard:account">
+
+	        <aura:set attribute="title">
+	            <h2>
+	                <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Subcuentas">
+	                    <span class="slds-text-heading_small">Información subcuenta {!v.app_ctc.instance.as400}</span>
+	                </a>
+	            </h2>
+	        </aura:set>
+
+	        <p class="slds-p-horizontal_small">
+				<c:EC_RenderURL_LC url="{!v.app_ctc.instance.url}" />
+			</p>
+		</lightning:card>
+	</aura:if>	
+</aura:component>

@@ -1,0 +1,47 @@
+<aura:component controller="TiempoReasignacionSemaforo" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global">	
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="objeto" type="String"/>
+    <aura:attribute name="colorF" type="String"/>
+    <aura:attribute name="colorFA" type="String"/>
+    <aura:attribute name="esField" type="boolean" default="false"/>
+    <aura:attribute name="esDist" type="boolean" default="false"/>
+    <aura:attribute name="progresoFA" type="Integer"/>
+    <aura:attribute name="progresoF" type="Integer"/>
+    <aura:attribute name="diasFaltA" type="Integer"/>
+    <aura:attribute name="diasFalt" type="Integer"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:card iconName="standard:event" title="Tiempo total para re-asignación">
+        <div class="slds-m-around_medium slds-text-heading_small" >
+            <center>
+                <aura:if isTrue="{!v.esField}">
+                    <!--Tiempo transcurrido sin Actividad({!v.diasFaltA} días para la reasignación)-->                
+                    <c:ProgressBarCircular aura:id="progressBarAc" Legend="{!'Restan ' + v.diasFaltA + ' días para seguimiento del prospecto(sin actividad).'}" actualProgress="{!v.progresoFA}" theme="{!v.colorFA}" size="small"/>                
+                    <!--lightning:progressbar variant="circular" value="{!v.progresoFA}" size="large"/-->
+                    <br/>
+                    <aura:if isTrue="{!v.objeto=='Lead'}">
+                        <!--Restan {!v.diasFalt} días para seguimiento del prospecto.-->
+                        <c:ProgressBarCircular aura:id="progressBar" Legend="{!'Restan ' + v.diasFalt + ' días para seguimiento del prospecto.'}" actualProgress="{!v.progresoF}" theme="{!v.colorF}" size="small"/>
+                        <aura:set attribute="else">
+                            <!--Restan {!v.diasFalt} para concretar la oportunidad.-->
+                            <c:ProgressBarCircular aura:id="progressBar" Legend="{!'Restan ' + v.diasFalt + ' días para concretar la oportunidad.'}" actualProgress="{!v.progresoF}" theme="{!v.colorF}" size="small"/>
+                        </aura:set>
+                    </aura:if>
+                    <!--c:ProgressBarCircular Legend="" actualProgress="{!v.progresoF}" theme="{!v.colorF}" size="small"/>
+                <lightning:progressbar variant="circular" value="{!v.progresoF}" size="large"/-->
+                </aura:if>
+                <aura:if isTrue="{!v.esDist}">
+                    <aura:if isTrue="{!v.objeto=='Lead'}">
+                        <!--Restan {!v.diasFalt} días para seguimiento del prospecto.-->
+                        <c:ProgressBarCircular aura:id="progressBar" Legend="{!'Restan ' + v.diasFalt + ' días para seguimiento del prospecto.'}" actualProgress="{!v.progresoF}" theme="{!v.colorF}" size="small"/>
+                        <aura:set attribute="else">
+                            <!--Restan {!v.diasFalt} para concretar la oportunidad.-->
+                            <c:ProgressBarCircular aura:id="progressBar" Legend="{!'Restan ' + v.diasFalt + ' días para concretar la oportunidad'}" actualProgress="{!v.progresoF}" theme="{!v.colorF}" size="small"/>
+                        </aura:set>
+                    </aura:if>                
+                    <!--lightning:progressbar variant="circular" value="{!v.progresoF}" size="large"/-->
+                </aura:if> 
+            </center>
+        </div>
+    </lightning:card>
+</aura:component>

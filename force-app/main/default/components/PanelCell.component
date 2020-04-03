@@ -1,0 +1,16 @@
+<apex:component >
+	<apex:attribute name="label" type="String" description="Title of the panel"/>
+	<apex:attribute name="for" type="String" description="For label"/>
+	<apex:attribute name="color" type="String" description="For input" default=""/>
+	<apex:attribute name="columns" type="String" description="columns bootstrap" default="3"/>
+	<apex:attribute name="alineacion" type="String" description="columns bootstrap" default="right"/>
+	<apex:attribute name="alineacionLabel" type="String" description="columns bootstrap" default="left"/>
+	<apex:attribute name="toggle" type="String" description=" bootstrap" default=""/>
+	<apex:attribute name="placement" type="String" description=" bootstrap" default=""/>
+	<apex:attribute name="title" type="String" description=" bootstrap" default=""/>
+	
+	<label for="{!for}"  style="text-align: {!alineacionLabel}" class="col-md-{!columns} control-label "  >{!label}</label>
+	<div class="col-md-{!columns} text-{!alineacion} {!color}" data-toggle="{!toggle}" data-plascement="{!placement}" title="{!title}" >
+	  <apex:componentBody ></apex:componentBody>
+	</div>
+</apex:component>

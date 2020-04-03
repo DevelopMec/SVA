@@ -1,0 +1,15 @@
+.THIS .celda{
+    white-space: nowrap;
+    text-align:center;
+}
+.THIS .columna{
+    text-align:center;
+}
+.THIS .alerta{
+    font-size:1em;
+    color:white;
+    background-color:#F64A3A;
+    border-color:#CC1C0B;
+    border-radius:1em;
+    border-width: 0.3em;
+}

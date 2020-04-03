@@ -1,0 +1,2 @@
+<aura:event type="APPLICATION" description="by this event we are refreshing VistaDinamica component">
+</aura:event>

@@ -1,0 +1,9 @@
+.THIS .slds-modal__content {
+    height: 300px;
+}
+.THIS.twitter-typeahead {
+    display: block !important;
+}
+.THIS.slds-form_stacked {
+    width: 100%;
+}

@@ -1,0 +1,44 @@
+<aura:component controller="AsignacionAutomatica"  implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:appHostable,lightning:actionOverride" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="UserList" type="List"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="userSelected" type="Id" default=""/>   
+    <aura:attribute name="Asignaciones" type="String" default=""/>   
+    <aura:attribute name="FiltroAsignacion" type="String" default=""/>  
+    <aura:attribute name="ObjectName" type="String" />  
+    <aura:attribute name="Visible" type="Boolean" default="false"/>  
+    <aura:attribute name="SpinnerVisible" type="Boolean" default="false"/>  
+    <aura:attribute name="ProfileName" type="String" />  
+    <aura:attribute name="EnableSave" type="Boolean" default="false" />  
+    
+    <lightning:card title="Asignación de Folios">
+                
+        <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">
+            <lightning:combobox name="user" label="Usuarios" value="inProgress" placeholder="Selecciona un usuario" options="{! v.UserList }" onchange="{! c.handleChange }"/>    
+            <aura:if isTrue="{!v.SpinnerVisible}">
+                <div class="exampleHolder">
+                    <lightning:spinner alternativeText="Loading" size="medium" />
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.Visible}">
+                <lightning:recordEditForm  aura:id="editForm"  
+                                          onsuccess="{!c.handleSuccess}"
+                                          onload="{!c.handleLoad}"
+                                          onsubmit="{!c.handleLoad}"
+                                          recordId="{!v.recordId}" 
+                                          objectApiName="User" >
+                <!--<lightning:messages />-->
+                <lightning:inputField aura:id="asigna" fieldName="Asignaciones_PL__c" onchange="{!c.onCh}" default="" />
+                <lightning:inputField fieldName="FiltroAsignacion_MSPL__c" />           
+                <!--Picklist-->
+                <lightning:button aura:id="submit" type="submit" label="Guardar" disabled="{!v.EnableSave}" class="slds-m-top_medium" />
+               
+            </lightning:recordEditForm>
+            </aura:if>
+        </div>
+        
+        
+    </lightning:card>
+    
+    
+</aura:component>

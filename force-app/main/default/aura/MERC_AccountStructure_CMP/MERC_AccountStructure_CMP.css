@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'edenredFont';
+    src: url("font/edenred.eot?iefix") format('embedded-opentype'),
+    url("font/edenred.otf") format('embedded'),
+    url("font/edenred.woff") format('woff'),
+    url("font/edenred.ttf") format('ttf');
+    }
+
+.THIS{
+    background-color:white;
+    font-family: 'edenredFont';
+}
+
+.THIS .seccionDiv{
+    background-color:#E1E6E9;
+    border-radius:50px;
+    height:1.5em;
+	display:inline;
+    text-align:center;
+}
+
+.THIS .logoEdenRed {
+    float:right;
+    background-color:white;
+}
+
+.THIS .title {
+    font-size: 2em;
+    text-align:center;
+    font-family: 'edenredFont';
+    color:#d10000;
+}

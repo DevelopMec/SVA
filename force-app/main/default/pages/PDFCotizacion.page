@@ -1,0 +1,1109 @@
+<apex:page apiVersion="28.0" showHeader="{!IF(cotizacion.Id != null , false, true)}" sidebar="false"
+           standardStylesheets="false" applyBodyTag="false" applyHtmlTag="{!IF(cotizacion.Id != null , false, true)}"
+           doctype="html-5.0" renderAs="{!IF(cotizacion.Id != null ,'pdf',null)}" controller="PLAN_PDFCotizacionCtrl">
+    <html lang="es">
+    <head>
+        <title>PDF</title>
+        <meta charset="utf-8"/>
+        <style>
+            
+            /********** Página **********/
+            @page
+            {
+                size:letter;
+                margin:0;
+            }
+            body
+            {
+                margin:0;
+            }
+            
+            /********* Cabecera **********/
+            .cab_fot {
+                width: 100%;
+                height: 3.8cm;
+                
+            }
+            .cab_fot > img{
+                width: 215.9mm;
+                height: 38mm;
+            }
+            
+            /********** Contenido de la página **********/
+            p{
+                color: #000;
+                text-size: 11pt;
+                text-align: justify;
+                
+            }
+            h1, h2, h3, h4, h5, h6{
+                color: #032C54;
+            }
+            .check_sign{
+                content: "\u2713"
+            }
+            .contenido{
+                margin-top:0mm;
+                margin-bottom:0mm;
+                margin-left:19mm;
+                margin-right: 19mm;
+                font-family: "Sans-serif","Arial","Verdana";
+                font-size: 11pt;
+            }
+            .contenido .label{
+                color:#032C54;
+            }
+            
+            /***** Labels y Values *****/
+            .label{
+                font-size: 11pt;
+            }
+            .value{
+                font-size: 11pt;
+                /*background-color: #D4F4FE;*/
+                background-color: #e4e6e6;
+            }
+            
+            /***** Tabla de fecha *****/
+            .fecha{
+                position: absolute;
+                right: 25mm;
+                top: 30mm;
+                
+            }
+            .fecha2{
+                position: relative;
+                right: 25mm;
+                top: 30mm;
+            }
+            .fecha .label, .fecha2 .label{
+                color: #808080;
+                text-align:right;
+            }
+            .fecha .value, .fecha2 .value{
+                color: black;
+                text-align:left;
+            }
+            /***** Titulo Propuesta Comercial *****/
+            .tituloPropCom{
+                
+            }
+            .tituloPropCom > h1{
+                color: #11204c;
+                text-size: 20pt;
+                border-style: none none none solid;
+                border-width:5mm;
+                border-color:#11204c;
+                padding-top:5mm;
+                padding-bottom:5mm;
+                padding-left:5mm;
+            }
+            /***** Info Cliente *****/
+            .infoCliente{
+                text-align:left;
+                width: 100%;
+                
+            }
+            .infoCliente > table{
+                width: 60%;
+            }
+            td.width10{
+                width: 10%;
+            }
+            td.width50{
+                width: 50%;
+            }
+            
+            /***** Info propuesta comercial *****/
+            .infoPropCom{
+                
+            }
+            /***** Forma de pago y vigencia *****/
+            .fomaPagoYVigencia{
+                
+            }
+            .formaPagoYVigencia > table{
+                width: 17.5cm;
+                margin-top: 7mm;
+            }
+            .formaPagoYVigencia > table > tr > th{
+                width: 50%;
+                color: #032C54;
+            }
+            .formaPagoYVigencia > table > tr > td{
+                width: 50%;
+                font-size: x-small;
+                color: #808080;
+            }
+            .formaPagoYVigencia > table > tr > td > p
+            {
+                font-size: xx-small;
+                text-align: right;
+            }
+            span.checkbox{
+                width: 10pt;
+                height: 10pt;
+                border-style: solid;
+                border-color: #808080;
+                border-width: 1pt;
+                margin: 2mm;
+            }
+            
+            /***** Documentación para contratar *****/
+            .documentacionContratar{
+                color: #808080;
+                font-size: 9pt;
+            }
+            .documentacionContratar > ul{
+                margin-top:1mm;
+            }
+            .documentacionContratar > table{
+                margin-top: 3mm;
+                margin-bottom: 3mm;
+            }
+            .documentacionContratar > table > tr > th{
+                color:#00BFFF;
+                width: 50%
+            }
+            .documentacionContratar > table > tr > td{
+                width: 50%;
+            }
+            .documentacionContratar > p{
+                margin-top: 0mm;
+                margin-bottom: 0mm;
+            }
+            
+            /***** Tabla de comparativos *****/
+            .resumenProducto{
+                text-align:left;
+                width: 100%;
+                margin-top: 5mm;
+            }
+            .resumenProducto > table{
+                width:85%;
+            }
+            .comparativo{
+                margin-top: 5mm;
+            }
+            
+            img.imagenTarjeta{
+                width: 1.5cm;
+            }
+            .comparativo > table{
+                width: 17.5cm;
+                border-style: solid;
+                /*border-color: #6BBCCE;*/
+                border-color: #939798;
+                border-width: 3px;
+                font-size: 10pt;
+                border-collapse: collapse;
+            }
+            .comparativo > table > tr{
+                /*border-color: #6BBCCE;*/
+                border-color: #939798;
+                border-style: solid;
+            }
+            .comparativo > table > tr > td{
+                height: 0.8cm;
+                padding-left:3mm;
+            }
+            .comparativo > table > tr.cabeceraTabla{
+                /*background-color:#6BBCCE;*/
+                background-color:#939798;
+                text-weight: bold;
+                color: white;
+                border-style: solid;
+                /*border-color: #6BBCCE;*/
+                border-color: #939798;
+                text-align:center;
+                
+            }
+            .comparativo > table > tr.cabeceraTablaDiff{
+                background-color:#939798;
+                text-weight: bold;
+                color: white;
+                height: 1.0 cm;
+                border-style: solid;
+                /*border-color: #6BBCCE;*/
+                border-color: #939798;
+                text-align:center;
+            }
+            .comparativo > table > tr.cabeceraTabla > td{
+                text-align:center;
+                font-size: xx-small;
+            }
+            .comparativo > table > tr.non{
+                color:#808080;
+                background-color:#DBE8EB;
+                
+                border-style: solid;
+                border-color: #939798;
+                font-size: 10pt;
+            }
+            .comparativo > table > tr.par{
+                color: #808080;
+                background-color:#FFFFFF;
+                
+                border-style: solid;
+                border-color: #939798;
+                font-size: 10pt;
+            }
+            .comparativo > table > tr > td.concepto{
+                font-weight: normal;
+            }
+            .centrado{
+                text-align:center;
+            }
+            .derecha{
+                text-align:center;
+            }
+            .izquierda{
+                text-align:left;
+            }
+            .justificado{
+                text-align: justify;
+            }
+            
+            .comparativo2{
+                margin-top: 5mm;
+                width: 17.5cm;
+                font-size: xx-small;
+                border-style: solid;
+                /*border-color: #6BBCCE;*/
+                border-color: #939798;
+                border-width: 3px;
+            }
+            
+            table.tablaComparativo{
+                width: 17.5cm;
+                border-collapse: collapse;
+            }
+            table.tablaComparativo > tr > th{
+                text-align:center;
+            }
+            table.tablaComparativo > tr > td{
+                padding: 0px 0px 0px 0px;
+                /*border-right: 1px solid #6BBCCE;*/
+                border-right: 1px solid #939798;
+            }
+            table.tablaComparativo > tr.cabecera
+            {
+                /*background-color:#6BBCCE;*/
+                background-color:#939798;
+                text-weight: bold;
+                font-size: x-small;
+                color: white;
+                height: 8mm;
+            }
+            table.listadoConceptos{
+                width: 100%;
+                margin: 0px 0px 0px 0px;
+                padding: 0px 0px 0px 0px;
+                border-collapse: collapse;
+            }
+            table.listadoConceptos > tr.cabecera{
+                /*background-color:#6BBCCE;
+                border-color:#6BBCCE;*/
+                background-color:#939798;
+                border-color:#939798;
+                border-style:solid;
+                font-size: xx-small;
+                text-weight: bold;
+                color: white;
+                height: 8mm;
+            }
+            table.listadoConceptos > tr:nth-child(even){
+                background-color:#DBE8EB;
+            }
+            table.listadoConceptos > tr > th{
+                height: 8mm;
+                padding-left:3mm;
+                font-size: x-small;
+                text-align: center;
+            }
+            table.listadoConceptos > tr > td{
+                height: 8mm;
+                font-size: xx-small;
+                /*border-top: 1px solid #6BBCCE;
+                border-bottom: 1px solid #6BBCCE;*/
+                border-top: 1px solid #939798;
+                border-bottom: 1px solid #939798;
+                border-right: 1px solid #DBE8EB;
+            }
+            table.listadoConceptos > tr > td.conceptos{
+                padding-left: 3mm;
+            }
+            /***** Términos y condiciones (Contrato) *****/
+            .terminos{
+                font-size:9.5pt;
+                color: #808080;
+            }
+            .terminos p{
+                font-size:10pt;
+                color: #808080;
+            }
+            .formEjecutivoCampo{
+                width: 8cm;
+                height: 5mm;
+                background: #FFFFFF;
+                border-radius: 2.5mm;
+                border-color: #808080;
+                border-style: solid;
+                border-weight: 1pt;
+                margin-bottom: 3mm;
+                -moz-border-radius: 2.5mm;
+                -webkit-border-radius: 2.5mm;
+            }
+            /***** Firmas *****/
+            .firmas{
+                font-size: 9.5pt;
+                color:#808080;
+            }
+            .firmas > table{
+                width: 17.5cm;
+            }
+            
+            /***** Formulario e información de contacto *****/
+            .infoContacto{
+            }
+            .infoContacto > table{
+                width: 17.5cm;
+                font-size: 10pt;
+                color: #808080;
+            }
+            .infoContacto > table > tr > td.formulario{
+                background:#E0E0E0;
+                padding-left: 10mm;
+                width: 9cm;
+            }
+            .infoContacto > table > tr > td.infoEmpresa{
+                text-align: right;
+                vertical-align:bottom;
+            }
+            .infoContacto > table > tr > td.infoEmpresa > div{
+                color:#032C54;
+                font-weight: bold;
+            }
+            /***** Footer (íconos y links) *****/
+            .iconosProductos > table{
+                width: 17.5cm;
+                font-size: 11pt;
+                color:#032C54;
+                font-weight: 12pt;
+            }
+            .iconosProductos > table > tr > td{
+                text-align: center;
+            }
+            .iconProductos > table > tr > td > strong{
+                margin-top: 3mm;
+            }
+            img.iconoProducto{
+                height: 1.4cm;
+            }
+            img.iconoMarca{
+                height: 10mm;
+            }
+            a.linkProducto{
+                font-weight: bold;
+                text-decoration: none;
+                font-size: 10pt;
+            }
+            a.linkDS{
+                color: #C0392B;
+            }
+            a.linkCM{
+                color: #F39C12;
+            }
+            a.linkVT{
+                color: #707B7C
+            }
+            a.linkRG{
+                color: #3498DB;
+            }
+            a.linkRS{
+                color: #01DF01;
+            }
+            a.linkUN{
+                color: #784212;
+            }
+            a.linkMANT{
+                color: #f29200;
+            }
+            
+            /***** Saltos de página *****/
+            .saltoDePaginaAntes{
+                PAGE-BREAK-BEFORE: always;
+            }
+            .saltoDePaginaDespues{
+                PAGE-BREAK-AFTER: always;
+            }
+            .table-dif>tbody>tr:nth-of-type(odd) {
+                color:#000000;
+                background-color:#DBE8EB;
+                border-style: solid;
+                border-color: #939798;
+            }
+
+            .cab_foot > img{
+                margin-left: -19mm !important;
+            }
+            .cabeceraAlto {
+                min-height: 50px !important;
+                height: 50px !important;
+            }
+            .lbl-no-aplica {
+                color: #939798;
+                font-style: italic;            
+            }
+
+        </style>
+    </head>
+    <apex:outputPanel rendered="{!IF(cotizacion.Id != null, true, false)}" layout="none">
+        <body class="body">
+        <!-- Pdf con paginado -->
+        <apex:repeat value="{!paginas}" var="pagina"> 
+            <apex:outputPanel rendered="{!if(pagina.numPagina > 1,'true','false')}" layout="none">
+                <div class="saltoDePaginaDespues">
+                </div>
+            </apex:outputPanel>
+            
+            <apex:repeat value="{!pagina.secciones}" var="seccion">
+                <c:PdfComponent nombre="{!seccion.nombre}" imagen="{!URLFOR($Resource.headerspdf,'header_general.png')}" estilo="cab_fot"/>
+                <apex:outputPanel rendered="{!pagina.numPagina == 1}" layout="none">
+                    <div class="fecha" >
+                        <table>
+                            <tr>
+                                <th class="label">FECHA:</th>
+                                <td class="value">{!currentDate}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </apex:outputPanel>
+            </apex:repeat>
+            
+            <div class="contenido">
+            <!-- Primera parte de Secciones -->
+            <apex:repeat value="{!pagina.secciones}" var="seccion">
+                    <apex:outputPanel rendered="{!seccion.nombre == 'Titulo Propuesta Comercial'}" layout="none">
+                        <div class="tituloPropCom">
+                            <h1>{!seccion.titulo}</h1>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!seccion.nombre == 'Información Cliente'}" layout="none">
+                        <div class="infoCliente">
+                            <table>
+                                <tr>
+                                    <td class="value width50">
+                                        {!cotizacion.Contact.Name} &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="value width50">
+                                        {!cotizacion.Contact.Puesto__c}&nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="value width50">
+                                        {!cotizacion.Opportunity.Account.Name} &nbsp;
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!seccion.nombre == 'Informacion Propuesta Comercial'}" layout="none">
+                        <div class="infoPropCom">
+                            <p>Por medio de la presente, te comparto la propuesta comercial del servicio pensado y orientado en las necesidades de tu
+                            empresa o negocio. Para EDENRED es muy importante seguir contribuyendo en la competitividad y crecimiento de nuestros clientes.</p>
+                            <!--
+                            <p>
+                                <strong>Edenred</strong> es tu aliado comercial especializado y orientado a satisfacer las necesidades de tu empresa o
+                                negocio. <strong>Contamos con soluciones exclusivas</strong> para incrementar tu competitividad con respecto a empresas
+                                más grandes.
+                            </p>
+                              
+                            <p>
+                                Ticket Regalo&reg; y Ticket Premium&reg; son las soluciones ideales para otorgar regalos  a tus empleados,
+                                proveedores o clientes, no te preocupes por seleccionar, almacenar y distribuir obsequios físicos.
+                            </p>
+                            -->
+                            <p>
+                                A continuación te comparto la propuesta comercial:
+                            </p>
+                            
+                        </div>
+                    </apex:outputPanel>
+            </apex:repeat>
+            
+            <!-- Comparativo de productos -->
+            <apex:repeat value="{!pagina.seccionesProducto}" var="sp">
+                <apex:outputPanel styleClass="resumenProducto" layout="block" rendered="{!sp.showResumen}">
+                    <table>
+                        <tr>
+                            <th class="label" width="30%">
+                                Monto de la compra:
+                            </th>
+                            <td class="value" width="50%">
+                                <apex:outputText value="{0, number, currency}">
+                                    <apex:param value="{!sp.producto.totalPrice}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="label" width="30%">
+                                Número de tarjetas:
+                            </th>
+                            <td class="value" width="50%">
+                                {!sp.producto.cantidadTarjetas}
+                            </td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>
+                <div class="comparativo2">
+                    <table class="tablaComparativo">
+                        <tr class="cabecera">
+                            <th colspan="4">{!sp.producto.nombre}</th>
+                            <apex:repeat value="{!sp.producto.comparados}" var="comparado"> 
+                                <th colspan="4">
+                                    {!comparado.nombre}
+                                </th>
+                            </apex:repeat>
+                        </tr>
+                        <tr>
+                            <th colspan="4">
+                                <table  class="listadoConceptos">
+                                    <tr class="cabecera">
+                                        <th>Concepto</th>
+                                        <!--th>Precio de lista</th-->
+                                        <th>{!$ObjectType.ProductoConcepto__c.Fields.PrecioLista__c.Label}</th>
+                                        <apex:outputPanel rendered="{!sp.producto.showBonificacion[sp.producto.Id]}" layout="none">
+                                            <!--th>Bonificación</th-->
+                                            <th>{!$ObjectType.ProductoConcepto__c.Fields.PrecioFinal__c.Label}</th>
+                                            <th>{!$ObjectType.ProductoConcepto__c.Fields.Bonificacion__c.Label}</th>
+                                            <!--th>Precio final</th-->
+                                        </apex:outputPanel>
+                                    </tr>
+                                    <apex:repeat value="{!sp.conceptos}" var="concepto">    
+                                        <tr>
+                                            <td class="concepto">{!concepto}</td>
+                                            <td class="derecha">
+                                                <apex:outputText value="${0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioLista != null),true,false)}">
+                                                   <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioLista}"/>
+                                                </apex:outputText>
+
+                                                <apex:outputText styleClass="lbl-no-aplica" value="No aplica" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioLista == null),true,false)}">
+                                                   <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioLista}"/>
+                                                </apex:outputText>
+
+
+                                                <!-- comenta calvarez 15 mayo 2017 apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioLista != null),true,false)}">
+                                                   <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioLista2}"/>
+                                                </apex:outputText-->
+
+
+                                                
+                                            </td>
+                                            <apex:outputPanel rendered="{!sp.producto.showBonificacion[sp.producto.Id]}" layout="none">
+                                            
+                                                <!--comenta calvarez 4 agosto de 2017 td class="derecha">
+                                                    <apex:outputText value="${0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioFinal != null),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioFinal}"/>
+                                                    </apex:outputText>
+
+                                                    <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioFinal != null, sp.producto.prodCon[sp.producto.Id][concepto].precioFinal != '0.00'),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioFinal}"/>
+                                                    </apex:outputText>
+
+                                                    <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioLista2 != null, sp.producto.prodCon[sp.producto.Id][concepto].precioFinal == '0.00'),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioLista2}"/>
+                                                    </apex:outputText>
+
+                                                </td-->
+                                                <td class="derecha">
+                                                    <apex:outputText value="${0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].precioFinal != null),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioFinal}"/>
+                                                    </apex:outputText>
+
+                                                    <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].bonificacion != '0.00'),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioFinal}"/>
+                                                    </apex:outputText>
+
+                                                    <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio',  sp.producto.prodCon[sp.producto.Id][concepto].bonificacion == '0.00'),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].precioLista2}"/>
+                                                    </apex:outputText>
+
+                                                </td>
+                                                <td class="derecha">
+                                                    <!--apex:outputText value="$ {0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].bonificacion != null),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].bonificacion}"/>
+                                                    </apex:outputText-->
+
+                                                    <apex:outputText value="{0} %"  rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[sp.producto.Id][concepto].bonificacion != null), true, false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[sp.producto.Id][concepto].bonificacion}"/>
+                                                    </apex:outputText>
+
+                                                </td>
+                                            </apex:outputPanel>
+                                        </tr>
+                                    </apex:repeat>
+
+
+                                    <!--apex:repeat value="{!sp.conceptosAux}" var="concepto">    
+                                        <tr>
+                                            <td class="concepto">->{!concepto.tipoCargo}</td>
+                                        </tr>
+                                    </apex:repeat-->
+
+                                </table>
+                            </th>
+                            <apex:repeat value="{!sp.producto.comparados}" var="comparado">
+                                <th colspan="4">
+                                    <table class="listadoConceptos">
+                                        <tr class="cabecera">
+
+                                            <!--th>Precio de lista</th-->
+                                            <th>{!$ObjectType.ProductoConcepto__c.Fields.PrecioLista__c.Label}</th>
+                                            <apex:outputPanel rendered="{!sp.producto.showBonificacion[comparado.Id]}" layout="none">
+                                                <!--th>Bonificacion</th>
+                                                <th>Precio final</th-->
+                                                <th>{!$ObjectType.ProductoConcepto__c.Fields.PrecioFinal__c.Label}</th>
+                                                <th>{!$ObjectType.ProductoConcepto__c.Fields.Bonificacion__c.Label}</th>
+                                            </apex:outputPanel>
+                                        </tr>
+                                        <apex:repeat value="{!sp.conceptos}" var="concepto">
+                                            <tr>
+                                                <td class="derecha">
+                                                    <apex:outputText value="${0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioLista != null),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioLista}"/>
+                                                    </apex:outputText>
+
+                                                    <apex:outputText styleClass="lbl-no-aplica" value="No aplica" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioLista == null),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioLista}"/>
+                                                    </apex:outputText>
+
+                                                    <!-- comenta calvarez 15 mayo 2017 apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioLista != null),true,false)}">
+                                                       <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioLista2}"/>
+                                                    </apex:outputText-->
+
+                                                </td>
+                                                <apex:outputPanel rendered="{!sp.producto.showBonificacion[comparado.Id]}" layout="none" >
+                                                    <!--comenta calvarez 4 agosto de 2017 td class="derecha">
+
+                                                        <apex:outputText value="${0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioFinal!=null),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioFinal}"/>
+                                                        </apex:outputText>
+
+                                                        <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioFinal !=null,  sp.producto.prodCon[comparado.Id][concepto].precioFinal != '0.00'),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioFinal}"/>
+                                                        </apex:outputText>
+                                                        
+                                                        <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioLista != null, sp.producto.prodCon[comparado.Id][concepto].precioFinal == '0.00' ),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioLista2}"/>
+                                                        </apex:outputText>
+                                                    </td-->
+                                                    <td class="derecha">
+                                                        <apex:outputText value="${0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].precioFinal!=null),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioFinal}"/>
+                                                        </apex:outputText>
+
+                                                        <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio',  sp.producto.prodCon[comparado.Id][concepto].bonificacion != '0.00'),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioFinal}"/>
+                                                        </apex:outputText>
+                                                        
+                                                        <apex:outputText value="{0} %" rendered="{!IF(AND(concepto == 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].bonificacion == '0.00' ),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].precioLista2}"/>
+                                                        </apex:outputText>
+                                                    </td>
+
+                                                    <td class="derecha">
+                                                        <!--apex:outputText value="$ {0}" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].bonificacion != null),true,false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].bonificacion}"/>
+                                                        </apex:outputText-->
+
+                                                        <apex:outputText value="{0} %" rendered="{!IF(AND(concepto != 'Comisión por el servicio', sp.producto.prodCon[comparado.Id][concepto].bonificacion != null), true, false)}">
+                                                           <apex:param value="{!sp.producto.prodCon[comparado.Id][concepto].bonificacion}"/>
+                                                        </apex:outputText>
+                                                        &nbsp;
+                                                    </td>
+                                                </apex:outputPanel>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </th>
+                            </apex:repeat>
+                        </tr>
+                    </table>
+                </div>
+            </apex:repeat>
+            
+            <!-- Inicia Secciones desde Forma de pago a informacion adicional -->
+            <apex:repeat value="{!pagina.secciones}" var="seccion">
+                <apex:outputPanel rendered="{!seccion.nombre == 'Forma de pago y vigencia'}" layout="none">
+                    <div class="formaPagoYVigencia">
+                        <table>
+                            <tr>
+                                <th>{!FormaDePago.titulo}</th>
+                                <th class="derecha">{!Vigencia.titulo}</th>
+                            </tr>
+                            <tr>
+                                <td><apex:repeat value="{!FormaDePago.listaContenido}"
+                                        var="t">
+                                        <span class="checkbox">&nbsp; &nbsp;</span>{!t}<br />
+                                    </apex:repeat></td>
+                                <td class="derecha"><apex:repeat value="{!Vigencia.listaContenido}" var="t">
+                                        <p>{!t}</p>
+                                    </apex:repeat></td>
+                            </tr>
+                        </table>
+                    </div>
+                </apex:outputPanel>
+            </apex:repeat>
+            <apex:repeat value="{!pagina.seccionesDiferencial}" var="sd">
+                <div class="comparativo">
+                    <apex:OutputPanel layout="none" rendered="{!sd.titulo != '' || sd.titulo != null}">
+                        <h3>{!sd.titulo}</h3>
+                    </apex:OutputPanel>
+                    <table>
+                        <tr class="cabeceraTablaDiff">
+                            <apex:repeat value="{!sd.cabecerasTabla}" var="cabdif">
+                                <th>{!cabdif}</th>
+                            </apex:repeat>
+                        </tr>
+                        <apex:repeat value="{!sd.diferencialesRows}" var="rowdiff">
+                            <tr class="{!rowdiff.styleClass}">
+                            <td class="concepto">
+                                <apex:outputText escape="false" value="{!rowdiff.descripcion}"></apex:outputText>
+                            </td>
+                            <apex:repeat value="{!rowdiff.checks}" var="check">
+                                <td class="centrado"><apex:outputPanel rendered="{!check}">
+                                    <apex:image alt="check"
+                                            url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                            height="11pt" />
+                                </apex:outputPanel></td>
+                            </apex:repeat>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </div>
+            </apex:repeat>
+            <apex:repeat value="{!pagina.secciones}" var="seccion">
+                <apex:outputPanel rendered="{!seccion.nombre == 'Diferenciales'}" layout="none">
+
+                    <apex:outputText rendered="{!IF(seccion.html != null, true, false)}" escape="false" value="{!seccion.html}"></apex:outputText> 
+
+                    <!--apex:repeat value="{!pdf.productos}" var="producto">
+                        <h2>Diferenciales de {!producto.nombre}<sup>&reg;</sup> 
+                            <apex:repeat value="{!producto.comparados}" var="comparado">
+                                <apex:outputText value=", {!comparado.nombre}">
+                                </apex:outputText><sup>&reg;</sup>
+                            </apex:repeat>
+                        </h2>
+
+                        <div class="comparativo">
+                            <table class="table-dif">
+                                <tr class="cabeceraTabla">
+                                    <th>Descripción</th>
+
+                                    <th>
+                                        <apex:outputText value="{!producto.nombre}">
+                                        </apex:outputText>
+                                    </th>
+                                    <apex:repeat value="{!producto.comparados}" var="comparado">
+                                        <th>
+                                            <apex:outputText value="{!comparado.nombre}">
+                                            </apex:outputText>
+                                        </th>
+                                    </apex:repeat>
+                                </tr>
+                                <apex:repeat value="{!producto.diferenciales}" var="diferencial">
+                                    <tr>
+
+                                        <td class="concepto">{!diferencial}</td>
+                                        <td class="centrado">
+                                            <apex:image rendered="{!IF(producto.hasDiferencial[diferencial + '_' + producto.idProduct2] == true, true, false)}" alt="check"  url="{!URLFOR($Resource.pdfImages,'check_mark.png')}" height="11pt" />
+                                        </td>
+                                        <apex:repeat value="{!producto.comparados}" var="comparado">
+                                            <td class="centrado">
+                                                <apex:image rendered="{!IF(producto.hasDiferencial[diferencial + '_' + comparado.idProduct2] == true, true, false)}" alt="check" url="{!URLFOR($Resource.pdfImages,'check_mark.png')}" height="11pt" />
+                                            </td>
+                                        </apex:repeat>
+                                    </tr>
+                                </apex:repeat>
+                            </table>
+                        </div>
+
+
+
+                    </apex:repeat-->
+
+                    <!--h2>Diferenciales de Ticket Regalo<sup>&reg;</sup> y Ticket Premium<sup>&reg;</sup></h2>
+                    <div class="comparativo">
+                        <table>
+                            <tr class="cabeceraTabla">
+                                <th>Descripción</th>
+                                <th><apex:image alt="Ticket Regalo"
+                                        url="{!URLFOR($Resource.pdfImages,'tarjeta1.png')}"
+                                        styleClass="imagenTarjeta" /></th>
+                                <th><apex:image alt="Ticket Regalo"
+                                        url="{!URLFOR($Resource.pdfImages,'tarjeta1.png')}"
+                                        styleClass="imagenTarjeta" /></th>
+                            </tr>
+
+                            <apex:repeat value="{!FormaDePago.listaContenido}">
+                                <td class="concepto">Mejor costo beneficio</td>
+                            </apex:repeat>
+                            <tr class="non">
+                                <td class="concepto">Mejor costo beneficio</td>
+                                <td class="centrado"><c:PdfComponent nombre="checkmark"
+                                        height="11pt" /></td>
+                                <td class="centrado"></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Aceptada en más de 27,000
+                                    establecimientos afiliados a nivel nacional.</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"></td>
+                            </tr>
+                            <tr class="non">
+                                <td class="concepto">Cobertura nacional e internacional con
+                                    sello Master Card<sup>&reg;</sup>
+                                </td>
+                                <td class="centrado"></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Call center con atención 24/7</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="non">
+                                <td class="concepto">Geolocalización de comercios afiliados</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Portal Edenred Secure con enlace de
+                                    pago seguro al banco.</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="non">
+                                <td class="concepto">5 horarios para asignar saldo durante
+                                    el día de 9 a.m. a 7 p.m.</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Cuenta corriente: cuentas con saldo
+                                    inmediato en tu cuenta para la asignación de saldos si
+                                    autorización del banco</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="non">
+                                <td class="concepto">Asistencia personalizada por parte de
+                                    un ejecutivo</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Reportes de gastos administrativos.</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="non">
+                                <td class="concepto">Notificaciones en tiempo real de las
+                                    compras realizadas para usuario</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Información inmediata de asignación de
+                                    saldos vía correo electrónico y app (Push Notification)</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="non">
+                                <td class="concepto"><strong>Beneficio Club&reg;</strong>
+                                    con promociones y descuentos (cupones digitales) en más de
+                                    8,000 establecimientos a nivel nacional.</td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                            <tr class="par">
+                                <td class="concepto">Consulta de saldo via SMS*, APP y
+                                    Portal de Usuarios<small><br />*Costo por mensaje $3.50
+                                        IVA Incluida</small>
+                                </td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                                <td class="centrado"><apex:image alt="check"
+                                        url="{!URLFOR($Resource.pdfImages,'check_mark.png')}"
+                                        height="11pt" /></td>
+                            </tr>
+                        </table>
+                    </div-->
+                </apex:outputPanel>
+                
+                <apex:outputPanel rendered="{!seccion.nombre == 'Documentación para contratar'}" layout="none">
+                    
+                    <div class="documentacionContratar">
+                        <apex:outputPanel rendered="{!seccion.titulo == 'Tabla de documentos'}" layout="none">
+                            <h3>Documentación para contratar</h3>
+                            <table>
+                                <tr>
+                                    <th>{!DocumentacionPFisica.titulo}</th>
+                                    <th>{!DocumentacionPMoral.titulo}</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <ol>
+                                            <apex:repeat value="{!documentacionPFisica.listaContenido}"
+                                                var="doc">
+                                                <li>{!doc}</li>
+                                            </apex:repeat>
+                                        </ol>
+                                    </td>
+                                    <td>
+                                        <ol>
+                                            <apex:repeat value="{!documentacionPMoral.listaContenido}"
+                                                var="doc">
+                                                <li>{!doc}</li>
+                                            </apex:repeat>
+                                        </ol>
+                                    </td>
+                                </tr>
+                            </table>
+                        </apex:outputPanel>
+
+
+                        <apex:outputPanel rendered="{!seccion.titulo == 'RequerimientoFirma'}">
+                            <p>{!seccion.listaContenido[0]}</p>
+                            <ul>
+                                <li>{!seccion.listaContenido[1]}</li>
+                                <li>{!seccion.listaContenido[2]}</li>
+                                <li>{!seccion.listaContenido[3]}</li>
+                            </ul>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!seccion.titulo == 'Despedida'}">
+                            <p class="izquierda">
+                                {!seccion.listaContenido[0]}<br /> <strong>{!seccion.listaContenido[1]}</strong>
+                            </p>
+                        </apex:outputPanel>
+
+                    </div>
+                </apex:outputPanel>
+                
+                <apex:outputPanel rendered="{!seccion.nombre == 'Información Adicional'}" layout="none">
+                    <h4>Información adicional</h4>
+                    <div style="font-size: 10pt; color: #808080">
+                        <table>
+                            <tr>
+                                <td><strong>Pedidos de tarjetas:</strong></td>
+                                <td>Desde 24hrs hasta 6 días hábiles dependiendo de la
+                                    zona.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pedido de fondos:</strong></td>
+                                <td>Recibirá una proforma electrónica de forma inmediata al
+                                    realizar su pedido.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Liberación de saldo:</strong></td>
+                                <td>Pago del mísmo banco o SPEI referenciado, desde el
+                                    momento y máximo el mismo día.</td>
+                            </tr>
+                        </table>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!seccion.nombre == 'Terminos y condiciones'}" layout="none">
+                    
+                    <div class="terminos">
+                        <apex:outputPanel rendered="{!seccion.titulo != ''}" layout="none">             
+                            <h4>{!seccion.titulo}</h4>
+                        </apex:outputPanel>
+                        <apex:repeat value="{!seccion.listaContenido}" var="parrafo">
+                            <p>{!parrafo}</p>
+                        </apex:repeat>
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!seccion.nombre == 'Firmas'}" layout="none">
+                    <c:PdfComponent nombre="firmas"/>
+                    <br />
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!seccion.nombre == 'Contacto'}" layout="none">
+                    <c:PdfComponent nombre="infoContacto" ejecutivoName="{!ejecutivoName}" ejecutivoEmail="{!ejecutivoEmail}" ejecutivoTelefono="{!ejecutivoTelefono}"/>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!seccion.nombre == 'Footer'}" layout="none">
+                    <c:PdfComponent nombre="footer"/>
+                </apex:outputPanel>
+            </apex:repeat>
+            <!-- Finaliza listado de secciones -->
+        </div>
+        </apex:repeat>
+        </body>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!IF(cotizacion.Id != null, !true, !false)}" layout="none">
+        <body>
+            <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/bootstrap.min.css')}" />
+            <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/bootstrap-theme.min.css')}"/>
+            <div class="container">
+                <br/>
+                <br/>
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="alert alert-danger">
+                            <h3>El id ingresado no es válido {!$CurrentPage.parameters.id} </h3>
+                            <h3 class="hidden"><br/>{!msgError}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </apex:outputPanel>
+    </html>
+</apex:page>

@@ -1,0 +1,22 @@
+<apex:component >
+    <apex:attribute name="title" type="String" description="Title of the panel"/>
+    <apex:attribute name="idCollapse" type="String" description="Id of the panel to collapse"/>
+    <apex:attribute name="expanded" type="String" default="false" description="if the panel is showed or not"/>
+    <apex:attribute name="idParent" type="String" description=""/>
+     <apex:attribute name="rendered" type="boolean" description="" default="true"/>
+    
+    <apex:outputPanel StyleClass="panel panel-default" rendered="{!rendered}" layout="block">
+        <header class="panel-heading" role="tab">
+            <!--  <h2 class="panel-title">{!title}</h2>-->
+            <a class="panel-title" data-toggle="collapse"  data-parent="#{!idParent}" href="#{!idCollapse}" aria-expanded="{!expanded}" 
+            	aria-controls="{!idCollapse}">
+                {!title}
+            </a>
+        </header>
+        <div class="panel-collapse {!IF(expanded = 'true','in','')}" id="{!idCollapse}" role="tabpanel" aria-labelledby="{!idCollapse}">
+            <div class="panel-body">
+                 <apex:componentBody ></apex:componentBody>
+            </div>
+        </div>
+    </apex:outputPanel> 
+</apex:component>

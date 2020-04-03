@@ -1,0 +1,317 @@
+<aura:component implements="flexipage:availableForRecordHome,force:lightningQuickAction,force:hasRecordId" controller="CheckInCheckOut_CTRL">
+	
+	<ltng:require styles="{!$Resource.CTC_BASE + '/font-awesome/css/font-awesome.min.css'}"/>
+	
+	<!-- Handlers -->
+	<aura:handler action="{!c.init}" name="init" value="{!this}"/>
+	<!-- <aura:handler name="select" event="ltng:select" action="{!c.deselectDefaultOption}"/> -->
+	<!-- Handlers -->
+	
+	<!-- Registered Events -->
+	<!-- <aura:registerEvent name="deselect" type="c:CON_DeselectDefaultOption_EVENT"/> -->
+	<!-- Registered Events -->
+	
+	<!-- Google Map attributes -->
+	<aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="lcHost" type="String" />
+	<aura:attribute name="vfHost" type="String" default=""/>
+	<aura:attribute name="account" type="Account[]" />
+	<aura:attribute name="mapOptions" type="Object" default='{"zoom": 18}' />
+	<aura:attribute name="mapOptionsCenter" type="Object" />
+	<aura:attribute name="mapData" type="Object[]" />
+	<aura:attribute name="posData" type="Object"/>
+	<!-- Google Map attributes -->
+	
+	<!-- Displayed information -->
+	<aura:attribute name="datiFechaHoraInicio" type="DateTime"/>
+	<aura:attribute name="datiFechaHoraFin" type="DateTime"/>
+	<!-- <aura:attribute name="oStartEventLocation" type="Object"/> -->
+	<aura:attribute name="sContactName" type="String" default=""/>
+	<aura:attribute name="sEventsName" type="String"/>
+	<aura:attribute name="sEstatusEvento" type="String"/>
+	<aura:attribute name="sFullStartLocation" type="String"/>
+	<aura:attribute name="sFullEndLocation" type="String"/>
+	<!-- <aura:attribute name="sInvalidDateMessage" type="String"/> -->
+	<aura:attribute name="oCVOptions" type="List"/>
+	<aura:attribute name="sVCOption" type="String" default=""/>
+	<aura:attribute name="sCamposRequeridos" type="String" default=""/>
+	<!-- Displayed information -->
+	
+	<!-- Logical flags -->
+	<aura:attribute name="bShowCheckIn" type="Boolean" default="true"/>
+	<aura:attribute name="bShowCheckOut" type="Boolean" default="true"/>
+	<aura:attribute name="bItsToday" type="Boolean" default="true"/>
+	<aura:attribute name="bShowStartEventInfo" type="Boolean" default="true"/>
+	<aura:attribute default="true" name="bLIFav1" type="Boolean"/>
+	<aura:attribute default="true" name="bLIFav2" type="Boolean"/>
+	<aura:attribute default="true" name="bLIFav3" type="Boolean"/>
+	<aura:attribute default="true" name="bLIFav4" type="Boolean"/>
+	<aura:attribute default="true" name="bLIFav5" type="Boolean"/>
+	<aura:attribute name="sUIThemeDisplayed" type="String" default="Theme4t"/>
+	<aura:attribute name="daTodayDate" type="Date"/>
+	<aura:attribute name="sValoracionCita" type="String"/>
+	<!-- <aura:attribute name="ready" type="Boolean" default="true"/> -->
+	<aura:attribute name="userInfo" type="Map" default="{Segmento__c: 'MLK', Profile: {Name: 'Administrador del sistema'}}"/>
+	<aura:attribute name="isDefaultOptionSelected" type="Boolean" default="true"/>
+	<!-- Logical flags -->
+	
+	<!-- Utility attributes -->
+	<aura:attribute name="URL" type="String"/>
+	<aura:attribute name="oEndCoordinates" type="Object"/>
+	<aura:attribute name="loading" type="Boolean" default="false"/>
+	<aura:attribute name="log" type="String" default="Hola"/>
+	<!-- Utility attributes -->
+	
+	<!-- <lightning:textArea name="Log" label="Log" value="{!v.log}"/> -->
+	
+	<aura:if isTrue="{!v.sUIThemeDisplayed == 'Theme4t'}">
+		<aura:if isTrue="{!(v.userInfo.Segmento__c == 'MLK' &amp;&amp; (v.userInfo.Profile.Name == 'Implementación' || v.userInfo.Profile.Name == 'Mantenimiento' || v.userInfo.Profile.Name == 'Trademarketing' || v.userInfo.Profile.Name == 'Ventas' || v.userInfo.Profile.Name == 'Posventa' || v.userInfo.Profile.Name == 'Ventas_Exp_Reportes' || v.userInfo.Profile.Name == 'CRM' || v.userInfo.Profile.Name == 'Ejecutivo Comercial')) || v.userInfo.Profile.Name == 'Administrador del sistema'|| v.userInfo.Profile.Name == 'Standar Services' || v.userInfo.Profile.Name == 'Admin Service'}">
+			<aura:if isTrue="{!v.bItsToday}">
+				<aura:if isTrue="{!v.sEstatusEvento != 'Cancelado'}">
+					<aura:if isTrue="{!v.sValoracionCita == '' || v.sValoracionCita == null}">
+						<aura:if isTrue="{!v.sCamposRequeridos == '' || v.sCamposRequeridos == null}">
+							<div class="slds-panel slds-grid slds-grid_vertical slds-nowrap">
+								<div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+									<div class="slds-panel__section slds-border_bottom">
+										<div class="slds-media">
+											<div class="slds-media__figure">
+												<lightning:icon iconName="standard:event"/>
+											</div>
+											<div class="slds-media__body">
+												<p class="slds-breadcrumb__item slds-line-height--reset">Evento</p>
+												<h1 class="slds-page-header__title slds-m-right--small slds-truncate slds-align-middle">{!v.sEventsName}</h1>
+											</div>
+										</div>
+									</div>
+									<div class="slds-panel__section">
+										<h3 class="slds-text-heading_small slds-m-bottom_medium">Información del Evento</h3>
+										<ul>
+											<li class="slds-form-element slds-hint-parent slds-border_bottom">
+												<span class="slds-form-element__label">Estatus del Evento</span>
+												<div class="slds-form-element__control">
+													<span class="slds-form-element__static">{!v.sEstatusEvento}</span>    
+													<!-- <lightning:combobox aura:id="EstatusEventoPicklist" name="Estatus del Evento" label="Estatus del Evento" placeholder="Selecciona un Estatus" options="{!v.estatusEventoOptions}"/> -->
+												</div>
+											</li>
+											<li class="slds-form-element slds-hint-parent slds-border_bottom">
+												<aura:if isTrue="{!v.sEstatusEvento != 'Finalizado'}">
+													<span class="slds-form-element__label">Fecha y Hora de Inicio</span>
+													<div class="slds-form-element__control">
+														<span class="slds-form-element__static">
+															<aura:if isTrue="{!v.datiFechaHoraInicio != null}">
+																<lightning:formattedDateTime value="{!v.datiFechaHoraInicio}" day="numeric" month="numeric" year="numeric" hour="2-digit" minute="2-digit"/>
+															</aura:if>
+														</span>
+													</div>
+													<aura:set attribute="else">
+														<span class="slds-form-element__label">Fecha y Hora de Fin</span>
+														<div class="slds-form-element__control">
+															<span class="slds-form-element__static">
+																<aura:if isTrue="{!v.datiFechaHoraFin != null}">
+																	<lightning:formattedDateTime value="{!v.datiFechaHoraFin}" day="numeric" month="numeric" year="numeric" hour="2-digit" minute="2-digit"/>
+																</aura:if>
+															</span>
+														</div>
+													</aura:set>
+												</aura:if>
+											</li>
+											<li class="slds-form-element slds-hint-parent slds-border_bottom">
+												<aura:if isTrue="{!v.sEstatusEvento != 'Finalizado'}">
+													<span class="slds-form-element__label">Ubicación de Inicio</span>
+													<div class="slds-form-element__control">
+														<!-- <span class="slds-form-element__static">{!'Latitud: ' + v.oStartEventLocation.Latitude + ', ' + 'Longitud: ' + v.oStartEventLocation.Longitude}</span> -->
+														<span class="slds-form-element__static">{!v.sFullStartLocation}</span>
+													</div>
+													<aura:set attribute="else">
+														<span class="slds-form-element__label">Ubicación de Fin</span>
+														<div class="slds-form-element__control">
+															<!-- <span class="slds-form-element__static">{!'Latitud: ' + v.oStartEventLocation.Latitude + ', ' + 'Longitud: ' + v.oStartEventLocation.Longitude}</span> -->
+															<span class="slds-form-element__static">{!v.sFullEndLocation}</span>
+														</div>
+													</aura:set>
+												</aura:if>
+											</li>
+											<li class="slds-form-element slds-hint-parent">
+												<aura:if isTrue="{!v.loading}">
+													<lightning:spinner alternativeText="Cargando" title="Cargando" size="large" variant="brand"/>
+												</aura:if>
+												<iframe aura:id="ctcMap_Page" id="ifVFP" allow="geolocation" class="slds-form-element__static" frameborder="0" height="330px" src="{!'/apex/' + v.URL + '?lcHost=' + v.lcHost}" width="100%"></iframe>
+											</li>
+											<aura:if isTrue="{!v.sEstatusEvento == 'Iniciado'}">
+												<li class="slds-form-element slds-hint-parent">
+													<div class="slds-media slds-no-space slds-has-divider_bottom-space slds-media_center">
+														<div class="slds-media__figure">
+															<lightning:icon iconName="standard:performance"/>
+														</div>
+														<div class="slds-media__body">
+															<h1 class="slds-page-header__title slds-truncate slds-align-middle">Valoración del Evento</h1>
+														</div>
+													</div>
+													<h2 class="slds-text-align_center slds-p-top_medium slds-text-heading_small">¿Cómo estuvo tu cita con</h2>
+													<h2 class="slds-text-align_center slds-text-heading_small" style="font-style: italic;">{!v.sContactName}?</h2>
+													<div class="slds-align_absolute-center slds-p-vertical_large">
+														<a onclick="{!c.changeIcon1}">
+															<aura:if isTrue="{!v.bLIFav1}">
+																<span class="fa fa-star-o fa-3x fa-star-o-color"></span>
+																<aura:set attribute="else">
+																	<span class="fa fa-star fa-3x fa-star-color"></span>
+																</aura:set>
+															</aura:if>
+														</a>
+														<a onclick="{!c.changeIcon2}">
+															<aura:if isTrue="{!v.bLIFav2}">
+																<span class="fa fa-star-o fa-3x fa-star-o-color"></span>
+																<aura:set attribute="else">
+																	<span class="fa fa-star fa-3x fa-star-color"></span>
+																</aura:set>
+															</aura:if>
+														</a>
+														<!-- <a data-star="star3" onclick="{!c.changeIcon3}"> -->
+														<a onclick="{!c.changeIcon3}">
+															<aura:if isTrue="{!v.bLIFav3}">
+																<span class="fa fa-star-o fa-3x fa-star-o-color"></span>
+																<aura:set attribute="else">
+																	<span class="fa fa-star fa-3x fa-star-color"></span>
+																</aura:set>
+															</aura:if>
+														</a>
+														<a onclick="{!c.changeIcon4}">
+															<aura:if isTrue="{!v.bLIFav4}">
+																<span class="fa fa-star-o fa-3x fa-star-o-color"></span>
+																<aura:set attribute="else">
+																	<span class="fa fa-star fa-3x fa-star-color"></span>
+																</aura:set>
+															</aura:if>
+														</a>
+														<a onclick="{!c.changeIcon5}">
+															<aura:if isTrue="{!v.bLIFav5}">
+																<span class="fa fa-star-o fa-3x fa-star-o-color"></span>
+																<aura:set attribute="else">
+																	<span class="fa fa-star fa-3x fa-star-color"></span>
+																</aura:set>
+															</aura:if>
+														</a>
+													</div>
+												</li>
+												<aura:if isTrue="{!v.sVCOption == '' ? false : true}">
+													<li class="slds-form-element slds-hint-parent">
+														<h2 class="slds-text-align_center slds-text-heading_small slds-p-bottom_medium" style="font-style: italic;">{!v.sVCOption}</h2>
+														<aura:if isTrue="{!(v.sVCOption == 'Bien' || v.sVCOption == 'Excelente') ? true : false}">
+															<div class="slds-align_absolute-center">
+																<span class="fa fa-smile-o fa-2x"></span>
+															</div>
+															<h2 class="slds-text-align_center slds-text-heading_small slds-p-bottom_medium">¡Súper!</h2>
+															<h2 class="slds-text-align_center slds-text-heading_small">¿Qué fue lo que más te agrado?</h2>
+															<p class="slds-text-align_center slds-p-bottom_medium">Si es necesario elige más de una opción</p>
+															<aura:set attribute="else">
+																<div class="slds-align_absolute-center">
+																	<span class="fa fa-frown-o fa-2x"></span>
+																</div>
+																<h2 class="slds-text-align_center slds-text-heading_small slds-p-bottom_medium">¿Por qué?</h2>
+																<h2 class="slds-text-align_center slds-text-heading_small">¿Qué fue lo que salió mal?</h2>
+																<p class="slds-text-align_center slds-p-bottom_medium">Si es necesario elige más de una opción</p>
+															</aura:set>
+														</aura:if>
+													</li>
+												</aura:if>
+												<aura:if isTrue="{!v.sVCOption != ''}">
+													<li class="slds-form-element slds-hint-parent">
+                                                        <a onclick="{!c.checkButtonActivation}">
+                                                            <ui:inputSelect aura:id="aiCVOptions" multiple="true">
+                                                                <aura:iteration items="{!v.oCVOptions}" var="cvOption">
+                                                                    <aura:if isTrue="{!cvOption.label == 'Ninguno'}">
+                                                                        <ui:inputSelectOption aura:id="defaultSelectOption" label="{!cvOption.label}" text="{!cvOption.value}" value="true" select="{!c.deselectDefaultOption}"/>
+                                                                        <aura:set attribute="else">
+                                                                            <ui:inputSelectOption label="{!cvOption.label}" text="{!cvOption.value}"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                            </ui:inputSelect>
+                                                        </a>
+													</li>
+												</aura:if>
+												<aura:if isTrue="{!v.sVCOption != ''}">
+													<li class="slds-form-element slds-hint-parent">
+														<lightning:textarea aura:id="aiComentario" class="lTextarea1" label="Comentario" messageWhenValueMissing="Ingresa un comentario sobre tu experiencia!" name="Comentario" onchange="{!c.checkButtonActivation}"/>
+													</li>
+												</aura:if>
+											</aura:if>
+											<!-- <lightning:button class="slds-align_absolute-center" label="Prueba" variant="success" onclick="{!c.prueba}"/> -->
+											<aura:if isTrue="{!v.sEstatusEvento == 'Planeado'}">
+												<li class="slds-form-element slds-hint-parent">
+													<lightning:button aura:id="aiCheckIn" class="slds-align_absolute-center" disabled="{!v.bShowCheckIn}" label="Check In" variant="success" onclick="{!c.doCheckIn}"/>
+												</li>
+												<aura:set attribute="else">
+													<aura:if isTrue="{!and(v.sEstatusEvento == 'Iniciado', v.sVCOption != '')}">
+														<li class="slds-form-element slds-hint-parent">
+															<lightning:button class="slds-align_absolute-center" disabled="{!v.bShowCheckOut}" label="Check Out" variant="destructive" onclick="{!c.doCheckOut}"/>
+														</li>
+														<!--aura:set attribute="else">
+															<aura:if isTrue="{!v.sVCOption != ''}">
+																<li class="slds-form-element slds-hint-parent slds-p-top_medium">
+																	<lightning:button class="slds-align_absolute-center" label="Guardar" variant="neutral" onclick="{!c.saveEventAssessment}"/>
+																</li>
+															</aura:if>
+														</aura:set-->
+													</aura:if>
+												</aura:set>
+											</aura:if>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<aura:set attribute="else">
+								<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+									<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+										<lightning:icon iconName="utility:warning" size="small"/>
+									</span>
+									<h2>Los siguientes campos son requeridos: {!v.sCamposRequeridos}</h2>
+								</div>
+							</aura:set>
+						</aura:if>
+						<aura:set attribute="else">
+							<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+								<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+									<lightning:icon iconName="utility:warning" size="small"/>
+								</span>
+								<h2>El evento ya ha sido valorado</h2>
+							</div>
+						</aura:set>
+					</aura:if>
+					<aura:set attribute="else">
+						<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+							<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+								<lightning:icon iconName="utility:warning" size="small"/>
+							</span>
+							<h2>El evento ha sido cancelado</h2>
+						</div>
+					</aura:set>
+				</aura:if>
+				<aura:set attribute="else">
+					<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+						<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+							<lightning:icon iconName="utility:warning" size="small"/>
+						</span>
+						<h2>El día del evento no coincide con el día de hoy</h2>
+					</div>
+				</aura:set>
+			</aura:if>
+			<aura:set attribute="else">
+				<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+					<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+						<lightning:icon iconName="utility:warning" size="small"/>
+					</span>
+					<h2>Lo sentimos, la funcionalidad de CheckIn no está disponible para este tipo de usuario</h2>
+				</div>
+			</aura:set>
+		</aura:if>
+		<aura:set attribute="else">
+			<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+				<span class="slds-icon_container slds-icon-utility-user slds-m-right_x-small">
+					<lightning:icon iconName="utility:warning" size="small"/>
+				</span>
+				<h2>Lo sentimos, la funcionalidad de CheckIn solamente está disponible desde la aplicación móvil de Salesforce1</h2>
+			</div>
+		</aura:set>
+	</aura:if>
+</aura:component>

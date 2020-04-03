@@ -1,0 +1,355 @@
+<apex:component >
+    <script type="text/ng-template" id="escalonamiento.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Escalonamiento</h4>
+        </div>
+        <div class="modal-body" ng-if="sc.loading">
+            <div class="alert alert-success"> <strong class="fa fa-spinner fa-pulse fa-fw"></strong> Cargando información. </div>
+        </div>
+        <form name="sc.formEscalonamiento" ng-submit="sc.guardarEscalonamiento()">
+            <div class="modal-body" ng-if="!sc.loading">
+
+                <ctc-error ctc-body="sc.errors"></ctc-error>
+
+                <div class="row">
+                    <div class="col-sm-8">
+                        <span ng-if="sc.totalDelete > 0" class="label label-danger" ng-bind="'Registros a eliminar ' + sc.totalDelete"></span>
+                    </div>
+                    <div class="col-sm-4 text-right">
+                        <div class="btnb-group">
+                            <a class="btnb btnb-danger" uib-tooltip="Eliminar todos los escalonamientos" ng-click="sc.eliminarTodosEscalonamientos()" ng-if="sc.escalonamientos.length > 0">
+                                <span class="fa fa-trash" />
+                            </a>
+                            <a class="btnb btnb-success" uib-tooltip="Agregar fila" ng-click="sc.agregarEscalonamiento()">
+                                <span class="fa fa-plus" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <center><span><strong>Volúmen de emisión</strong> : {{sc.sumatoria | currency}}</span></center>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" ng-bind="sc.schema.QuoteLineItem.UnitPrice.label"></th>
+                                    <th class="text-center" ng-bind="sc.schema.QuoteLineItem.ServiceDate_Copy.label"></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="escalonamiento in sc.escalonamientos">
+                                    <td>
+                                        <ctc-input ctc-instance="escalonamiento" ctc-field="sc.schema.QuoteLineItem.UnitPrice" ng-keyup="sc.setSumatoria()" ctc-form="sc.formEscalonamiento" ctc-attrs="'ctc-min-number=\'1\''"></ctc-input>
+                                    </td>
+                                    <td>
+                                        <ctc-input ctc-instance="escalonamiento" ctc-field="sc.schema.QuoteLineItem.ServiceDate_Copy" ctc-form="sc.formEscalonamiento" ctc-on-change="sc.definirFechaMinima" ctc-params="{index: $index, first: $first, last: $last}"></ctc-input>
+                                    </td>
+                                    <td>
+                                        <a ng-if="sc.escalonamientos.length > 2" ng-click="sc.eliminarEscalonamiento(escalonamiento)" class="btnb btnb-sm btnb-danger" uib-tooltip="Eliminar" >
+                                            <span class="fa fa-trash"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" ng-init="sc.definirFechaMinima(null, null, null, sc.formEscalonamiento)">
+                <button ng-if="!sc.loading && (sc.escalonamientos.length > 1 || sc.totalDelete > 0)" type="submit" ng-disabled="sc.processing || sc.formEscalonamiento.$invalid" class="btnb btnb-success">
+                    <span class="fa fa-spinner fa-pulse fa-fw ng-animate-disabled" ng-if="sc.processing"></span>
+                    <span class="fa fa-save fa-fw"></span>
+                    <span ng-if="sc.processing">Guardando</span>
+                    <span ng-if="!sc.processing">Guardar</span>
+                </button>
+                <button type="button" ng-disabled="sc.processing" class="btnb btnb-default" ng-click="sc.close()">
+                    <span class="fa fa-mail-reply fa-fw"></span>
+                    Cerrar
+                </button>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/javascript">
+        (function() {
+            'use sctrict'
+            angular.module('appEdenred')
+            .controller('escalonamientoCtrl', EscalonamientoCtrl)
+
+            EscalonamientoCtrl.$inject = ['ctcUtils', '$filter', '$uibModal', '$uibModalInstance', 'producto']
+
+            function EscalonamientoCtrl( ctcUtils, $filter, $uibModal, $uibModalInstance, producto ) {
+                var vm = this
+                vm.schema               = {QuoteLineItem: ctcUtils.app.schema.QuoteLineItem || {}}
+                vm.producto             = producto || {}
+                vm.escalonamientos      = []
+                vm.ids2Delete           = {}
+                vm.processing           = false
+                vm.idsEscalonamientos   = []
+
+                console.log('EscalonamientoCtrl: ', vm, ctcUtils)
+
+
+                vm.cargarEscalonamientos = function() {
+                    vm.loading = true
+                    vm.processing = true
+                    ctcUtils.query('SELECT Id,QuoteId, UnitPrice, ServiceDate FROM QuoteLineItem WHERE Escalonamiento__c=\'' + vm.producto.Id + '\'')
+                    .then(function( res ) {
+                        vm.escalonamientos = res || []
+                        if( vm.escalonamientos.length > 0 ) {
+                            angular.forEach( vm.escalonamientos, function( escalonamiento, index ) {
+                                vm.idsEscalonamientos.push(escalonamiento.Id)
+                            })
+
+                            var qliBase = {
+                                Id: angular.copy(vm.producto.Id),
+                                UnitPrice: angular.copy(vm.producto.UnitPrice),
+                                ServiceDate: angular.copy(vm.producto.ServiceDate)
+                            }
+                            vm.escalonamientos.unshift(qliBase)
+
+                            angular.forEach( vm.escalonamientos, function( escalonamiento, index ) {
+                                escalonamiento.ServiceDate = $filter('date')(escalonamiento.ServiceDate, 'dd/MM/yyyy', 'UTC')
+                            })
+                        } else {
+                            vm.escalonamientos = [{}, {}]
+                        }
+                        vm.setSumatoria()
+                        vm.loading = false
+                        vm.processing = false
+                    })
+                    .catch(function(err){
+                        vm.errors = [err]
+                        vm.loading = false
+                        vm.processing = false
+                    })
+                }
+                
+                vm.cargarQuote = function() {            
+                    ctcUtils.query('SELECT Id,QuoteId, UnitPrice, ServiceDate FROM QuoteLineItem WHERE Id=\'' + vm.producto.Id + '\'')
+                    .then(function( res ) {
+                        var escalonamientos = res || [];
+                       
+                        angular.forEach( escalonamientos, function( escalonamiento, index ) {
+                            console.log('---'+escalonamiento.QuoteId);
+                            vm.producto.QuoteId=escalonamiento.QuoteId;
+                        })
+
+                    })
+                    .catch(function(err){
+                        vm.errors = [err]
+                        vm.loading = false
+                        vm.processing = false
+                    })
+                }
+
+                vm.setSumatoria = function(){
+                    vm.sumatoria = 0
+                    angular.forEach( vm.escalonamientos, function( escalonamiento, index ) {
+                        if( escalonamiento.UnitPrice ) {
+                            vm.sumatoria += ctcUtils.number(escalonamiento.UnitPrice)
+                        }
+                    })
+                }
+
+                vm.eliminarEscalonamiento = function( escalonamiento ) {
+
+                    var index = vm.escalonamientos.indexOf(escalonamiento)
+                    if( escalonamiento.Id && vm.producto.Id == escalonamiento.Id ) {
+                        vm.ids2Delete['undefined'] = true
+                    } else if( escalonamiento.Id ) {
+                        vm.ids2Delete[escalonamiento.Id] = true
+                    }
+                    vm.escalonamientos.splice(index, 1)
+
+                    vm.setSumatoria()
+                    vm.totalDelete = Object.keys(vm.ids2Delete).length
+                }
+
+                vm.eliminarTodosEscalonamientos = function() {
+                    angular.forEach( vm.escalonamientos, function( escalonamiento, index ) {
+                        if( escalonamiento.Id && vm.producto.Id == escalonamiento.Id ) {
+                            vm.ids2Delete['undefined'] = true
+                        } else if( escalonamiento.Id ) {
+                            vm.ids2Delete[escalonamiento.Id] = true
+                        }
+                    })
+                    vm.escalonamientos = []
+
+                    vm.setSumatoria()
+                    vm.totalDelete = Object.keys(vm.ids2Delete).length
+                }
+
+                vm.agregarEscalonamiento = function() {
+                    vm.escalonamientos.push({})
+                }
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+
+                vm.definirFechaMinima = function( model, instance, field, form, params ) {
+                    var prev = 0
+                    var current = 0
+                    angular.forEach(vm.escalonamientos, function( escalonamiento, index ) {
+                        var isValid = true
+                        if(prev == 0 && escalonamiento.ServiceDate && escalonamiento.ServiceDate.indexOf('/') != -1 && escalonamiento.ServiceDate.split('/').length == 3) {
+                            var str = escalonamiento.ServiceDate.split('/')
+                            prev = new Date(str[1] + ' ' + str[0] + ' ' + str[2]).getTime()
+                        } else if(escalonamiento.ServiceDate && escalonamiento.ServiceDate.indexOf('/') != -1 && escalonamiento.ServiceDate.split('/').length == 3){
+                            var str = escalonamiento.ServiceDate.split('/')
+                            current = new Date(str[1] + ' ' + str[0] + ' ' + str[2]).getTime()
+                            isValid = current > prev
+                            prev = current
+                        }
+                        form['ServiceDate_' + escalonamiento.IdElement].$setValidity('majorDate', isValid)
+                    })
+                }
+
+                vm.initSchema = function() {
+                    vm.schema.QuoteLineItem.ServiceDate_Copy = angular.copy(vm.schema.QuoteLineItem.ServiceDate)
+                    vm.schema.QuoteLineItem.ServiceDate_Copy.required = true
+                    vm.schema.QuoteLineItem.ServiceDate_Copy.minDate = new Date()
+                }
+
+                vm.initSchema()
+                vm.cargarEscalonamientos()
+                vm.cargarQuote()
+                
+                vm.guardarEscalonamiento = function() {
+                    ctcUtils.showProcess(true, 'Guardando escalonamientos')
+                    vm.processing = true
+                    
+                    var escalonamientos2Save = []
+
+                    var idsUtilizados = {}
+                    var actualizarDatos = {}
+                    var limpiarEscalonamiento = false
+
+
+                    if( vm.escalonamientos.length > 0 ) {
+
+                        var total = 0
+                        angular.forEach( vm.escalonamientos, function( escalonamiento, index ) {
+                            var esc2Save = {}
+                            if( index == 0 ) { // QuoteLineItem base
+                                esc2Save.Id = vm.producto.Id
+
+                                var fecha = escalonamiento.ServiceDate.split('/')
+
+                                var today = new Date(fecha[2], fecha[1] - 1, fecha[0])
+                                actualizarDatos.ServiceDate = today.getTime()
+
+                                actualizarDatos.UnitPrice = angular.copy(escalonamiento.UnitPrice)
+
+                            } else if( escalonamiento.Id ) { // Los escalonamientos
+                                esc2Save.Id = escalonamiento.Id
+                                idsUtilizados[escalonamiento.Id] = true
+                            }
+
+                            if( index > 0) {
+                                esc2Save.Escalonamiento__c      = vm.producto.Id
+                                esc2Save.QuoteId                = vm.producto.QuoteId
+                                esc2Save.PricebookEntryId       = vm.producto.PricebookEntryId
+                                esc2Save.Quantity               = 1
+                                esc2Save.CantidadTarjetas__c    = vm.producto.CantidadTarjetas__c
+                                esc2Save.Product2Id             = vm.producto.Product2Id
+                            }
+                            esc2Save.Escalonamiento1__c = true
+                            esc2Save.UnitPrice = escalonamiento.UnitPrice
+                            var fecha = escalonamiento.ServiceDate.split('/')
+                            esc2Save.ServiceDate = fecha[2] + '-' + fecha[1] + '-' + fecha[0]
+
+                            total += ctcUtils.number(esc2Save.UnitPrice)
+
+                            escalonamientos2Save.push(esc2Save)
+                        })
+
+                        actualizarDatos.escalonamientos = {
+                            Escalonamiento__c: vm.producto.Id,
+                            total: total
+                        }
+                    } else {
+                        // delete vm.producto.escalonamientos
+                        limpiarEscalonamiento = true
+                        var esc2Save = {}
+                        esc2Save.Id = vm.producto.Id
+                        esc2Save.Escalonamiento1__c = false
+                        esc2Save.UnitPrice = vm.producto.UnitPrice
+                        escalonamientos2Save.push(esc2Save)
+                    }
+
+                    angular.forEach(vm.idsEscalonamientos, function( idUtilizado, index ) {
+                        if( !idsUtilizados.hasOwnProperty(idUtilizado)) {
+                            vm.ids2Delete[idUtilizado] = true
+                        }
+                    }) 
+                        
+
+                    var payloadIds2Delete = []
+                    angular.forEach(Object.keys(vm.ids2Delete), function( key2Delete, index ) {
+                        if( key2Delete && key2Delete != 'undefined' ) {
+                            payloadIds2Delete.push(key2Delete)
+                        }
+                    })
+
+
+                    console.log('\n\n escalonamientos2Save: ', escalonamientos2Save)
+
+                    ctcUtils.remove(payloadIds2Delete)
+                    .then(function(res) {
+                        console.log('response deleteIds: ', res)
+                        vm.ids2Delete = {}
+                        vm.totalDelete = 0
+                        return ctcUtils.upsert('QuoteLineItem', JSON.stringify(escalonamientos2Save))
+                    })
+                    .then( function( res ) {
+
+                        var payloadOpp = {
+                            Id: ctcUtils.app.opportunity.Id
+                        }
+                        var closeDate = ''
+
+                        if( limpiarEscalonamiento ) {
+                            delete vm.producto.escalonamientos
+                            
+                        } else {
+                            vm.producto.ServiceDate = actualizarDatos.ServiceDate
+                            vm.producto.UnitPrice = actualizarDatos.UnitPrice
+                            vm.producto.escalonamientos = actualizarDatos.escalonamientos
+
+                        }
+
+                        angular.forEach( vm.escalonamientos, function( escalonamiento, index ) {
+                            escalonamiento.Id = res[index].id
+                        })
+                        console.log('response upsert: ', res, vm.escalonamientos)
+
+                        var fecha = new Date(vm.producto.ServiceDate)
+                        closeDate = fecha.getFullYear() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getUTCDate()
+                        payloadOpp.CloseDate = closeDate
+
+                        return ctcUtils.upsert('Opportunity', JSON.stringify([payloadOpp]))
+                    }).then( function( res ) {
+
+                        console.log('response update Opp: ', res)
+
+                        ctcUtils.showProcess(false, 'Guardando escalonamientos')
+                        vm.processing = false
+                        vm.close()
+
+                    }).catch( function( err ) {
+                        ctcUtils.showProcess(false, 'Guardando escalonamientos')
+                        vm.processing = false
+                        ctcUtils.showError( err )
+                    })
+                }
+            }
+        })()    
+
+
+    </script>
+</apex:component>

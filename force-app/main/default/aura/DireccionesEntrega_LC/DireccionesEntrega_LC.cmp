@@ -1,0 +1,69 @@
+<aura:component controller="DireccionesEntrega_CR"  implements="force:hasRecordId,flexipage:availableForRecordHome,lightning:isUrlAddressable">
+    <aura:handler   name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId"      type="String"/>
+    <aura:attribute name="catalogoDirecciones" type="Object[]"/>
+    <aura:attribute name="dirSelected"  type="String"  />
+    <aura:attribute name="dirSeleccionadas" type="Object[]"/>
+    <aura:attribute name="oportunidad" type="Opportunity"/>
+    <aura:attribute name="contrato2" type="Contrato2__c"/>
+    <aura:attribute name="direcciones" type="Map"/>
+    <aura:attribute name="mapAux" type="Map"/>
+    <aura:attribute name="columnas" type="List"/>
+    <aura:attribute name="valor" type="String"/>
+    <aura:attribute name="etapaOPP" type="String"/>
+    <aura:attribute name="bandera" type="Boolean"/>
+    <aura:attribute name="totalDirecciones" type="Integer"/>
+    
+    
+    <aura:attribute name="accountId" type="Id"/>
+    <aura:attribute name="productCode" type="String" default=""/>
+    <aura:attribute name="fieldDA" type="Map" default="{ label: 'Layout de Direcciones Auxiliares', name: 'DireccionesAuxiliares__c', value: true }"/>
+    <aura:attribute name="layoutDAId" type="Id" default=""/>
+    <aura:attribute name="contentDocumentDA" type="Object" default="{ id: '', title: '' }"/>
+    
+    <!--<c:PicklistValues sObjectName="CatalogoDirecciones__c" fieldName="Tipo_Pt__c" picklistValues="{!v.picklistValues}" />-->  
+    
+    <lightning:layoutItem flexibility="auto" padding="around-small">
+        <div class="custom-box">    
+            <lightning:select aura:id="picklistDirecciones" name="picklistDirecciones"  disabled="false" label="Dirección de Entrega:" value="{!v.dirSelected}" onchange="{!c.cambiarEstatus}" onfocus="{!c.bloqueaEnADV}"><!--{!c.bloqueaEnADV}-->       
+                <option value="">--Seleccionar--</option>
+                
+                <aura:iteration items="{!v.catalogoDirecciones}" var="item">
+                    <option value="{!item.Id}">
+                        {!item.Tipo_Pt__c}: {!item.Calle_Tt__c} #Ext.{!item.NumeroExterior_Tt__c} - #Int.{!item.NumeroInterior_Tt__c}, {!item.Colonia_Tt__c} {!item.CodigoPostal_Tt__c}, {!item.DelegacionMunicipio_Tt__c}, {!item.Ciudad_Tt__c}, {!item.Estado_Tt__c}
+                    </option>
+                </aura:iteration>
+                <option value="direccionesAux">Direcciones Auxiliares</option>
+            </lightning:select>
+        </div>
+    </lightning:layoutItem>
+    
+    <lightning:layoutItem flexibility="auto" padding="around-small">
+        <lightning:button aura:id="btn-agregarDireccion"  label="Agregar" title="Agregar" onclick="{!c.agregarDireccion}" disabled="true"/>
+    </lightning:layoutItem>
+    
+    <aura:if isTrue="{!v.bandera}">
+        <div class="slds-section slds-is-open slds-p-top_medium">
+            <span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
+                Direcciones de Entrega
+            </span>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.contrato2.DireccionesAuxiliares__c}">
+        <lightning:layout horizontalAlign="center" multipleRows="true" class="slds-m-top_large">
+            <lightning:layoutItem size="6" padding="horizontal-medium">
+                <c:CON_DownloadUploadLayout_LC accountId="{!v.oportunidad.AccountId}" productCode="{!v.oportunidad.Codigo_Producto_cotizacion__c}" field="{!v.fieldDA}" layoutId="{!v.layoutDAId}" contentDocument="{!v.contentDocumentDA}"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:if>
+    
+    <lightning:layoutItem flexibility="auto" padding="around-small">
+        <lightning:datatable name="tablaDirecciones"  aura:id="tablaDirecciones"  data="{! v.dirSeleccionadas }" columns="{! v.columnas }" keyField="Id" onrowselection="{!c.cambiarEstatus}"/>
+    </lightning:layoutItem>
+    
+    <lightning:layoutItem flexibility="auto" padding="around-small">
+        <lightning:button aura:id="btn-quitarDireccion"  label="Quitar" title="Retornar" onclick="{!c.agregarQuitar}" disabled="true"/>
+        <lightning:button aura:id="guardar"   variant="brand" label="Guardar" title="Retornar" onclick="{!c.guardar}" disabled="true"/>
+    </lightning:layoutItem>
+</aura:component>

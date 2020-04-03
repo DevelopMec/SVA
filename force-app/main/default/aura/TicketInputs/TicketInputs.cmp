@@ -1,0 +1,1939 @@
+<aura:component controller="TicketControladorInputs" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+
+    
+    <aura:attribute name="recordId" type="Id"/> 
+    <aura:attribute name="caso" type="Case"/>
+    
+    
+    <!-- creación de 2 aura handler waiting y donewaiting events--> 
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+ 	<aura:if isTrue="{!v.Spinner}">
+    	<div aura:id="spinnerId" class="slds-spinner_container">
+       	<div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+            <div class="slds-spinner__dot-a"></div>
+         	<div class="slds-spinner__dot-b"></div>
+       	</div>
+    	</div>
+ 	</aura:if>
+
+<aura:handler name="init" value="{! this}" action="{!c.doInit}"/>
+<aura:handler event="force:refreshView" action="{!c.doInit}" />    
+  
+
+    
+<lightning:recordEditForm aura:id="editForm" recordId="{!v.caso.Id}" objectApiName="Case"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+
+<lightning:icon iconName="utility:work_order_type" size="small" class="slds-p-right_x-small" />
+	<aura:if isTrue="{!v.caso.Type}">
+    	<lightning:outputField fieldName="Type" variant="label-hidden" />
+    	<aura:set attribute="else">
+            Tipo no seleccionado
+ 		</aura:set>
+  	</aura:if>         
+<lightning:icon iconName="utility:right"  size="x-small"  class="slds-p-right_x-small" /> 
+
+    <aura:if isTrue="{!v.caso.Motivo__c}">
+    	<lightning:outputField fieldName="Motivo__c"  variant="label-hidden" /> 
+		<aura:set attribute="else">
+            Motivo no seleccionado
+ 		</aura:set>
+  	</aura:if>     
+<lightning:icon iconName="utility:right"  size="x-small" class="slds-p-right_x-small" /> 
+
+    <aura:if isTrue="{!v.caso.Sub_Motivo__c}">    
+    <lightning:outputField fieldName="Sub_Motivo__c"  variant="label-hidden" />
+		<aura:set attribute="else">
+            Sub Motivo no seleccionado
+ 		</aura:set>
+  	</aura:if> 
+    
+</lightning:layout>
+</div>
+</lightning:recordEditForm>
+<br></br> 
+<br></br> 
+ 
+ 
+   
+    
+    
+
+<!--********INCIDENCIA-Autorización Telefónica******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Autorización Telefónica'), 
+                      or(
+                      v.caso.Sub_Motivo__c == 'AT por tarjeta con problemas',
+                      v.caso.Sub_Motivo__c == 'AT por terminal dañada')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm1" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"  onsubmit="{!c.handleSubmit}" onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        
+       		 <lightning:layout horizontalAlign="spread" multipleRows="true">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem>
+        
+        	<lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 		    <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+            </lightning:layoutItem>
+       	    </lightning:layout> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+  					<aura:if isTrue="{or(
+                      v.caso.Sub_Motivo__c.Tarjeta__c == '',
+                      v.caso.Sub_Motivo__c.Transaccion__c == '')
+                     )}"></aura:if>      
+        
+    </lightning:recordEditForm>  
+    </aura:if>
+        
+   
+    
+<!--********INCIDENCIA-Cobranza******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Cobranza'), 
+                      or(
+                      v.caso.Sub_Motivo__c == 'Aplicación de pago',
+                      v.caso.Sub_Motivo__c == 'Liberación de pedido')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm2" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"    onsubmit="{!c.handleSubmit}"  onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+        
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"/> 
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"/>
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"/> 
+             </lightning:layoutItem>
+
+      		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"/>
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_control_factura__c"/> 
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Factura_Electronica__c"/>
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_de_factura__c"/>
+             </lightning:layoutItem>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Liberación de pedido' }"> 
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Bonos_Vales__c"  />
+             </lightning:layoutItem></aura:if>            
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+        
+        
+    <!--********INCIDENCIA-Conciliación******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Conciliación'), 
+                      
+                      or(or(
+                      v.caso.Sub_Motivo__c == 'Conciliación de cuentas del cliente',
+                      v.caso.Sub_Motivo__c == 'Conciliación de cuentas del afiliado'),
+                      v.caso.Sub_Motivo__c == 'Conciliación de movimientos de tarjeta')
+                     )}">
+        
+
+<!--  *************** Caso especial en que no se requiere ingresar registros  *********** -->      
+        <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de cuentas del afiliado'}">
+        <lightning:recordEditForm aura:id="editForm3" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"   class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+    <!-- este botón es oculto y va de último -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+     </aura:if>   
+<!--  *************** FIN del Caso especial en que no se requiere ingresar registros  *********** -->      
+
+        
+    <lightning:recordEditForm aura:id="editForm4" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"   onsubmit="{!c.handleSubmit}"    onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+        	
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de movimientos de tarjeta'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de movimientos de tarjeta'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de cuentas del cliente'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+        
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de cuentas del cliente'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+        </lightning:layout>
+        
+ <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Conciliación de cuentas del afiliado'}">               
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+     </aura:if>
+    </lightning:recordEditForm>  
+     </aura:if>
+    
+        
+    
+    
+    
+        
+    <!--********INCIDENCIA-	Cuentas ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Cuentas'), 
+                     v.caso.Sub_Motivo__c == 'Bloqueo de cuenta'
+                     )}">
+    <lightning:recordEditForm aura:id="editForm5" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"   onsubmit="{!c.handleSubmit}"    onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+        	
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+           
+ 		</lightning:layout> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>
+        
+
+    
+    
+    
+<!--********INCIDENCIA-Dispersión ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Dispersión'), 
+                      or(
+                      v.caso.Sub_Motivo__c == 'No se refleja la dispersión',
+                      v.caso.Sub_Motivo__c == 'Error en la dispersión')
+                     )}">
+<lightning:recordEditForm aura:id="editForm6" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"    onsubmit="{!c.handleSubmit}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+    <lightning:layout horizontalAlign="spread" multipleRows="true">
+        
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"/> 
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"/>
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"/> 
+             </lightning:layoutItem>
+
+      		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"/>
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_control_factura__c"/> 
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Factura_Electronica__c"/>
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_de_factura__c"/>
+             </lightning:layoutItem>
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    </lightning:layout> 
+            
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+     
+    
+    
+    
+    
+<!--********INCIDENCIA-Facturación ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Facturación'), 
+                      
+                      or(
+                      v.caso.Sub_Motivo__c == 'Retraso en la entrega del documento',
+                      v.caso.Sub_Motivo__c == 'No se puede descargar el documento')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm7" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"   onsubmit="{!c.handleSubmit}"    onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Bonos_Vales__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"/> 
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"/> 
+             </lightning:layoutItem>
+
+      		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"/>
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_control_factura__c"/> 
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Factura_Electronica__c"/>
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_de_factura__c"/>
+             </lightning:layoutItem>
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'No se puede descargar el documento'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Tipo_de_Cliente__c"/>
+             </lightning:layoutItem></aura:if>            
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'No se puede descargar el documento'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="C_mo_factura__c"/>
+             </lightning:layoutItem></aura:if>            
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'No se puede descargar el documento'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Observaciones_num_intermedio__c"/>
+             </lightning:layoutItem></aura:if>            
+                     
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'No se puede descargar el documento'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_fiscal__c"/>
+             </lightning:layoutItem></aura:if>            
+                     
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'No se puede descargar el documento'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Periodo_factura__c"/>
+             </lightning:layoutItem></aura:if>       
+              
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_pago_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="UUID_complemento_de_Pago__c"/>
+             </lightning:layoutItem>
+           
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'No se puede descargar el documento'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="UUID__c"/>
+             </lightning:layoutItem></aura:if>            
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+            
+    	</lightning:layout> 
+        
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+        
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+        
+    
+    
+    
+    
+    
+    
+     
+   
+ <!--********INCIDENCIA-    	Layout  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Layout'), v.caso.Sub_Motivo__c == 'Error en la carga del layout'
+                      )}">
+ <!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm8" recordId="{!v.caso.Id}" objectApiName="Case"     onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"  onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    	     <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField value="false" aura:id="campovacio1v"  fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+       
+   
+
+    
+    
+    
+    
+    
+<!--********INCIDENCIA- Pedidos de Tarjeta ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Pedidos de Tarjeta'), 
+                      
+                      or(or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'No reconoce la entrega',
+                      v.caso.Sub_Motivo__c == 'Pedido incompleto'),
+                      v.caso.Sub_Motivo__c == 'Pedido incorrecto (ordenamiento)' ),
+                      v.caso.Sub_Motivo__c == 'El estatus del pedido no cambia'),
+                      v.caso.Sub_Motivo__c == 'Actualización de dirección auxiliar'),
+                      v.caso.Sub_Motivo__c == 'Sobres abiertos/maltratados'),
+                      v.caso.Sub_Motivo__c == 'Vales dañados')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm9" recordId="{!v.caso.Id}" objectApiName="Case" onsuccess="{!c.handleSuccess}"    onsubmit="{!c.handleSubmit}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Bonos_Vales__c"  />
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"/> 
+             </lightning:layoutItem>
+            
+ 			 <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Vales dañados'}">
+      		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Tarjeta__c"/>
+             </lightning:layoutItem></aura:if>              
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Vales dañados'}">
+      		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Tarjeta__c"/>
+             </lightning:layoutItem></aura:if>              
+
+             <aura:if isTrue="{!and(and(
+                                        and(v.caso.Sub_Motivo__c != 'No reconoce la entrega', v.caso.Sub_Motivo__c != 'El estatus del pedido no cambia'), 
+                                        v.caso.Sub_Motivo__c != 'Sobres abiertos/maltratados'), 
+                                        v.caso.Sub_Motivo__c != 'Vales dañados') 
+                                        }">
+      		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Direccion_Auxiliar__c"/>
+             </lightning:layoutItem></aura:if>              
+
+     		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="N_mero_de_Remisi_n__c"/>
+             </lightning:layoutItem>             
+   
+             <aura:if isTrue="{!or(v.caso.Sub_Motivo__c == 'Pedido incompleto', v.caso.Sub_Motivo__c == 'Vales dañados')}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Cantidad_de_bonos_y_o_tarjetas__c"/> 
+             </lightning:layoutItem></aura:if>
+             
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Actualización de dirección auxiliar'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nombre_del_contacto_que_recibe_el_pedido__c"/>
+             </lightning:layoutItem></aura:if>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+  
+ 
+    
+        
+       
+    
+<!--********INCIDENCIA-  Re facturación ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Re facturación'), 
+                      
+                      or(or(or(or(or(or(or(or(or(or(or(or(or(or(or(
+                     v.caso.Sub_Motivo__c == 'Adenda/Factura No Emitida',
+                     v.caso.Sub_Motivo__c == 'Cambio De Cliente (subcuenta)'),
+                     v.caso.Sub_Motivo__c == 'Cambio De Comisión' ),
+                     v.caso.Sub_Motivo__c == 'Cambio De Domicilio'),
+                     v.caso.Sub_Motivo__c == 'Cambio de fecha'),
+                     v.caso.Sub_Motivo__c == 'Cambio De Metodo De Pago'),
+                     v.caso.Sub_Motivo__c == 'Cambio De Razón Social'),
+                     v.caso.Sub_Motivo__c == 'Cancelación Definitiva De Factura'),
+                     v.caso.Sub_Motivo__c == 'Corrección De RFC'),
+                     v.caso.Sub_Motivo__c == 'Corte especial'),
+                     v.caso.Sub_Motivo__c == 'Cuota de Adscripción'),
+                     v.caso.Sub_Motivo__c == 'De Servicio Comisión'),
+                     v.caso.Sub_Motivo__c == 'De Servicios por Plásticos'),
+                     v.caso.Sub_Motivo__c == 'Error Edenred (cancela re facturación y vuelve a generar)'),
+                     v.caso.Sub_Motivo__c == 'Unificación o Separación de Comisión o Plásticos'),
+                     v.caso.Sub_Motivo__c == 'Unificación o Separación de Transacciones')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm10" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+
+			 <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Unificación o Separación de Transacciones'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6">
+             <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem></aura:if>
+           
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Unificación o Separación de Transacciones'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6">
+			 <lightning:inputField fieldName="Fecha_Movimiento__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"/> 
+             </lightning:layoutItem>
+ 
+     		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"/>
+             </lightning:layoutItem>
+      
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_control_factura__c"/> 
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Factura_Electronica__c"/>
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_de_factura__c"/>
+             </lightning:layoutItem>
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Periodo__c"/>
+             </lightning:layoutItem>
+          
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Tipo_de_Cliente__c"/>
+             </lightning:layoutItem>           
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="C_mo_factura__c"/>
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Observaciones_num_intermedio__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_fiscal__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Periodo_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_pago_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="UUID_complemento_de_Pago__c"/>
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="UUID__c"/>
+             </lightning:layoutItem>
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Validacion__c"/>
+             </lightning:layoutItem>
+            
+            
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+            
+    	</lightning:layout>
+        
+ <lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+    
+   
+    
+    
+    
+    
+    
+        
+    
+<!--********INCIDENCIA- Saldos ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Saldos'), 
+                     v.caso.Sub_Motivo__c == 'Error al solicitar saldo a su cuenta corriente'
+                     )}">
+    <lightning:recordEditForm aura:id="editForm11" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"  />
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"/> 
+             </lightning:layoutItem>
+
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+            
+        
+ 
+    <!--********INCIDENCIA-	Tarjeta ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Tarjeta'), 
+                      or(or(
+                      v.caso.Sub_Motivo__c == 'No puedo transaccionar', v.caso.Sub_Motivo__c == 'No puedo retirar efectivo del ATM'),
+                      v.caso.Sub_Motivo__c == 'No puede transaccionar en eCommerce')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm12" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+     <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+        	
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6">
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+              
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6">
+			 <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem>
+
+            <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+       
+        </lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>
+    
+        
+        
+        
+
+    <!--********INCIDENCIA-	Web/App  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Incidencia', v.caso.Motivo__c == 'Web/App'), 
+                      or(or(
+                      v.caso.Sub_Motivo__c == 'Error de registro en la app', v.caso.Sub_Motivo__c == 'Lentitud/ intermitencia en la app'),
+                      v.caso.Sub_Motivo__c == 'Lentitud/ intermitencia en la web')
+                     )}">
+<!--  *************** Caso especial en que no se requiere ingresar registros  *********** -->      
+        <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Lentitud/ intermitencia en la web'}">
+        <lightning:recordEditForm aura:id="editForm13" recordId="{!v.caso.Id}" objectApiName="Case"   onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"   class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c" value="false" />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+<!--  ***************SOLO BOTON CANCELAR para el Caso especial en que no se requiere ingresar registros  *********** -->                    
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+     </aura:if>   
+<!--  *************** FIN del Caso especial en que no se requiere ingresar registros  *********** -->  
+        
+    <lightning:recordEditForm aura:id="editForm14" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+        	
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Lentitud/ intermitencia en la web'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+         </lightning:layout>
+<!--  *************** BOTONES GUARDAR Y CANCELAR cuando no es el Caso especial en que no se requiere ingresar registros  *********** --> 
+<aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Lentitud/ intermitencia en la web'}">                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout></aura:if>    
+    </lightning:recordEditForm>  
+    </aura:if>
+    
+    
+    
+    
+    
+<!--******************************************************************************************************************* -->            
+<!--******************************************************************************************************************* -->                
+<!--******************************************************************************************************************* -->            
+    
+    
+    
+    
+
+    <!--********SOLICITUD -ACLARACIÓN******** -->
+        
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Aclaración'), 
+                      
+                      or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Cargo no reconocido en ATM',
+                      v.caso.Sub_Motivo__c == 'Cargo no reconocidos'),
+                      v.caso.Sub_Motivo__c == 'Cobro de más' ),
+                      v.caso.Sub_Motivo__c == 'Cobro de menos'),
+                      v.caso.Sub_Motivo__c == 'Reembolso al afiliado') 
+                      
+                     )}">
+        
+    <lightning:recordEditForm aura:id="editForm15" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+ 
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+            
+              <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Reembolso al afiliado'}">
+              <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem></aura:if>
+
+            <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+        
+        </lightning:layout>
+        
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>
+    
+
+    
+ 
+ <!--******** Solicitud -    Cambio de datos (Empleado) ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Cambio de datos (Empleado)'), v.caso.Sub_Motivo__c == 'Cambio de datos (Empleado)'
+                      )}">
+ <!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm16" recordId="{!v.caso.Id}" objectApiName="Case"     onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"  onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if>    
+    
+    
+   
+    
+    
+    
+    
+    <!--********SOLICITUD-	Cancelación  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Cancelación'), 
+                      or(or(
+                      v.caso.Sub_Motivo__c == 'de Pedido de Saldos TVDE', v.caso.Sub_Motivo__c == 'de Pedidos de vales con emisión de bonos'),
+                      v.caso.Sub_Motivo__c == 'de Pedidos de vales sin emisión de bonos')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm17" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+        	
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'de Pedido de Saldos TVDE'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Bonos_Vales__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'de Pedido de Saldos TVDE'}"> 
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'de Pedido de Saldos TVDE'}"> 
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+         </lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>
+    
+            
+      <!--********SOLICITUD-  Cobranza.  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Cobranza'), 
+                      or(
+                      v.caso.Sub_Motivo__c == 'Desbloqueo de Cuenta')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm18" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+
+     		 <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"/>
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Factura_Electronica__c"/>
+             </lightning:layoutItem>
+      
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Importe_de_factura__c"/>
+             </lightning:layoutItem>
+         
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Nde_Pedido_de_Tarjeta__c"  />
+             </lightning:layoutItem>
+
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+            
+         </lightning:layout>
+        
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>     
+    
+    
+    
+      <!--********SOLICITUD-  Cuentas.  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Cuentas'), 
+                      or(
+                      v.caso.Sub_Motivo__c == 'Reactivación cuenta Empleado')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm19" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Contrato_Filial__c"  />
+             </lightning:layoutItem>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+         </lightning:layout>
+        
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>     
+    
+
+    
+  
+ 
+ <!--******** Solicitud -    Estatus de incidencia ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Estatus de incidencia'), v.caso.Sub_Motivo__c == 'Estatus de incidencia'
+                      )}">
+ <!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm20" recordId="{!v.caso.Id}" objectApiName="Case"     onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"  onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if>    
+    
+    
+   
+    
+    
+    
+<!--********SOLICITUD- Facturación. ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Facturación'), 
+                      or(or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Envío',
+                      v.caso.Sub_Motivo__c == 'Nota de servicio'),
+                      v.caso.Sub_Motivo__c == 'Envío de factura'),
+                      v.caso.Sub_Motivo__c == 'Conciliación de Factura'),
+                      v.caso.Sub_Motivo__c == 'Envío de proformas'),
+                      v.caso.Sub_Motivo__c == 'Reenvío'),
+                      v.caso.Sub_Motivo__c == 'Cancelación Factura de Fondos')
+                     )}">
+        
+    <lightning:recordEditForm aura:id="editForm21" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+             
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de Factura'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Conciliación de Factura'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Fecha_Movimiento__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <aura:if isTrue="{!or(v.caso.Sub_Motivo__c == 'Nota de servicio', v.caso.Sub_Motivo__c == 'Cancelación Factura de Fondos') 
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Bonos_Vales__c"  />
+             </lightning:layoutItem></aura:if>
+            
+                          <aura:if isTrue="{!and(v.caso.Sub_Motivo__c != 'Reenvío', v.caso.Sub_Motivo__c != 'Envío de factura') 
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Envío de factura'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"/> 
+             </lightning:layoutItem></aura:if>
+            
+ 			 <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Envío de factura'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"/> 
+             </lightning:layoutItem></aura:if>
+            
+   			 <aura:if isTrue="{!or(or(v.caso.Sub_Motivo__c == 'Conciliación de Factura', v.caso.Sub_Motivo__c == 'Reenvío'), 
+                   					  v.caso.Sub_Motivo__c == 'Cancelación Factura de Fondos')
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"  />
+             </lightning:layoutItem></aura:if>           
+           
+             <aura:if isTrue="{!or(or(v.caso.Sub_Motivo__c == 'Nota de servicio', v.caso.Sub_Motivo__c == 'Conciliación de Factura'), 
+                                     v.caso.Sub_Motivo__c == 'Cancelación Factura de Fondos')
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_control_factura__c"  />
+             </lightning:layoutItem></aura:if>
+
+            <aura:if isTrue="{!or(or(v.caso.Sub_Motivo__c == 'Nota de servicio', v.caso.Sub_Motivo__c == 'Conciliación de Factura'), 
+                                     v.caso.Sub_Motivo__c == 'Cancelación Factura de Fondos')
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Factura_Electronica__c"  />
+             </lightning:layoutItem></aura:if>
+ 
+             <aura:if isTrue="{!and(v.caso.Sub_Motivo__c != 'Envío de factura', v.caso.Sub_Motivo__c != 'Envío de proformas') 
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Importe_de_factura__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Nota de servicio'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Tarjeta__c"  />
+             </lightning:layoutItem></aura:if>
+
+     <aura:if isTrue="{!or(v.caso.Sub_Motivo__c == 'Nota de servicio', v.caso.Sub_Motivo__c == 'Reenvío')}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Fecha_de_Pedido_Tarjeta__c"  />
+             </lightning:layoutItem></aura:if>
+                
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_pago_de_la_factura__c"/>
+             </lightning:layoutItem>
+            
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="UUID_complemento_de_Pago__c"/>
+             </lightning:layoutItem>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>   
+
+
+
+
+
+ 
+ 
+ <!--******** Solicitud -    Layout.   ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Layout'), v.caso.Sub_Motivo__c == 'Confirmación de Archivos enviados el Servidor'
+                      )}">
+ <!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm22" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if>    
+    
+
+
+
+      <!--********SOLICITUD-  Liberación  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Liberación'), 
+                      or(or(
+                     v.caso.Sub_Motivo__c == 'Cambio de No. de Nómina único'),
+                     v.caso.Sub_Motivo__c == 'Cambio de No. de Nómina masivo')
+                     )}">
+<!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm23" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"  onsubmit="{!c.handleSubmit}"   class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if>    
+    
+
+    
+    
+    
+ 
+
+      <!--********SOLICITUD-  	Ligue de Empleadoras  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Ligue de Empleadoras'), 
+                      or(or(
+                     v.caso.Sub_Motivo__c == 'del mismo grupo'),
+                     v.caso.Sub_Motivo__c == 'de diferente grupo')
+                     )}">
+<!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm24" recordId="{!v.caso.Id}" objectApiName="Case"   onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"   class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if>    
+    
+   
+    
+     
+    
+    
+
+<!--********SOLICITUD- 	 Pedidos de Tarjeta.  ****** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Pedidos de Tarjeta'), 
+                      or(or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Estatus de entrega',v.caso.Sub_Motivo__c == 'Re programación'),
+                      v.caso.Sub_Motivo__c == 'Cambio de dirección de entrega' ),
+                      v.caso.Sub_Motivo__c == 'Cambio de fecha de entrega'),
+                      v.caso.Sub_Motivo__c == 'Cambio de persona'),
+                      v.caso.Sub_Motivo__c == 'Rastreo de pedido'),
+                      v.caso.Sub_Motivo__c == 'Cancelación de pedido')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm25" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}" class="slds-show">
+     <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+             
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Cancelación de pedido'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Bonos_Vales__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"  />
+             </lightning:layoutItem>
+                
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c== 'Cancelación de pedido'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_control_factura__c"  />
+             </lightning:layoutItem></aura:if>
+            
+              <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Cancelación de pedido'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Factura_Electronica__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Cancelación de pedido'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Importe_de_factura__c"  />
+             </lightning:layoutItem></aura:if>
+                
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Tarjeta__c"  />
+             </lightning:layoutItem>
+               
+            <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Fecha_de_Pedido_Tarjeta__c"  />
+             </lightning:layoutItem>
+      
+             <aura:if isTrue="{!and(v.caso.Sub_Motivo__c != 'Estatus de entrega', v.caso.Sub_Motivo__c != 'Cancelación de pedido')
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Direccion_Auxiliar__c"  />
+             </lightning:layoutItem></aura:if>
+           
+            <aura:if isTrue="{!and(and(v.caso.Sub_Motivo__c != 'Estatus de entrega', v.caso.Sub_Motivo__c != 'Cambio de persona'), 
+                                      v.caso.Sub_Motivo__c != 'Cancelación de pedido') 
+                                      }">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="N_mero_de_Remisi_n__c"  />
+             </lightning:layoutItem></aura:if>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+    
+    
+    
+ 
+<!--********SOLICITUD- 	Plataforma Web ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Plataforma Web'), 
+                      or(v.caso.Sub_Motivo__c == 'Baja de pedido de fondos',v.caso.Sub_Motivo__c == 'Cuenta mancomunada')
+                      )}">
+    <lightning:recordEditForm aura:id="editForm26" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+             
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Nde_Pedido_de_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+            
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Fecha_de_Pedido_Saldos__c"  />
+             </lightning:layoutItem></aura:if>
+        
+              <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Control_de_Pedido_N_mero__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c != 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Estatus_de_Facturas_Pendientes_de_Pago__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Observaciones_num_intermedio__c"  />
+             </lightning:layoutItem></aura:if>
+         
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Importe_fiscal__c"  />
+             </lightning:layoutItem></aura:if>
+
+             <aura:if isTrue="{!v.caso.Sub_Motivo__c == 'Cuenta mancomunada'}">
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Periodo_factura__c"  />
+             </lightning:layoutItem></aura:if>
+          
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+        
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+   
+
+
+
+
+    
+            
+ <!--********SOLICITUD- 	Saldos. ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Saldos'), 
+                      or(or(
+                      v.caso.Sub_Motivo__c == 'Retiro saldo empleado no vigente',v.caso.Sub_Motivo__c == 'Retiro saldo empleado vigente'),
+                      v.caso.Sub_Motivo__c == 'Retiro saldo por omisión de entrega de plástico')
+                     )}">
+    <lightning:recordEditForm aura:id="editForm28" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+    <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+              
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Contrato_Filial__c"  />
+             </lightning:layoutItem>
+                 
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Transaccion__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Fecha_Movimiento__c"  />
+             </lightning:layoutItem>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+    </lightning:recordEditForm>  
+    </aura:if>      
+                
+        
+ 
+        
+ 
+<!--********SOLICITUD-  Tarjeta. ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == '_Tarjeta'), 
+                      v.caso.Sub_Motivo__c == 'Reporte de movimientos'
+                      )}">
+    <lightning:recordEditForm aura:id="editForm29" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+     <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Periodo__c"  />
+             </lightning:layoutItem>
+              
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Observaciones_num_intermedio__c"  />
+             </lightning:layoutItem>
+              
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Importe_fiscal__c"  />
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Periodo_factura__c"  />
+             </lightning:layoutItem>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+    </lightning:recordEditForm>  
+    </aura:if>      
+
+        
+    
+    
+    
+    
+    
+  
+
+      <!--********SOLICITUD-  	Tramites Administrativos  ******* -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'Tramites Administrativos'), 
+                      or(or(or(or(or(
+                     v.caso.Sub_Motivo__c == 'Razón Social'),
+                     v.caso.Sub_Motivo__c == 'Dirección Auxiliar'),
+                     v.caso.Sub_Motivo__c == 'Administrador'),
+                     v.caso.Sub_Motivo__c == 'Apoderado Legal'),
+                     v.caso.Sub_Motivo__c == 'Domicilio Fiscal')
+                     )}">
+<!-- Caso especial donde no se requiere ingreso de datos -->    
+<lightning:recordEditForm aura:id="editForm30" recordId="{!v.caso.Id}" objectApiName="Case"     onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"  onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if>        
+    
+    
+  
+      
+
+         
+ 
+<!--********SOLICITUD-  Vales Ex empleados - TDVE ******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Solicitud', v.caso.Motivo__c == 'ValesExempleados-TDVE'), 
+                      v.caso.Sub_Motivo__c == 'Vales_ Ex_empleados_-_TDVE'
+                      )}">
+      
+    <lightning:recordEditForm aura:id="editForm31" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+     <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+            
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Tarjeta__c"  />
+             </lightning:layoutItem>
+
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+             <lightning:inputField fieldName="Contrato_Filial__c"  />
+             </lightning:layoutItem>
+
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+    	</lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout> 
+    </lightning:recordEditForm>  
+    </aura:if>      
+                
+
+     
+    
+    
+    
+<!--********************************************************************************** -->    
+<!--********************************************************************************** -->        
+<!--********************************************************************************** -->        
+    
+    
+    
+    
+ 
+
+    
+
+   
+ <!--********ASESORÍA-    Cuentas..  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == '__Cuentas'), 
+                      
+                      or(
+                      v.caso.Sub_Motivo__c == 'Conciliación de cuenta',
+                      v.caso.Sub_Motivo__c == 'Creación de cuentas' )
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm32" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+    
+    
+    
+   
+ <!--********ASESORÍA-    Dispersión..  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == '__Dispersión'), 
+                      
+                      or(
+                      v.caso.Sub_Motivo__c == 'Abono a cuenta corriente',
+                      v.caso.Sub_Motivo__c == 'Plantillas de carga masiva' )
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm33" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+    
+    
+
+
+
+    
+<!--********ASESORÍA-   Facturación..******** -->
+    <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == '__Facturación'), 
+                      
+                      or(or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Descarga',
+                      v.caso.Sub_Motivo__c == 'Generar proforma' ),
+                      v.caso.Sub_Motivo__c == 'Cómo se paga'),
+                      v.caso.Sub_Motivo__c == 'Descarga facturas'),
+                      v.caso.Sub_Motivo__c == 'Descarga de proformas'),
+                      v.caso.Sub_Motivo__c == 'Programación reportes'),
+                      v.caso.Sub_Motivo__c == 'Envío de reportes')
+                      )}">
+    <lightning:recordEditForm aura:id="editForm34" recordId="{!v.caso.Id}" objectApiName="Case"   onsubmit="{!c.handleSubmit}"  onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}" class="slds-show">
+     <lightning:messages />
+        <lightning:layout horizontalAlign="spread" multipleRows="true">        
+
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="Fecha_de_pago_de_la_factura__c"/>
+             </lightning:layoutItem>
+             
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6"  >
+			 <lightning:inputField fieldName="UUID_complemento_de_Pago__c"/>
+             </lightning:layoutItem>
+
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  />
+             </lightning:layoutItem>
+
+        </lightning:layout>
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>
+</lightning:layout>    
+    </lightning:recordEditForm>  
+    </aura:if>      
+         
+
+
+
+    
+    
+    
+   
+ <!--********ASESORÍA-    Lay Out  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == 'Lay Out'), 
+                      
+                      or(
+                      v.caso.Sub_Motivo__c == 'Productos Electrónicos',
+                      v.caso.Sub_Motivo__c == 'Productos Papel' )
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm35" recordId="{!v.caso.Id}" objectApiName="Case"   onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"    onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+       
+    
+    
+    
+   
+ <!--********ASESORÍA-    	Plataforma Web..  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == '__Plataforma Web'), 
+                      
+                      or(or(or(or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Crear administrador nuevo',
+                      v.caso.Sub_Motivo__c == 'Creación estructura' ),
+                         v.caso.Sub_Motivo__c == 'Alta de conductores' ),
+                         v.caso.Sub_Motivo__c == 'Manejo de Controles' ),
+                         v.caso.Sub_Motivo__c == 'Uso de la plataforma' ),
+                         v.caso.Sub_Motivo__c == 'Alta de un jefe' ),
+                         v.caso.Sub_Motivo__c == 'Subcuentas' ),
+                         v.caso.Sub_Motivo__c == 'Generación de Reporte de Gastos' ),
+                         v.caso.Sub_Motivo__c == 'Habilitar reglas' )
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm36" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+    
+             <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+       
+        
+    
+    
+    
+   
+ <!--********ASESORÍA-    	Producto Papel  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == 'Producto Papel'), v.caso.Sub_Motivo__c == 'Asesoría'
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm37" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+ 
+   
+    
+   
+ <!--********ASESORÍA-    	Saldo  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == 'Saldo'), 
+                      
+                      or(or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Carga masiva',
+                      v.caso.Sub_Motivo__c == 'Asignación de saldo' ),
+                         v.caso.Sub_Motivo__c == 'Asignación IVR' ),
+                         v.caso.Sub_Motivo__c == 'Cuenta Corriente' ),
+                         v.caso.Sub_Motivo__c == 'Tarjetas' ),
+                         v.caso.Sub_Motivo__c == 'Liberación de pedido de saldo' ),
+                         v.caso.Sub_Motivo__c == 'Cuenta' )
+
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm38" recordId="{!v.caso.Id}" objectApiName="Case"   onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"    onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br>
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+       
+ 
+
+
+
+  
+    
+   
+ <!--********ASESORÍA-    	Tarjeta..  ******** -->   
+        <aura:if isTrue="{!and(
+                     and(v.caso.Type == 'Asesoría', v.caso.Motivo__c == '__Tarjeta'), 
+                      
+                      or(or(or(or(or(
+                      v.caso.Sub_Motivo__c == 'Movimientos de Tarjeta',
+                      v.caso.Sub_Motivo__c == 'Solicitud' ),
+                         v.caso.Sub_Motivo__c == 'Asignación' ),
+                         v.caso.Sub_Motivo__c == 'Stock' ),
+                         v.caso.Sub_Motivo__c == 'Renovación' ),
+                         v.caso.Sub_Motivo__c == 'Activación' )
+                        
+
+                      )}">
+    
+<lightning:recordEditForm aura:id="editForm39" recordId="{!v.caso.Id}" objectApiName="Case"    onsuccess="{!c.handleSuccess}"   onerror="{!c.handleError}"   onsubmit="{!c.handleSubmit}"  class="slds-show">
+<div class="slds-box parent slds-box_x-small slds-theme_shade ">
+<lightning:layout horizontalAlign="left" > 
+     <lightning:icon iconName="utility:info" size="small" class="slds-p-right_x-small"/>
+    No se requiere introducir datos para este Sub-Motivo
+<br></br> 
+    
+              <!-- Este botón va de último y está oculto -->
+             <lightning:layoutItem padding="around-small" flexibility="grow" size="6" mediumDeviceSize="6" largeDeviceSize="6" class="slds-hide" >
+ 	         <lightning:inputField aura:id="campovacio1" fieldName="TicketCampoVacio__c"  value="false"  />
+             </lightning:layoutItem>
+
+</lightning:layout>
+</div>
+<br></br> 
+                
+<lightning:layout horizontalAlign="center" class="slds-m-top_large" >
+<lightning:button variant="neutral" label="Cancelar" title="Cancelar" type="text" onclick="{!c.navToRecord}"/>
+ <!--<lightning:button variant="brand" label="Guardar" title="Submit" type="submit"/>-->
+</lightning:layout>    
+    </lightning:recordEditForm>  
+</aura:if> 
+    
+       
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+</aura:component>

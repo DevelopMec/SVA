@@ -1,0 +1,62 @@
+<apex:page standardController="Opportunity" extensions="OpportunityEditCtrl">
+
+    <apex:sectionHeader title="Modificación de la oportunidad" subtitle="{!Opportunity.Name}" rendered="{!IF(Opportunity.Id != null,true,false)}"/>
+    <apex:sectionHeader title="Modificación de la oportunidad" subtitle="Nueva oportunidad" rendered="{!IF(Opportunity.Id == null,true,false)}"/>
+
+    <apex:form >
+        <apex:pageBlock title="Modificar Oportunidad" mode="edit">
+        	<apex:pageMessages />
+
+        	<apex:pageBlockButtons >
+                <apex:commandButton value="Guardar" action="{!save}"/>
+                <apex:commandButton value="Cancelar" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection title="Información de la oportunidad" columns="2">
+                <apex:inputField value="{!Opportunity.AccountId}" required="true"/>
+
+		        <apex:selectList size="1" multiselect="false" value="{!Opportunity.StageName}" rendered="{!IF(Opportunity.Id == null,true,false)}">
+                    <apex:selectOptions value="{!items}"  />
+                </apex:selectList>
+                <apex:outputField value="{!Opportunity.StageName}" rendered="{!IF(Opportunity.Id != null,true,false)}"/>
+
+                <apex:inputField value="{!Opportunity.Name}"/>
+                <apex:inputField value="{!Opportunity.CloseDate}" rendered="{!IF(Opportunity.Id == null,true,false)}"/> 
+                <apex:outputField value="{!Opportunity.CloseDate}" rendered="{!IF(Opportunity.Id != null,true,false)}"/>
+
+                <apex:inputField value="{!Opportunity.Type}" required="true"/>
+
+                <apex:inputField value="{!Opportunity.CantidadTarjetas__c}" rendered="{!IF(Opportunity.Id == null,true,false)}"/> 
+                <apex:outputField value="{!Opportunity.CantidadTarjetas__c}" rendered="{!IF(Opportunity.Id != null,true,false)}"/>
+
+                <apex:inputField value="{!Opportunity.SubtipoNegocio__c}"/>
+
+                <apex:inputField value="{!Opportunity.Amount}" rendered="{!IF(Opportunity.Id == null,true,false)}"/> 
+                <apex:outputField value="{!Opportunity.Amount}" rendered="{!IF(Opportunity.Id != null,true,false)}"/>
+
+                <apex:inputField value="{!Opportunity.LeadSource}"/>
+
+                <apex:outputText value="{!Opportunity.Owner.Name}" rendered="{!IF(Opportunity.Id != null,true,false)}" label="Propietario de oportunidad"/> 
+                <apex:outputText value="{!currentName}" rendered="{!IF(Opportunity.Id == null,true,false)}" label="Propietario de oportunidad"/>
+
+                <apex:inputField value="{!Opportunity.SubOrigen__c}"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Información adicional" columns="2">
+                <apex:inputField value="{!Opportunity.CampaignId}"/>
+
+                <apex:inputField value="{!Opportunity.FechaUltimaActividad__c}" rendered="{!IF(Opportunity.Id == null,true,false)}"/> 
+                <apex:outputField value="{!Opportunity.FechaUltimaActividad__c}" rendered="{!IF(Opportunity.Id != null,true,false)}"/>
+
+                <apex:inputField value="{!Opportunity.Description}"/>
+                <apex:inputField value="{!Opportunity.VentaCruzadaMKT__c}" rendered="{!IF($Setup.VentaCruzadaMKTAcc__c.Editar__c == true,true,false)}"/>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Condiciones de operación actual" columns="1">
+                <apex:inputField value="{!Opportunity.CompraMensualActual__c}"/>
+                <apex:inputField value="{!Opportunity.ComisionEmisionActual__c}"/> 
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

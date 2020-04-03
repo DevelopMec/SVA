@@ -1,0 +1,83 @@
+<aura:component controller="Vista_EjecutivosAsignadosController" implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="ejecutivos" type="List" /> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:card iconName="standard:account" title="Ejecutivos Asignados">
+        <p class="slds-p-horizontal_small">
+            <div class="slds-p-left_medium slds-p-right_medium">
+                <ul class="slds-list_vertical slds-has-dividers_top-space ctcListEntidadLegal">
+                    <aura:iteration items="{!v.ejecutivos}" var="ejecutivo" indexVar="i">                                                                                                                
+                        <li>
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title slds-theme_shade">                                                                                                                      
+                                    {!ejecutivo.BU}                                                                           
+                                </h3>
+                            </div>
+                        </li>           
+                        <div class="slds-grid  bold slds-text-align_center slds-m-bottom_small">  
+                            <span class="slds-list__item slds-size_1-of-8">                                                    
+                                Solución
+                            </span>
+                            <span class="slds-list__item slds-size_1-of-5">                                                    
+                                Ejecutivo asignado
+                            </span>
+                            <span class="slds-list__item slds-size_1-of-4">                                                    
+                                Puesto
+                            </span>
+                            <span class="slds-list__item slds-size_1-of-5">                                                    
+                                Territorio          
+                            </span>
+                            <span class="slds-list__item slds-size_1-of-5">                                                    
+                                Gestor           
+                            </span>
+                        </div>   
+                        <aura:iteration items="{!ejecutivo.ListEjecutivo}" var="lejecutivo"> 
+                            <div class="slds-grid slds-text-align_center">  
+                                <span class="slds-list__item slds-size_1-of-8">    
+                                    <aura:if isTrue="{!lejecutivo.Icono}">
+                                        <img src="{!lejecutivo.Icono}" alt="texto"  class="logofamilia" style="height:30px;"/>
+                                        <aura:set attribute="else">
+                                            —
+                                        </aura:set>
+                                    </aura:if>  
+                                </span>
+                                <span class="slds-list__item slds-size_1-of-5">   
+                                    <aura:if isTrue="{!lejecutivo.Nombre}">
+                                        {!lejecutivo.Nombre}
+                                        <aura:set attribute="else">
+                                            —
+                                        </aura:set>
+                                    </aura:if> 
+                                </span>
+                                <span class="slds-list__item slds-size_1-of-4">                                                    
+                                    <aura:if isTrue="{!lejecutivo.Cargo}">
+                                        {!lejecutivo.Cargo}
+                                        <aura:set attribute="else">
+                                            —
+                                        </aura:set>
+                                    </aura:if>    
+                                </span>
+                                <span class="slds-list__item slds-size_1-of-5">  
+                                    <aura:if isTrue="{!lejecutivo.TerritorioPostventa}">
+                                        {!lejecutivo.TerritorioPostventa}
+                                        <aura:set attribute="else">
+                                            —
+                                        </aura:set>
+                                    </aura:if>   
+                                </span>
+                                <span class="slds-list__item slds-size_1-of-5">                                                    
+                                    <aura:if isTrue="{!lejecutivo.Gestor}">
+                                        {!lejecutivo.Gestor}
+                                        <aura:set attribute="else">
+                                            —
+                                        </aura:set>
+                                    </aura:if>  
+                                </span>
+                            </div>
+                            <br/>
+                        </aura:iteration>                                                                                                                
+                    </aura:iteration>
+                </ul>
+            </div>
+        </p> 
+    </lightning:card>
+</aura:component>

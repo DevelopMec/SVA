@@ -1,0 +1,46 @@
+.THIS .slds-file-selector__dropzone {
+	border: none;
+}
+
+.THIS .slds-file-selector__dropzone .slds-file-selector__text {
+	display: none;
+}
+
+.THIS input[type="file"] {
+	display: none;
+}
+
+.THIS .label-edit-file {
+	cursor: pointer;
+}
+
+.THIS .icon-edit-file .slds-icon {
+	fill: #0070d2; 
+}
+
+.THIS .doc-buttons-position {
+	display: grid;
+}
+
+.THIS .fileUploadEdenred .slds-file-selector__dropzone {
+    position: relative !important;
+    left: 25px !important;
+    top: -20px !important;
+    width: 130px !important;
+}
+.THIS .fileUploadEdenred .slds-file-selector__text {
+    display: none !important;
+}
+.THIS .btnsEdenred .slds-button_neutral {
+    padding-left: .2rem !important;
+    padding-right: .2rem !important;
+}
+.THIS .fileUploadEdenred .slds-file-selector__button {
+    height: 30px !important;
+    max-height: 30px !important;
+}
+.THIS .fileUploadEdenred .slds-button_neutral {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    width: 123px !important;
+}

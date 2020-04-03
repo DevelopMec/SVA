@@ -1,0 +1,498 @@
+<apex:component >
+    <div ng-controller="costosCtrl as cos" id="costosCtrl" ng-init="cos.leerParams(producto, cot.schema, cotizacion, sc.opportunity.Owner.Segmento__c)">
+        <br/>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">(Costos <span ng-bind="cotizacion.Name"/> / <span ng-bind="producto.Product2Id__o.Name"/>)
+                </h3>
+                <a ng-show="false" class="btnb btnb-danger" ng-click="cos.copyCot(cotizacion)">Copiar</a>
+            </div>
+            <!-- performance calvarez  -->
+            <div class="panel-body panel-costos" mng-if="sc.opportunity.Performance">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center lbl-th" colspan="6">
+                                    <span ng-bind="producto.Product2Id__o.Name" uib-tooltip="{{producto.Product2Id__o.Name}}"/>   
+                                </th>
+                                <th ng-repeat="comparado in producto.comparados" class="text-center lbl-th separador-notas-left" colspan="5" ng-if="producto.comparados.length > 0 && producto.comparados[0].ProductoComparado__c__o">
+                                    <span ng-bind="comparado.ProductoComparado__c__o.Name" uib-tooltip="{{comparado.ProductoComparado__c__o.Name}}"/>   
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="sep-concepto" ng-class="{'nombreConcepto': producto.comparados[0].ProductoComparado__c__o.Id}">Concepto</th>
+                                <th ng-class="{'conceptoCostoFinal': producto.comparados[0].ProductoComparado__c__o.Id}">{!$Label.SuggestedPrice}</th>
+                                <th ng-bind="cot.schema.ProductoConcepto__c.PrecioFinal__c.label" ng-class="{'conceptoCostoFinal': producto.comparados[0].ProductoComparado__c__o.Id}"></th>
+                                <th ng-bind="cot.schema.ProductoConcepto__c.Bonificacion__c.label" ng-class="{'conceptoDescuento': producto.comparados[0].ProductoComparado__c__o.Id}"></th>
+                                <th ng-bind="cot.schema.ProductoConcepto__c.VigenciaDescuento__c.label" ng-class="{'conceptoFecha': producto.comparados[0].ProductoComparado__c__o.Id}"></th>
+                                <th ng-bind="cot.schema.ProductoConcepto__c.CantidadTarjetas__c.label"></th>
+                                <th ng-repeat="columna in producto.columnasComparado" ng-bind="columna.label" ng-class="{'separador-notas-left': columna.name == 'Importe__c', 'conceptoCostoFinal': columna.name == 'PrecioLista__c' || columna.name == 'PrecioFinal__c', 'conceptoFecha': columna.name == 'VigenciaDescuento__c'}" ng-if="producto.comparados[0].ProductoComparado__c__o.Id"></th>
+                                <th ng-class="{'conceptoCostoFinal': producto.comparados[0].ProductoComparado__c__o.Id}">{!$Label.ApprovalLevel}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="tr-conceptos" ng-repeat="concepto in producto.conceptosUnicos" ng-if="producto.conceptosUnicos.length > 0">
+                                <td description="TipoCargo__c">
+                                    <div class="checkbox" ng-if="!concepto.Obligatorio__c" description="Si el concepto Obligatorio__c == false y SinEdicion__c == false se pintará un checkbox">
+                                        <label>
+                                            <input ng-change="cos.activateSaveButton()" type="checkbox" ng-model="concepto.Render" ng-disabled="!cotizacion.Editable"/>
+                                            <span ng-bind="concepto.TipoCargo__c"></span>
+                                            <span uib-tooltip="Libre" class="fa fa-pencil fa-fw lbl-libre" ng-if="concepto.Libre__c"></span>
+                                        </label>
+                                    </div>
+                                    <span description="Sólo pintar etiqueta TipoCargo__c si Obligatorio__c == true ó SinEdicion__c == true">
+                                        <span ng-if="concepto.Obligatorio__c" ng-bind="concepto.TipoCargo__c"></span>
+                                        <span uib-tooltip="Libre" class="fa fa-pencil fa-fw lbl-libre" ng-if="(concepto.Obligatorio__c || concepto.SinEdicion__c) && concepto.Libre__c"></span>
+                                    </span>
+                                    <a ng-if="concepto.TipoCargo__c == 'Comisión por el servicio'" class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" ng-click="cos.mostrarComisiones(producto)" uib-tooltip="Tabulador de comisiones" tooltip-placement="left">
+                                        <span class="fa fa-percent fa-fw" />
+                                    </a>
+                                    <a ng-if="concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' " class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" ng-click="cos.mostrarTablaAprobaciones(producto,concepto)" uib-tooltip="Tabulador de aprobaciones" tooltip-placement="left">
+                                        <span class="fa fa-percent fa-fw" />
+                                    </a>
+                                </td>
+                                <td description="Costo inicial Importe__c" class="text-right">
+                                    <ctc-input
+                                        ng-if="concepto.Libre__c && concepto.Render && producto.conceptosKey[concepto.key]"
+                                        ctc-field="cot.schema.ProductoConcepto__c.Importe__c"
+                                        ctc-instance="producto.conceptosKey[concepto.key]"
+                                        ctc-form="cotizacion.formCotiza">
+                                    </ctc-input>
+                                    <span ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && producto.conceptosKey[concepto.key].PrecioLista__c == null" description="Si el concepto no es editable" ng-bind="(producto.conceptosKey[concepto.key].Importe__c | number : 2) + ' %'"></span>
+                                    <span ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && producto.conceptosKey[concepto.key].PrecioLista__c != null" description="Si el concepto no es editable" ng-bind="(producto.conceptosKey[concepto.key].PrecioLista__c | number : 2) + ' %'"></span>
+                                    <span ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="producto.conceptosKey[concepto.key].Importe__c | currency: '$ ': 2"></span>
+                                </td>
+                                <td description="Costo final PrecioFinal__c" class="text-right">
+                                    <span ng-if="producto.conceptosKey[concepto.key]">
+                                        <ctc-input
+                                            ng-if="!concepto.SinEdicion__c && concepto.Render && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio'"
+                                            ctc-field="cot.schema.ProductoConcepto__c.PrecioFinal2__c"
+                                            ctc-instance="producto.conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-on-change="cos.calcularDescuento"
+                                            ng-keyup="cos.activateSaveButton()"
+                                            old-ctc-params="{concepto: concepto}">
+                                        </ctc-input>
+                                        <ctc-input
+                                            ng-if="!concepto.SinEdicion__c && concepto.Render && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio'"
+                                            ctc-field="cot.schema.ProductoConcepto__c.PrecioFinal__c"
+                                            ctc-instance="producto.conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-on-change="cos.calcularDescuento"
+                                            ng-keyup="cos.activateSaveButton()"
+                                            old-ctc-params="{concepto: concepto}">
+                                        </ctc-input>
+                                        <span ng-if="concepto.SinEdicion__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="(producto.conceptosKey[concepto.key].Importe__c | number : 2) + ' %'"></span>
+                                        <span ng-if="concepto.SinEdicion__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="producto.conceptosKey[concepto.key].Importe__c | currency: '$ ': 2"></span>
+                                    </span>
+                                </td>
+                                <td description="Descuento Bonificacion__c" class="text-right">
+                                    <span ng-if="producto.conceptosKey[concepto.key]">
+                                        <ctc-input
+                                            ng-if="!concepto.SinEdicion__c && concepto.Render"
+                                            ctc-field="cot.schema.ProductoConcepto__c.Bonificacion__c"
+                                            ctc-instance="producto.conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-on-change="cos.calcularCostoFinal"
+                                            ng-keyup="cos.activateSaveButton()"       
+                                            old-ctc-params="{concepto: concepto}">
+                                        </ctc-input>
+                                        <span ng-if="concepto.SinEdicion__c" description="Si el concepto no es editable" ng-bind="(0 | number : 2) + ' %'"></span>
+                                    </span>
+                                </td>
+                                <td description="Vigencia del descuento VigenciaDescuento__c" class="text-center">
+                                    <ctc-input
+                                        ng-if="concepto.Render && producto.conceptosKey[concepto.key].VigenciaDescuento__c__render"
+                                        ctc-field="producto.conceptosKey[concepto.key].schema.VigenciaDescuento__c"
+                                        ctc-instance="producto.conceptosKey[concepto.key]"
+                                        ctc-form="cotizacion.formCotiza"
+                                        ctc-disable-date="true"
+                                        ctc-on-change="cos.cambiaVigenciaCantidad"
+                                        ng-mouseup="cos.activateSaveButton()">
+                                    </ctc-input>
+                                </td>
+                                <td description="Cantidad de tarjetas o chequeras CantidadTarjetas__c" class="text-right">
+                                    <ctc-input
+                                        ng-if="concepto.Render && producto.conceptosKey[concepto.key].CantidadTarjetas__c__render"
+                                        ctc-field="producto.conceptosKey[concepto.key].schema.CantidadTarjetas__c"
+                                        ctc-instance="producto.conceptosKey[concepto.key]"
+                                        ctc-form="cotizacion.formCotiza"
+                                        ctc-on-change="cos.cambiaVigenciaCantidad"
+                                        ng-keyup="cos.activateSaveButton()">
+                                    </ctc-input>
+                                </td>
+                                <td ng-repeat="columna in producto.columnasComparado" class="text-right" ng-class="{'separador-notas-left': columna.name == 'Importe__c', 'conceptoDescuento': columna.name == 'Bonificacion__c'}" description="Conceptos de ProductoComparado__c" ng-if="producto.comparados[0].ProductoComparado__c__o.Id">
+                                    <span description="Costo inicial Importe__c" ng-if="columna.name == 'Importe__c' && producto.comparados[columna.index].conceptosKey[concepto.key]" class="text-right">
+                                        <ctc-input
+                                            ng-if="concepto.Libre__c && concepto.Render && producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                            ctc-field="cot.schema.ProductoConcepto__c.Importe__c"
+                                            ctc-instance="producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza">
+                                        </ctc-input>
+                                        <span ng-if="!concepto.Libre__c && producto.comparados[columna.index].conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="(producto.comparados[columna.index].conceptosKey[concepto.key].Importe__c | number : 2) + ' %'"></span>
+                                        <span ng-if="!concepto.Libre__c && producto.comparados[columna.index].conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="producto.comparados[columna.index].conceptosKey[concepto.key].Importe__c | currency: '$ ': 2"></span>
+                                    </span>
+                                    <span description="Costo Final PrecioFinal__c ó PrecioFinal2__c" ng-if="columna.name == 'PrecioFinal__c' && producto.comparados[columna.index].conceptosKey[concepto.key]" class="text-right">
+                                        <ctc-input
+                                            ng-if="!concepto.SinEdicion__c && concepto.Render && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio'"
+                                            ctc-field="cot.schema.ProductoConcepto__c.PrecioFinal2__c"
+                                            ctc-instance="producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-on-change="cos.calcularDescuento"
+                                            ctc-params="{concepto: concepto}">
+                                        </ctc-input>
+                                        <ctc-input
+                                            ng-if="!concepto.SinEdicion__c && concepto.Render && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio'"
+                                            ctc-field="cot.schema.ProductoConcepto__c.PrecioFinal__c"
+                                            ctc-instance="producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-on-change="cos.calcularDescuento"
+                                            ctc-params="{concepto: concepto}">
+                                        </ctc-input>
+                                        <span ng-if="concepto.SinEdicion__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="(producto.comparados[columna.index].conceptosKey[concepto.key].Importe__c | number : 2) + ' %'"></span>
+                                        <span ng-if="concepto.SinEdicion__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio'" description="Si el concepto no es editable" ng-bind="producto.comparados[columna.index].conceptosKey[concepto.key].Importe__c | currency: '$ ': 2"></span>
+                                    </span>
+                                    <span description="Descuento Bonificacion__c" ng-if="columna.name == 'Bonificacion__c' && producto.comparados[columna.index].conceptosKey[concepto.key]" class="text-right">
+                                        <span ng-if="producto.comparados[columna.index].conceptosKey[concepto.key]">
+                                            <ctc-input
+                                                ng-if="!concepto.SinEdicion__c && concepto.Render"
+                                                ctc-field="cot.schema.ProductoConcepto__c.Bonificacion__c"
+                                                ctc-instance="producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                                ctc-form="cotizacion.formCotiza"
+                                                ctc-on-change="cos.calcularCostoFinal"
+                                                ctc-params="{concepto: concepto}">
+                                            </ctc-input>
+                                            <span ng-if="concepto.SinEdicion__c" description="Si el concepto no es editable" ng-bind="(0 | number : 2) + ' %'"></span>
+                                        </span>
+                                    </span>
+                                    <span description="Vigencia del descuento VigenciaDescuento__c" ng-if="columna.name == 'VigenciaDescuento__c' && producto.comparados[columna.index].conceptosKey[concepto.key]" class="text-right">
+                                        <ctc-input
+                                            ng-if="concepto.Render && producto.comparados[columna.index].conceptosKey[concepto.key].VigenciaDescuento__c__render"
+                                            ctc-field="producto.comparados[columna.index].conceptosKey[concepto.key].schema.VigenciaDescuento__c"
+                                            ctc-instance="producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-disable-date="true"
+                                            ctc-on-change="cos.cambiaVigenciaCantidad">
+                                        </ctc-input>
+                                    </span>
+                                    <span description="Cantidad de tarjetas o chequeras CantidadTarjetas__c" ng-if="columna.name == 'CantidadTarjetas__c' && producto.comparados[columna.index].conceptosKey[concepto.key]" class="text-right">
+                                        <ctc-input
+                                            ng-if="concepto.Render && producto.comparados[columna.index].conceptosKey[concepto.key].CantidadTarjetas__c__render"
+                                            ctc-field="producto.comparados[columna.index].conceptosKey[concepto.key].schema.CantidadTarjetas__c"
+                                            ctc-instance="producto.comparados[columna.index].conceptosKey[concepto.key]"
+                                            ctc-form="cotizacion.formCotiza"
+                                            ctc-on-change="cos.cambiaVigenciaCantidad">
+                                        </ctc-input>
+                                    </span>
+                                </td>
+                                <td description="Contiene el nivel de aprobación">
+                                    <div style="text-align:center">
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevel == 0 )" ><span class="fa fa-circle greenCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevel == 1 )" ><span class="fa fa-circle greenCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevel == 2 )"><span class="fa fa-circle yellowCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevel == 3 )"><span class="fa fa-circle redCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevel == 4 )"><span class="fa fa-circle grayCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevelConcepto == 0 )" ><span class="fa fa-circle greenCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevelConcepto == 1 )" ><span class="fa fa-circle greenCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevelConcepto == 2 )" ><span class="fa fa-circle yellowCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevelConcepto == 3 )" ><span class="fa fa-circle redCircle"></span></span>
+                                    <span id="approvLevel" ng-if="!concepto.Libre__c && producto.conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && (producto.conceptosKey[concepto.key].PrecioFinal__c__approvalLevelConcepto == 4 )" ><span class="fa fa-circle grayCircle"></span></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ctc-form-group 
+                            ctc-field="cot.schema.QuoteLineItem.ComentariosCotizacion__c" 
+                            ctc-instance="producto" 
+                            ctc-form="cotizacion.formCotiza"
+                            ctc-cols="[2, 10]"
+                            ng-keyup="cot.activateSaveButton()"
+                            ></ctc-form-group>
+                    </div>
+                </div>
+            </div>
+            <c:PLAN_Comisiones />
+            <c:PLAN_Aprobaciones />
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('costosCtrl', CostosCtrl)
+
+            CostosCtrl.$inject = ['ctcUtils', '$timeout', '$uibModal', '$scope', '$filter', '$interval']
+
+            function CostosCtrl(ctcUtils, $timeout, $uibModal, $scope, $filter, $interval) {
+                var vm = this
+                vm.costos = {
+                    cols: [],
+                    cotizado: {}
+                }
+                vm.schema = {}
+                vm.cotizado = {}
+                vm.cotizacion = {}
+                vm.errors = []
+                vm.comisionServicio = 'Comisión por el servicio'
+                vm.segmento = ''
+
+                vm.test = {}
+
+                vm.leerParams = function(producto, schema, cotizacion, segmento ) {
+
+                    // console.log('leerParams: ', arguments)
+                    vm.producto = producto || {}
+                    vm.schema = {
+                        Concepto__c: schema.Concepto__c,
+                        ProductoConcepto__c: schema.ProductoConcepto__c
+                    }
+
+                    vm.schema.ProductoConcepto__c['ComisionLibre__c'] = angular.copy(vm.schema.ProductoConcepto__c.Bonificacion__c)
+                    vm.schema.ProductoConcepto__c['ComisionLibre__c'].name = 'ComisionLibre__c'
+                    vm.schema.ProductoConcepto__c['ComisionLibre__c'].length = 3
+                    if(cotizacion) {
+                        if(cotizacion.Id) {
+                            vm.cotizacion.Id = cotizacion.Id
+                            vm.cotizacion.IsSyncing = cotizacion.IsSyncing
+                        }
+                        vm.cotizacion.IsClone = cotizacion.IsClone
+
+                        $timeout( function() {
+                            delete vm.cotizacion.IsClone
+                            // console.log('clear is clone')
+                        }, 2000)
+                    }
+
+                    vm.segmento = segmento || ''
+
+                    vm.cotizacion.Render = true
+                }
+
+                vm.verificaProductos = function(producto) {
+                    if(producto) {
+
+                        // console.log('verificaProductos cot is Clone: ', angular.copy(vm.cotizacion))
+
+                        var length = 0
+                        var unique = {}
+                        var ids2 = []
+
+                        var idBase = producto.Name__o && producto.Name__o.Id ? producto.Name__o.Id : ''
+                        var ids = idBase.length > 0 ? ('\'' + idBase + '\'') : ''
+                        angular.forEach(producto.productosComparar, function(v, k) {
+                            if(v.Name__o && v.Name__o.Id && idBase != v.Name__o.Id) {
+                                if(ids.length > 0) {
+                                    ids += ', '
+                                }
+                                ids += '\'' + v.Name__o.Id + '\''
+                                if(!unique[v.Name__o.Id]) {
+                                    unique[v.Name__o.Id] = true
+                                    ids2[length++] = v
+                                }
+                            }
+                        })
+
+                        unique[idBase] = true
+                        vm.listaConceptosDeProductos( ids, unique )
+                        if(producto && producto.Id) {
+                            $timeout(function() {
+                                vm.listaProductoConcepto(producto, ids)
+                            }, 1000)
+                        }
+
+                        producto.cols = []
+                        if(length > 0) {
+                            var temp = angular.copy(vm.schema.Concepto__c.Importe__c)
+                            temp.label = vm.schema.ProductoConcepto__c.PrecioLista__c.label
+                            var aux = [
+                                //vm.schema.Concepto__c.Importe__c,
+                                temp,
+                                vm.schema.ProductoConcepto__c.PrecioFinal__c,
+                                vm.schema.ProductoConcepto__c.Bonificacion__c,
+                                vm.schema.ProductoConcepto__c.VigenciaDescuento__c,
+                                vm.schema.ProductoConcepto__c.CantidadTarjetas__c
+                            ]
+                            for (var i = 0; i < length; i++) {
+                                var mod = []
+
+                                angular.forEach(aux, function(v, k){
+                                    v.instance = ids2[i]
+                                    if( v.name == 'Importe__c' ) {
+                                    //if(v.name == 'Bonificacion__c' || v.name == 'Importe__c') {
+                                    //comenta calvarez 14 mayo 2017 if(v.name == 'PrecioFinal__c' || v.name == 'Importe__c') {
+                                        v.editable = false
+                                    }
+                                    mod.push(v)
+                                })
+                                producto.cols = producto.cols.concat(angular.copy(mod))
+                            }
+                        }
+                        //agrega calvarez 3-mar-2017 desactivas campo de bonificación en header de producto concepto
+                        var disabled = !vm.cotizacion.IsSyncing
+                        if(!vm.cotizacion.Id) {
+                            disabled = false
+                        }
+                        disabled = disabled ? disabled : (!(disabled) && !(producto.Etapa__c != 'Perdida' && producto.Etapa__c != 'Ganada'))
+                        angular.forEach(producto.cols, function(v, k) {
+                            if(!v.instance.hasOwnProperty('disabled')) {
+                                v.instance.disabled = {}
+                            }
+
+                            v.instance.disabled['Bonificacion__c'] = disabled
+                        })
+                    }
+                }
+
+                vm.esCampoNotas = function(col) {
+                    return col && col.name && col.name.indexOf('CantidadTarjetas__') != -1
+                }
+
+                vm.generaInicialesProducto = function(producto) {
+                    var iniciales = ''
+                    if(producto && producto.Name) {
+                        var index = producto.Name.lastIndexOf('-') != -1 ? (producto.Name.lastIndexOf('-') + 1) : 0
+                        iniciales = producto.Name.substring(index, producto.Name.length)
+                    }
+                    return iniciales
+                } 
+
+                /*agrega calvarez 14 mayo 2017 */
+                vm.generaBonificacion = function(instancia, concepto) {
+                    //console.log('generaBonificacion: ', instancia, concepto)
+                    var field = concepto.TipoCargo__c == vm.comisionServicio ? 'PrecioLista2__c' : 'Importe__c'
+                    //field = 'PrecioFinal__c'
+                    var fielPrecio = concepto.TipoCargo__c == vm.comisionServicio ? 'PrecioFinal2__c' : 'PrecioFinal__c'
+                    var bonificacionFinal = instancia[fielPrecio] || 0
+                    
+                    if(instancia && instancia[field] && instancia[fielPrecio]) {
+
+                        if(concepto.TipoCargo__c == vm.comisionServicio) {
+                            //console.log(instancia, '\n\n')
+                        }
+
+                        bonificacionFinal = (((instancia[field] - parseFloat(instancia[fielPrecio])) / parseFloat(instancia[field])) * 100).toFixed(2)
+                    }
+                    if(instancia) {
+                        instancia.Bonificacion__c = bonificacionFinal
+                    }
+
+                    return bonificacionFinal
+                }
+                
+                vm.generaPrecioFinal = function(instancia, concepto) {
+                    //console.log('concepto: ', concepto)
+                    var field = concepto.TipoCargo__c == vm.comisionServicio ? 'PrecioLista2__c' : 'Importe__c'
+                    var precioFinal = instancia[field] || 0
+                    /*if(instancia && instancia['Importe__c'] && instancia['Bonificacion__c']) {
+                        precioFinal = (instancia['Importe__c'] - (instancia['Importe__c'] * (instancia['Bonificacion__c'] / 100))).toFixed(2)
+                    }*/
+                    if(instancia && instancia[field] && instancia['Bonificacion__c']) {
+                        precioFinal = (instancia[field] - (instancia[field] * (instancia['Bonificacion__c'] / 100))).toFixed(2)
+                    }
+                    if(instancia) {
+                        instancia.PrecioFinal__c = precioFinal
+                    }
+
+                    return precioFinal
+                }
+
+                /*agrega calvarez 14 mayo 2017 */
+                vm.actualizaPrecioFinal = function(model, instance, field) {
+                    if(instance && instance.Name__o && instance.Name__o.Id && vm.producto.productoConceptoInstancias[instance.Name__o.Id]) {
+                        angular.forEach(Object.keys(vm.producto.productoConceptoInstancias[instance.Name__o.Id]), function(v, k) {
+
+                            var ins = vm.producto.productoConceptoInstancias[instance.Name__o.Id][v]
+
+                            //console.log('actualizaPrecioFinal: ', vm.producto.productoConceptoInstancias[instance.Name__o.Id][v], '\n tiene: ', vm.producto.conceptosId[ins.Concepto__c])
+
+                            if(vm.producto.conceptosId[ins.Concepto__c]) {
+                                vm.producto.productoConceptoInstancias[instance.Name__o.Id][v].PrecioFinal__c = vm.producto.conceptosId[ins.Concepto__c].Render ? model : 0
+
+                                vm.producto.productoConceptoInstancias[instance.Name__o.Id][v].PrecioFinal2__c = angular.copy(vm.producto.productoConceptoInstancias[instance.Name__o.Id][v].PrecioFinal__c)
+
+                                //console.log('\n entra:: ', vm.producto.productoConceptoInstancias[instance.Name__o.Id][v] , '\n\n')
+                            }
+
+                        })
+                    }
+                }
+
+                vm.actualizaBonificacion = function(model, instance, field) {
+                    if(instance && instance.Name__o && instance.Name__o.Id && vm.producto.productoConceptoInstancias[instance.Name__o.Id]) {
+
+                        angular.forEach(Object.keys(vm.producto.productoConceptoInstancias[instance.Name__o.Id]), function(v, k) {
+                            //console.log('actualizaBonificacion: ', vm.producto.productoConceptoInstancias[instance.Name__o.Id][v])
+                            var ins = vm.producto.productoConceptoInstancias[instance.Name__o.Id][v]
+                            if(vm.producto.conceptosId[ins.Concepto__c]) {
+                                vm.producto.productoConceptoInstancias[instance.Name__o.Id][v].Bonificacion__c = vm.producto.conceptosId[ins.Concepto__c].Render ? model : 0
+                            }
+                        })
+                    }
+                }
+
+                vm.mostrarTablaAprobaciones = function( producto, concepto ) {
+                    ctcUtils.app.conceptoActual = concepto;
+                    ctcUtils.openModal('aprobaciones', {producto: function () {return producto } }, 'md', 'com')
+                    .then( function( res ) { 
+                    }).catch( function( err ) {
+                    })
+                }
+                
+                vm.mostrarComisiones = function( producto ) {
+
+                    ctcUtils.openModal('comisiones', {producto: function () {return producto } }, 'md', 'com')
+                    .then( function( res ) { 
+                    }).catch( function( err ) {
+                    })
+                }
+
+                $scope.$watch('cos.producto.Name__o', function(newval, oldval) {
+                    // console.log('\n cos.producto.Name__o: ', newval, oldval, 'is clone: ', vm.cotizacion.IsClone)
+                    if( newval && vm.cotizacion.Render) {
+                        $timeout(function() {
+                            vm.verificaProductos(vm.producto)
+                        }, 700)
+                    }
+                })
+
+                $scope.$watchCollection('cos.producto.productosComparar', function(newval, oldval) {
+                    // console.log('\n cos.producto.productosComparar: ', newval, oldval, 'is clone: ', vm.cotizacion.IsClone)
+                    if( newval && vm.cotizacion.Render) {
+                        $timeout(function() {
+                            vm.verificaProductos(vm.producto)
+                        }, 700)
+                    }
+                })
+
+                // Nuevos métodos cotizador monoproducto - noviembre de 2017 calvarez 
+                vm.calcularDescuento = function( model, instance, field, form, params, fromCtc ) {
+                    ctcUtils.calcularDescuento( model, instance, field, form, params, fromCtc )
+                }
+
+                vm.calcularCostoFinal = function( model, instance, field, form, params, fromCtc ) {
+                    ctcUtils.calcularCostoFinal( model, instance, field, form, params, fromCtc )
+                }
+
+                vm.cambiaVigenciaCantidad = function( model, instance, field, form, params, fromCtc ) {
+                    ctcUtils.cambiaVigenciaCantidad( model, instance, field, form, params, fromCtc )
+                }
+
+                vm.conceptoIniciaCon = function( str, pattern ) {
+                    return str && pattern && str.length > 0 && pattern.length > 0 && str.toLowerCase().startsWith(pattern.toLowerCase())
+                }
+                
+                vm.activateSaveButton = function() {
+                    //Activate save button.
+                    ctcUtils.changeButtonStatus();
+                }
+            }
+        })()
+    </script>
+</apex:component>

@@ -1,0 +1,71 @@
+.THIS .contract-container-border {
+	border: 5px solid #0070D2;
+	border-radius: 16px;
+	background-color: white;
+}
+
+.THIS .finish-button .slds-icon {
+	fill: green;
+}
+
+.THIS .save-button .slds-icon {
+	fill: blue;
+}
+
+.THIS .send-button .slds-icon {
+	fill: orange;
+}
+
+.THIS .pdf-button .slds-icon {
+	fill: red;
+}
+
+.THIS .button-size {
+	height: 48px;
+	width: 48px;
+}
+
+.THIS .slds-button:focus {
+	/*outline: 0;
+	border: 0;*/
+	color: #FFFFFF;
+	box-shadow: none;
+}
+
+.THIS button[disabled] {
+	cursor: not-allowed;
+}
+
+.THIS .slds-button_icon-border-filled[disabled]:hover {
+	background-color: #FFFFFF;
+}
+
+.THIS button[disabled] .slds-icon {
+	fill: gray;
+}
+
+.THIS .button-group-container {
+	position: fixed;
+	bottom: 2.5%;
+	right: 1.5%;
+	border: 1px solid #F9F9FA;
+	border-radius: 16px;
+}
+
+.THIS .align-checkbox {
+	padding-top: 27px;
+}
+
+.THIS [role=combobox] input[disabled] {
+	background-color: #E9EAEC;
+}
+
+.THIS .spinner-relative-position {
+	position: relative;
+	height: 75px;
+}
+
+.THIS .spinner-container {
+	border-radius: 16px;
+	background-color: #F9F9FA;
+}

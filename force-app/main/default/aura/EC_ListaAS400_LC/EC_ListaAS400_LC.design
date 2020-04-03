@@ -1,0 +1,3 @@
+<design:component label="iFrame Component">
+	<design:attribute name="sandbox" label="Frame Border" default="allow-same-origin allow-scripts allow-forms"/>
+</design:component>

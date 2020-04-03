@@ -1,0 +1,19 @@
+<aura:component controller="EC_ListaEntidadLegal_LC_Ctrl" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js'
+    						)}"
+                            afterScriptsLoaded="{!c.init}"
+    				/> 
+
+    <!-- <aura:attribute name="app_ctc" type="Map" default="{}"/>
+    <lightning:card title="Ver Entidades Legales" iconName="standard:account">
+        
+        <aura:set attribute="actions">
+            <lightning:button label="Agregar" onclick="{!c.addEntidadLegal}" name="add"/>
+        </aura:set>
+
+        <p class="slds-p-horizontal_small">
+        </p>
+    </lightning:card> -->
+
+	
+</aura:component>

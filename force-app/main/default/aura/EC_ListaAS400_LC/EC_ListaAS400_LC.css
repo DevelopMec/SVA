@@ -1,0 +1,14 @@
+.THIS .ctcElEstatus {
+    margin-top: 6px;
+}
+.THIS .ctcListEntidadLegal {
+    max-height: 343px;
+    overflow-y: scroll;
+}
+
+.THIS .logofamilia{
+    display: inline;
+    height : 36px;
+    width : 36px;
+    margin-left: 8px;
+}

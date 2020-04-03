@@ -1,0 +1,30 @@
+<apex:page standardController="Lead"  extensions="DuplicatedProspectController" >
+    <apex:pageBlock title="Coincidencias del prospecto" rendered="{!records.size > 0 }">
+        <apex:pageBlockTable value="{!records}" var="o">
+            <apex:column >
+                <apex:outputLink value="/{!o.item.RecordId}" target="_blank">Ver registro</apex:outputLink>
+            </apex:column>
+            
+           <!-- <apex:column headerValue="# Registro Duplicado" >
+                <apex:outputField value="{!o.item.Name}"/>
+            </apex:column>-->
+            
+            <apex:column headerValue="Nombre del registro" >
+                <apex:outputText value="{!o.item.Record.Name}"/>
+            </apex:column>
+            
+            <apex:column headerValue="Tipo de registro" >
+                <apex:outputText value="{!o.name}"/>
+            </apex:column>
+
+            <!--<apex:column headerValue="Nombre del Conjunto de Registro Duplicado" >
+                <apex:outputLink value="/{!o.item.DuplicateRecordSetId}" target="_top">{!o.item.DuplicateRecordSet.Name}</apex:outputLink>
+            </apex:column>-->
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+
+	<div style="text-align:center">
+        <apex:outputText rendered="{!records.size <= 0 }"  > No se encontraron coincidencias </apex:outputText>
+    </div>   
+    
+</apex:page>

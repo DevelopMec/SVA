@@ -1,0 +1,411 @@
+<aura:component access="global" controller="CON_ContractsContainer_CTRL">
+	 
+	<!-- Handlers -->
+	<!-- <aura:handler name="init" value="{!this}" action="{!c.init}"/> -->
+	<aura:handler name="showCC" event="c:CON_MessageForCC_EVENT" action="{!c.showContractsContainer}"/>
+	<aura:handler event="c:CON_FileReady_EVENT" action="{!c.hidePDFSpinner}"/>
+	<aura:handler name="change" value="{!v.fieldPT}" action="{!c.deleteLayout}"/>
+	<!-- <aura:handler name="change" value="{!v.fieldDA}" action="{!c.deleteLayout}"/> -->
+	<aura:handler name="invokeSaveMethod" event="c:CON_InvokeSaveMethod_EVENT" action="{!c.saveLayoutData}"/>
+	<!-- Handlers -->
+	
+	<!-- Registered Events -->
+	<aura:registerEvent name="generatePDF" type="c:CON_GeneratePDF_EVENT"/>
+	<aura:registerEvent name="createDatepicker" type="c:CON_CreateDatepicker_EVENT"/>
+	<!-- Registered Events -->
+	
+	<!-- Displayed Information -->
+	<aura:attribute name="objectsByDocument" type="Object"/>
+	<aura:attribute name="contractTitle" type="String"/>
+	<aura:attribute name="headerData" type="Object"/>
+	<!-- Displayed Information -->
+	
+	<!-- Logical Flags -->
+	<aura:attribute name="isCCVisible" type="Boolean" default="false"/>
+	<aura:attribute name="isSaveButtonDisabled" type="Boolean" default="true"/>
+	<aura:attribute name="isFinishButtonDisabled" type="Boolean" default="false"/>
+	<aura:attribute name="isPDFButtonDisabled" type="Boolean" default="false"/>
+	<aura:attribute name="isSendButtonDisabled" type="Boolean" default="true"/>
+	<aura:attribute name="isPDFGenerated" type="Boolean" default="false"/>
+	<aura:attribute name="isSending" type="Boolean" default="false"/>
+	<aura:attribute name="isThereContractRecord" type="Boolean" default="false"/>
+	<aura:attribute name="isDataReady" type="Boolean" default="false"/>
+	<aura:attribute name="isPDFSpinnerVisible" type="Boolean" default="false"/>
+	<aura:attribute name="isDataSaved" type="Boolean" default="false"/>
+	<aura:attribute name="isContractFinalized" type="Boolean" default="false"/>
+	<aura:attribute name="isLERequired" type="Boolean" default="false"/>
+	<aura:attribute name="isLRRequired" type="Boolean" default="false"/>
+    
+    <!--<aura:attribute name="obligatorio" type="Boolean" default="false"/>  --> 
+    
+	<!-- Logical Flags -->
+	
+	<!-- Utility Attributes -->
+    <aura:attribute name="EtapaOportunidad" type="String" default=""/> 
+	<aura:attribute name="recordId" type="Id"/>
+	<aura:attribute name="dataToSave" type="Object"/>
+	<aura:attribute name="currentContractStage" type="String"/>
+	<aura:attribute name="dependentFieldsBySObject" type="Object"/>
+	<aura:attribute name="opportunityId" type="Id"/>
+	<aura:attribute name="accountId" type="Id"/>
+	<aura:attribute name="quoteId" type="Id"/>
+	<aura:attribute name="qliFormaPago" type="String" default=""/>
+	<aura:attribute name="dependetFieldsCA" type="Object"/>
+	<aura:attribute name="onlyReadAnnexAFields" type="String[]"/>
+	<aura:attribute name="legalRepresentativeData" type="Object"/>
+	<aura:attribute name="productCode" type="String" default=""/>
+	<aura:attribute name="ejecutivo" type="Map"/>
+	<aura:attribute name="layoutPTId" type="Id" default=""/>
+	<aura:attribute name="layoutDAId" type="Id" default=""/>
+	<aura:attribute name="contentDocumentPT" type="Object" default="{ id: '', title: '' }"/>
+	<aura:attribute name="contentDocumentDA" type="Object" default="{ id: '', title: '' }"/>
+    <aura:attribute name="producFamily" type="String" default=""/>
+	<!-- Is the field "Personalizacion_de_Tarjetas__c" checked? -->
+	<aura:attribute name="fieldPT" type="Map" default="{ label: '', name: '', value: false }"/>
+	<aura:attribute name="fieldDA" type="Map" default="{ label: '', name: '', value: false }"/>
+	<aura:attribute name="selectedLegalEntity" type="Object"/>
+	<!-- Utility Attributes -->
+    
+    <!-- DVM 3 Julio, para requerimiento de asignación OT Trade Marketing --> 
+    <aura:attribute name="ventaTradeMarketing" type="String"/>
+    
+    
+	<!-- The Contracts Container must be hidden by default -->
+	<aura:if isTrue="{!v.isCCVisible || v.isThereContractRecord}">
+		<div class="slds-p-horizontal_large slds-p-vertical_large">
+			<!-- Contract Title -->
+			<span class="slds-text-heading_medium slds-align_absolute-center slds-p-bottom_large">
+				{!v.contractTitle}
+			</span>
+			<!-- /Contract Title -->
+			<!-- Contract Body -->
+			<div class="slds-m-horizontal_xx-large slds-p-around_x-large contract-container-border">
+				<!-- Contract Form Header -->
+				<c:CON_ContractHeader_LC data="{!v.headerData}"/>
+				<!-- /Contract Form Header -->
+				<!-- Contract Form Body -->
+				<aura:if isTrue="{!v.isDataReady}">
+					<c:EC_ContractWithLRLESUB_LC accountId="{!v.accountId}" opportunityId="{!v.opportunityId}" dataToSave="{!v.dataToSave}" finishButtonFlag="{!v.isFinishButtonDisabled}" saveButtonFlag="{!v.isSaveButtonDisabled}" emailButtonFlag="{!v.isSendButtonDisabled}" pdfButtonFlag="{!v.isPDFButtonDisabled}" isDataSaved="{!v.isDataSaved}" isContractFinalized="{!v.isContractFinalized}" selectedLegalEntity="{!v.selectedLegalEntity}" isLERequired="{!v.isLERequired}" isLRRequired="{!v.isLRRequired}"/>
+					<div class="slds-m-around_x-small">
+						<!-- Contract Sections -->
+						<aura:iteration items="{!v.objectsByDocument.contractSections}" var="fieldsBySection" indexVar="index">
+							<div class="slds-section slds-is-open slds-p-top_medium">
+								<h3 class="slds-section__title slds-theme_shade">
+									<span class="slds-truncate slds-p-horizontal_small" title="{!fieldsBySection.name}">
+										{!fieldsBySection.name}
+									</span>
+								</h3>
+							</div>
+							<lightning:layout multipleRows="true">
+								<aura:iteration items="{!fieldsBySection.fields}" var="field" indexVar="index">
+									<aura:if isTrue="{!field.isVisible}">
+										<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
+											<aura:if isTrue="{!field.type == 'PICKLIST'}">
+												<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+													<lightning:combobox label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" options="{!field.picklistEntries}" placeholder="Selecciona una Opción" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveContractFieldValue}"/>
+												</div>
+												<aura:set attribute="else">
+													<aura:if isTrue="{!field.type == 'BOOLEAN'}">
+                                                        <aura:if isTrue="{!fieldsBySection.name != 'Detalles del Pedido'}">
+                                                        <aura:if isTrue="{!!and(v.producFamily=='Despensa',and(v.producFamily=='Vestimenta',and(v.producFamily=='Regalo',and(v.producFamily=='Ayuda social',v.producFamily=='Ticket Restaurante'))))}">
+														<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" type="checkbox" checked="{!field.value}" disabled="{!field.disabled}" onchange="{!c.saveContractFieldValue}" class="align-checkbox"/>
+														</aura:if>
+                                                        </aura:if>
+                                                            <aura:set attribute="else">
+															<aura:if isTrue="{!field.type == 'PERCENT'}">
+																<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																	<lightning:input label="{!field.label + ' (%)'}" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" type="number" max="{!field.maxValue}" min="0" step="any" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveContractFieldValue}"/>
+																</div>
+																<aura:set attribute="else">
+																	<aura:if isTrue="{!field.type == 'DOUBLE'}">
+																		<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																			<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" type="number" max="{!field.maxValue}" min="0" step="any" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveContractFieldValue}"/>
+																		</div>
+																		<aura:set attribute="else">
+																			<aura:if isTrue="{!field.type == 'MULTIPICKLIST'}">
+																				<aura:if isTrue="{!field.value == '' || field.value == null}">
+																					<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																						<ui:inputSelect aura:id="conMultipicklist" labelClass="{!field}" label="{!field.label + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" multiple="true" options="{!field.picklistEntries}" change="{!c.saveContractFieldValue}" required="{!field.required}" disabled="{!field.disabled}" class="slds-select"/>
+																					</div>
+																					<aura:set attribute="else">
+																						<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																							<ui:inputSelect labelClass="{!field}" label="{!field.label + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" multiple="true" options="{!field.picklistEntries}" value="{!field.value}" change="{!c.saveContractFieldValue}" required="{!field.required}" disabled="{!field.disabled}" class="slds-select"/>
+																						</div>
+																					</aura:set>
+																				</aura:if>
+																				<aura:set attribute="else">
+																					<aura:if isTrue="{!field.type == 'EMAIL'}">
+																						<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																							<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" type="email" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveContractFieldValue}"/>
+																						</div>
+																						<aura:set attribute="else">
+																							<aura:if isTrue="{!field.type == 'DATE'}">
+																								<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																									<div class="slds-form-element">
+																										<label class="slds-form-element__label" for="{!fieldsBySection.name + '-date-input-id-' + index}">{!field.required ? '*&nbsp;' : ''}{!field.label}</label>
+																										<div class="slds-form-element__control">
+																											<input id="{!fieldsBySection.name + '-date-input-id-' + index}" type="text" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" value="{!field.value}" required="{!field.required}" disabled="{!field.disabled}" class="slds-input inputDatepicker" onmouseenter="{!c.createDatepicker}" onchange="{!c.saveContractFieldValue}"></input>
+																										</div>
+																									</div>
+																								</div>
+																								<aura:set attribute="else">                                                                                                                                                                                                        
+                                                                                                        <div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+                                                                                                            <lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + fieldsBySection.name : '')}" type="text" value="{!field.value}" messageWhenValueMissing="El campo no puede quedar vacío" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveContractFieldValue}"/>
+                                                                                                        </div>                                                                                                  
+                                                                                          
+                                                                                                </aura:set>
+																							</aura:if>
+																						</aura:set>
+																					</aura:if>
+																				</aura:set>
+																			</aura:if>
+																		</aura:set>
+																	</aura:if>
+																</aura:set>
+															</aura:if>
+														</aura:set>
+													</aura:if>
+												</aura:set>
+											</aura:if>
+										</lightning:layoutItem>
+									</aura:if>
+								</aura:iteration>
+                             </lightning:layout>
+							<!-- Download and upload buttons for the layout -->
+							<aura:if isTrue="{!fieldsBySection.name == 'Detalles del Pedido'}">
+                                <!--<aura:if isTrue="{!v.fieldPT.value}">-->
+								<lightning:layout horizontalAlign="center" multipleRows="true" class="slds-m-top_large">
+									<aura:if isTrue="{!!and(v.producFamily=='Despensa',and(v.producFamily=='Vestimenta',and(v.producFamily=='Regalo',and(v.producFamily=='Ayuda social',v.producFamily=='Ticket Restaurante'))))}">										
+                                        <lightning:layoutItem size="6" padding="horizontal-medium">
+											<c:CON_DownloadUploadLayout_LC opportunityId="{!v.opportunityId}" productCode="{!v.productCode}" field="{!v.fieldPT}" layoutId="{!v.layoutPTId}" contentDocument="{!v.contentDocumentPT}" obligatorio="{!v.obligatorio}"/>
+										</lightning:layoutItem>
+									</aura:if>
+									<aura:if isTrue="{!v.fieldDA.value}">
+										<lightning:layoutItem size="6" padding="horizontal-medium">
+											<c:CON_DownloadUploadLayout_LC accountId="{!v.accountId}" productCode="{!v.productCode}" field="{!v.fieldDA}" layoutId="{!v.layoutDAId}" contentDocument="{!v.contentDocumentDA}"/>
+										</lightning:layoutItem>
+									</aura:if>
+								</lightning:layout>
+							</aura:if>
+							<!-- Download and upload buttons for the layout -->
+						</aura:iteration>
+						<!-- /Contract Sections -->
+						<!-- Annex A Sections -->
+						<aura:if isTrue="{!v.contractTitle == 'Contrato Ticket Car 3.0'}">
+							<aura:iteration items="{!v.objectsByDocument.annexes[0].contractSections}" var="section" indexVar="index">
+								<div class="slds-section slds-is-open slds-p-top_medium">
+									<h3 class="slds-section__title slds-theme_shade">
+										<span class="slds-truncate slds-p-horizontal_small" title="{!section.name}">
+											{!section.name}
+										</span>
+									</h3>
+								</div>
+								<lightning:layout multipleRows="true">
+									<aura:iteration items="{!section.fields}" var="field">
+										<aura:if isTrue="{!field.isVisible}">
+											<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-bottom_medium">
+												<aura:if isTrue="{!field.type == 'PICKLIST'}">
+													<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+														<lightning:combobox label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" options="{!field.picklistEntries}" placeholder="Selecciona una Opción" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}" class="input-disabled"/>
+													</div>
+													<aura:set attribute="else">
+														<aura:if isTrue="{!field.type == 'BOOLEAN'}">
+															<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" type="checkbox" checked="{!field.value}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}" class="align-checkbox"/>
+															<aura:set attribute="else">
+																<aura:if isTrue="{!field.type == 'PERCENT'}">
+																	<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																		<lightning:input label="{!field.label + ' (%)'}" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" type="number" max="{!field.maxValue}" min="0" step="any" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																	</div>
+																	<aura:set attribute="else">
+																		<aura:if isTrue="{!field.type == 'DOUBLE'}">
+																			<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																				<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" type="number" max="{!field.maxValue}" min="0" step="any" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																			</div>
+																			<aura:set attribute="else">
+																				<aura:if isTrue="{!field.type == 'MULTIPICKLIST'}">
+																					<aura:if isTrue="{!field.value == '' || field.value == null}">
+																						<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																							<ui:inputSelect labelClass="{!field}" label="{!field.label + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" multiple="true" options="{!field.picklistEntries}" change="{!c.saveAnnexFieldValue}" required="{!field.required}" disabled="{!field.disabled}" class="slds-select"/>
+																						</div>
+																						<aura:set attribute="else">
+																							<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																								<ui:inputSelect labelClass="{!field}" label="{!field.label + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" multiple="true" options="{!field.picklistEntries}" value="{!field.value}" change="{!c.saveAnnexFieldValue}" required="{!field.required}" disabled="{!field.disabled}" class="slds-select"/>
+																							</div>
+																						</aura:set>
+																					</aura:if>
+																					<aura:set attribute="else">
+																						<aura:if isTrue="{!field.type == 'EMAIL'}">
+																							<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																								<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" type="email" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																							</div>
+																							<aura:set attribute="else">
+																								<aura:if isTrue="{!field.type == 'DATE'}">
+																									<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																										<div class="slds-form-element">
+																											<label class="slds-form-element__label" for="{!'Campos Anexo A' + '-' + field.name + '-' + index}">{!field.required ? '*&nbsp;' : ''}{!field.label}</label>
+																											<div class="slds-form-element__control">
+																												<input id="{!'Campos Anexo A' + '-' + field.name + '-' + index}" contenteditable="false" type="text" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" value="{!field.value}" required="{!field.required}" disabled="{!field.disabled}" class="slds-input inputDatepicker" onmouseenter="{!c.createDatepicker}" onchange="{!c.saveAnnexFieldValue}"></input>
+																											</div>
+																										</div>
+																									</div>
+																									<aura:set attribute="else">
+																										<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																											<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + 'Campos Anexo A' : '')}" type="text" value="{!field.value}" messageWhenValueMissing="El campo no puede quedar vacío" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																										</div>
+																									</aura:set>
+																								</aura:if>
+																							</aura:set>
+																						</aura:if>
+																					</aura:set>
+																				</aura:if>
+																			</aura:set>
+																		</aura:if>
+																	</aura:set>
+																</aura:if>
+															</aura:set>
+														</aura:if>
+													</aura:set>
+												</aura:if>
+											</lightning:layoutItem>
+										</aura:if>
+									</aura:iteration>
+								</lightning:layout>
+							</aura:iteration>
+						</aura:if>
+						<!-- /Annex A Sections -->
+						<!-- Annexes -->
+						<lightning:tabset variant="scoped" class="slds-p-top_x-large">
+							<aura:iteration items="{!v.objectsByDocument.annexes}" var="annex">
+								<aura:if isTrue="{!annex.isVisible}">
+									<lightning:tab label="{!annex.name}" title="{!annex.name}" onactive="{!c.updateDuplicatedAnnexFields}">
+										<aura:iteration items="{!annex.sections}" var="section" indexVar="index">
+											<aura:if isTrue="{!section.name != 'Sin Nombre'}">
+												<div class="slds-section slds-is-open">
+													<h3 class="slds-section__title slds-theme_shade">
+														<span class="slds-truncate slds-p-horizontal_small" title="{!section.name}">
+															{!section.name}
+														</span>
+													</h3>
+												</div>
+											</aura:if>
+											<lightning:layout multipleRows="true">
+												<aura:iteration items="{!section.fields}" var="field">
+													<aura:if isTrue="{!field.isVisible}">
+														<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-bottom_medium">
+															<aura:if isTrue="{!field.type == 'PICKLIST'}">
+																<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																	<lightning:combobox label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" options="{!field.picklistEntries}" placeholder="Selecciona una Opción" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}" class="input-disabled"/>
+																</div>
+																<aura:set attribute="else">
+																	<aura:if isTrue="{!field.type == 'BOOLEAN'}">
+																		<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" type="checkbox" checked="{!field.value}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}" class="align-checkbox"/>
+																		<aura:set attribute="else">
+																			<aura:if isTrue="{!field.type == 'PERCENT'}">
+																				<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																					<lightning:input label="{!field.label + ' (%)'}" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" type="number" max="{!field.maxValue}" min="0" step="any" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																				</div>
+																				<aura:set attribute="else">
+																					<aura:if isTrue="{!field.type == 'DOUBLE'}">
+																						<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																							<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" type="number" max="{!field.maxValue}" min="0" step="any" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																						</div>
+																						<aura:set attribute="else">
+																							<aura:if isTrue="{!field.type == 'MULTIPICKLIST'}">
+																								<aura:if isTrue="{!field.value == '' || field.value == null}">
+																									<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																										<ui:inputSelect labelClass="{!field}" label="{!field.label + (field.isControlField ? '-isControlField-' + annex.name : '')}" multiple="true" options="{!field.picklistEntries}" change="{!c.saveAnnexFieldValue}" required="{!field.required}" disabled="{!field.disabled}" class="slds-select"/>
+																									</div>
+																									<aura:set attribute="else">
+																										<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																											<ui:inputSelect labelClass="{!field}" label="{!field.label + (field.isControlField ? '-isControlField-' + annex.name : '')}" multiple="true" options="{!field.picklistEntries}" value="{!field.value}" change="{!c.saveAnnexFieldValue}" required="{!field.required}" disabled="{!field.disabled}" class="slds-select"/>
+																										</div>
+																									</aura:set>
+																								</aura:if>
+																								<aura:set attribute="else">
+																									<aura:if isTrue="{!field.type == 'EMAIL'}">
+																										<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																											<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" type="email" value="{!field.value}" messageWhenValueMissing="Campo requerido" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																										</div>
+																										<aura:set attribute="else">
+																											<aura:if isTrue="{!field.type == 'DATE'}">
+																												<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																													<div class="slds-form-element">
+																														<label class="slds-form-element__label" for="{!annex.name + '-' + field.name + '-' + index}">{!field.required ? '*&nbsp;' : ''}{!field.label}</label>
+																														<div class="slds-form-element__control">
+																															<input id="{!annex.name + '-' + field.name + '-' + index}" contenteditable="false" type="text" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" value="{!field.value}" required="{!field.required}" disabled="{!field.disabled}" class="slds-input inputDatepicker" onmouseenter="{!c.createDatepicker}" onchange="{!c.saveAnnexFieldValue}"></input>
+																														</div>
+																													</div>
+																												</div>
+																												<aura:set attribute="else">
+																													<div class="{!field.required ? 'slds-form-element slds-has-error' : ''}">
+																														<lightning:input label="{!field.label}" name="{!field.name + (field.isControlField ? '-isControlField-' + annex.name : '')}" type="text" value="{!field.value}" messageWhenValueMissing="El campo no puede quedar vacío" required="{!field.required}" disabled="{!field.disabled}" onchange="{!c.saveAnnexFieldValue}"/>
+																													</div>
+																												</aura:set>
+																											</aura:if>
+																										</aura:set>
+																									</aura:if>
+																								</aura:set>
+																							</aura:if>
+																						</aura:set>
+																					</aura:if>
+																				</aura:set>
+																			</aura:if>
+																		</aura:set>
+																	</aura:if>
+																</aura:set>
+															</aura:if>
+														</lightning:layoutItem>
+													</aura:if>
+												</aura:iteration>
+											</lightning:layout>
+										</aura:iteration>
+									</lightning:tab>
+								</aura:if>
+							</aura:iteration>
+						</lightning:tabset>
+						<!-- /Annexes -->
+					</div>
+					<aura:set attribute="else">
+						<div class="slds-p-vertical_large spinner-relative-position spinner-container">
+							<lightning:spinner size="medium" variant="brand" alternativeText="Cargando el formulario del Contrato"/>
+						</div>
+					</aura:set>
+				</aura:if>
+				<!-- /Contract Form Body -->
+			</div>
+			<!-- /Contract Body -->
+			<!-- Actions Buttons -->
+			<aura:if isTrue="{!v.isDataReady}">
+				<lightning:buttonGroup class="button-group-container">                 
+					<button disabled="{!v.isFinishButtonDisabled}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.validateFields}">
+						<lightning:icon iconName="utility:success" title="Finalizar" class="finish-button"/>
+					</button>                  
+					<button disabled="{!v.isSaveButtonDisabled}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.saveContractData}">
+						<lightning:icon iconName="utility:save" title="Guardar" class="save-button"/>
+					</button>
+                    <!-- DVM: 14/Junio/17: Se comenta este bloque para permitir que todos los usuarios vean el botón de PDF y Correo en la pantalla de Funcionalidades
+                    <aura:if isTrue="{!(v.ejecutivo.Segmento__c == 'MLK') || ((v.ejecutivo.Segmento__c == 'Small') &amp;&amp; ((v.contractTitle == 'Contrato Ticket Car 3.0') || (v.contractTitle == 'Contrato Clientes TPlus Público') || (v.contractTitle == 'Contrato Clientes TPlus Privado') || (v.contractTitle == 'Contrato Ecovale Despensa') || (v.contractTitle == 'Contrato Clientes Mantenimiento')))}">
+                     -->
+						<button disabled="{!v.isSendButtonDisabled}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.sendEmail}">
+							<lightning:icon iconName="utility:email" title="Enviar" class="send-button"/>
+							<aura:if isTrue="{!v.isSending}">
+								<lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
+							</aura:if>
+						</button>
+						<button disabled="{!v.isPDFButtonDisabled}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.generatePDF}">
+							<lightning:icon iconName="utility:page" title="Descargar PDF" class="pdf-button"/>
+							<aura:if isTrue="{!v.isPDFGenerated}">
+								<lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
+							</aura:if>
+						</button>
+					<!--</aura:if> DVM: 14/Junio/17: Se comenta este bloque para permitir que todos los usuarios vean el botón de PDF y Correo en la pantalla de Funcionalidades-->
+                    
+				</lightning:buttonGroup>
+			</aura:if>
+			<!-- /Actions Buttons -->
+		</div>
+		<aura:set attribute="else">
+			<c:CON_ValidationChecklist_LC recordId="{!v.recordId}"/>
+		</aura:set>
+	</aura:if>	
+</aura:component>

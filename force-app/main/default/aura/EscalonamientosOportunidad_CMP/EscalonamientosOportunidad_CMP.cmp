@@ -1,0 +1,100 @@
+<aura:component controller="EscalonamientosOportunidad_CONT" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="productos" type="List"/>
+    <aura:attribute name="productosIn" type="List"/>
+    <aura:attribute name="tieneEscalonamiento" type="boolean" default="false"/>
+    <aura:attribute name="editar" type="boolean" default="false"/>
+    <aura:attribute name="etapa" type="String"/>
+    <aura:attribute name="comentarios" type="String"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="botonEditar" type="boolean" default="false"/>
+    <aura:registerEvent name="edicionShow" type="c:MostrarEdicion"/>    
+    <aura:if isTrue="{!v.tieneEscalonamiento}">
+        <lightning:card class="card">  
+            <aura:if isTrue="{!v.spinner}">
+                <lightning:spinner size="large"/>
+            </aura:if>
+            <aura:set attribute="title">
+                <aura:if isTrue="{!!v.editar}">
+                    <div style="display:inline-block;">
+                        <aura:if isTrue="{!v.productos.length>1}">
+                            <lightning:icon iconName="custom:custom102"/>
+                            Escalonamientos
+                            <aura:set attribute="else">
+                                <lightning:icon iconName="standard:currency_input"/>
+                                Detalles de la oportunidad
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <div style="display:inline-block;margin-left:.5em;">
+                        <lightning:buttonIcon iconName="utility:edit" variant="bare" onclick="{!c.editarEnabled}" alternativeText="Settings" />
+                    </div>
+                </aura:if>
+            </aura:set>
+            
+            <div class="slds-p-around_xx-small">
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <th class="columna celda">
+                                <lightning:icon style="display:inline-block;margin-right:0.5em;" iconName="utility:currency" size="small"/>
+                                <div style="display:inline-block;font-size:14px;margin-bottom:10px;" class="slds-text-heading_small">
+                                    Volumen de emisión
+                                </div>
+                            </th>
+                            <th class="columna celda">
+                                <lightning:icon style="display:inline-block;margin-right:0.5em;" iconName="utility:date_input" size="small"/>
+                                <div style="display:inline-block;font-size:14px;margin-bottom:10px;" class="slds-text-heading_small">
+                                    Fecha escalonamiento
+                                </div>
+                            </th>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.productos}" var="prod" indexVar="index">
+                                <tr>
+                                    <td class="celda">
+                                        <div class="slds-text-heading_small slds-p-around_xx-small" style="font-size:12px;">
+                                            <aura:if isTrue="{!v.editar}">
+                                                <lightning:input min="1" type="number" required="true" value="{!prod.UnitPrice}" label="Volumen de emisión:" formatter="currency" step="0.01"/>
+                                                <aura:set attribute="else">
+                                                    <lightning:formattedNumber value="{!prod.UnitPrice}" style="currency" currencyCode="MXN"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </div>
+                                    </td>
+                                    <td class="celda">
+                                        <div class="slds-text-heading_small slds-p-around_xx-small" style="font-size:12px;">
+                                            <aura:if isTrue="{!v.editar}">
+                                                <lightning:input type="date" required="true" name="{!index}" value="{!prod.ServiceDate}" label="Fecha:" onchange="{!c.validarFechas}"/>
+                                                <aura:set attribute="else">
+                                                    {!prod.ServiceDate}
+                                                </aura:set>
+                                            </aura:if>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>                
+            </div>
+            <aura:if isTrue="{!and(v.editar,v.etapa=='Implementación')}">
+                <div class="slds-p-around_xx-small">
+                    <lightning:textarea name="comentarios" value="{!v.comentarios}" label="Comentarios" required="true" />
+                </div>
+            </aura:if>
+            <div>
+                <center>
+                    <aura:if isTrue="{!v.editar}">
+                        <aura:if isTrue="{!v.botonEditar}">
+                            <ui:message severity="error" closable="false">
+                                Fechas para escalonamiento incorrectas, las fechas deben tener por lo menos 1 dia de diferencia y ordenadas de la mas proxima a la mas lejana
+                            </ui:message>                            
+                        </aura:if>
+                        <lightning:button variant="Neutral" label="Cancelar" onclick="{!c.editarEnabled}"/>
+                        <lightning:button variant="success" label="Guardar" onclick="{!c.guardarInfo}" disabled="{!v.botonEditar}"/>
+                    </aura:if>
+                </center>
+            </div>
+        </lightning:card>
+    </aura:if>
+</aura:component>

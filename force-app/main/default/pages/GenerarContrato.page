@@ -1,0 +1,32 @@
+<apex:page standardController="Opportunity" extensions="GenerarContratoController" >
+    <h2 id="mensaje">
+        {!IF(TipoContrato!='NO','Redireccionando...','El producto relacionado no tiene un contrato definido')}
+    </h2>
+    <script>
+    var idOportunidad='{!IdOportunidad}';
+    var tipoContrato='{!TipoContrato}';
+    	console.log(idOportunidad);
+    	console.log(tipoContrato);
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        if(tipoContrato == 'CSV')
+            redireccionar('PantallaIntermediaContrato?id='+idOportunidad);
+        else if(tipoContrato == 'TC3')
+            redireccionar('ContratoTC3?id='+idOportunidad);
+        else if(tipoContrato == 'TCM')
+            redireccionar('ContratoTCM?id='+idOportunidad);
+        
+            	
+		});
+        function redireccionar(direccion){
+            if({!generar}){
+         	  location.href=direccion;
+                }
+             else{
+                document.getElementById('mensaje').innerHTML = "La oportunidad no tiene tarifas asociadas";
+                alert('La oportunidad no tiene tarifas asociadas');
+                 location.href='../'+idOportunidad;
+             }
+               
+        }
+    </script>
+</apex:page>

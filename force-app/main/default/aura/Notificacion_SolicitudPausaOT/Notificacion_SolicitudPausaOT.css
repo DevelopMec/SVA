@@ -1,0 +1,7 @@
+.THIS.snackbar {
+    visibility: visible;
+    position: fixed;
+    width:75%;
+    z-index: 1;
+    margin-left:10%;
+}

@@ -1,0 +1,20 @@
+<aura:component controller="HistorialUsuario_CONT" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="registros" type="List"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:card title="Historial de Cambios" iconName="action:record">
+        <aura:if isTrue="{!v.spin}">
+            <lightning:spinner size="large"/>
+        </aura:if>
+        <div style="height: 300px">
+            <lightning:datatable
+                                 keyField="Id"
+                                 data="{!v.registros}"
+                                 columns="{!v.columns}"
+                                 hideCheckboxColumn="true"/>
+        </div>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,521 @@
+<apex:page standardController="QuoteLineItem" extensions="PLAN_CuentaService" standardStylesheets="false" showHeader="false" sidebar="false" applyBodyTag="false" docType="html-5.0">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/bootstrap.min.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/animate.css')}"/>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.css')}"/>
+
+        <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/bootstrap/js/bootstrap.min.js')}"/>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/ui-bootstrap-tpls-2.2.0.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular-animate.min.js')}"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/css/ctc_main.css')}"/>
+
+
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/datatables/datatables.min.js')}"></script>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/datatables/datatables.min.css')}"/>
+        
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.module.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.factory.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.processing.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/error.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/datepicker.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/formgroup.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/input.directive.js')}"/>
+
+    </head>
+    <body ng-app="contratoApp" ng-controller="tarifasCtrl as sc" id="tarifasCtrl">
+        <div class="container">
+        	<h3 class="page-header">
+	        	<div class="row">
+	        		<div class="col-sm-8">
+        				Conceptos del Producto: {!QuoteLineItem.Product2.Name}
+	        		</div>
+	        		<div class="col-sm-4 text-right">
+        				<button type="button" class="close" ng-click="sc.close()">
+        					<span aria-hidden="true">&times;</span>
+        				</button>
+	        		</div>
+	        	</div>
+        	</h3>
+            <ctc-error ctc-body="sc.errors" ctc-class="sc.class"></ctc-error>
+            <ctc-processing ctc-active="sc.loading" ctc-message="sc.action" ></ctc-processing>
+
+            <div class="form-horizontal" ng-if="sc.schema.Product2.Id">
+	            <div class="row">
+		            <div class="col-sm-6">
+		            	<div class="form-group">
+		            		<label class="col-sm-2 control-label" ng-bind="sc.schema.Product2.Family.label"></label>
+						    <div class="col-sm-10">
+						      <p class="form-control-static" ng-bind="'{!QuoteLineItem.Product2.Family}'"></p>
+						    </div>
+		            	</div>
+	            	</div>
+
+		            <div class="col-sm-6">
+		            	<div class="form-group">
+		            		<label class="col-sm-2 control-label" ng-bind="sc.schema.Product2.Red__c.label"></label>
+						    <div class="col-sm-10">
+						      <p class="form-control-static" ng-bind="'{!QuoteLineItem.Product2.Red__c}'"></p>
+						    </div>
+		            	</div>
+	            	</div>
+            	</div>
+
+            	<div class="row">
+		            <div class="col-sm-6">
+		            	<div class="form-group">
+		            		<label class="col-sm-2 control-label" ng-bind="sc.schema.Product2.Uso__c.label"></label>
+						    <div class="col-sm-10">
+						      <p class="form-control-static" ng-bind="'{!QuoteLineItem.Product2.Uso__c}'"></p>
+						    </div>
+		            	</div>
+	            	</div>
+
+		            <div class="col-sm-6">
+		            	<div class="form-group">
+		            		<label class="col-sm-2 control-label" ng-bind="sc.schema.Product2.Formato__c.label"></label>
+						    <div class="col-sm-10">
+						      <p class="form-control-static" ng-bind="'{!QuoteLineItem.Product2.Formato__c}'"></p>
+						    </div>
+		            	</div>
+	            	</div>
+            	</div>
+                <form name="sc.formEdit" ng-submit="sc.saveChanges(sc.instances)">
+            		<table class="table table-bordered" id="tableTarifas">
+            			<thead>
+            				<tr>
+                                <th ng-bind="sc.schema.ProductoConcepto__c.Id.label"></th>
+            					<th>Concepto</th>
+            					<th ng-bind="sc.schema.ProductoConcepto__c.PrecioLista__c.label"></th>
+            					<th ng-bind="sc.schema.ProductoConcepto__c.Bonificacion__c.label"></th>
+                                <th ng-bind="sc.schema.ProductoConcepto__c.PrecioFinal__c.label"></th>
+                                <th ng-bind="sc.schema.ProductoConcepto__c.FechaInicio__c.label"></th>
+                                <th ng-bind="sc.schema.ProductoConcepto__c.FechaFinal__c.label"></th>
+            					<th ng-bind="sc.schema.ProductoConcepto__c.AjusteInflacion__c.label"></th>
+            					<th ng-bind="sc.schema.ProductoConcepto__c.Notas__c.label"></th>
+            				</tr>
+            			</thead>
+            			<tbody>
+            			</tbody>
+            		</table>
+
+                    <hr/>
+                    <div class="row" ng-if="sc.instanceAniversario.Id">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <ctc-form-group 
+                                ctc-field="sc.schema.ProductoConcepto__c.AplicaAniversario__c" 
+                                ctc-instance="sc.instanceAniversario" 
+                                ctc-form="sc.formEdit"
+                                ctc-on-change="sc.cambiaAplicaAniversario"
+                                ng-init="sc.initAplicaAniversario(sc.instanceAniversario)"
+                                ></ctc-form-group>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <ctc-form-group 
+                                ctc-field="sc.schema.ProductoConcepto__c.MesAplica__c" 
+                                ctc-instance="sc.instanceAniversario" 
+                                ctc-form="sc.formEdit"
+                                ctc-opts="sc.schema.ProductoConcepto__c.MesAplica__c.values"
+                                ctc-label="['label']"
+                                ></ctc-form-group>
+                        </div>
+                    </div>
+    
+                    <div class="row">
+                        <div class="col-sm-12 text-right">
+                            <ctc-error ctc-body="sc.errors" ctc-class="sc.class"></ctc-error>
+                            <button type="submit" class="btnb btnb-success" ng-disabled="sc.formEdit.$invalid || sc.loading">
+                                <span class="fa fa-save fa-fw"></span>
+                                Guardar cambios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr/>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3 class="page-header">Escalonamientos</h3>
+                        <table class="table table-bordered" id="tableEscalonamientos">
+                            <thead>
+                                <tr>
+                                    <th ng-bind="sc.schema.QuoteLineItem.Id.label"></th>
+                                    <th ng-bind="sc.schema.QuoteLineItem.UnitPrice.label"></th>
+                                    <th ng-bind="sc.schema.QuoteLineItem.ServiceDate.label"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <script type="text/javascript">
+            (function() {
+                'use sctrict'
+                angular.module('contratoApp' , ['ctc.module', 'ui.bootstrap', 'ngAnimate', 'ngSanitize'])
+                .controller('tarifasCtrl', TarifasCtrl)
+
+                TarifasCtrl.$inject = ['ctcUtils', '$timeout', '$interval', '$uibModal', '$filter', '$scope', '$compile']
+
+                function TarifasCtrl(ctcUtils, $timeout, $interval, $uibModal, $filter, $scope, $compile) {
+                	var vm = this
+                	vm.schema = {}
+                	vm.prefix = {}
+                	vm.errors = []
+                    vm.conceptos = []
+                	vm.escalonamientos = []
+                	vm.loading = false
+                	vm.ctrl = 'PLAN_CuentaService'
+                	vm.comision = 'Comisión por el servicio'
+                    vm.tNameT = 'tableTarifas'
+                	vm.tNameE = 'tableEscalonamientos'
+                    vm.producto = {
+                        Id: '{!QuoteLineItem.Id}',
+                        UnitPrice: '{!QuoteLineItem.UnitPrice}',
+                        ServiceDate: new Date('{!QuoteLineItem.ServiceDate}').getTime()
+                    }
+                    vm.claveReferencia = '{!$Setup.Negocio__c.ClaveReferenciaAnualidad__c}'
+                    vm.hasAnualidad = false
+                    vm.instances = {}
+                    vm.instanceAniversario = {}
+
+                    ctcUtils.errors.majorDate = 'Fecha inválida'
+                    vm.action = 'Cargando información'
+                    vm.class = 'alert-danger'
+
+                	vm.init = function() {
+            			vm.loading = true
+                		ctcUtils.remote(vm.ctrl + '.describe')(['Opportunity', 'Quote', 'QuoteLineItem', 'Product2', 'Concepto__c', 'ProductoConcepto__c'])
+                        .then(function(schema) {
+                            vm.schema = ctcUtils.schema(schema)
+
+
+                            //vm.schema.ProductoConcepto__c.MesAplica__c.required = true
+                            vm.prefix = ctcUtils.prefix(schema)
+                            return ctcUtils.remote(vm.ctrl + '.query')('SELECT Id, Concepto__r.TipoCargo__c, Concepto__r.Orden__c, Concepto__r.Obligatorio__c, Concepto__r.ClaveReferencia__c, Concepto__r.AplicaAjusteInflacion__c, PrecioLista__c, PrecioFinal__c, Bonificacion__c, Notas__c, PrecioLista2__c, AjusteInflacion__c, FechaInicio__c, FechaFinal__c, AplicaAniversario__c, MesAplica__c FROM ProductoConcepto__c WHERE Concepto__r.Activo__c=true AND PartidaPresupuesto__c=\'{!QuoteLineItem.Id}\'')
+                        })
+                        .then(function(conceptos) {
+                        	var temp = []
+                        	angular.forEach(conceptos, function(v, k) {
+                        		var obj = {
+                        			TipoCargo__c: v.Concepto__r.TipoCargo__c || '',
+                        			PrecioLista__c: $filter('currency')(v.PrecioLista__c, '$'),
+                        			Bonificacion__c: (v.Bonificacion__c || '') + '%',
+                        			PrecioFinal__c: $filter('currency')(v.PrecioFinal__c, '$'),
+                        			Notas__c: v.Notas__c || '',
+                        			Obligatorio__c: v.Concepto__r.Obligatorio__c || false,
+                        			Orden__c: v.Concepto__r.Orden__c || 0,
+                                    Id: v.Id,
+                                    AplicaAniversario__c: v.AplicaAniversario__c,
+                                    AplicaAjusteInflacion__c: v.Concepto__r.AplicaAjusteInflacion__c,
+                                    MesAplica__c: v.MesAplica__c,
+                                    AjusteInflacion__c: v.AjusteInflacion__c,
+                                    FechaInicio__c: $filter('date')(v.FechaInicio__c, 'dd/MM/yyyy', 'UTC'),
+                                    FechaFinal__c: $filter('date')(v.FechaFinal__c, 'dd/MM/yyyy', 'UTC')
+
+                        		}
+                        		if(obj.TipoCargo__c == vm.comision) {
+                        			obj.PrecioLista__c = v.PrecioLista2__c + '%'
+                        			obj.Bonificacion__c = (v.Bonificacion__c || '') + '%'
+                        			obj.PrecioFinal__c = v.PrecioFinal__c + '%'
+                        			obj.Orden__c = -1
+                        		}
+
+                                vm.instances[v.Id] = obj
+
+                        		temp.push(obj)
+
+                                if(!vm.hasAnualidad && vm.claveReferencia && vm.claveReferencia.length > 0 && v.Concepto__r.ClaveReferencia__c && v.Concepto__r.ClaveReferencia__c.length > 0 && v.Concepto__r.ClaveReferencia__c == vm.claveReferencia) {
+                                    vm.hasAnualidad = true
+                                    vm.instanceAniversario = vm.instances[v.Id]
+                                }
+
+                        	})
+                            
+                            if(!vm.instanceAniversario.hasOwnProperty('disabled')) {
+                                vm.instanceAniversario.disabled = {}
+                            }
+                            if(vm.instanceAniversario.AplicaAniversario__c) {
+                                vm.schema.ProductoConcepto__c.MesAplica__c.required = true
+                                vm.instanceAniversario.disabled.MesAplica__c = false
+                            } else {
+                                vm.schema.ProductoConcepto__c.MesAplica__c.required = false
+                                vm.instanceAniversario.disabled.MesAplica__c = true
+                            }
+
+                            
+
+                        	var ob = $filter('orderBy')(ctcUtils.filter(temp, {Obligatorio__c: true}, true), 'Orden__c')
+                        	var op = $filter('orderBy')(ctcUtils.filter(temp, {Obligatorio__c: false}, true), 'Orden__c')
+
+                        	vm.conceptos = ob.concat(op)
+                        	angular.forEach(vm.conceptos, function(v, k) {
+                        		v.Sort__c = k
+                        	})
+                            var def = [
+                                {"data": "Id", "defaultContent": ''},
+                                {"data": "TipoCargo__c", "defaultContent": ''},
+                                {"data": "PrecioLista__c", "defaultContent": ''},
+                                {"data": "Bonificacion__c", "defaultContent": ''},
+                                {"data": "PrecioFinal__c", "defaultContent": ''},
+                                {"data": "FechaInicio__c", "defaultContent": ''},
+                                {"data": "FechaFinal__c", "defaultContent": ''},
+                                {"data": "AjusteInflacion__c", "defaultContent": ''},
+                                {"data": "Notas__c", "defaultContent": ''}
+                            ]
+
+                            var render = [
+                                {
+                                    "targets": 0,
+                                    "visible": false
+                                },
+                                {
+                                    "render": function (data, type, row) {
+                                        return '<span class="hidden">' + row.Sort__c + '</span>' + data
+                                    },
+                                    "targets": 1
+                                },
+                                {
+                                    "render": function (data, type, row ) {
+                                        return '<span id="FechaInicio__c_' + row.Id + '"/>'
+                                    },
+                                    "targets": 5
+                                },
+                                {
+                                    "render": function (data, type, row ) {
+                                        return '<span id="FechaFinal__c_' + row.Id + '"/>'
+                                    },
+                                    "targets": 6
+                                },
+                                {
+                                    "render": function (data, type, row ) {
+                                        return '<span id="AjusteInflacion__c_' + row.Id + '"/>'
+                                    },
+                                    "targets": 7
+                                }
+                            ]
+                            jQuery('#' + vm.tNameT).on('draw.dt', function (a, b) {
+                                var rows = $(this).DataTable().rows({ page: 'current' }).nodes()
+                                var size = rows.length
+                                for(var i = 0; i < size; i++) {
+                                    var index = rows.table().row(jQuery(rows[i])).index()
+                                    var instance = rows.data()[index]
+                                    vm.renderInput(instance, 'FechaInicio__c')
+                                    vm.renderInput(instance, 'FechaFinal__c')
+                                    if(instance.AplicaAjusteInflacion__c) {
+                                        vm.renderInput(instance, 'AjusteInflacion__c')
+                                    }
+                                }
+                            })
+
+                            vm.renderTable(vm.conceptos, def, render, vm.tNameT)
+
+                            return ctcUtils.remote('PLAN_CuentaService.query')('SELECT Id, UnitPrice, ServiceDate FROM QuoteLineItem WHERE Escalonamiento__c=\'{!QuoteLineItem.Id}\'')
+                        })
+                        .then(function(escalonamientos) {
+                            vm.escalonamientos = escalonamientos || []
+                            if(vm.escalonamientos && vm.escalonamientos.length > 0) {
+                                vm.escalonamientos.unshift(vm.producto)
+                                angular.forEach(vm.escalonamientos, function(v, k) {
+                                    v.ServiceDate = $filter('date')(v.ServiceDate, 'd/M/yyyy', 'UTC')
+                                    v.UnitPrice = $filter('currency')(v.UnitPrice, '$')
+                                    v.Sort__c = k
+                                })
+                            }
+                            var def = [
+                                {"data": "Id", "defaultContent": ''},
+                                {"data": "UnitPrice", "defaultContent": ''},
+                                {"data": "ServiceDate", "defaultContent": ''}
+                            ]
+
+                            var render = [
+                                {
+                                    "targets": 0,
+                                    "visible": false
+                                },
+                                {
+                                    "render": function (data, type, row) {
+                                        return '<span class="hidden">' + row.Sort__c + '</span>' + data
+                                    },
+                                    "targets": 1
+                                }
+                            ]
+                            console.log('vm.escalonamientos: ', vm.escalonamientos)
+                            vm.renderTable(vm.escalonamientos, def, render, vm.tNameE)
+                            vm.loading = false
+                        }).catch(function(err) {
+                        	console.log('error -> ')
+                        	vm.errors = [err]
+                			vm.loading = false
+                        })
+                	}
+
+                	vm.renderTable = function(data, def, render, tname) {
+                		if(!jQuery.fn.DataTable.isDataTable('#' + tname)) {
+	                        jQuery("#" + tname).DataTable({
+	                            data: data,
+	                            "columns": def,
+	                            "processing": true,
+	                            "language": {
+	                                "searchPlaceholder": "",
+                                    "emptyTable": "No se encontraron datos"
+	                            },
+	                            "columnDefs": render,
+	                            "lengthMenu": [5, 10, 20, 30, 50, 100],
+	                            "order": [[ 0, "asc" ]]
+	                        })
+	                    } else {
+	                        jQuery("#" + tname).DataTable().clear().draw()
+	                        jQuery("#" + tname).DataTable().rows.add(data).draw()
+	                    }
+                        $timeout(function() {
+                            jQuery('#' + tname + '_wrapper').removeClass('form-inline')
+                        }, 1500)
+                	}
+
+                    vm.renderInput = function(row, fieldName) {
+                        var element = jQuery('[id="' + fieldName +'_' + row.Id + '"]')
+                        element.empty()
+                        var html = '<ctc-input ctc-field="sc.schema.ProductoConcepto__c[\'' + fieldName + '\']" ctc-form="sc.formEdit" ctc-instance="sc.instances[\'' + row.Id + '\']" ctc-disable-date="true" ctc-on-change="sc.change' + fieldName + '"></ctc-input>'
+                        var el = angular.element(html)
+                        element.append(el)
+                        element.append($compile(el)($scope))
+                    }
+
+                    vm.cambiaAplicaAniversario = function(model, instance) {
+                        console.log('cambiaAplicaAniversario: ', arguments)
+                        if(!instance.hasOwnProperty('disabled')) {
+                            instance.disabled = {}
+                        }
+                        if(model) {
+                            instance.MesAplica__c = vm.schema.ProductoConcepto__c.MesAplica__c.values[new Date().getMonth()].value
+                            instance.MesAplica__c__o = vm.schema.ProductoConcepto__c.MesAplica__c.values[new Date().getMonth()]
+                            vm.schema.ProductoConcepto__c.MesAplica__c.required = true
+                            instance.disabled.MesAplica__c = false
+
+                        } else {
+                            vm.schema.ProductoConcepto__c.MesAplica__c.required = false
+                            instance.disabled.MesAplica__c = true
+                        }
+                    }
+
+                    vm.initAplicaAniversario = function(instance) {
+                        $timeout(function() {
+                            jQuery('#AplicaAniversario__c_' + instance.IdElement).parent().addClass('form-control-static')
+                        }, 1000)
+                    }
+
+                    vm.saveChanges = function(instances) {
+                        vm.class = 'alert-danger'
+                        console.log('saveChanges: ', instances)
+                        if(instances) {
+                            vm.errors = []
+                            var payload = []
+                            angular.forEach(Object.keys(instances), function(v, k) {
+                                var ins = angular.copy(instances[v])
+                                var obj = {
+                                    Id: ins.Id,
+                                    AplicaAniversario__c: ins.AplicaAniversario__c,
+                                    AjusteInflacion__c: ins.AjusteInflacion__c
+                                }
+                                if(ins.FechaInicio__c) {
+                                    var str = ins.FechaInicio__c.split('\/')
+                                    obj.FechaInicio__c = str[2] + '-' + str[1] + '-' + str[0]
+                                }
+
+                                if(ins.FechaFinal__c) {
+                                    var str = ins.FechaFinal__c.split('\/')
+                                    obj.FechaFinal__c = str[2] + '-' + str[1] + '-' + str[0]
+                                }
+                                if(ins.AplicaAniversario__c) {
+                                    obj.MesAplica__c = ins.MesAplica__c
+                                } else {
+                                    obj.MesAplica__c = ''
+                                }
+                                payload.push(obj)
+                            })
+
+                            if(payload.length > 0) {
+
+                                vm.loading = true
+                                vm.action = 'Guardando'
+                                ctcUtils.remote(vm.ctrl + '.upsertObjectsMultiple')(['ProductoConcepto__c', JSON.stringify(payload)], false)
+                                .then(function(res) {
+                                    console.log('res ProductoConcepto__c: ', res)
+                                    vm.class = 'alert-success'
+                                    vm.errors = ['Información actualizada']
+                                    vm.loading = false
+                                    $timeout(function() {
+                                       vm.errors = [] 
+                                    }, 5000)
+                                })
+                                .catch(function(err) {
+                                    console.log('err ProductoConcepto__c: ', err)
+                                    vm.loading = false
+                                    if(vm.errors.length > 0) {
+                                        vm.errors.push(err)
+                                    } else {
+                                        vm.errors = [err]
+                                    }
+                                })
+                            }
+
+                            console.log('payload: ', payload)
+                        }
+                    }
+
+                    vm.changeFechaInicio__c = function(model, instance, field, form) {
+                        vm.validaFechas(instance, form)
+                    }
+
+                    vm.changeFechaFinal__c = function(model, instance, field, form) {
+                        vm.validaFechas(instance, form)
+                    }
+
+                    vm.validaFechas = function(instance, form) {
+                        var isValid = true
+                        if(instance && instance.FechaInicio__c && instance.FechaFinal__c) {
+                            var str = instance.FechaFinal__c.split('\/')
+                            var df = str[2] + '-' + str[1] + '-' + (parseInt(str[0]) + 1)
+                            var str2 = instance.FechaInicio__c.split('\/')
+                            var di = new Date(parseInt(str2[2]), parseInt(str2[1]) - 1, parseInt(str2[0]))
+                            var df = new Date(parseInt(str[2]), parseInt(str[1]) - 1, parseInt(str[0]))
+                            isValid = !(df.getTime() < di.getTime())
+                        }
+                        form['FechaFinal__c_' + instance.IdElement].$setValidity('majorDate', isValid)
+                    }
+
+                	vm.close = function() {
+                		window.close()
+                	}
+
+                	vm.init()
+                }
+
+            })()
+        </script>
+        <style type="text/css">
+        	h1, h2, h3, h4, h5, h6 {
+                display: block;
+            }
+            .container {
+                width: 97%;
+            }
+        </style>
+    </body>
+</apex:page>

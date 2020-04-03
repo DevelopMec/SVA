@@ -1,0 +1,222 @@
+<apex:page controller="RevisionDireccionController" docType="html-5.0" standardStylesheets="false" showHeader="false" sidebar="false">
+    <!--JQUERY-->
+	<apex:includeScript value="{!URLFOR($Resource.jquery)}" />
+    <apex:includeScript value="{!URLFOR($Resource.tableFixer,'jQuery-Plugin-For-Fixed-Table-Header-Footer-Columns-TableHeadFixer/tableHeadFixer.js')}" />
+    <!--BOOTSTRAP-->
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap,'dist/js/bootstrap.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap,'dist/css/bootstrap.css')}" />
+    
+        <apex:includeScript value="{!URLFOR($Resource.dataTables,'DataTables-1.10.9/media/js/jquery.dataTables.min.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.dataTables,'DataTables-1.10.9/media/css/jquery.dataTables.css')}" />
+    <style>
+    	.pad{ 
+            padding: 1em 0 0 0 ;
+        }
+    </style>
+    <div class="container bs-docs-container" id="contenedorPrincipal">
+        
+        <apex:form id="forma">
+            <apex:actionFunction name="llenaEditables" action="{!llenando}" reRender="parteModificable">
+               
+                <apex:param name="indice" value="" />
+            </apex:actionFunction>
+            <apex:actionFunction name="actualizaBoton" action="{!nada}" reRender="imagenMapa,parteActual,parteModificable" />
+            <div class="row">
+                <div class="col-md-12 ">
+                    
+                        <c:PageMessages closableErrors="true"  id="mensaje"/>
+                    <c:Panel title="Revisar dirección" idCollapse="panelDireccion"  id="direccion" idParent="panelParent" expanded="true">
+                    <div class="row">
+                        <apex:outputPanel id="parteActual">
+                            <div class="col-md-4">
+                                <h3>
+                                    Dirección actual:
+                                </h3>
+                                <div class="row pad">
+                                    <c:PanelCell columns="6" label="Estado : "  for="estado">
+                                                <apex:outputText value="{!registro.Estado}" StyleClass="form-control-static" id="estado" />
+                                        </c:PanelCell> 
+                                </div>
+                                <div class="row pad">
+                                    <c:PanelCell columns="6"  label="Ciudad : " for="ciudad">
+                                                <apex:outputText value="{!registro.Ciudad}" StyleClass="form-control-static" id="ciudad" />
+                                        </c:PanelCell> 
+                                </div>
+                                <div class="row pad">
+                                    <c:PanelCell columns="6" label="Colonia : " for="colonia">
+                                                <apex:outputText value="{!registro.Colonia}" StyleClass="form-control-static" id="colonia" />
+                                        </c:PanelCell> 
+                                </div>
+                               <!--- <div class="row pad">
+                                    <c:PanelCell columns="6" label="Calle : " for="calle">
+                                                <apex:outputText value="{!registro.Calle}" StyleClass="form-control-static" id="Calle" />
+                                        </c:PanelCell> 
+                                </div>-->
+                                <div class="row pad">
+                                    <c:PanelCell columns="6" label="Codigo postal : " for="codigoPostal">
+                                                <apex:outputText value="{!registro.CodigoPostal}" StyleClass="form-control-static" id="codigoPostal" />
+                                        </c:PanelCell> 
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                                <apex:outputPanel id="parteModificable">   
+                        <div class="col-md-4">
+                                <h3>
+                                    Dirección modificable:
+                                </h3>
+                                <div class="row pad ">
+                                      <label for="Calle" class="col-md-4" >Estado </label>
+                                      <div class="col-md-6">
+                                                <apex:inputText value="{!registro.EstadoSugerido}" StyleClass="form-control" id="estadoSugerido" />
+                                      </div>
+                                      <div class="col-md-2">
+                                            <apex:inputCheckbox value="{!registro.EstadoSugeridoCheck}"/>  
+                                        </div>
+                                        
+                                </div>
+                                <div class="row pad ">
+                                      <label for="Calle" class="col-md-4" >Ciudad </label>
+                                      <div class="col-md-6">
+                                                <apex:inputText value="{!registro.CiudadSugerido}" StyleClass="form-control" id="CiudadSugerido" />
+                                      </div>
+                                      <div class="col-md-2">
+                                            <apex:inputCheckbox value="{!registro.CiudadSugeridoCheck}"/>  
+                                        </div>
+                                        
+                                </div>
+                                <div class="row pad ">
+                                      <label for="Calle" class="col-md-4" >Colonia </label>
+                                      <div class="col-md-6">
+                                                <apex:inputText value="{!registro.ColoniaSugerido}" StyleClass="form-control" id="ColoniaSugerido" />
+                                      </div>
+                                      <div class="col-md-2">
+                                            <apex:inputCheckbox value="{!registro.ColoniaSugeridoCheck}"/>  
+                                        </div>
+                                        
+                                </div>
+                               <!-- <div class="row pad ">
+                                      <label for="Calle" class="col-md-4" >Calle </label>
+                                      <div class="col-md-6">
+                                                <apex:inputText value="{!registro.CalleSugerido}" StyleClass="form-control" id="CalleSugerido" />
+                                      </div>
+                                      <div class="col-md-2">
+                                            <apex:inputCheckbox value="{!registro.CalleSugeridoCheck}"/>  
+                                        </div>
+                                        
+                                </div>-->
+                                <div class="row pad">
+                                      <label for="Codigo postal" class="col-md-4" >Codigo postal </label>
+                                      <div class="col-md-6">
+                                                <apex:inputText value="{!registro.CodigoPostalSugerido}" StyleClass="form-control" id="codigoSugerido" />
+                                      </div>
+                                      <div class="col-md-2">
+                                            <apex:inputCheckbox value="{!registro.CodigoPostalSugeridoCheck}"/>  
+                                        </div> 
+                                </div>
+                                <div class="row pad" style="text-align:center;">
+                                    <button type="button"  onclick="actualizaBoton();" id="agregarContactoBtn" class="btn btn-primary" >Cambiar
+                                    	</button> 
+                                   
+                                    <!--<apex:commandButton value="Cambiar" reRender="parteActual,mensaje,imagenMapa" styleClass="btn btn-primary "/>-->
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel id="tablaDirecciones">
+                            <div class="col-md-4">
+                        		<h3>
+                                    Buscador:
+                                </h3>
+                                <div class="row">
+                                    <label class="col-md-6">Estado seleccionado: </label>
+                                    <div class="col-md-6">
+                                        <apex:selectList value="{!estadoCombo}"  size="1"  multiselect="false" >
+                                            <apex:selectOptions value="{!comboEstado}"/>
+                                            <apex:actionSupport action="{!cambiaEstado}" event="onchange" reRender="parteModificable,tablaDirecciones,panelJS"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-md-6">Ciudad seleccionado: </label>
+                                    <div class="col-md-6">
+                                        <apex:selectList value="{!ciudadCombo}"  size="1"  multiselect="false" >
+                                            <apex:selectOptions value="{!comboCiudad}"/>
+                                            <apex:actionSupport action="{!cambiaCiudad}" event="onchange" reRender="parteModificable,tablaDirecciones,panelJS"/> 
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                           		<table id="listaDirecciones" class="table table-bordered table-striped table-responsive" > 
+                                    <thead>
+                                    <tr>
+                                    	<th>Elegir</th>
+                                    	<th>CP</th>
+                                    	<!--<th>Calle</th>-->
+                                    	<th>Colonia</th>
+                                    	<th>Ciudad</th>
+                                    	<th>Estado</th>
+                                    </tr>
+                                        </thead>
+                                    <apex:variable value="{!0}" var="cnt"/>
+                                    <apex:repeat value="{!direcciones}" var="direccion">
+                                        <tr>
+                                        <td><input type="radio" name="elegir" value="{!cnt}"  onclick="llenaEditables(j$(this).val());" /></td>
+                                        <td>{!direccion.CodigoPostal__c}</td>
+                                       <!-- <td>{!direccion.Calle__c}</td> -->
+                                        <td>{!direccion.Colonia__c}</td>
+                                        <td>{!direccion.Ciudad__c}</td>
+                                        <td>{!direccion.Estado__c}</td>
+                                            </tr>
+                                    	<apex:variable value="{!cnt+1}" var="cnt"/>
+                                    </apex:repeat>
+                                </table>
+                   		    </div>
+                            </apex:outputPanel>
+                    </div>
+                        
+                        <div class="row" style="text-align:left;">
+                        </div>
+                   		<div class="row" >
+                           
+                            <apex:outputPanel id="imagenMapa" >
+                            <div class="col-md-8" style="text-align:center;">
+                                <script>
+                                j$=jQuery.noConflict();
+                                	j$(document).ready(function(){
+                                        //j$("#mapaCiudad").attr('src',"https://maps.googleapis.com/maps/api/staticmap?center={!registro.Calle},{!registro.CodigoPostal},{!registro.Ciudad},{!registro.Estado},Mexico&zoom=15&size=600x200&markers=color%3Ared%7C{!registro.calle},{!registro.CodigoPostal},{!registro.Ciudad},{!registro.Estado}Mexico&language=es");
+                                    });
+                                //console.log("https://maps.googleapis.com/maps/api/staticmap?center={!registro.Colonia},{!registro.CodigoPostal},{!registro.Ciudad},{!registro.Estado},Mexico&zoom=15&size=600x200&markers=color%3Ared%7C,{!registro.CodigoPostal},{!registro.Ciudad},{!registro.Estado}Mexico&language=es");
+                                </script>
+                            <img  id="mapaCiudad" class="img-responsive" src="https://maps.googleapis.com/maps/api/staticmap?center={!registro.Colonia},{!registro.CodigoPostal},{!registro.Ciudad},{!registro.Estado},Mexico&zoom=15&size=600x200&markers=color%3Ared%7C,{!registro.CodigoPostal},{!registro.Ciudad},{!registro.Estado}Mexico&language=es" />
+                            </div>
+                            </apex:outputPanel>
+                            <div class="col-md-4" style="text-align:center;">
+                                
+                                    <apex:commandButton action="{!guardar}" reRender="forma,panelJS" styleClass="btn btn-success" />
+                        
+                            </div>
+                         </div>
+                   </c:Panel>
+                </div>
+                
+                    
+            </div>
+        </apex:form>
+    </div>
+    <apex:outputPanel id="panelJS">
+  	<script>
+    	var tabla;
+    	j$= jQuery.noConflict();
+    	j$(document).ready(function(){
+            tabla=null;
+        	tabla=j$('#listaDirecciones').DataTable({
+            "scrollX": true,
+            "autoWidth": true,
+                "pageLength": 5,
+            "oSearch": {"sSearch": "{!registro.CodigoPostal}" }});
+            j$('input:radio[name=elegir]').on('click',function(){
+            	console.log(j$('input:radio[name=elegir]:checked').val());
+                // llenaEditables(j$('input:radio[name=elegir]:checked').val());
+            });
+        });
+    </script>
+        </apex:outputPanel>
+</apex:page>

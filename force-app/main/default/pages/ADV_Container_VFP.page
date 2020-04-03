@@ -1,0 +1,266 @@
+<apex:page applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" showHeader="false" sidebar="false" standardController="Contrato2__c" standardStylesheets="false" extensions="PLAN_CuentaService">
+
+	<script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"/>
+	<script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
+	<apex:stylesheet value="{!URLFOR($Resource.jqueryui_custom_theme,'jquery-ui-1.11.4.custom/jquery-ui.css')}" />
+	
+	<script src="{!URLFOR($Resource.kendoui,'/js/kendo.all.min.js')}"></script>
+	<script src="{!URLFOR($Resource.kendoui,'/js/pako_deflate.min.js')}"></script>
+	<script src="{!URLFOR($Resource.kendoui,'/js/jszip.min.js')}"></script>
+	<script src="{!URLFOR($Resource.CTC_BASE,'/lightning/ctcLightning.js')}"></script>
+	
+	<link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.default.min.css')}" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.common.min.css')}" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}" />
+	
+	<apex:includeLightning />
+	<apex:slds />
+	
+	<div id="containerADV" class="containerADV"></div>
+	
+	<script type="text/javascript">
+
+		(function() {
+            'use strict'
+
+            kendo.pdf.defineFont({
+                "DejaVu Sans"             : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans.ttf')}",
+                "DejaVu Sans|Bold"        : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Bold.ttf')}",
+                "DejaVu Sans|Bold|Italic" : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Oblique.ttf')}",
+                "DejaVu Sans|Italic"      : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Oblique.ttf')}",
+                "Helvetica"               : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Regular.ttf')}",
+                "Helvetica|Bold"          : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Bold.ttf')}",
+                "Helvetica|Bold|Italic"   : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-BoldItalic.ttf')}",
+                "Helvetica|Italic"        : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Italic.ttf')}"
+            })
+        })()
+    
+        var pdfFlagBoolean = false;
+        var pdfReadyEvent = {};
+		
+		$Lightning.use("c:ADV_Container_APP", function() {
+			$Lightning.createComponent("c:CON_ADVContainer", { recordId: "{!Contrato2__c.Id}" }, "containerADV", function( cmp ) {
+
+				$A.eventService.addHandler({
+					event: "force:showToast",
+					handler: function(event) {
+						 //console.log("event", event);
+						if (SfdcApp && SfdcApp.projectOneNavigator && SfdcApp.projectOneNavigator.fireContainerEvent) {
+							SfdcApp.projectOneNavigator.fireContainerEvent("force:showToast", event.getParams());
+						} else {
+							alert(event.getParams().message);
+						}
+					}
+				});
+				
+				$A.eventService.addHandler({
+					event: "c:CON_GeneratePDF_EVENT",
+					handler: function(event) {
+
+						//$('[onclick="generaPDF()"]').trigger('click');
+
+						var args = event.getParams() || {}
+						var params = args.params || {}
+						var filiales = params.filiales || {}
+						var entidadLegal = params.entidadLegal || {}
+						var docArray = []
+						console.log('CON_GeneratePDF_EVENT:', event);
+						console.log('CON_GeneratePDF_EVENT params:', params);
+						console.log('CON_GeneratePDF_EVENT params filiales:', filiales, Object.keys(params));
+												
+						if(entidadLegal){
+							var razonSocial = (entidadLegal.RazonSocial__c) ? entidadLegal.RazonSocial__c : '-';				
+
+							var rfc = (entidadLegal.RFC__c) ? entidadLegal.RFC__c : '-';
+
+							var direccion = (entidadLegal.Direccion__c) ? entidadLegal.Direccion__c : '-';
+
+							var name = (entidadLegal && entidadLegal.Name) ? entidadLegal.Name : '-'
+							
+							docArray.push({Name: name,RFC__c: rfc,RazonSocial__c: razonSocial,Direccion__c: direccion,CodigoAS400: entidadLegal.CodigoAS400__c});
+						}
+						if(filiales.length > 0){
+
+							for(var contFilial = 0 ; contFilial < filiales.length ; contFilial ++){
+
+								var razonSocial = (filiales[contFilial].Entidad_Cuenta__r && filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r && filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c) ? filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c : '-';				
+
+								var rfc = (filiales[contFilial].Entidad_Cuenta__r && filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r && filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r.RFC__c) ? filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r.RFC__c : '-';
+
+								var direccion = (filiales[contFilial].Entidad_Cuenta__r && filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r && filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r.Direccion__c) ? filiales[contFilial].Entidad_Cuenta__r.EntidadLegal__r.Direccion__c : '-';
+
+								var name = (filiales[contFilial].Name ) ? filiales[contFilial].Name : '-';
+
+								docArray.push({Name: name,RFC__c: rfc,RazonSocial__c: razonSocial,Direccion__c: direccion,CodigoAS400: filiales[contFilial].CodigoAS400__c});
+							}
+
+							
+						}
+
+
+						console.log('DocArrayPDF:',docArray);
+
+						if(docArray.length >0){
+
+							if(!pdfFlagBoolean){
+								var toastW = $A.get('e.force:showToast')
+								toastW.setParams({type: 'warning',duration: "3000", message: 'Generando PDFs,espere por favor.'})
+								toastW.fire()
+								pdfFlagBoolean = true
+							}
+
+							renderPDF(0,docArray,docArray.length);
+
+						}
+
+						pdfReadyEvent = $A.get("e.c:CON_PdfReady_EVENT");
+						console.log('pdfReadyEvent:',pdfReadyEvent);
+					}
+				});
+			})
+		})
+
+		function renderPDF( contFilial,filial,filialTotal ) {
+
+			var draw = kendo.drawing;
+			
+
+			if(contFilial < filialTotal){
+
+				console.log('renderPDF:',contFilial,' filial:',filial[contFilial],' noVeces:',filialTotal);
+
+				setTimeout(function(){
+
+					jQuery('[class="slds-tabs--scoped slds-p-top_x-large"]').css('display', 'none')
+                    //boton de Descargar Direcciones Auxiliares
+					jQuery('[class="slds-button slds-button--neutral"]').css('display', 'none')
+					jQuery('#visorDocumentos').css('display', 'none')
+                    //jQuery('#tableEL').css('display', 'none')
+                    jQuery('#colCheckBoxTitle').css('display', 'none')
+					//jQuery('.breakCostos').css('page-break-before','always')	
+					//jQuery('#breakCostos').css('background-color','#00000')	
+
+
+					jQuery('[class="slds-text-heading_large slds-align_absolute-center slds-p-bottom_large"]').html('Anexo E')
+					jQuery('.cCON_ADVContainer > .contract-container-border').css('border', 'none') 
+					
+					if( filial[contFilial] ) {
+						// Selectores para reemplazar datos de EntidadLegal Por Datos de Filial
+						var razonSocial = filial[contFilial].RazonSocial__c;				
+
+						var rfc = filial[contFilial].RFC__c ;
+
+						var direccion = filial[contFilial].Direccion__c;
+						
+						jQuery("input[name='razonSocial']").val(razonSocial);
+						jQuery("input[name='rfc']").val(rfc);
+						jQuery("input[name='direccionFiscal']").val(direccion);
+					}
+
+			        draw.drawDOM($("#containerADV"), {
+			            avoidLinks: true,
+			            paperSize: "A4",
+						scale: 0.4,
+						forcePageBreak: ".page-break",
+						margin: {left: "0.2cm", top: "0.2cm", right: "0.2cm", bottom: "0.2cm"},
+			        })
+			        .then(function(root) {
+			        	kendo.drawing.pdf.toDataURL(root, function(a) {
+		                    var data = a.replace('data:application/pdf;base64,', '')
+							console.log('filial[contFilial].Name: ',filial[contFilial].Name );
+		                    guardaContrato( "{!Contrato2__c.PartidaPresupuesto__c}", data,filial[contFilial].CodigoAS400 )
+
+		                })
+
+			            return draw.exportPDF(root);
+			        })
+			        .done(function(data) {
+			            
+						
+
+						contFilial += 1;
+
+						return renderPDF(contFilial,filial,filialTotal);
+			        }).fail(function(error){
+
+
+			        	jQuery('[class="slds-tabs--scoped slds-p-top_x-large"]').css('display', 'block')
+                        //boton de Descargar Direcciones Auxiliares
+						jQuery('[class="slds-button slds-button--neutral"]').css('display', 'block')
+						jQuery('#visorDocumentos').css('display', 'block')
+                        //jQuery('#tableEL').css('display', 'inline-table')
+                        jQuery('#colCheckBoxTitle').css('display', 'block')
+						jQuery('[class="slds-text-heading_large slds-align_absolute-center slds-p-bottom_large"]').html('Formato Alta Cliente')
+						jQuery('.cCON_ADVContainer > .contract-container-border').css('border', '5px solid #0070d2')
+
+			        	var toastE = $A.get('e.force:showToast')
+						toastE.setParams({type: 'error', message: 'Error al crear PDFs '+error})
+						toastE.fire()
+			        })
+		        }, 3500);
+		        
+	        }else{
+
+	        	jQuery('[class="slds-tabs--scoped slds-p-top_x-large"]').css('display', 'block')
+                //boton de Descargar Direcciones Auxiliares
+				jQuery('[class="slds-button slds-button--neutral"]').css('display', 'block')
+				jQuery('#visorDocumentos').css('display', 'block')
+                //jQuery('#tableEL').css('display', 'inline-table')
+                jQuery('#colCheckBoxTitle').css('display', 'block')
+				jQuery('[class="slds-text-heading_large slds-align_absolute-center slds-p-bottom_large"]').html('Formato Alta Cliente')
+				jQuery('.cCON_ADVContainer > .contract-container-border').css('border', '5px solid #0070d2')
+						
+	        	var toastS = $A.get('e.force:showToast')
+				toastS.setParams({type: 'success', message: 'PDF generados con exito.'})
+				toastS.fire()
+				hidePDFSpinner();
+	        }
+
+	        
+
+	        return contFilial;
+		}
+
+		function guardaContrato( qliId, strBase64,filial ) {
+
+			var filial = filial || ''
+
+			ctcLightning.remote('PLAN_CuentaService.guardaAnexoE')( qliId, strBase64,filial )
+        	.then( function( res ) {
+                
+                console.log('Respuesta guardaAnexoE:'+res);
+        		url ='/servlet/servlet.FileDownload?file='+res.Upsert_Attachment.Id;
+				//sforce.one.navigateToURL(url, true)
+				window.open(url)
+
+        		console.log('success => guardado de anexoE: ', res)
+        	
+        	}).catch( function( err ) {
+        		console.log('error => guardado de anexoE: ', res)
+        	})
+		}
+
+		var hidePDFSpinner = function() {
+			
+
+			console.log('entro spinner:',pdfReadyEvent);
+			pdfReadyEvent.fire();
+		}
+
+
+
+	</script>
+	<style>
+		.containerADV > *, .slds-scope h1, .slds-scope h2, .slds-scope h3, .slds-scope h4, .slds-scope h5, .slds-scope h6, .slds-scope th, .slds-scope td {
+            font-family: "Helvetica" !important;
+        }
+        #generaPDFButton{
+       		opacity: 0.0;
+       	}
+       	#visorDocumentos{
+       		width: 100%;
+       	}
+	</style>
+	<button id="generaPDFButton" type="submit" class="btn btn-primary buscar" onclick="renderPDF()" >Muestra PDF</button>
+	
+</apex:page>

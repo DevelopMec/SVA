@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="SendDocuSing_CTRL">    
+    <lightning:card title="" iconName="doctype:box_notes">
+        <div>
+            <center>
+                <lightning:button label="Enviar Contrato Digital" onclick="{!c.enviarDocumento}" variant="brand"/>  
+            </center>
+        </div>
+    </lightning:card>
+</aura:component>

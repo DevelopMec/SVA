@@ -1,0 +1,1135 @@
+<apex:component >
+    <div ng-controller="productosCtrl as prod" id="productosCtrl" ng-init="prod.init(cotizacion)">
+        <br/>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Productos <span ng-bind="cotizacion.Name"/></h3>
+            </div>
+            
+            <div class="panel-body" ng-if="cotizacion && (!cot.soluciones || cot.soluciones.length <= 0)">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="alert alert-danger">
+                            <span ng-bind="'Para editar productos primero debe seleccionar ' + cot.schema.Product2.Family.label"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- performance calvarez -->
+            <div class="panel-body" mng-if="cotizacion.soluciones.length > 0">
+                <div class="row producto-container">
+                    <div class="col-sm-12">
+                        
+                        <div class="table-responsive table-container">
+                            <table class="table table-striped table-condensed table-hover">
+                                <thead>
+                                    <tr>
+
+                                        <th ng-bind="cot.schema.Product2.Name.label" class="th-producto nombreProducto"></th>
+                                        <th ng-bind="cot.schema.Product2.Red__c.label" class="th-producto text-center"></th>
+                                        <th ng-bind="cot.schema.Product2.Uso__c.label" class="th-producto text-center"></th>
+                                        <th ng-bind="cot.schema.Product2.Formato__c.label" class="th-producto text-center"></th>
+                                            
+                                        <th ng-bind="cot.schema.QuoteLineItem.CantidadTarjetas__c.label"></th>
+                                        <th ng-bind="cot.schema.QuoteLineItem.UnitPrice.label" class="precioProducto text-center"></th>
+                                        <th ng-bind="cot.schema.QuoteLineItem.ServiceDate.label" class="fechaProducto text-center"></th>
+                                        <th ng-bind="cot.schema.QuoteLineItem.NumberOfShipments__c.label" class="th-envios text-center"></th>
+                                        <th ng-bind="cot.schema.Opportunity.Competidor__c.label" class="th-producto competidorProducto"></th>
+                                        <th class="th-acciones text-right"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat-start="producto in cotizacion.productos">
+                                        <td>
+                                            <ctc-input 
+                                                ctc-instance="producto" 
+                                                ctc-field="cot.schema.QuoteLineItem.Product2Id" 
+                                                ctc-form="cotizacion.formCotiza" 
+                                                ctc-opts="cotizacion.soluciones" 
+                                                ctc-label="'Name'" 
+                                                ctc-on-change="prod.seleccionaProducto"
+                                                ctc-tooltip-body="true"
+                                            ></ctc-input>
+                                        </td>
+
+                                        <td class="text-center" ng-bind="producto.Product2Id__o.Red__c"></td>
+                                        <td class="text-center" ng-bind="producto.Product2Id__o.Uso__c"></td>
+                                        <td class="text-center" ng-bind="producto.Product2Id__o.Formato__c"></td>
+
+                                        <td>
+                                            
+                                            <div ng-class="{'has-error': cotizacion.formCotiza['CantidadTarjetas__c' + producto.IdElement].$invalid}" class="ctc-input-base">
+                                                
+                                                <input ng-keyup="prod.activateSaveButton()" type="text" class="form-control" ng-model="producto.CantidadTarjetas__c" ng-required="cot.schema.QuoteLineItem.CantidadTarjetas__c.required" ctc-min-number="cotizacion.Familia__c == 'Mantenimiento' ? 0 : 1" ctc-format-number="-" ctc-field="cot.schema.QuoteLineItem.CantidadTarjetas__c" name="{{'CantidadTarjetas__c' + producto.IdElement}}" id="{{'CantidadTarjetas__c' + producto.IdElement}}" ng-disabled="producto.disabled.CantidadTarjetas__c" />
+
+                                                <i class="label label-danger animated rubberBand msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza['CantidadTarjetas__c' + producto.IdElement].$invalid" >Requerido</i>
+
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span ng-bind="producto.escalonamientos.total | currency: '$ '" ng-if="producto.escalonamientos.Escalonamiento__c"></span>
+
+                                            <ctc-input ng-keyup="prod.activateSaveButton()" ng-if="!producto.escalonamientos.Escalonamiento__c" ctc-instance="producto" ctc-field="cot.schema.QuoteLineItem.UnitPrice" ctc-form="cotizacion.formCotiza" ctc-on-change="prod.calculaComision" ctc-attrs="'ctc-min-number=\'1\''"></ctc-input>
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="ctc-btn" ng-init="prod.initPopover(producto)" ng-if="producto.escalonamientos.Escalonamiento__c" ng-mouseover="prod.loadEscalonamientos(producto)" uib-popover-html="producto.popover.body" popover-title="{{producto.popover.title}}" popover-trigger="'mouseenter'" popover-placement="bottom" ng-bind="'Escalonamientos ' + (producto.ServiceDate | date: 'dd/MM/yyyy': 'UTC')"></a>
+
+                                            <span ng-if="!producto.escalonamientos.Escalonamiento__c" ng-bind="producto.ServiceDate | date: 'dd/MM/yyyy': 'UTC'"></span>
+                                        </td>
+                                        <td>
+                                            <div ng-class="{'has-error': cotizacion.formCotiza['NumberOfShipments__c' + producto.IdElement].$invalid}" class="ctc-input-base">
+                                                
+                                                <input  ng-keyup="prod.getApprovalOtherConcepts(producto.NumberOfShipments__c)" type="text" class="form-control" ng-model="producto.NumberOfShipments__c" ng-required="cot.schema.QuoteLineItem.NumberOfShipments__c.required" ctc-min-number="cotizacion.Familia__c == 'Mantenimiento' ? 0 : 1" ctc-format-number="-" ctc-field="cot.schema.QuoteLineItem.NumberOfShipments__c" name="{{'NumberOfShipments__c' + producto.IdElement}}" id="{{'NumberOfShipments__c' + producto.IdElement}}" ng-disabled="producto.disabled.NumberOfShipments__c"/>
+                                                
+                                                <i class="label label-danger animated rubberBand msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza['NumberOfShipments__c' + producto.IdElement].$invalid" >Requerido</i>
+                                                
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span ng-bind="sc.opportunity.Competidor__c" ></span>
+                                        </td>
+
+                                        <td class="text-right">
+                                            <div class="btnb-group">
+                                               
+                                               <a ng-if="producto.Id" ng-click="prod.escalonamiento(producto, sc.schema)" class="btnb btnb-sm btnb-primary" uib-tooltip="Escalonamiento">
+                                                    <span class="fa fa-line-chart"></span>
+                                                </a>
+
+                                               <!-- <a ng-if="producto.Id && !producto.IsClone && !cotizacion._otraFamilia" target="_blank" ng-href="{{prod.theme != 'Theme4d' ? '/apex/CON_LCsContainer_VFP?id=' + producto.Id : '/one/one.app#/alohaRedirect/apex/CON_LCsContainer_VFP?id=' + producto.Id}}" class="btnb btnb-sm btnb-success" uib-tooltip="Contrato" tooltip-append-to-body="true">
+                                                    <span class="fa fa-file-text"></span>
+                                                </a>-->
+                                                
+                                                <!--<a ng-if="producto.Id && cotizacion.Editable && !producto.IsClone && prod.tieneAccesoEscalonamiento" ng-click="prod.escalonamiento(producto, cotizacion.Id)" class="btnb btnb-sm btnb-primary" uib-tooltip="Escalonamiento" tooltip-append-to-body="true">
+                                                    <span class="fa fa-line-chart"></span>
+                                                </a>-->
+
+                                                <a ng-if="cotizacion.Editable || producto.IsClone" ng-click="prod.eliminarProducto($index)" class="btnb btnb-sm btnb-danger" uib-tooltip="Eliminar producto" tooltip-append-to-body="true">
+                                                    <span class="fa fa-trash"></span>
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    <tr ng-repeat-end="-" ng-repeat="comparado in producto.comparados">
+                                        <td></td>
+                                        <td>Comparar con: </td>
+                                        <td colspan="3">
+                                            <ctc-input 
+                                                ctc-instance="comparado" 
+                                                ctc-field="cot.schema.QuoteLineItem.ProductoComparado__c" 
+                                                ctc-form="cotizacion.formCotiza" 
+                                                ctc-opts="producto.soluciones" 
+                                                ctc-label="'Name'"
+                                                ctc-tooltip-body="true"
+                                                ctc-on-change="prod.seleccionaProducto"
+                                                ctc-params="{producto: producto}"
+                                            ></ctc-input>
+                                        </td>
+                                        <td>
+                                            <a ng-click="prod.utilizarComparado(comparado, producto, cot.soluciones)" class="btnb btnb-sm btnb-info" uib-tooltip="Utilizar éste producto como principal"  style="" tooltip-append-to-body="true" ng-if="comparado.ProductoComparado__c__o.Id && cotizacion.Editable"> 
+                                                <span class="fa fa-refresh"></span> 
+                                            </a>
+
+                                            <a ng-click="prod.eliminarComparado(comparado, producto)" class="btnb btnb-sm btnb-danger" uib-tooltip="Eliminar"  style="" tooltip-append-to-body="true" ng-if="comparado.ProductoComparado__c__o.Id && cotizacion.Editable"> 
+                                                <span class="fa fa-trash"></span> 
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <uib-tabset active="cotizacion.tab" ng-if="cotizacion.productos.length > 0">
+            <uib-tab ng-repeat="producto in cotizacion.productos" select="prod.seleccionarProducto(producto)">
+                <uib-tab-heading>
+                    <i class="fa fa-check-circle-o"/>
+                    <span ng-bind="producto.Product2Id__o.Name"/>
+                </uib-tab-heading>
+
+                <c:PLAN_FormaPago ></c:PLAN_FormaPago>
+                <c:PLAN_Costos ></c:PLAN_Costos>
+                <c:PLAN_Condiciones ></c:PLAN_Condiciones>
+
+            </uib-tab>
+        </uib-tabset>
+
+        <br/>
+    </div>
+    <script type="text/javascript">
+        (function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('productosCtrl', ProductosCtrl)
+
+            ProductosCtrl.$inject = ['ctcUtils','$uibModal', '$scope', '$timeout', '$filter', '$compile']
+            function ProductosCtrl(ctcUtils, $uibModal, $scope, $timeout, $filter, $compile) {
+
+                var vm = this
+                vm.cotizacion = {}
+                vm.schema = ctcUtils.app.schema || {}
+                vm.profile = ctcUtils.app.profile || ''
+
+
+                vm.keyProductoSeleccionado = ''
+                vm.comisionServicio = 'Comisión por el servicio'
+                vm.theme = '{!$User.UIThemeDisplayed}'
+                vm.segmento = ''
+                vm.tieneAccesoEscalonamiento = false
+
+
+                vm.init = function( cotizacion ) {
+                    vm.cotizacion = cotizacion || {}
+                    vm.tieneAccesoEscalonamiento = ctcUtils.app.tieneAccesoEscalonamiento
+                }
+
+                vm.getApprovalOtherConcepts = function( model ) {
+                    //console.log('Sí está entrando a getApprovalOtherConcepts.'); 
+                    if (model != undefined) {
+                        //Activate save button.
+                        ctcUtils.changeButtonStatus();
+                    	ctcUtils.getApprovalOtherConcepts( null, null, null, model )
+                    }
+                }
+
+                vm.activateSaveButton = function() {
+                    //Activate save button. 
+                    ctcUtils.changeButtonStatus();
+                }
+                
+                vm.seleccionaProducto = function( model, instance, field, form, params, fromCtc ) {
+                    if( !fromCtc ) {
+                        //Activate save button.
+                        ctcUtils.changeButtonStatus();
+                        // console.log('\n\n\n seleccionaProducto: ', angular.copy(model), angular.copy(instance), angular.copy(params), '\n\n\n')
+                        instance.caracteristicas = []
+                        instance.conceptos = []
+                        instance.conceptosIds = {}
+                        instance.conceptosKey = {}
+                        instance.productoConcepto = []
+                        instance.soluciones = []
+
+                        var producto = params && params.producto ? params.producto : {}
+                        var esProductoCotizado = typeof producto.Product2Id == 'undefined'
+
+                        if( !vm.cotizacion.hasOwnProperty('Ids2Delete') ) {
+                            vm.cotizacion.Ids2Delete  = {}
+                        }
+                        
+                        if( !instance.IsClone ) {
+
+                            if( (!model && instance.Id_BK) || (instance.Product2Id_BK && model.Id != instance.Product2Id_BK && instance.Id_BK )) {
+                                vm.cotizacion.Ids2Delete[instance.Id_BK] = true
+                                delete instance.Id
+                                instance.IdElement = new Date().getTime()
+    
+                            } else if( instance.Id_BK && model.Id == instance.Product2Id_BK ) {
+                                delete vm.cotizacion.Ids2Delete[instance.Id_BK]
+                                instance.Id = instance.Id_BK
+                                instance.IdElement = instance.Id    
+                            }
+                            
+                        }
+
+                        if( model && model.Id ) {
+                            var idsProducts = '\'' + model.Id + '\''
+                            if( esProductoCotizado ) {
+                                angular.forEach( instance.comparados, function( comparado, comparado_index ) {
+                                    if( comparado.ProductoComparado__c ) {
+                                        if( idsProducts.length > 0 ) {
+                                            idsProducts += ', '
+                                        }
+
+                                        idsProducts += '\'' + comparado.ProductoComparado__c + '\''
+                                    }
+                                })
+                            }
+
+                            ctcUtils.obtenerConceptosCaracteristicasPorProducto(idsProducts)
+                            .then( function( res ) {
+
+                                // console.log('\n\n\n nuevos conceptos: ', res, '\n\n producto: ', producto, '\n\n\n')
+
+                                var conceptos = res && res.conceptos ? res.conceptos : {}
+                                var caracteristicas = res && res.caracteristicas ? res.caracteristicas : {}
+
+                                instance.caracteristicas = caracteristicas[model.Id] || []
+                                instance.conceptos = conceptos[model.Id] || []
+                                ctcUtils.defineConceptosKey( instance )
+
+                                var todosConceptos = []
+                                todosConceptos = todosConceptos.concat(instance.conceptos)
+
+
+                                if( esProductoCotizado ) { // Es producto cotizado
+
+                                    instance.soluciones = ctcUtils.obtenerSoluciones(instance.Product2Id, ctcUtils.app.soluciones)
+
+                                    angular.forEach( instance.comparados, function( comparado, comparado_index ) {
+                                        comparado.conceptos = conceptos[comparado.ProductoComparado__c] || []
+                                        comparado.caracteristicas = caracteristicas[comparado.ProductoComparado__c] || []
+                                        // comparado.productoConcepto = productosConcepto[comparado.Id] || []  
+
+                                        ctcUtils.defineConceptosKey( comparado )
+                                        
+
+                                        todosConceptos = todosConceptos.concat(comparado.conceptos)
+                                    })
+
+                                    ctcUtils.obtenerConceptosUnicos(todosConceptos, instance)
+                                    ctcUtils.calculaComision( instance, fromCtc )
+
+                                } else { // Es producto comparado
+                                    angular.forEach( instance.conceptos, function( concepto, index_concepto ) {
+                                        concepto.Bonificacion__c = 0
+                                        concepto.TieneBonificacion = true
+                                        if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                            concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                        } else {
+                                            concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                        }
+                                    })
+                                    
+                                    todosConceptos = todosConceptos.concat(producto.conceptos)
+                                    ctcUtils.obtenerConceptosUnicos(todosConceptos, producto, true)
+                                    ctcUtils.calculaComision( producto, fromCtc )
+                                }
+
+                            }).catch( function( err ) {
+                                ctcUtils.showError(err)
+                            })
+                        }
+                            
+                        // console.log('seleccionaProducto instance: ', instance, '\n cotizacion: ', vm.cotizacion)
+                    }
+                }
+                
+                vm._ODL_agregarProducto = function() {
+                    if(!vm.cotizacion.productos) {
+                        vm.cotizacion.productos = []
+                    }
+
+                    var sdate = new Date(ctcUtils.app.opportunity.CloseDate)
+                    sdate = sdate.getTime()
+
+                    var newObj = {comparados : [{}], ServiceDate: sdate}
+                    var nuevosCampos = [
+                        angular.copy(ctcUtils.app.schema.Concepto__c.Importe__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.PrecioFinal__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.VigenciaDescuento__c),
+                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.CantidadTarjetas__c)
+                    ]
+                    angular.forEach( nuevosCampos, function( nuevoCampo, nuevoCampo_index ) {
+                        nuevoCampo.index = 0
+                    })
+
+                    if( !newObj.columnasComparado ) {
+                        newObj.columnasComparado = []
+                    }
+                    newObj.columnasComparado = newObj.columnasComparado.concat(nuevosCampos)
+
+                    vm.cotizacion.productos.push(newObj)
+
+                    $timeout(function(){
+                        vm.cotizacion.tab = vm.cotizacion.productos.length - 1
+                    },300)
+                }
+
+                vm.utilizarComparado = function( comparado, cotizado, soluciones ) {
+                    console.log('utilizarComparado: ', arguments)
+                    cotizado.Product2Id = angular.copy(comparado.ProductoComparado__c)
+                    var buscar = ctcUtils.filter(soluciones, {Id: cotizado.Product2Id}, true)
+                    if( buscar && buscar.length > 0 ) {
+                        cotizado.Product2Id__o = buscar[0]
+                    }
+
+                    vm.seleccionaProducto( cotizado.Product2Id__o, cotizado, {}, {}, {}, false )
+                }
+
+                vm.eliminarComparado = function( comparado, cotizado ) {
+                    ctcUtils.removeConfig = {icon: 'fa fa-trash fa-fw', confirm: 'Eliminar', cancel: 'Cancelar', showRemove: true, headerClass: 'modal-header-danger'}
+                    var name = comparado.ProductoComparado__c__o.Name
+
+                    ctcUtils.openModal('modalGenerico', {instance: function () {return comparado}, title: function() {return 'Eliminar ' + name}, subTitle: function() {return 'Eliminar producto comparado: ' + name + '?'}}, 'md')
+                    .then( function() {
+
+                        if( !vm.cotizacion.hasOwnProperty('Ids2Delete') ) {
+                            vm.cotizacion.Ids2Delete  = {}
+                        }
+
+                        if( comparado.Id ) {
+                            vm.cotizacion.Ids2Delete[comparado.Id] = true
+                        }
+
+                        comparado.ProductoComparado__c = undefined
+                        comparado.ProductoComparado__c__o = undefined
+
+                        ctcUtils.obtenerConceptosUnicos(cotizado.conceptos, cotizado, true)
+
+
+                        console.log('eliminarComparado: ', comparado)
+                    })
+                }
+
+                vm.eliminarProducto = function( index ) {
+                    if( !vm.cotizacion.hasOwnProperty('Ids2Delete') ) {
+                        vm.cotizacion.Ids2Delete  = {}
+                    }
+
+                    var producto = vm.cotizacion.productos[index]
+                    var name = producto && producto.Product2Id__o ? (' ' + producto.Product2Id__o.Name) : ' producto'
+
+                    ctcUtils.removeConfig = {icon: 'fa fa-trash fa-fw', confirm: 'Eliminar', cancel: 'Cancelar', showRemove: true, headerClass: 'modal-header-danger'}
+
+                    ctcUtils.openModal('modalGenerico', {instance: function () {return producto}, title: function() {return 'Eliminar ' + name}, subTitle: function() {return 'Eliminar ' + name + '?'}}, 'md')
+                    .then( function() {
+                        if( producto.Id && !producto.IsClone ) {
+                            vm.cotizacion.Ids2Delete[producto.Id] = true
+
+                            if( producto.comparados ) {
+                                angular.forEach( producto.comparados, function( comparado, index ) {
+                                    if( comparado.Id ) {
+                                        vm.cotizacion.Ids2Delete[comparado.Id] = true
+                                    }
+                                })
+                            }
+                        }
+
+                        vm.cotizacion.productos.splice(index, 1)
+                    })
+                }
+
+                vm.escalonamiento = function( producto, quoteId ) {
+                    producto.QuoteId = quoteId
+                    ctcUtils.openModal('escalonamiento', {producto: function () {return producto } }, 'md')
+                    .then( function( res ) { 
+                    }).catch( function( err ) {
+                    })
+                }
+
+                vm.loadEscalonamientos = function( producto ) {
+                    producto.popover = {
+                        title: 'Cargando',
+                        body: '<p><span class="fa fa-spinner fa-pulse fa-fw"></span> Cargando información</p>'
+                    }
+                    ctcUtils.query('SELECT Id, Escalonamiento__c, QuoteId, PricebookEntryId, Product2Id, Quantity, UnitPrice, ServiceDate, Etapa__c, Escalonamiento__r.Etapa__c FROM QuoteLineItem WHERE Escalonamiento__c=\'' + producto.Id + '\'')
+                    .then(function(escalonamientos) {
+                        producto.popover.title = 'Escalonamientos'
+                        producto.popover.body = ''
+
+                        producto.popover.body += '<li><div class="row"><div class="col-sm-6">' + $filter('currency')(producto.UnitPrice, '$') + '</div><div class="col-sm-6 text-center">' + ctcUtils.parseDate(producto.ServiceDate) + '</div></div></li>'
+                        angular.forEach(escalonamientos, function(v, k) {
+                            producto.popover.body += '<li><div class="row"><div class="col-sm-6">' + $filter('currency')(v.UnitPrice, '$') + '</div><div class="col-sm-6 text-center">' + ctcUtils.parseDate(v.ServiceDate) + '</div></div></li>'
+                        })
+                        producto.popover.body = '<ul class="list-unstyled">' + producto.popover.body + '</ul>'
+
+                    }).catch(function(err) {
+                        producto.popover = {
+                            title: 'Ocurrió un error',
+                            body: '<p>' + err + '</p>'
+                        }
+                    })
+                }
+
+                vm.calculaComision = function( model, instance, field, form, params, fromCtc ) {
+
+                    ctcUtils.calculaComision( instance, fromCtc )
+                    
+                    // // if(model && instance && instance.Family ) {
+                    //     ctcUtils.remote('PLAN_CuentaService.query')('SELECT Id, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, Segmento__c FROM ComisionServicio__c WHERE Familia__c=\'' + instance.Family + '\' AND Segmento__c=\'' + vm.segmento + '\' ORDER BY MontoInicial__c ASC')
+                    //     .then(function(comisiones) {
+                    //         var comision = {}
+                    //         angular.forEach(comisiones, function(v, k) {
+                    //             if((instance.UnitPrice >= v.MontoInicial__c && instance.UnitPrice <= v.MontoFinal__c) || (!v.MontoFinal__c && instance.UnitPrice >= v.MontoInicial__c)) {
+                    //                 comision = angular.copy(v)
+                    //             } else if(!comision.hasOwnProperty('Id')){
+                    //                 comision = angular.copy(v)
+                    //             }
+                    //         })
+
+                    //         comision.Value = instance.TipoTarjeta__c == 'Amex' ? comision.PorcentajeAmex__c : comision.Porcentaje__c
+                    //         //console.log('calculaComision comision: ', comision)
+                    //         var ids = {}
+                    //         if(instance.conceptosId) {
+                    //             angular.forEach(Object.keys(instance.conceptosId), function(v, k) {
+                    //                 if(instance.conceptosId[v].TipoCargo__c == vm.comisionServicio) {
+                    //                     ids[v] = true
+                    //                 }
+                    //             })
+                    //         }
+                    //         //console.log('ids: ', ids)
+                    //         //8 ó 9 am - domingo
+
+                    //         if(instance.productoConceptoInstancias) {
+                    //             angular.forEach(Object.keys(instance.productoConceptoInstancias), function(v, k) {
+                    //                 angular.forEach(Object.keys(instance.productoConceptoInstancias[v]), function(v1, k1) {
+                    //                     if(ids.hasOwnProperty(v1) && instance.productoConceptoInstancias[v][v1]) {
+                    //                         instance.productoConceptoInstancias[v][v1].PrecioLista2__c = comision.Value
+                    //                     }
+                    //                 })
+                    //             })
+                    //         }
+                    //     }).catch(function(err) {
+                    //         vm.errors = [err]
+                    //     })
+                    // // }
+                }
+
+
+
+
+
+
+                vm.leerParams = function(cotizacion, schema, segmento ) {
+                    vm.cotizacion = cotizacion || {}
+                    vm.schema = schema || {}
+                    vm.segmento = segmento || ''
+                }
+
+                vm.productoSeleccionado = function(producto) { //deprecated
+                    vm.cotizacion.productoSeleccionado = producto
+                    vm.cotizacion.tab = vm.cotizacion.tab || 0
+                }
+
+                vm.addProductToComparison = function(productChild) { // deprecated
+                    if(productChild.firstClic){
+                        productChild.productosComparar.push({Producto__c__o : productChild.productoCotizado.Producto__c__o, isDelete : false})
+                        productChild.productosComparar.push({isDelete : true})
+                        productChild.firstClic = false
+                    }
+                    else{
+                        productChild.productosComparar.push({isDelete : true})
+                    }
+                }
+
+                //vm.eliminarChildProduct = function(prodComp, index){
+                vm.eliminarChildProduct = function(prodComp, index, producto){
+                    //console.log('producto',producto)
+                    if(!vm.cotizacion.eliminados) {
+                        vm.cotizacion.eliminados = {}
+                    }
+
+                    if(prodComp[index].Id)
+                    {
+                        vm.cotizacion.eliminados[prodComp[index].Id] = false
+                        vm.getIdsToDelete_ProductoConcepto(producto,prodComp[index],'Name', false)
+                        // console.log('prodComp.Name__o.Id: ', prodComp)
+                        // console.log('prodComp.Name__o.Id antes: ', producto.productoConceptoInstancias)
+                        if(prodComp[index].Name__o && prodComp[index].Name__o.Id) {
+                            delete producto.productoConceptoInstancias[prodComp[index].Name__o.Id]
+                        }
+                        // console.log('prodComp.Name__o.Id despues: ', producto.productoConceptoInstancias)
+                    }
+
+                    prodComp.splice(index,1)
+                    //angular.element($('#costosCtrl')).scope().cos.verificaProductos()
+                    $('[id="trprod_' + producto.$$hashKey + '"]')[index + 1].remove()
+                    //vm.actualizaModeloCostos()
+                    // console.log('vm.cotizacion.eliminados', vm.cotizacion.eliminados)
+                }
+
+                vm.seleccionarChildProduct = function( productoCotizado, productoComparado, soluciones ) {
+                    // console.log('\n\n\n productoCotizado: ', productoCotizado, '\n\n productoComparado: ', productoComparado, '\n\n soluciones: ', soluciones)
+
+                    productoCotizado.Name = angular.copy(productoComparado.Name)
+                    var buscar = ctcUtils.filter(soluciones, {Id: productoCotizado.Name}, true)
+                    // console.log('buscar: ', buscar)
+                    if( buscar && buscar.length > 0 ) {
+                        productoCotizado.Name__o = buscar[0]
+                    }
+
+
+                    vm.selectProducto( productoCotizado.Name__o, productoCotizado, {}, {}, {soluciones: soluciones}, false )
+
+
+                    // SELECT DataType, QualifiedApiName FROM EntityParticle WHERE DataType = 'picklist' AND EntityDefinition.QualifiedApiName = 'Event'
+
+                    //vm.seleccionarChildProduct = function( productoParent, productoCotizado, productos ) {
+
+                    // Nueva funcionalidad Cotizador monoproducto 14 11 2017 calvarez 
+
+                    /*var red = ctcUtils.filter(productoParent.Red__c_opts, {label: productoCotizado.Name__o.Red__c}, true)
+                    if(red && red.length > 0) {
+                        productoParent.Red__c__o = red[0]
+                    }
+
+                    var unique = {}
+                    productos.filter(function(item) {
+                        if(item.Family == productoCotizado.Name__o.Family && item.Red__c == productoCotizado.Name__o.Red__c && item.Uso__c && !unique[item.Uso__c]) {
+                            unique[item.Uso__c] = true
+                        }
+                    })
+                    productoParent['Uso__c_opts'] = []
+                    angular.forEach(Object.keys(unique), function(v, k) {
+                        productoParent['Uso__c_opts'].push({label: v, value: v})
+                    })
+                    var uso = ctcUtils.filter(productoParent.Uso__c_opts, {label: productoCotizado.Name__o.Uso__c}, true)
+                    if(uso && uso.length > 0) {
+                        productoParent.Uso__c__o = uso[0]
+                    }
+
+                    unique = {}
+                    productos.filter(function(item) {
+                        if(item.Family == productoCotizado.Name__o.Family && item.Red__c == productoCotizado.Name__o.Red__c && item.Uso__c == productoCotizado.Name__o.Uso__c && item.Formato__c && !unique[item.Formato__c]) {
+                            unique[item.Formato__c] = true
+                        }
+                    })
+                    productoParent['Formato__c_opts'] = []
+                    angular.forEach(Object.keys(unique), function(v, k) {
+                        productoParent['Formato__c_opts'].push({label: v, value: v})
+                    })
+                    var formato = ctcUtils.filter(productoParent.Formato__c_opts, {label: productoCotizado.Name__o.Formato__c}, true)
+                    if(formato && formato.length > 0) {
+                        productoParent.Formato__c__o = formato[0]
+                    }
+
+                    productoParent['Products2'] = []
+                    productos.filter(function(item) {
+                        if(item.Family == productoCotizado.Name__o.Family && item.Red__c == productoCotizado.Name__o.Red__c && item.Uso__c == productoCotizado.Name__o.Uso__c && item.Formato__c == productoCotizado.Name__o.Formato__c) {
+                            productoParent.Products2.push(item)
+                        }
+                    })
+
+                    var producto = ctcUtils.filter(productoParent.Products2, {Id: productoCotizado.Name__o.Id}, true)
+                    if(producto && producto.length > 0) {
+                        productoParent.Name__o = producto[0]
+                    }
+                    //productoParent.Name__o = productoCotizado.Name__o //comenta calvarez 14 mar 2017 nueva funcionalidad
+                    */
+                }
+
+                vm.isDisabled = function(prodCot) { // deprecated
+                    if(prodCot && 
+                        (prodCot.Amount && prodCot.Amount.length > 0) &&
+                        (prodCot.CantidadTarjetas__c && prodCot.CantidadTarjetas__c.length > 0) &&
+                        //(prodCot.FechaAltaContrato__c && prodCot.FechaAltaContrato__c.length > 0) &&
+                        (prodCot.Familia__c__o && prodCot.Familia__c__o.Name.length > 0) &&
+                        (prodCot.Producto__c__o && prodCot.Producto__c__o.Name && prodCot.Producto__c__o.Name.length > 0))
+                    {
+                        return false
+                    }
+                    return true
+                }
+
+                
+
+                vm.seleccionarProducto = function(producto) {
+                    if(producto) {
+                        vm.keyProductoSeleccionado = producto.$$hashKey
+                    }
+                }
+
+                vm.selectProducto = function( model, instance, field, form, params ) {
+                    if( model && instance && params && params.soluciones ) {
+                        if(!instance.productosComparar) {
+                            instance.productosComparar = []
+                        }
+                        if(instance.productosComparar.length < 1) {
+                            instance.productosComparar.push({isDelete : true, parentReference: instance.$$hashKey})
+                        }
+
+                        instance.ComparadosLista = []
+                        var ComparadosLista = []
+                        // cambia a monoproducto angular.forEach(instance.Family__o.values, function(v, k) {
+                        angular.forEach(params.soluciones, function( solucion, _index ) {
+                            if(model.Id != solucion.Id) {
+                                ComparadosLista.push(solucion)
+                            }
+                        })
+                        instance.ComparadosLista = ComparadosLista || []
+                    }
+                    $timeout(function() {
+                        vm.calculaComision(model, instance)//agrega calvarez 22mar2017
+                    }, 800)
+
+                    // permitir editar un QuoteLineItem
+                    if( instance.Product2Id ) {
+                        if( instance.Name != instance.Product2Id ) {
+                            if( !vm.cotizacion.eliminados ) {
+                                vm.cotizacion.eliminados = {}
+                            }
+                            vm.cotizacion.eliminados[instance.Id] = true
+                            // prueba calvarez 14 enero 2018 delete instance.Id
+                            // delete instance.Id
+                        } else if( instance.Name == instance.Product2Id && vm.cotizacion.eliminados ) {
+                            //delete vm.cotizacion.eliminados[instance.Product2Id]
+                        }
+                    }
+                }
+
+                vm.selectProductoChild = function( model, instance, field, form, params, init ) {
+                    // console.log('selectProductoChild: ', arguments)
+                    // if( !init ) {
+                        if(instance) {
+                            var producto = ctcUtils.filter(vm.cotizacion.productos, {'$$hashKey': instance.parentReference})
+                            if(producto && producto.length > 0) {
+                                producto = producto[0]
+                                var lastElement = producto.productosComparar.length - 1
+                                if(model) {
+                                    if(producto.productosComparar[lastElement].Name__o) {
+                                        producto.productosComparar.push({isDelete : true, parentReference: producto.$$hashKey})
+                                    }
+                                }
+                                lastElement = producto.productosComparar.length - 1
+                                producto.productosComparar.splice(lastElement, 1)
+                                $timeout(function() {
+                                    var el = $('[id="trprod_' + producto.$$hashKey + '"]')[lastElement + 1]
+                                    if(el) {
+                                        el.remove()
+                                    }
+                                    if(lastElement < 2) {
+                                        producto.productosComparar.push({isDelete : true, parentReference: producto.$$hashKey})
+                                    }
+
+                                }, 300)
+                            }
+
+                        }
+                        if(!vm.cotizacion.eliminados) {
+                            vm.cotizacion.eliminados = {}
+                        }
+                        if(model && model.Id) {
+                            var deleteComp = model.Id != instance.Name
+                            if(deleteComp) {
+                                if(instance.Id){
+                                    vm.cotizacion.eliminados[instance.Id] = false
+                                    angular.forEach(vm.obtenerIdsProductosConcepto(producto, instance.Name), function(idProdConc, key){
+                                        vm.cotizacion.eliminados[idProdConc] = false
+                                    })
+                                }
+                            } 
+                            else {
+                                delete vm.cotizacion.eliminados[instance.Id]
+                                angular.forEach(vm.obtenerIdsProductosConcepto(producto,instance.Name), function(idProdConc, key){
+                                    delete vm.cotizacion.eliminados[idProdConc]
+                                })
+                            }
+                        }
+                        // console.log(' selectProductoChild vm.cotizacion.eliminados', vm.cotizacion.eliminados)
+                    // }
+                }
+
+                vm.obtenerIdsProductosConcepto = function(producto,idProduct2){
+                    // console.log('producto',producto)
+                    // console.log('producto.productoConceptoInstancias', producto.productoConceptoInstancias)
+                    // console.log('idProduct2', idProduct2)
+                    var idsProductoConcepto = []
+
+                    if(producto.productoConceptoInstancias && producto.productoConceptoInstancias[idProduct2]){
+                        angular.forEach(Object.keys(producto.productoConceptoInstancias[idProduct2]), function(idConcepto, key){
+                            var productoConcepto = producto.productoConceptoInstancias[idProduct2]
+
+                            if(productoConcepto[idConcepto].Id){
+                                idsProductoConcepto.push(productoConcepto[idConcepto].Id)
+                            }
+                        })
+                    }
+
+                    return idsProductoConcepto
+                }
+
+                vm.actualizaModeloCostos = function(cotizacion) {
+                    var scope = angular.element($('#costosCtrl')).scope()
+                    if(scope && scope.cos) {
+                        scope.cos.verificaProductos(cotizacion)
+                    }
+                }
+
+                vm.setHashkey = function(comparado, producto) {
+                    if(comparado && producto) {
+                        comparado.parentReference = producto.$$hashKey
+                    }
+                }
+
+                vm.getIdsToDelete_ProductoConcepto = function(qli,prod,field, isQli){
+                    
+                    if(prod && prod[field] && qli.productoConceptoInstancias[prod[field]] ){
+                        angular.forEach(Object.keys(qli.productoConceptoInstancias[prod[field]]), function(idConcepto, key){
+                            var concepto = qli.productoConceptoInstancias[prod[field]]
+                            if(concepto[idConcepto].Id) {
+                                vm.cotizacion.eliminados[concepto[idConcepto].Id] = isQli
+                            }
+                        })
+                    }
+                    else{
+                        if(prod && prod.Name__o && prod.Name__o.Id && qli.productoConceptoInstancias[prod.Name__o.Id]){
+                            angular.forEach(Object.keys(qli.productoConceptoInstancias[prod.Name__o.Id]), function(idConcepto, key){
+                                var concepto = qli.productoConceptoInstancias[prod.Name__o.Id]
+
+                                vm.cotizacion.eliminados[concepto[idConcepto].Id] = isQli
+                            })
+                        }
+                    }
+                }
+
+                vm.initPopover = function(producto) {
+                    producto.popover = {
+                        title: 'Cargando',
+                        body: '<p><span class="fa fa-spinner fa-pulse fa-fw"></span> Cargando información</p>'
+                    }
+                }
+
+                vm.selectFamilia = function(model, instance, field, form, params) {
+                    var args = arguments
+                    // console.log('selectFamilia args: ', args)
+                    var unique = {}
+                    instance['Red__c_opts'] = []
+                    if(model) {
+                        var filter = args[4].filter(function(item) {
+                            if(item.Family == args[0].value && (item.Red__c == 'Abierta'||item.Red__c == 'Cerrada')) {
+                                if(!unique[item.Red__c]) {
+                                    unique[item.Red__c] = true
+                                }
+                            }
+                            return item.Family == args[0].value && (item.Red__c == 'Abierta'||item.Red__c == 'Cerrada')
+                        })
+                        // console.log('filter: ', filter, 'unique: ', unique)
+                        angular.forEach(Object.keys(unique), function(v, k) {
+                            instance['Red__c_opts'].push({label: v, value: v})
+                        })
+                        // console.log('instance: ', instance.Red__c_opts)
+                        if(instance.Red__c_opts && instance.Red__c_opts.length == 1) {
+                            instance.Red__c__o = instance.Red__c_opts[0]
+                            vm.selectRed(instance.Red__c__o, instance, field, form, params)
+                        }
+                    }
+                }
+
+                vm.selectRed = function(model, instance, field, form, params){
+                    // console.log('selectRed')
+                    // console.log('args: ', arguments)
+                    var unique = {}
+                    if(model && model.value){
+                        var filter = params.filter(function(item) {
+                            if(item.Family == instance.Family__o.value && item.Red__c == instance.Red__c__o.value && item.Uso__c){
+                                if(!unique[item.Uso__c]) {
+                                    unique[item.Uso__c] = true
+                                }
+                            }
+                            return item.Family == instance.Family__o.value && item.Red__c == instance.Red__c__o.value && item.Uso__c
+                        })
+                        // console.log('filter: ', filter, 'unique: ', unique)
+                        instance['Uso__c_opts'] = []
+                        angular.forEach(Object.keys(unique), function(v, k) {
+                            instance['Uso__c_opts'].push({label: v, value: v})
+                        })
+                        if(instance.Uso__c_opts && instance.Uso__c_opts.length == 1) {
+                            instance.Uso__c__o = instance.Uso__c_opts[0]
+                            vm.selectUso(instance.Uso__c__o, instance, field, form, params)
+                        }
+                    }
+                }
+
+                vm.selectUso = function(model, instance, field, form, params) {
+                    // console.log('selectUso')
+                    // console.log('args: ', arguments)
+                    var unique = {}
+                    if(model && model.value) {
+                        var filter = params.filter(function(item) {
+                            if(item.Family == instance.Family__o.value && item.Red__c == instance.Red__c__o.value && item.Uso__c == instance.Uso__c__o.value && item.Formato__c){
+                                if(!unique[item.Formato__c]) {
+                                    unique[item.Formato__c] = true
+                                }
+                            }
+                            return item.Family == instance.Family__o.value && item.Red__c == instance.Red__c__o.value && item.Uso__c == instance.Uso__c__o.value && item.Formato__c
+                        })
+                        // console.log('filter: ', filter, 'unique: ', unique)
+                        instance['Formato__c_opts'] = []
+                        angular.forEach(Object.keys(unique), function(v, k) {
+                            instance['Formato__c_opts'].push({label: v, value: v})
+                        })
+                        if(instance.Formato__c_opts && instance.Formato__c_opts.length == 1) {
+                            instance.Formato__c__o = instance.Formato__c_opts[0]
+                            vm.selectFormato(instance.Formato__c__o, instance, field, form, params)
+                        }
+                    }
+                }
+
+                vm.selectFormato = function(model, instance, field, form, params){
+                    // console.log('selectFormato')
+                    // console.log('args: ', arguments)
+                    instance.Products2 = []
+                    var unique = {}
+                    if(model && model.value){
+                        var filter = params.filter(function(item) {
+                            if(item.Family == instance.Family__o.value && item.Red__c == instance.Red__c__o.value && item.Uso__c == instance.Uso__c__o.value && item.Formato__c == instance.Formato__c__o.value){
+                                instance.Products2.push(item)
+                            }
+                            return item.Family == instance.Family__o.value && item.Red__c == instance.Red__c__o.value && item.Uso__c == instance.Uso__c__o.value && item.Formato__c == instance.Formato__c__o.value
+                        })
+                        // console.log('filter: ', filter, 'instance.Products2: ', instance.Products2)
+                        if(instance.Products2 && instance.Products2.length == 1) {
+                            instance.Name__o = instance.Products2[0]
+                            vm.selectProducto(instance.Name__o, instance, field, form, params)
+                        }
+                    }
+                }
+
+                
+
+                vm.cambiaEtapa = function(model, instance, field, form, params) {
+                    // console.log('in cambiaEtapa: ', arguments)
+                    instance.MotivoEtapa__c__values = []
+                    var value = model && model.value ? model.value : ''
+                    jQuery('[id*="SF_' + field.name + '"]').val(value)
+                    jQuery('[id*="SF_' + field.name + '"]').trigger('change')
+                    instance.MotivoEtapa__c__values = vm.getValues('SF_MotivoEtapa__c')
+                }
+
+                vm.getValues = function(idElement) {
+                    idElement = idElement || 'SubOrigenCandidato__c'
+                    return jQuery.map(jQuery('[id*="' + idElement + '"] option'), function(e) { return typeof e.value != 'undefined' && e.value.length > 0 && e.label != '--None--' && e.label != '--Ninguno--' ? {label: e.label, value: e.value} : null})
+                }
+
+                vm.renderHelp = function(field, instance) {
+                    $timeout(function() {
+                        var ele =jQuery('.helpText' + field.name + '_' + instance.IdElement)
+                        ele.empty()
+                        ele.addClass('help-text')
+                        ele.addClass('ctc-btn')
+                        ele.append($compile('<span class="fa fa-info-circle" tooltip-placement="left" uib-tooltip="Seleccionar ' + field.label + '"></span>')($scope))
+                    }, 500)
+                }
+
+                vm.verPdfCotizacion = function( cotizacion, owner ) {
+
+                    console.log('visualizarPDF: ', arguments)
+
+                    ctcUtils.showProcess(true, 'Comprobando datos')
+
+                    var soluciones = []
+                    var idsQli = ''
+                    var idsProducts = ''
+                    var keyProducto = {}
+                    var codigos = {}
+                    var productCodes = {}
+                    var codigosTYC = {}
+
+                    angular.forEach( cotizacion.productos, function( producto, index) {
+                        if( idsQli.length > 0 ) {
+                            idsQli += ', '
+                        }  
+                        idsQli += '\'' + producto.Id + '\''
+
+
+                        if( idsProducts.length > 0 ) {
+                            idsProducts += ', '
+                        }  
+                        idsProducts += '\'' + producto.Product2Id + '\''
+
+                        productCodes[producto.Product2Id__o.ProductCode] = true
+                    })
+
+
+                    ctcUtils.query('SELECT Id, Product2.Name, Product2.ProductCode, Quote.Name, Quote.VigenciaCotizacion__c, Quote.Contact.Name, Quote.Contact.Puesto__c, Quote.Contact.Account.Name, CantidadTarjetas__c, UnitPrice, NumberOfShipments__c (SELECT PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, Concepto__r.Name, Concepto__r.TipoCargo__c, Concepto__r.NombreSistemas__c, Concepto__r.Orden__c FROM Productos_Concepto__r) FROM QuoteLineItem WHERE Id IN(' + idsQli + ')')
+                    .then( function( res ) {
+
+                        soluciones = res || []
+
+                        return ctcUtils.query('SELECT Id, CaracteristicasSolucion__c, Producto__c FROM Concepto__c WHERE Producto__c IN(' + idsProducts + ') AND RecordType.DeveloperName=\'CaracteristicasSolucion\' AND Activo__c=true')
+
+                    })
+                    .then( function( res ) {
+                        angular.forEach( res, function( caracteristica, index ) {
+                            if( !keyProducto.hasOwnProperty(caracteristica.Producto__c) ) {
+                                keyProducto[caracteristica.Producto__c] = []
+                            }
+                            keyProducto[caracteristica.Producto__c].push(caracteristica)
+                        })
+
+                        angular.forEach( soluciones, function( solucion, index ) {
+                            solucion.diferenciales = keyProducto.hasOwnProperty(solucion.Product2Id) ? keyProducto[solucion.Product2Id] : []
+                        })
+
+
+                        return ctcUtils.query('SELECT Name, Codigos__c FROM PropuestaComercial__c')
+
+
+
+                    })
+                    .then( function( res ) {
+                        angular.forEach(res, function( propuesta, index ) {
+                            if( propuesta.Codigos__c && propuesta.Codigos__c.length > 0 ) {
+                                var codesTemp = propuesta.Codigos__c.split('\,')
+                                angular.forEach( codesTemp , function( code, index_code) {
+                                    if( !codigos.hasOwnProperty(code) ) {
+                                        codigos[code] = propuesta.Name
+                                    }
+                                })
+                            }  
+                        })
+
+                        if( owner.Segmento__c == 'Small' ) {
+                            return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c FROM PlantillaContrato__c WHERE CodigosTYC__c != null')
+                        }
+                    })
+                    .then( function( res ) {
+
+                        
+
+                        angular.forEach( res, function( tyc, index ) {
+                            if( tyc.CodigosTYC__c && tyc.CodigosTYC__c.length > 0 ) {
+                                var codesTemp = tyc.CodigosTYC__c.split('\,')
+                                angular.forEach( codesTemp , function( code, index_code) {
+                                    if( !codigosTYC.hasOwnProperty(code) && productCodes.hasOwnProperty(code) ) {
+                                        codigosTYC[code] = tyc.Id
+                                    }
+                                })
+                            }
+                        })
+
+                        console.log('\n\n codigosTYC: ', codigosTYC, '\n productCodes: ', productCodes)
+
+
+                        if( Object.keys(codigosTYC).length > 0 ) {
+                            var idsTYC = ''
+                            angular.forEach( Object.keys(codigosTYC), function( id, index ) {
+                                 if( idsTYC.length > 0 ) {
+                                    idsTYC += ', '
+                                 } 
+
+                                 idsTYC += '\'' + codigosTYC[id] + '\''
+                            })
+
+                            console.log('\n idsTYC: ', idsTYC)
+                            return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c FROM PlantillaContrato__c WHERE Id IN(' + idsTYC + ')')
+                        }
+
+                    })
+
+
+
+                    .then( function( res ) {
+
+                        console.log('result: ', res)
+
+                        ctcUtils.showProcess(false, 'Comprobando datos')
+
+                        console.log('\n\n soluciones: ', soluciones, '\n keyProducto: ', keyProducto, '\n codigos: ', codigos, '\n codigosTYC: ', codigosTYC)
+
+                        $timeout( function() {
+                            // Abrir modal del componente
+                            ctcUtils.openModal('generarPDFPDFCotizacionTC3_Small', {cotizacion: function () {return cotizacion }, owner: function () {return owner }, producto: function() { return soluciones[0]}, solucion: function() { return soluciones[0]}}, 'lg')
+                            .then( function( res ) {
+                                console.log('cierra modal: ', res)
+                            })
+                        }, 600)
+
+                    }).catch( function( err ) {
+
+                        ctcUtils.showProcess(false, 'Comprobando datos')
+
+                        ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                        ctcUtils.openModal('modalGenerico', {instance: function () {return err}, title: function() {return 'Ocurrió un error'}, subTitle: function() {return err }}, 'md')
+                        .then( function( res ) { }).catch( function( err ) { })
+                    }) 
+
+                   /* ctcUtils.showProcess(true, 'Comprobando datos')
+
+                    var component = {}
+                    var solucion = {}
+
+                    ctcUtils.query('SELECT Name, Codigos__c FROM PropuestaComercial__c WHERE Codigos__c LIKE \'%' + producto.Name__o.ProductCode + '%\' ORDER BY Id ASC')
+                    .then( function( res ) {
+                        console.log('response propuestas: ', res)
+                        if( res && res.length > 0 ) {
+                            var codes = {}
+                            angular.forEach( res, function( propuesta, index ) {
+                                if( propuesta.Codigos__c && propuesta.Codigos__c.length > 0 ) {
+                                    var codesTemp = propuesta.Codigos__c.split('\,')
+                                    angular.forEach( codesTemp , function( code, index_code) {
+                                        if( !codes.hasOwnProperty(code) ) {
+                                            codes[code] = propuesta
+                                        }
+                                    })
+                                }
+                            })
+                            component = codes[producto.Name__o.ProductCode]
+
+                            if( component && component.Name && component.Name.indexOf('PLAN_') != -1 ) {
+                                component.IdComponent = 'generarPDF' + component.Name.substring(5, component.Name.length)
+                                return ctcUtils.query('SELECT Id, Product2.Name, Quote.Name, Quote.VigenciaCotizacion__c, Quote.Contact.Name, Quote.Contact.Puesto__c, Quote.Contact.Account.Name, CantidadTarjetas__c, UnitPrice, (SELECT PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, Concepto__r.Name, Concepto__r.TipoCargo__c, Concepto__r.NombreSistemas__c, Concepto__r.Orden__c FROM Productos_Concepto__r) FROM QuoteLineItem WHERE Id=\'' + producto.Id + '\'')
+                            }
+
+                            console.log('component: ', component)
+
+                        } else {
+                            throw new Error('No se encontró componente para el producto: ' + producto.Name__o.Name + ' ' + producto.Name__o.ProductCode + ', revisar configuración personalizada Propuestas Comerciales')
+                        }
+                    })
+                    .then( function( res ) { // Respuesta QuoteLineItem => Solución
+
+                        solucion = res && res.length > 0 ? res[0] : {}
+                        return ctcUtils.query('SELECT Id, CaracteristicasSolucion__c FROM Concepto__c WHERE Producto__c=\'' + producto.Product2Id + '\' AND RecordType.DeveloperName=\'CaracteristicasSolucion\' AND Activo__c=true')
+
+                    })
+                    .then( function( res ) { // Respuesta diferenciales
+                        solucion.diferenciales = res || []
+                        var element = jQuery('[id="' + component.IdComponent + '.html"]')
+
+
+                        ctcUtils.showProcess(false, 'Comprobando datos')
+
+                        if( element && element.length > 0 ) {
+
+                            $timeout( function() {
+                                
+
+                                // Abrir modal del componente
+                                ctcUtils.openModal(component.IdComponent, {producto: function () {return producto }, owner: function () {return owner }, solucion: function() { return solucion}}, 'lg')
+                                .then( function( res ) {
+                                    console.log('cierra modal: ', res)
+                                })
+
+
+                            }, 600)
+
+
+
+
+
+
+                        } else {
+                            var err = "No se encontró el componente <c\:" + component.Name + "/>."
+                            ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                            ctcUtils.openModal('modalGenerico', {instance: function () {return err}, title: function() {return 'Ocurrió un error'}, subTitle: function() {return err }}, 'md')
+                            .then( function( res ) { }).catch( function( err ) { })
+                        }
+
+                    }).catch( function( err ) {
+                        ctcUtils.showProcess(false, 'Comprobando datos')
+
+                        ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                        ctcUtils.openModal('modalGenerico', {instance: function () {return err}, title: function() {return 'Ocurrió un error'}, subTitle: function() {return err }}, 'md')
+                        .then( function( res ) { }).catch( function( err ) { })
+
+                    })*/
+
+                    // ctcUtils.openModal('generarPDFCotizacion', {producto: function () {return producto }, owner: function () {return owner }}, 'lg')
+                    // .then(function(res) {
+                    // })
+                }
+
+                vm.utilizarEsteProducto = function( comparado, cotizado, soluciones ) {
+
+                    cotizado.Product2Id = angular.copy(comparado.ProductoComparado__c)
+                    var buscar = ctcUtils.filter(soluciones, {Id: cotizado.Product2Id}, true)
+                    if( buscar && buscar.length > 0 ) {
+                        cotizado.Product2Id__o = buscar[0]
+                    }
+
+
+                    vm.selectProducto( cotizado.Product2Id__o, cotizado, {}, {}, {soluciones: soluciones}, false )
+                }
+
+            }
+
+        })()
+    </script>
+</apex:component>

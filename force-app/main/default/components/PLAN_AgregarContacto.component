@@ -1,0 +1,153 @@
+<apex:component >
+    <script type="text/ng-template" id="agregarContacto.html">
+        <div class="modal-header" id="agregarContacto" ng-init="sc.init()">
+            <button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">
+                <span class="fa fa-user-plus fa-fw"></span>
+                Agregar contacto
+            </h4>
+        </div>
+        <form class="form-horizontal" name="sc.formContact" ng-submit="sc.saveContact(sc.contact)">
+            <div class="modal-body">
+                <ctc-error ctc-body="sc.errors"></ctc-error>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.Salutation"
+                            ctc-form="sc.formContact"
+                            ctc-opts="sc.schema.Contact.Salutation.values"
+                            ctc-label="'label'"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group>
+
+                        <ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.FirstName"
+                            ctc-form="sc.formContact"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group>
+                            
+                        <ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.LastName"
+                            ctc-form="sc.formContact"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group>
+                            
+                        <ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.RazonSocial__c"
+                            ctc-form="sc.formContact"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group>
+                            
+                        <!--ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.TipoSociedad__c"
+                            ctc-opts="sc.schema.Contact.TipoSociedad__c.values"
+                            ctc-label="['label']"
+                            ctc-form="sc.formContact"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group-->
+                            
+                        <ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.Email"
+                            ctc-form="sc.formContact"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group>
+                            
+                        <ctc-form-group
+                            ctc-instance="sc.contact"
+                            ctc-field="sc.schema.Contact.Phone"
+                            ctc-form="sc.formContact"
+                            ctc-cols="[4, 6]"
+                            ></ctc-form-group>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4" ng-bind="sc.schema.Contact.AccountId.label"></label>
+                            <div class="col-sm-6">
+                                <p class="form-control-static" ng-bind="sc.account.Name"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" ng-disabled="sc.formContact.$invalid || sc.processing" class="btnb btnb-success">
+                    <span ng-if="sc.processing" class="fa fa-spinner fa-pulse fa-fw ng-animate-disabled"></span>
+                    <span class="fa fa-save fa-fw"></span>
+                    <span ng-if="!sc.processing">Guardar</span>
+                    <span ng-if="sc.processing">Guardando</span>
+                </button>
+                <button type="button" ng-disabled="sc.processing" class="btnb btnb-default" ng-click="sc.close()">
+                    <span class="fa fa-mail-reply fa-fw"></span>
+                    Cerrar
+                </button>
+            </div>
+        </form>
+    </script>
+    <script type="text/javascript">
+        (function() {
+            'use sctrict'
+            angular.module('appEdenred')
+            .controller('agregarContactoCtrl', AgregarContactoCtrl)
+
+
+            AgregarContactoCtrl.$inject = ['ctcUtils', '$uibModal', '$uibModalInstance', '$timeout']
+
+            function AgregarContactoCtrl( ctcUtils, $uibModal, $uibModalInstance, $timeout ) {
+                var vm = this
+                vm.account = ctcUtils.app.account || {}
+                vm.schema = ctcUtils.app.schema || {}
+                vm.contact = {}
+
+
+                vm.saveContact = function( contact ) {
+                    vm.processing = true
+
+                    var payload = {
+                        LastName: contact.LastName,
+                        RazonSocial__c: contact.RazonSocial__c,
+                        // TipoSociedad__c: contact.TipoSociedad__c,
+                        AccountId: vm.account.Id
+                    }
+                    if(contact) {
+                        if(contact.Salutation__o && contact.Salutation__o.value) {
+                            payload.Salutation = contact.Salutation__o.value
+                        }
+                        if(contact.FirstName && contact.FirstName.length > 0) {
+                            payload.FirstName = contact.FirstName
+                        }
+                        if(contact.Email && contact.Email.length > 0) {
+                            payload.Email = contact.Email
+                        }
+                        if(contact.Phone && contact.Phone.length > 0) {
+                            payload.Phone = contact.Phone
+                        }
+                    }
+                    ctcUtils.upsert('Contact', JSON.stringify([payload]))
+                    .then(function( res ) {
+                        vm.processing = false
+                        $uibModalInstance.close(res)
+                    }).catch(function( err ) {
+                        vm.processing = false
+                        ctcUtils.showError( err )
+                    })
+                }
+
+                vm.init = function() {
+                    $timeout(function() {
+                        jQuery('#Salutation_' + vm.contact.IdElement).focus()
+                    }, 500)
+                }
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+            }
+        })()
+    </script>
+
+</apex:component>

@@ -1,0 +1,2029 @@
+<apex:page standardController="Opportunity" extensions="ContratoTC3Controller" docType="html-5.0" sidebar="false" showHeader="false"  standardStylesheets="false">
+    <!--JQUERY-->
+    <apex:includeScript value="{!URLFOR($Resource.jquery)}" />
+    
+    <!--JQUERYUI-->
+    <apex:includeScript value="{!$Resource.jqueryblock}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jqueryUIB,'js/jquery-ui-1.9.2.custom.min.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.jqueryUIB,'css/custom-theme/jquery-ui-1.9.2.custom.css')}" />
+    <!--BOOTSTRAP-->
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap,'dist/js/bootstrap.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap,'dist/css/bootstrap.css')}" />
+    
+    
+    <style>
+        .pad{ 
+        padding: 1em 0 0 0 ;
+        }
+        .scroll{
+        overflow-x: scroll;
+        }
+        .fijarBoton{
+        position: fixed; 
+        bottom: -20px;
+        padding-left: 0px !important;
+        }
+        .desactivar{
+        background-color: #F5F6F7;
+        cursor: not-allowed;
+        }
+        .row{ 
+        padding: 1em 0 0 0 !important;
+        }
+        .has-error .form-control{
+        border-color: #CC090F;
+        }
+        .has-error .form-control:focus {
+        border-color: #CC090F;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 15px #CC090F;
+        box-shadow: inset 0 1px px rgba(0, 0, 0, 0.075), 0 0 15px #CC090F;
+        }
+        .alert-danger, .alert-success{
+        position:   fixed;
+        z-index:    1000;
+        }
+        .error{
+        position: inherit !important;
+        }
+        .errorMsg{
+         color: #CC090F;
+        }
+    </style>
+    <script>
+    j$ = jQuery.noConflict();
+    </script>
+    <div class="container bs-docs-container" id="contenedorPrincipal">
+
+        <apex:form id="forma">                        
+            <div class="row">
+                <div class="col-md-12" id="formaDiv">
+                    <section class="section">
+                        <div id="bloqueaContrato">
+                            
+                        <c:PageMessages closableErrors="true"/>
+                        <c:Panel title="Información General" idCollapse="panelGeneral"  id="info" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="Oportunidad" >
+                                    <apex:outputLink value="../{!oppContrato.id}">{!oppContrato.Name}</apex:outputLink>
+                                </c:PanelCell>
+                                <c:PanelCell label="Familia" >
+                                    <apex:outputField value="{!contrato.FamiliaCorporativa__c}"/>
+                                </c:PanelCell>  
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Cuenta" >
+                                    <apex:outputLink value="../{!accContrato.id}">{!accContrato.Name}</apex:outputLink>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Migracion__c.Label}" >
+                                    <apex:inputField value="{!contrato.Migracion__c}"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Account.fields.RazonSocial__c.Label}" >
+                                    <apex:outputField value="{!contrato.RazonSocial__c}" />
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.NumeroSolicitud__c.Label}" color="{!IF((contrato.NumeroSolicitud__c != ''),'has-success has-feedback','has-error')}" >
+                                    <apex:inputField value="{!contrato.NumeroSolicitud__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Account.fields.RFC__c.Label}" >
+                                    <apex:outputField value="{!contrato.RFC__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.OrigenVenta__c.Label}" color="{!IF(contrato.ClaveOrigenVenta__c != '','has-success has-feedback','has-error')}" for="contratoInfo">
+                                    <apex:selectList value="{!contrato.ClaveOrigenVenta__c}" multiselect="false" size="1" StyleClass="form-control valida" >
+                                        <apex:selectOptions value="{!catOrigenVenta}" />
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Account.fields.Segmento__c.Label}" >
+                                    <apex:outputField value="{!contrato.Segmento__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Territorio__c.Label}" color="{!IF(contrato.Territorio__c != null,'has-success has-feedback','has-error')}" for="contratoInfo">
+                                    <apex:inputField html-maxlength="3" value="{!contrato.Territorio__c}" StyleClass="form-control valida"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell color="{!IF((contrato.ClaveSucursal__c != ''),'has-success has-feedback','has-error')}" label="{!$ObjectType.Contrato__c.fields.Sucursal__c.Label}" >
+                                    <apex:selectList value="{!contrato.ClaveSucursal__c}" styleClass="form-control valida"  multiselect="false" size="1">
+                                        <apex:selectOptions value="{!catSucursal}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.NombreEjecutivo__c.Label}" color="{!IF(contrato.NombreEjecutivo__c != '','has-success has-feedback','has-error')}" for="contratoInfo">
+                                    <apex:inputField id="nombreEjecutivo" value="{!contrato.NombreEjecutivo__c}" StyleClass="form-control valida"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Product2.fields.Name.Label}" >
+                                    <apex:outputField value="{!prod.Name}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Posvendedor__c.Label}" >
+                                    <apex:inputField html-maxlength="3" value="{!contrato.Posvendedor__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Grupo" color="{!IF(contrato.Grupo__c != '' ,'has-success has-feedback','has-error')}">
+                                    <apex:outputField value="{!contrato.Grupo__c}" rendered="{!ctaGrupo}" StyleClass="form-control" />
+                                    <apex:inputField value="{!contrato.Grupo__c}" rendered="{!NOT(ctaGrupo)}" StyleClass="form-control" />
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.VersionContrato__c.Label}" color="{!IF(contrato.VersionContrato__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:inputField id="versionContrato" value="{!contrato.VersionContrato__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="No. de cliente" color="{!IF(contrato.NumeroCliente__c != '' ,'has-success has-feedback','has-error')}">
+                                    <apex:outputField value="{!contrato.NumeroCliente__c}" rendered="{!ctaNoCliente}" StyleClass="form-control"/>
+                                    <apex:inputField value="{!contrato.NumeroCliente__c}"  rendered="{!NOT(ctaNoCliente)}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Competidor__c.Label}" >
+                                    <apex:selectList value="{!contrato.ClaveCompetidor__c}" multiselect="false" size="1" StyleClass="form-control">
+                                        <apex:selectOptions value="{!catCompetidor}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Giro" >
+                                    <apex:outputField value="{!contrato.Giro__c }" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Estatus__c.Label}" >
+                                    <apex:outputField value="{!contrato.Estatus__c}" id="estatusid" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <!--<c:PanelCell label="UsuarioAS400" >
+                                <apex:outputField value="{!accContrato.Owner.UsuarioAS400__c}" StyleClass="form-control"/>
+                                </c:PanelCell>-->
+                                
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Sector" >
+                                    <apex:outputField value="{!contrato.Sector__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="Mostrar catalogo de maquila" for="Maquila">
+                                     <apex:inputField id="Maquila" value="{!contrato.Maquila__c}" />
+                                </c:PanelCell>
+                                <!--<c:PanelCell label="Estatus alta TC3" >
+                                <apex:inputField value="{!contrato.EstatusAltaTC3__c}" StyleClass="form-control"/>
+                                </c:PanelCell>-->
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Account.fields.Fax.Label}" >
+                                    <apex:outputField value="{!contrato.Fax__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                                <div style="display:none ;" class="ocultaMaquila" >                                 
+                                    <c:PanelCell label="Maquiladores" for="Maquiladores" id="MaquiladoresDiv" color="{!IF(contrato.ClaveMaquila__c != '','has-success has-feedback','has-error')}"> 
+                                    <apex:selectList id="TipoMaquila" value="{!contrato.ClaveMaquila__c}" multiselect="false" size="1" StyleClass="form-control" >
+                                            <apex:selectOptions value="{!catMaquila}"/>
+                                        </apex:selectList>
+                                    </c:PanelCell>
+                                </div>
+
+                            </div>
+                            
+                        </c:Panel>
+                        
+                        <c:Panel title="Dirección Fiscal" idCollapse="panelDireccion"  id="direccion" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="Dirección Factura" for="direccionFiscal">
+                                    <apex:outputText value="{!contrato.DireccionFactura__c}" />
+                                </c:PanelCell>
+                                <c:PanelCell label="Código postal" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.CodigoPostal__c }"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Calle" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.Calle__c }" />
+                                </c:PanelCell>
+                                <c:PanelCell label="Colonia" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.Colonia__c }" />
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Número exterior" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.NumeroExterior__c}" />
+                                </c:PanelCell>
+                                <c:PanelCell label="Ciudad" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.Ciudad__c}" />
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="Número interior" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.NumeroInterior__c}" />
+                                </c:PanelCell>
+                                <c:PanelCell label="Estado" for="direccionFiscal">
+                                    <apex:outputField value="{!contrato.Estado__c }" />
+                                </c:PanelCell>
+                            </div>
+                        </c:Panel>
+                        
+                        <c:Panel title="Condiciones de Pago" idCollapse="panelPago"  id="pago" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TipoPago__c.Label}" color="{!IF(contrato.ClaveTipoPago__c !='', 'has-success has-feedback', 'has-error')}">
+                                    <apex:selectList id="tipoPago" value="{!contrato.ClaveTipoPago__c}" multiselect="false" size="1" StyleClass="form-control valida" > 
+                                        <apex:selectOptions value="{!catTipoPago}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Financiamiento__c .Label}"  >
+                                    <apex:selectList id="financiamiento" value="{!contrato.ClaveFinanciamiento__c}"  multiselect="false" size="1" StyleClass="form-control valida"> 
+                                        <apex:selectOptions value="{!catFinanciamiento}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.CondicionesPago__c.Label}" color="{!IF(contrato.CondicionesPago__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:inputField id="condicionesPago" value="{!contrato.CondicionesPago__c }" StyleClass="form-control valida"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.PagoCargosFinanciamiento__c.Label}">
+                                    <apex:inputField id="pagoCargosFinanciamiento" value="{!contrato.PagoCargosFinanciamiento__c}"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.FrecuenciaPedido__c.Label}" color="{!IF(contrato.FrecuenciaPedido__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:inputField id="frecuenciaPedido" value="{!contrato.FrecuenciaPedido__c  }" StyleClass="form-control valida"/>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TipoFinanciamiento__c.Label}">
+                                    <apex:selectList id="tipoFinanciamiento" value="{!contrato.ClaveTipoFinanciamiento__c}" styleClass="form-control valida" multiselect="false" size="1">
+                                        <apex:selectOptions value="{!catTipoFinanciamiento}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.MedioPago__c.Label}" color="{!IF(contrato.ClaveMedioPago__c != '','has-success has-feedback','has-error')}">
+                                    <apex:selectList value="{!contrato.ClaveMedioPago__c}" multiselect="false" size="1" StyleClass="form-control valida"> 
+                                        <apex:selectOptions value="{!catMedioPago}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Clasificacion__c.Label}" id="clasificacionDiv" >
+                                    <apex:inputField id="clasificacion" value="{!contrato.Clasificacion__c}" StyleClass="form-control"/>
+                                </c:PanelCell> 
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ComisionMinima__c.Label}">
+                                    <apex:inputField value="{!contrato.ComisionMinima__c}" />
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.CargoRecurrenteConFinanciamiento__c.Label}">
+                                    <apex:inputField id="cargoRecurrenteConFinanciamiento" value="{!contrato.CargoRecurrenteConFinanciamiento__c }"/>
+                                </c:PanelCell>
+                            </div>
+
+                            <div class="row">
+                                 <c:PanelCell label="Método de Pago"  color="{!IF(oppContrato.Metodo_Pago__c!= '','has-success has-feedback','has-error')}">
+                                <apex:inputField value="{!oppContrato.Metodo_Pago__c}" StyleClass="form-control"/>
+                                </c:PanelCell>                    
+                            </div>
+
+                        </c:Panel>
+                        
+                        <c:Panel title="Liberaciones automáticas" idCollapse="panelAuto"  id="auto" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.FrecuenciaLiberacionAutomatica__c.Label}" >
+                                    <apex:selectList value="{!contrato.ClaveFrecuenciaLiberacionAutomatica__c}" multiselect="false" size="1" styleClass="form-control" >
+                                        <apex:selectOptions value="{!catFrecuenciaLiberacionAutomatica}" />
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.VentanaRiesgo__c.Label}" >
+                                    <apex:inputField value="{!contrato.VentanaRiesgo__c}" StyleClass="form-control"/>
+                                </c:PanelCell>  
+                            </div> 
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.LineaOperativa__c.Label}" color="{!IF(contrato.LineaOperativa__c != null,'has-success has-feedback','has-error')}" for="lineaOperativa" >
+                                    <apex:inputField id="lineaOperativa" value="{!contrato.LineaOperativa__c}" StyleClass="form-control valida"/>
+                                </c:PanelCell>
+                            </div>
+                        </c:Panel>
+                        
+                        <c:Panel title="Garantía" idCollapse="panelGarantia"  id="garantia" idParent="panelParent" expanded="true" >
+                            <div class="row">
+                                <table id="tablaGarantia" class="table table-bordered table-striped table-responsive" > 
+                                    
+                                    <thead>    
+                                        <tr>
+                                            <td>Tipo garantía</td>
+                                            <td>Monto</td>
+                                            <td>Observaciones</td>
+                                        </tr>
+                                    </thead>
+                                    <apex:repeat value="{!garantias}" var="garante" >
+                                        <tr>
+                                            <td>
+                                                <apex:outputField styleClass="form-control" value="{!garante.TipoGarantia__c}"  />
+                                            </td>
+                                            <td>
+                                                <apex:inputField styleClass="form-control" label="$" value="{!garante.Monto__c}"  />
+                                            </td>
+                                            <td>
+                                                <apex:inputField styleClass="form-control" value="{!garante.Observaciones__c}"  />
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                </table>
+                            </div>
+                        </c:Panel>
+                        
+                        <c:Panel title="Día de liberación" idCollapse="panelDia"  id="dia" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.DiaLiberacion__c.Label}" for="liberacion" >
+                                    <apex:inputField id="diaLiberacion" value="{!contrato.DiaLiberacion__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.DiaSemana__c.Label}" for="liberacion" >
+                                    <apex:inputField id="diaSemana" value="{!contrato.DiaSemana__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.DiaInicio__c.Label}" for="liberacion" >
+                                    <apex:inputField id="diaInicio" value="{!contrato.DiaInicio__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ProximaCarga__c.Label}" for="liberacion" >
+                                    <apex:inputField id="proximaCarga" value="{!contrato.ProximaCarga__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Dia__c.Label}" for="liberacion" >
+                                    <apex:inputField id="diaCampo" value="{!contrato.Dia__c}" StyleClass="form-control"/>
+                                </c:PanelCell>
+                            </div>
+                        </c:Panel>
+                        
+                        <apex:actionRegion >
+                            <apex:actionFunction action="{!borrarFechaFacturacion}" name="borrarFechaFacturacion" status="statusFacturacion" reRender="opJS, fechafact" />
+                            <apex:actionFunction action="{!agregarFechaFacturacion}" name="agregarFechaFacturacion" status="statusFacturacion" reRender="opJS, fechafact" />
+                            <apex:actionStatus onstart="onstart('contenidoFecha');"  onstop="onstop('contenidoFecha');" id="statusFacturacion" /> 
+                            <c:Panel title="Condiciones de Facturación" idCollapse="panelCondicionesFac"  id="condicionesFac" idParent="panelParent" expanded="true">
+                                <div id="contenidoFecha">
+                                    <div class="row">
+                                        <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TipoFacturacion__c.Label}" for="tipoFacturacion" color="{!IF(contrato.ClaveTipoFacturacion__c != '','has-success has-feedback','has-error')}" >
+                                            <apex:selectList id="tipoFacturacion" value="{!contrato.ClaveTipoFacturacion__c}" multiselect="false" size="1" styleClass="form-control valida" >
+                                                <apex:selectOptions value="{!catTipoFacturacion}" />
+                                            </apex:selectList>
+                                        </c:PanelCell>
+                                        <c:PanelCell label="{!$ObjectType.Contrato__c.fields.EmailQueRecibeFactura__c.Label}" for="mailFactura" >
+                                            <apex:inputField type="email" id="mailFactura" value="{!contrato.EmailQueRecibeFactura__c}" styleClass="form-control" />
+                                        </c:PanelCell>
+                                    </div>
+                                    <div class="row">
+                                        <c:PanelCell label="{!$ObjectType.Contrato__c.fields.FrecuenciaFacturacion__c.Label}" for="frecuenciaFacturacion" color="{!IF(contrato.ClaveFrecuenciaFacturacion__c != '','has-success has-feedback','has-error')}" >
+                                            <apex:selectList id="frecuenciaFacturacion" value="{!contrato.ClaveFrecuenciaFacturacion__c}" multiselect="false" size="1" styleClass="form-control valida" >
+                                                <apex:selectOptions value="{!catFrecuenciaFacturacion}" />
+                                            </apex:selectList>
+                                        </c:PanelCell>
+                                    </div>
+                                    
+                                    <apex:outputPanel id="fechafact" > 
+                                        
+                                        <div style="display:none;" id="fechas" class="row pad">
+                                            
+                                            <div class="row pad" style="margin: 1em;" > 
+                                                <div class="col-md-1" ></div>
+                                                <div class="col-md-2" >
+                                                </div>
+                                                <div class="col-md-3 pad" >
+                                                    <button type="button" onclick="agregarFechaFacturacion();" class="btn btn-success" >Agregar Fecha</button>
+                                                </div>
+                                                <div class="col-md-3 pad" >
+                                                    <button type="button" onclick="borrarFechaFacturacion();" class="btn btn-danger" >Eliminar Fecha</button>
+                                                </div>
+                                            </div>
+                                            <table id="tablaCondiciones" class="pad table table-bordered table-striped table-responsive" > 
+                                                <thead>    
+                                                    <tr>
+                                                        <td></td>
+                                                        <td>Fecha Inicio</td>
+                                                        <td>Fecha Fin</td>
+                                                    </tr>
+                                                </thead>
+                                                
+                                                <apex:repeat value="{!lstFechaFacturacion}" var="listaFF">
+                                                    <tr>
+                                                        <td>
+                                                            <apex:inputCheckbox value="{!listaFF.checked}" />
+                                                        </td>
+                                                        <td >
+                                                            <apex:inputField styleClass="form-control fechaInicio" value="{!listaFF.fechaFacturacion.FechaInicio__c}" type="date" showDatePicker="false" />
+                                                        </td>
+                                                        <td >
+                                                            <apex:inputField styleClass="form-control fechaFin" value="{!listaFF.fechaFacturacion.FechaFin__c}" type="date" showDatePicker="false" />
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </table>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                            </c:Panel>
+                        </apex:actionRegion>
+                        
+                        <c:Panel title="Facturación del Cliente" idCollapse="panelFacturacionCl"  id="facturacionCl" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ComoFactura__c.Label}"  color="{!IF(contrato.ClaveComoFactura__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:selectList id="comoFactura" value="{!contrato.ClaveComoFactura__c}" multiselect="false"  size="1" styleClass="form-control valida">
+                                        <apex:selectOptions value="{!catComoFactura}" /> 
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TipoCliente__c.Label}" color="{!IF(contrato.ClaveTipoCliente__c !=null,'has-success has-feedback','has-error')}" >
+                                    <apex:selectList id="tipoCliente" value="{!contrato.ClaveTipoCliente__c}" multiselect="false" size="1" styleClass="form-control valida" >
+                                        <apex:selectOptions value="{!catTipoCliente}" />
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <div style="display:none;" id="ocultaEsConsolidador"  >
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.EsConsolidador__c.Label}" for="esConsolidador">
+                                        <apex:inputField id="esConsolidador" value="{!contrato.EsConsolidador__c}"></apex:inputField>
+                                    </c:PanelCell>
+                                </div>
+                            </div>
+                            
+                            <div style="display:none;" class="ocultaComoFactura" >
+                                <div class="row">
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ProductoFacturacionGlobal__c.Label}" color="{!IF(contrato.ProductoFacturacionGlobal__c != null,'has-success has-feedback','has-error')}" for="productoFacturacionGlobal">
+                                        <apex:inputField html-maxlength="2" id="productoFacturacionGlobal" value="{!contrato.ProductoFacturacionGlobal__c}" styleClass="form-control valida"></apex:inputField>
+                                    </c:PanelCell>
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.SucursalFacturacionGlobal__c.Label}" color="{!IF(contrato.SucursalFacturacionGlobal__c != null,'has-success has-feedback','has-error')}"  for="sucursalFacturacionGlobal">
+                                        <apex:inputField html-maxlength="3" id="sucursalFacturacionGlobal" value="{!contrato.SucursalFacturacionGlobal__c}" styleClass="form-control valida"></apex:inputField>
+                                    </c:PanelCell>
+                                </div>
+                                <div class="row">
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.GrupoFacturacionGlobal__c.Label}" color="{!IF(contrato.GrupoFacturacionGlobal__c != null,'has-success has-feedback','has-error')}" for="grupoFacturacionGlobal">
+                                        <apex:inputField html-maxlength="5" id="grupoFacturacionGlobal" value="{!contrato.GrupoFacturacionGlobal__c }" styleClass="form-control valida"></apex:inputField>
+                                    </c:PanelCell>
+                                    
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ClienteFacturacionGlobal__c.Label}" color="{!IF(contrato.ClienteFacturacionGlobal__c != null,'has-success has-feedback','has-error')}" for="clienteFacturacionGlobal" >
+                                        <apex:inputField html-maxlength="3" id="clienteFacturacionGlobal" value="{!contrato.ClienteFacturacionGlobal__c }" styleClass="form-control valida"></apex:inputField>
+                                    </c:PanelCell>
+                                </div>
+                            </div>
+                            
+                            <div style="display:none;" class="ocultaConsolidador " >
+                                <div class="row">
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ProductoConsolidacion__c.Label}"  for="productoConsolidacion" >
+                                        <apex:inputField html-maxlength="2" id="productoConsolidacion" value="{!contrato.ProductoConsolidacion__c}" styleClass="form-control"></apex:inputField>
+                                    </c:PanelCell>
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.GrupoConsolidacion__c.Label}" color="{!IF(contrato.GrupoConsolidacion__c !=null,'has-success has-feedback','has-error')}" for="grupoConsolidacion" >
+                                        <apex:inputField html-maxlength="3" id="grupoConsolidacion" value="{!contrato.GrupoConsolidacion__c}" styleClass="form-control valida"></apex:inputField>
+                                    </c:PanelCell>
+                                </div>
+                                <div class="row">
+                                    <div class="divSucursalConsolidacion" >
+                                        <c:PanelCell label="{!$ObjectType.Contrato__c.fields.SucursalConsolidacion__c.Label}" for="sucursalConsolidacion" color="{!IF(contrato.SucursalConsolidacion__c !=null,'has-success has-feedback','has-error')}"  >
+                                            <apex:inputField html-maxlength="5" id="sucursalConsolidacion" value="{!contrato.SucursalConsolidacion__c}" styleClass="form-control valida"></apex:inputField>
+                                        </c:PanelCell>
+                                    </div>
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ClienteConsolidacion__c.Label}" color="{!IF(contrato.ClienteConsolidacion__c !=null,'has-success has-feedback','has-error')}"  for="clienteConsolidacion" >
+                                        <apex:inputField html-maxlength="3" id="clienteConsolidacion" value="{!contrato.ClienteConsolidacion__c}" styleClass="form-control valida"></apex:inputField>
+                                    </c:PanelCell>
+                                </div>
+                            </div> 
+                        </c:Panel>
+                        <c:Panel title="Facturación Adicional" idCollapse="panelFacturacionAd"  id="facturacionAd" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.FacturacionCargos__c.Label}" for="facturacionCargos" color="{!IF(contrato.ClaveFacturacionCargos__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:selectList id="facturacionCargos" styleClass="form-control valida" value="{!contrato.ClaveFacturacionCargos__c}" multiselect="false" size="1">
+                                        <apex:selectOptions value="{!catFacturacionCargos}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.FacturacionComision__c.Label}" color="{!IF(contrato.ClaveFacturacionComision__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:selectList value="{!contrato.ClaveFacturacionComision__c}" multiselect="false" size="1" styleClass="form-control valida" >
+                                        <apex:selectOptions value="{!catFacturacionComision}" />
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.FacturacionPlastico__c.Label}" color="{!IF(contrato.ClaveFacturacionPlastico__c != '','has-success has-feedback','has-error')}" for="facturacionPlastico" >
+                                    <apex:selectList id="facturacionPlastico" value="{!contrato.ClaveFacturacionPlastico__c}" multiselect="false" size="1" styleClass="form-control valida" >
+                                        <apex:selectOptions value="{!catFacturacionPlastico}" />
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                        </c:Panel>
+                        
+                        <c:Panel title="Condiciones Operativas TC 3.0" idCollapse="panelFacturacionCliente"  id="facturacionCliente" idParent="panelParent" expanded="true">
+                            
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.VolEmisionEstimadoMensual__c.Label}" for="volEmisionEstimadoMensual">
+                                    <apex:outputField id="volEmisionEstimadoMensual" value="{!contrato.VolEmisionEstimadoMensual__c}" styleClass="form-control" />
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.NombrePersonalizacion__c.Label}" >
+                                    <apex:inputField value="{!contrato.NombrePersonalizacion__c}" styleClass="form-control" ></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.VIP__c.Label}" for="vip">
+                                    <apex:inputField id="vip" value="{!contrato.VIP__c}"></apex:inputField>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.EmpresaPrincipal__c.Label}" for="empresaPrincipal">
+                                    <apex:inputField id="empresaPrincipal" value="{!contrato.EmpresaPrincipal__c}" ></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.PermiteAutorizacionTelefonica__c.Label}" for="itemContratacion">
+                                    <apex:inputField value="{!contrato.PermiteAutorizacionTelefonica__c }" ></apex:inputField>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.IdPrime__c.Label}"  for="idPrime" id="idPrimeDiv">
+                                    <apex:inputField id="idPrime" value="{!contrato.IdPrime__c}" styleClass="form-control"></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ItemContratacion__c.Label}" for="itemContratacion" color="{!IF(contrato.ClaveItemContratacion__c != '','has-success has-feedback','has-error')}" >
+                                    <apex:selectList id="itemContratacion" value="{!contrato.ClaveItemContratacion__c}" multiselect="false" size="1" styleClass="form-control valida" >
+                                        <apex:selectOptions value="{!catItemContratacion}" />
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ImprimeLogo__c.Label}" for="imprimeLogo">
+                                    <apex:inputField id="imprimeLogo" value="{!contrato.ImprimeLogo__c}" ></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row">
+                                <div style="display:none ;" class="ocultaImprimeLogo" > 
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TipoPlasticoTarjetaFinanciera__c.Label}" color="{!IF(contrato.ClaveTipoPlasticoTarjetaFinanciera__c != '','has-success has-feedback','has-error')}" for="tipoPlasticoTarjetaFinanciera">
+                                        <apex:selectList value="{!contrato.ClaveTipoPlasticoTarjetaFinanciera__c}" multiselect="false" size="1" styleClass="form-control ocultaImprimeLogo valida" >
+                                            <apex:selectOptions value="{!catTipoPlasticoTarjetaFinanciera}" />
+                                        </apex:selectList>
+                                    </c:PanelCell>
+                                </div>
+                                <div style="display:none ;" class="ocultaImprimeLogo" > 
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TipoPlasticoTarjetaStock__c.Label}" color="{!IF(contrato.TipoPlasticoTarjetaStock__c != '','has-success has-feedback','has-error')}">
+                                        <apex:selectList value="{!contrato.ClaveTipoPlasticoTarjetaStock__c}" multiselect="false" size="1" styleClass="form-control ocultaImprimeLogo valida" >
+                                            <apex:selectOptions value="{!catTipoPlasticoTarjetaStock}" />
+                                        </apex:selectList>
+                                    </c:PanelCell>
+                                </div>
+                            </div>
+                            <div class="row avanzadoOculta">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.TicketBomba__c .Label}" for="controlVolumetrico">
+                                    <apex:inputField id="ticketBomba" value="{!contrato.TicketBomba__c }"  styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ManejaConductores__c.Label}" >
+                                    <apex:inputField id="manejaConductores" value="{!contrato.ManejaConductores__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                            </div>     
+                            <div class="row avanzadoOculta">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ControlVolumetrico__c.Label}" for="controlVolumetrico">
+                                    <apex:inputField id="controlVolumetrico" value="{!contrato.ControlVolumetrico__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ControlaPresenciaVehiculoNFC__c.Label}" for="controlaPresenciaVehiculoNFC">
+                                    <apex:inputField id="controlaPresenciaVehiculoNFC" value="{!contrato.ControlaPresenciaVehiculoNFC__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row avanzadoOculta">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.BombaPropia__c.Label}" for="bombaPropia">
+                                    <apex:inputField id="bombaPropia" value="{!contrato.BombaPropia__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ModoTransaccion__c.Label}" for="controlVolumetrico">
+                                    <apex:inputField id="modoTransaccion" value="{!contrato.ModoTransaccion__c}" styleClass="form-control avanzadoOculta" ></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            <div style="display:none;" class="ocultaBombaPropia row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Maneja__c.Label}" color="{!IF(contrato.Maneja__c != '','has-success has-feedback','has-error')}" for="maneja">
+                                    <apex:selectList value="{!contrato.ClaveManeja__c}" multiselect="false" size="1" styleClass="form-control ocultaBombaPropia valida">
+                                        <apex:selectOptions value="{!catManeja}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.Red__c.Label}" color="{!IF(contrato.ClaveRed__c != '','has-success has-feedback','has-error')}" for="red">
+                                    <apex:selectList value="{!contrato.ClaveRed__c}" multiselect="false" size="1" styleClass="form-control ocultaBombaPropia valida">
+                                        <apex:selectOptions value="{!catRed}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row avanzadoOculta">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ManejaNotaVale__c.Label}" for="manejaNotaVale">
+                                    <apex:inputField id="manejaNotaVale" value="{!contrato.ManejaNotaVale__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>                                
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.OperaTcTruck__c.Label}" for="operaTcTruck">
+                                    <apex:inputField id="operaTcTruck" value="{!contrato.OperaTcTruck__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            <div class="row avanzadoOculta">
+                                
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.NoMostrarKm__c.Label}" for="noMostrarKm">
+                                    <apex:inputField id="noMostrarKm" value="{!contrato.NoMostrarKm__c}" styleClass="avanzadoOculta"></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            <!--Termina Oculta -->
+                            
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.OperacionModoOffline__c.Label}" color="{!IF(contrato.ClaveOperacionModoOffline__c != '','has-success has-feedback','has-error')}" for="operacionModoOffline">
+                                    <apex:selectList styleClass="form-control valida" id="operacionModoOffline" value="{!contrato.ClaveOperacionModoOffline__c}"  multiselect="false" size="1">
+                                        <apex:selectOptions value="{!catOperacionModoOffline}"/>
+                                    </apex:selectList>
+                                </c:PanelCell>
+                                <div style="display:none ;" class="ocultaOffline" >
+                                    <c:PanelCell label="{!$ObjectType.Contrato__c.fields.IntervaloEntreTransacciones__c.Label}" color="{!IF(contrato.IntervaloEntreTransacciones__c != null,'has-success has-feedback','has-error')}" >
+                                        <apex:inputField value="{!contrato.IntervaloEntreTransacciones__c}" styleClass="form-control ocultaOffline valida"></apex:inputField>
+                                    </c:PanelCell>
+                                </div>
+                            </div>
+                            <div class="row ocultaOffline" style="display:none;">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ImpedirComprarSabado__c.Label}" for="impedirComprarSabado">
+                                    <apex:inputField id="impedirComprarSabado" value="{!contrato.ImpedirComprarSabado__c}" styleClass="ocultaOffline"></apex:inputField>
+                                </c:PanelCell>
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ImpedirComprarDomingo__c.Label}" >
+                                    <apex:inputField value="{!contrato.ImpedirComprarDomingo__c}" styleClass="ocultaOffline"></apex:inputField>
+                                </c:PanelCell>
+                            </div>
+                            
+                            <div class="row ocultaOffline" style="display:none;">
+                                
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.CantidadMaxTransaccionesOffline__c.Label}" color="{!IF(contrato.CantidadMaxTransaccionesOffline__c != null,'has-success has-feedback','has-error')}" >
+                                    <apex:inputField value="{!contrato.CantidadMaxTransaccionesOffline__c}" styleClass="form-control ocultaOffline valida"></apex:inputField>
+                                </c:PanelCell>
+                                
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ValorMaxParaUnaTransaccion__c.Label}" color="{!IF(contrato.ValorMaxParaUnaTransaccion__c != null,'has-success has-feedback','has-error')}" >
+                                    <apex:inputField value="{!contrato.ValorMaxParaUnaTransaccion__c}" styleClass="form-control valida"></apex:inputField>
+                                </c:PanelCell>
+                                
+                            </div>
+                            <!-- Oculta -->
+                        </c:Panel>
+                        
+                        
+                        <apex:actionRegion >
+                            <apex:actionFunction action="{!agregarLineaImpresion}" name="agregarLineaImpresion" status="statusLineas" reRender="lineas, opJS" />
+                            <apex:actionFunction action="{!borrarLineaImpresion}" name="borrarLineaImpresion" status="statusLineas" reRender="lineas, opJS" />
+                            <apex:actionStatus onstart="onstart('tablaLineas');"  onstop="onstop('tablaLineas');" id="statusLineas" />
+                            <c:Panel title="Líneas de impresión en tarjeta" idCollapse="panelLineasTarjetas"  id="condicionesOp" idParent="panelParent" expanded="true">
+                                <div class="row pad"> 
+                                    <div class="col-md-1 " ></div>
+                                    <div class="col-md-4 " >
+                                        <apex:selectList value="{!lineaImpresion}" multiselect="false" size="1" styleClass="form-control">
+                                            <apex:selectOptions value="{!catDescripcionLineaImpresion}"/>
+                                        </apex:selectList>
+                                    </div>
+                                    <div class="col-md-3" > 
+                                        <button type="button" id="addLineaImpresion" onclick="agregarLineaImpresion();" class="btn btn-success" >Agregar</button>
+                                    </div>
+                                    <div class="col-md-3" >
+                                        <button type="button" id="deleteLineaImpresion" onclick="borrarLineaImpresion();" class="btn btn-danger" >Eliminar línea de impresión</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="row pad">
+                                    
+                                    <apex:outputPanel id="lineas"  >
+                                        <table id="tablaLineas" class="table table-bordered table-striped table-responsive" > 
+                                            <thead>
+                                                <tr>
+                                                    <td></td>
+                                                    <td>Orden</td>
+                                                    <td>Descripción lineas de impresión</td>
+                                                    <td>Identificador</td>
+                                                </tr>
+                                            </thead>
+                                            <apex:repeat value="{!lstLineaImpresion}" var="listaLI">
+                                                <tr>
+                                                    <td>
+                                                        <apex:inputCheckbox value="{!listaLI.checked}" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:inputField html-min="1" html-max="3" type="number" value="{!listaLI.lineaImpresion.Orden__c }" styleClass="numero"  />
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{!listaLI.lineaImpresion.DescripcionLineaImpresion__c }" />
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{!listaLI.lineaImpresion.ClaveDescripcionLineaImpresion__c  }" />
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </table>
+                                    </apex:outputPanel>
+                                    
+                                </div>
+                            </c:Panel>
+                        </apex:actionRegion>
+                        
+                        <apex:actionRegion >
+                            <c:Panel title="Contactos" idCollapse="panelContacto"  id="contacto" idParent="panelParent" expanded="true">
+                                <apex:outputPanel id="panelContactos">
+                                <apex:actionFunction action="{!llenaCatalogoContacto}" name="llenar" status="statusCatalogoContacto" reRender="formaCatalogoContacto, opJS" />
+                                <apex:actionStatus onstart="onstart('modalCatalogoContacto');"  onstop="onstop('modalCatalogoContacto');" id="statusCatalogoContacto" />
+                                <apex:actionStatus onstart="onstart('tablaContacto');"  onstop="onstop('tablaContacto');" id="statusBorrarContacto" />
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <button type="button" id="agregarContactoBtn" class="btn btn-success" >Contactos</button>
+                                    </div>
+                                </div>
+                                <div class="row pad">
+                                    <table id="tablaContacto" class="table table-bordered table-striped table-responsive" > 
+                                        <thead>    
+                                            <tr>
+                                                <td></td>
+                                                <td>Tipo contacto</td>
+                                                <td>Nombre</td>
+                                                <td>Apellidos</td>
+                                                <td>Otro puesto</td>
+                                                <td>Horario de oficina</td>
+                                                <td>Telefóno</td>
+                                                <td>Extensión</td>
+                                                <td>Email</td>
+                                            </tr>
+                                        </thead>
+                                        <apex:repeat value="{!lstContacto}" var="listaCon">
+                                            <tr>
+                                                <td>
+                                                    <apex:inputCheckbox id="checkContacto" onchange="if(j$(this).prop('checked')){ j$('#tablaContacto').find('input[type=\'checkbox\']').prop('checked',false);j$(this).prop('checked',true)}"  value="{!listaCon.checked}"/> 
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.tipoContacto}" /> 
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.FirstName}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.LastName}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.OtroPuesto__c}" /> 
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.HorarioOficina__c }" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.Phone}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.Extension__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!listaCon.contacto.Email}" />
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </div>
+                                </apex:outputPanel>
+                            </c:Panel>
+                        </apex:actionRegion>
+                        <c:Panel title="Direcciones de entrega" idCollapse="panelDirecciones"  id="direcciones" idParent="panelParent" expanded="true">
+                            <apex:actionFunction action="{!iniciaDireccionEntrega}" status="statusAgregaDireccion" name="iniciaDireccion" reRender="formaDireccionEntrega" />
+                            <apex:actionFunction action="{!borrarDireccion}" name="deleteDireccion" status="statusBorrarDireccion" reRender=" forma, opJS "/>
+                            <apex:actionStatus onstart="onstart('modalDireccionEntrega');"  onstop="onstop('modalDireccionEntrega');" id="statusAgregaDireccion" />
+                            <apex:actionStatus onstart="onstart('tablaDireccion');"  onstop="onstop('tablaDireccion');" id="statusBorrarDireccion" />
+                                <div class="row ">
+                                    <div class="col-md-3">
+                                        <button id="agregarDireccionBtn" onclick="iniciaDireccion();" class="btn btn-success" type="button">Agregar direccion de entrega</button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button id="borrarDireccionBtn" class="btn btn-danger" type="button">Borrar direccion de entrega</button>
+                                    </div>
+                                </div>
+                                <div class="row pad scroll">
+                                    <table id="tablaDireccion" class="table table-bordered table-striped table-responsive" > 
+                                        <thead>    
+                                            <tr>
+                                                <td></td>
+                                                <td>Clave dirección</td>
+                                                <td>Dirección</td>
+                                                <td>Calle</td>
+                                                <td>Num. Exterior</td>
+                                                <td>Codigo postal</td>
+                                                <td>Colonia</td>
+                                                <td>Ciudad</td>
+                                                <td>Estado</td>
+                                                <td>Atencion a</td>
+                                                <td>Puesto</td>
+                                                <td>Telefóno</td>
+                                                <td>Extensión</td>
+                                                <td>Email</td>
+                                                <td>Horario</td>
+                                                <td>Nombre personalizar</td>
+                                                <td>Status</td>
+                                            </tr>
+                                        </thead>
+                                        <apex:repeat value="{!lstDireccion}" var="dir">
+                                            <tr>
+                                                <td>
+                                                    <apex:inputCheckbox value="{!dir.checked}"/>
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.ClaveDireccion__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Direccion__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.direntrega.Calle__c}"/>
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.NumExterior__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.CodigoPostal__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Colonia__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Ciudad__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Estado__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.AtencionA__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Puesto__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Telefono__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Extension__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Email__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.Horario__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputText value="{!dir.dirEntrega.NombrePersonalizar__c}" />
+                                                </td>
+                                                <td>
+                                                    <apex:outputField value="{!dir.dirEntrega.Estatus__c}" />
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </div>  
+                            </c:Panel>
+                        <c:Panel title="Tarifas, bonificaciones y escalonamientos" idCollapse="panelTarifa"  id="tarifa" idParent="panelParent" expanded="true">
+                            <div class="row" >
+                                <button type="button" onclick="redirigir();" target="_blank" class="btn btn-success center-block">Conceptos</button>
+                                
+                            </div>
+                        </c:Panel>
+                        
+                        <c:Panel title="Observaciones" idCollapse="panelObservaciones"  id="observaciones" idParent="panelParent" expanded="true">
+                            <div class="row">
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ObservacionesEjecutivos__c.Label}" for="observacion">
+                                    <apex:inputField value="{!contrato.ObservacionesEjecutivos__c}" styleClass="form-control"/>
+                                </c:PanelCell> 
+                           
+                                <c:PanelCell label="{!$ObjectType.Contrato__c.fields.ComentariosAdministracionVentas__c.Label}" for="observacion">
+                                    <apex:inputField value="{!contrato.ComentariosAdministracionVentas__c}" styleClass="form-control"/>
+                                </c:PanelCell> 
+                            </div>
+                        </c:Panel>
+                        </div>
+                        
+                        <div id="guarda" style="z-index: 1000;" class="row text-center">
+                            <c:Panel expanded="true">
+                                  
+                                        <apex:commandButton id="guarda1" value="Guardar" status="validaId" styleClass="btn btn-success" action="{!guardar}" 
+                                                            rendered="{!(contrato.Estatus__c != 'Enviado' && $Profile.Name != 'Administrador del sistema') ||  $Profile.Name == 'Administrador del sistema' }"
+                                                            reRender="forma, tablaBonificaciones, tablaNuevaBonificacion, opJS, bloqueaContrato" />
+                                        <apex:actionStatus onstart="onstart('formaDiv');" onstop="valida();" id="validaId" ></apex:actionStatus>
+                                
+                                    <apex:outputPanel rendered="{!IF((oppContrato.ContratoTC3__c != null && $Profile.Name != 'Administrador del sistema' && contrato.Estatus__c == 'Pendiente') || ($Profile.Name == 'Administrador del sistema' && oppContrato.ContratoTC3__c != null), true, false)}"> 
+                                        <button id="generalayoutId" type="button" class="btn btn-primary">Generar layout</button>
+                                    </apex:outputPanel>
+                            </c:Panel>
+                        </div> 
+                        
+                    </section>
+                </div>
+            </div>
+        </apex:form>
+    </div>
+    
+    
+   <!-- Modal catalogo contacto-->
+    
+    <div id="modalCatalogoContacto" title="Contactos">
+        <apex:form id="formaCatalogoContacto">
+            <apex:actionFunction action="{!nuevoContacto}" name="nuevoContact" status="statusModalNuevoContacto" reRender="modalContactoNuevo, formaContactoNuevo, opJS" />
+            <apex:actionFunction action="{!agregarContactoExistente}" name="addContactoExistente" status="statusModalContacto" reRender="formaCatalogoContacto, panelContactos, opJS" />
+            
+            <apex:actionStatus onstart="onstart('tablaContacto');"  onstop="onstop('tablaContacto');" id="statusModalContacto" />
+            <apex:actionStatus onstart="onstart('modalContactoNuevo');"  onstop="onstop('modalContactoNuevo');" id="statusModalNuevoContacto" />
+            <div class="row pad scroll">
+                <table id="tablaCatalogoContacto" class="table table-bordered table-striped table-responsive" > 
+                    <thead>    
+                        <tr>
+                            <td></td>
+                            <td>Contacto</td>
+                            <td>Nombre</td>
+                            <td>Otro puesto</td>
+                            <td>Horario de oficina</td>
+                            <td>Telefóno</td>
+                            <td>Extensión</td>
+                            <td>Email</td>
+                        </tr>
+                    </thead>
+                    <apex:repeat value="{!lstCatalogoBueno}" var="catalogo">
+                        <tr>
+                            <td>
+                                <apex:inputCheckbox onchange="if(j$(this).prop('checked')){ j$('#tablaCatalogoContacto').find('input[type=\'checkbox\']').prop('checked',false);j$(this).prop('checked',true) }"  value="{!catalogo.checked}" />
+                            </td>
+                            <td>
+                                <apex:outputText value="{!catalogo.contacto.FirstName}" />
+                            </td>
+                            <td>
+                                <apex:outputText value="{!catalogo.contacto.LastName}" />
+                            </td>
+                            <td>
+                                <apex:outputText value="{!catalogo.contacto.OtroPuesto__c }" />
+                            </td>
+                            <td>
+                                <apex:outputText value="{!catalogo.contacto.HorarioOficina__c}" />
+                            </td>
+                            <td>
+                                <apex:outputText value="{!catalogo.contacto.Phone}" />
+                            </td>
+                            <td>
+                                <apex:outputText value="{!catalogo.contacto.Extension__c}" />
+                            </td>
+                            <td>
+                                <apex:outputText id="mail" value="{!catalogo.contacto.Email}" />
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                </table>
+            </div>
+        </apex:form>
+    </div>
+    
+    <!-- Modal Contacto Nuevo-->
+    <div id="modalContactoNuevo" title="Crear/Modificar nuevo contacto ">
+        <div class="alert alert-danger error" id="modalContactoNuevoMensajeError" style="display:none;">Esto es un mensaje</div>
+        <apex:form id="formaContactoNuevo">
+            <apex:actionFunction action="{!nuevoContactoBoton}" status="statusNuevoContacto" name="nuevoContactoBtn" reRender="formaContactoNuevo" />
+            <apex:actionStatus onstart="onstart('modalContactoNuevo');"  onstop="onstop('modalContactoNuevo');" id="statusNuevoContacto" />
+            <apex:actionFunction action="{!agregarNuevoContacto}" name="newContacto" status="statusAgregaContacto" reRender="contacto, opJS" />
+            <apex:actionStatus onstart="onstart('tablaContacto');"  onstop="onstop('tablaContacto');" id="statusAgregaContacto" />
+            
+            <div class="row">
+                <button type="button" onclick="nuevoContactoBtn();" class="col-md-offset-4 col-md-4 btn btn-default">Nuevo</button>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Nombre" color="{!IF(nuevoContacto.contacto.FirstName != '','has-success has-feedback','has-error')}">
+                    <apex:inputField value="{!nuevoContacto.contacto.FirstName}"  styleclass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Otro Puesto" color="{!IF(nuevoContacto.contacto.OtroPuesto__c != '','has-success has-feedback','has-error')}">
+                    <apex:selectList value="{!nuevoContacto.contacto.OtroPuesto__c}" multiselect="false" size="1" styleClass="form-control">
+                        <apex:selectOptions value="{!otroPuesto}"/>
+                    </apex:selectList>
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Apellidos" color="{!IF(nuevoContacto.contacto.lastName != null,'has-success has-feedback','has-error')}">
+                    <apex:inputField value="{!nuevoContacto.contacto.lastName}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Horario de oficina" color="{!IF(nuevoContacto.contacto.HorarioOficina__c != '','has-success has-feedback','has-error')}">
+                    <apex:inputField value="{!nuevoContacto.contacto.HorarioOficina__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Telefóno" color="{!IF(nuevoContacto.contacto.Phone != '','has-success has-feedback','has-error')}">
+                    <apex:inputText html-type="number" value="{!nuevoContacto.contacto.Phone}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Email" color="{!IF(nuevoContacto.contacto.Email != '','has-success has-feedback','has-error')}">
+                    <apex:inputField id="correo" type="email" html-pattern="^[a-zA-Z0-9._-]+@example.com$" value="{!nuevoContacto.contacto.Email}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Extensión" color="{!IF(nuevoContacto.contacto.Extension__c != null,'has-success has-feedback','has-error')}">
+                    <apex:inputField html-maxlength="3" type="text" value="{!nuevoContacto.contacto.Extension__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Tipo de contacto" >
+                    <apex:outputText value="{!nuevoContacto.tipoContacto}" />
+                </c:PanelCell>
+            </div>
+        </apex:form>
+    </div>
+    
+    <!-- Modal Direccion de entrega-->
+    <div id="modalDireccionEntrega" title="Agregar direccion de entrega">
+        <div class="alert alert-danger error" id="modalDireccionNuevoMensajeError" style="display:none">Esto es un mensaje</div>
+        <apex:form id="formaDireccionEntrega">
+            <apex:actionFunction action="{!agregarDireccion}" name="addDireccion" status="statusAgregarDireccion" reRender="formaDireccionEntrega,direcciones,tablaDireccion, opJS " oncomplete="closeModal('modalDireccionEntrega');"/>
+            <apex:actionFunction action="{!agregarDireccionCuenta}" status="statusDireccionCuenta" name="addDireccionCuenta" reRender="formaDireccionEntrega"/>
+            <apex:actionStatus onstart="onstart('modalDireccionEntrega');"  onstop="onstop('modalDireccionEntrega');" id="statusDireccionCuenta" />
+            <apex:actionStatus onstart="onstart('tablaDireccion');"  onstop="onstop('tablaDireccion');" id="statusAgregarDireccion" />
+            <div class="row text-center">
+                <button type="button" onclick="addDireccionCuenta();" class="btn btn-default">Dirección de entrega = Dirección fiscal</button>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Clave Direccion" color="{!IF(direccionEntrega.dirEntrega.ClaveDireccion__c != '','has-success has-feedback','has-error')}">
+                    <apex:inputField html-minlength="4"  value="{!direccionEntrega.dirEntrega.ClaveDireccion__c}"  styleclass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Num. Exterior" color="{!IF(direccionEntrega.dirEntrega.NumExterior__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.NumExterior__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Dirección" color="{!IF(direccionEntrega.dirEntrega.Direccion__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Direccion__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Num. Interior" color="{!IF(direccionEntrega.dirEntrega.NumInterior__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.NumInterior__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Calle" color="{!IF(direccionEntrega.dirEntrega.Calle__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Calle__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Codigo postal" color="{!IF(direccionEntrega.dirEntrega.CodigoPostal__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.CodigoPostal__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Colonia" color="{!IF(direccionEntrega.dirEntrega.Colonia__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Colonia__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Ciudad" color="{!IF(direccionEntrega.dirEntrega.Ciudad__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Ciudad__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Estado" color="{!IF(direccionEntrega.dirEntrega.Estado__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Estado__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <hr/>
+            <div class="row">
+                <c:PanelCell label="Telefóno" color="{!IF(direccionEntrega.dirEntrega.Telefono__c != null ,'has-success has-feedback','has-error')}">
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Telefono__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Email" color="{!IF(direccionEntrega.dirEntrega.Email__c != '' ,'has-success has-feedback','has-error')}">
+                    <apex:inputField id="correo" type="email" html-pattern="^[a-zA-Z0-9._-]+@example.com$" value="{!direccionEntrega.dirEntrega.Email__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Extensión" color="{!IF(direccionEntrega.dirEntrega.Extension__c != null ,'has-success has-feedback','has-error')}">
+                    <apex:inputField type="number" html-maxlength="3" value="{!direccionEntrega.dirEntrega.Extension__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Atencion a" color="{!IF(direccionEntrega.dirEntrega.AtencionA__c != '' ,'has-success has-feedback','has-error')}">
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.AtencionA__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Puesto" color="{!IF(direccionEntrega.dirEntrega.Puesto__c != '' ,'has-success has-feedback','has-error')}">
+                    <apex:selectList value="{!direccionEntrega.dirEntrega.Puesto__c}" multiselect="false" size="1" styleClass="form-control">
+                        <apex:selectOptions value="{!otroPuesto}"/>
+                    </apex:selectList>
+                </c:PanelCell>
+                <c:PanelCell label="Horario" color="{!IF(direccionEntrega.dirEntrega.Horario__c != '' ,'has-success has-feedback','has-error')}">
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Horario__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Nombre personalizar" color="{!IF(direccionEntrega.dirEntrega.NombrePersonalizar__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.NombrePersonalizar__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Direccion personalizar" color="{!IF(direccionEntrega.dirEntrega.DireccionPersonalizar__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.DireccionPersonalizar__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Descripcion" color="{!IF(direccionEntrega.dirEntrega.Descripcion__c != '','has-success has-feedback','has-error')}" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Descripcion__c}" styleClass="form-control" />
+                </c:PanelCell>
+                <c:PanelCell label="Observaciones">
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Observaciones__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+            <div class="row">
+                <c:PanelCell label="Estatus" >
+                    <apex:inputField value="{!direccionEntrega.dirEntrega.Estatus__c}" styleClass="form-control" />
+                </c:PanelCell>
+            </div>
+        </apex:form>
+    </div>
+  
+    <apex:outputPanel id="opJS">
+        <script>
+        j$ = jQuery.noConflict();
+        
+        var dialogoCatalogoContacto;
+        var dialogoContactoNuevo;
+        var dialogoDireccion;
+        var dialogoBonificaciones;
+        var tipoModal = '';
+        var oculta;
+        var filtro = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        
+        j$(document).ready(function(){
+            // Boton guardar 
+            var estatus = '{!contrato.Estatus__c}';
+            var perfil = '{!$Profile.Name}'
+            if(estatus == 'Enviado'){
+                bloquea('bloqueaContrato');
+                 j$('[id$=guarda1]').prop('disabled', true);
+            }
+            if(perfil != 'Administrador del sistema'){
+            bloquea('generalayoutId');
+            }
+            j$(window).on('scroll', function() {
+                if(j$(window).scrollTop()<j$(document).height() - 1000){
+                    j$('[id$=guarda]').addClass('fijarBoton');
+                    j$('[id$=guarda]').addClass('container bs-docs-container');
+                }else{
+                    j$('[id$=guarda]').removeClass('fijarBoton');
+                    j$('[id$=guarda]').removeClass('container bs-docs-container');
+                }
+            }); 
+            
+            //lineas de impresion
+              j$('.numero').prop('disabled', true);
+            var lineas=[];
+            j$('.numero').each(function(index){
+                    lineas.push(this);
+            });
+            for(var i = 1; i <= lineas.length; i++){
+                if(lineas.length == 1){
+                    j$(lineas[0]).val(1);
+                    i = lineas.length;
+                }
+                if(lineas.length == 2){
+                    j$(lineas[0]).val(1);
+                    j$(lineas[1]).val(2);
+                     i = lineas.length;
+                }
+                if(lineas.length == 3){
+                    j$(lineas[0]).val(1);
+                    j$(lineas[1]).val(2);
+                    j$(lineas[2]).val(3);
+                    i = lineas.length;
+                } 
+            }
+            if(lineas.length == 3){
+                j$('#addLineaImpresion').hide();
+            }else{
+                 j$('#addLineaImpresion').show();
+            }
+            
+            //Validación de fechas
+            Date.prototype.addDays = function(days)
+            {
+                var dat = new Date(this.valueOf());
+                dat.setDate(dat.getDate() + days);
+            }
+            
+            function formatDate(fecha){
+                var fecha = new Date(fecha);
+                var year = fecha.getFullYear();
+                var month = (1 + fecha.getMonth()).toString();
+                month = month.length > 1 ? month : '0' + month;
+                var day = fecha.getDate().toString();
+                day = day.length > 1 ? day : '0' + day;
+                return year + '-' + month + '-' + day;
+            }
+            
+            
+            if({!contrato.EmpresaPrincipal__c}==false && '{!contrato.Id}'==''){
+                j$('[id$=empresaPrincipal]').prop('checked', 'true');
+                //validaEmpresaPrincipal();
+            }else{
+                validaEmpresaPrincipal();
+            }
+            j$('[id$=empresaPrincipal]').change(function(){
+                validaEmpresaPrincipal();
+            });
+            function validaEmpresaPrincipal(){
+                if(j$('[id$=empresaPrincipal]').is(':checked')){
+                    j$('[id$=idPrime]').val('').prop('disabled', true);
+                    j$('[id$=idPrimeDiv]>div').removeClass('has-error has-success has-feedback ');
+                }else{
+                    j$('[id$=idPrime]').prop('disabled', false);
+                     //if(j$('[id$=clasificacion]').val() != ''){
+                     if(j$('[id$=idPrime]').val() != ''){
+                            j$('[id$=idPrimeDiv]>div').addClass('has-success has-feedback'); 
+                            j$('[id$=idPrimeDiv]>div').removeClass('has-error'); 
+                        }else{
+                            j$('[id$=idPrimeDiv]>div').addClass('has-error'); 
+                            j$('[id$=idPrimeDiv]>div').removeClass('has-success has-feedback'); 
+                        }
+                }
+            }
+            validaMaquila();
+            j$('[id$=Maquila]').click(function(){
+                validaMaquila();
+            });
+            function validaMaquila(){
+                if(j$('[id$=Maquila]').is(':checked')) { 
+                    j$('.ocultaMaquila').show().prop('disabled', false); 
+                } 
+                else { 
+                    j$('.ocultaMaquila').val('').hide().prop('disabled', true); 
+                }
+            }
+            
+            j$('.fechaInicio').change(function(){
+                var fechaIniAct = new Date(j$(this).val());
+                var fechaFinAct = new Date(j$(this).closest('tr').find('input.fechaFin').val())
+                
+                //-------------------------
+                var fa = new Date();
+                 var fechaActual1 = ( fa.getFullYear() + "-" + ("0" + (fa.getMonth() + 1)).slice(-2) + "-" + ("0" + fa.getDate()).slice(-2)); 
+                 var f =new Date('{!fechaActual}');
+                
+                console.debug(j$(this).val());
+                console.debug(fechaActual1); 
+                console.debug(fechaIniAct);
+                console.debug(f);
+                
+                if(fechaIniAct <= f){ 
+                   alert('La fecha Inicial debe ser mayor o igual a la fecha actual');
+                    j$(this).val(fechaActual1);
+                }
+                //---------------------
+                if(fechaFinAct < fechaIniAct){
+                    alert('La fecha Inicial debe ser menor o igual a la fecha Final');
+                    j$(this).val(null);
+                }else{
+                    var fechaFinAnt = new Date(j$(this).closest('tr').prev().find('input.fechaFin').val())
+                    var fechaIniAnt = new Date(j$(this).closest('tr').prev().find('input.fechaInicio').val())
+                    
+                    var fecha = new Date(j$(this).val());
+                    fecha.addDays(-1);
+                    
+                    if(fecha<=fechaIniAnt){
+                        j$(this).val(formatDate(fechaIniAct));
+                        alert('La fecha inicial actual debe ser mayor a la fecha inicial anterior');
+                    }else{
+                        
+                        fecha= formatDate(fecha);
+                        
+                        //console.log(j$(this).closest('tr').prev().find('input.fechaFin').val());
+                        j$(this).closest('tr').prev().find('input.fechaFin').val( fecha );
+                    }
+                }
+            });
+            
+            j$('.fechaFin').change(function(){
+                var fechaFinAct = new Date(j$(this).val());
+                var fechaIniAct = new Date(j$(this).closest('tr').find('input.fechaInicio').val())
+                
+                if(fechaFinAct < fechaIniAct){
+                    alert('La fecha Final debe ser mayor o igual a la fecha Inicial');
+                    j$(this).val(null);
+                }else{
+                    
+                    var fechaFinAnt = new Date(j$(this).closest('tr').next().find('input.fechaFin').val())
+                    var fechaIniAnt = new Date(j$(this).closest('tr').next().find('input.fechaInicio').val())
+                    
+                    var fecha = new Date(j$(this).val());
+                    //fecha.addDays(1);
+                    
+                    fecha.setDate(fecha.getDate() + 2);
+                    
+                    if(fechaFinAct>=fechaFinAnt){
+                        j$(this).val(null);
+                        alert('La fecha final actual debe ser menor a la fecha final posterior');
+                    }else{
+                        
+                        fechaIniAnt= formatDate(fecha);
+                        
+                        //console.log(j$(this).closest('tr').prev().find('input.fechaFin').val());
+                        j$(this).closest('tr').next().find('input.fechaInicio').val(fechaIniAnt);
+                    }
+                    
+                }
+            });
+
+            //Tarifa bonificacion / Escalonamiento
+            if(j$('[id$=tipoCargoid]').val()==''){
+                j$('#bonificacionBtn').prop('disabled', true);
+            }
+            j$('[id$=tipoCargoid]').change(function(){
+                if(j$('[id$=tipoCargoid]').val()!=''){
+                    j$('#bonificacionBtn').prop('disabled', false);
+                }else{
+                    j$('#bonificacionBtn').prop('disabled', true);
+                }
+            });
+            
+            if(j$('[id$=tipoCargoid]').val()==''){
+                j$('#modificaBonificacionBtn').prop('disabled', true);
+            }
+            
+            //Se selecciona contrato por default
+            fijaContrato()
+            j$('[id$=versionContrato]').change(function(){
+                fijaContrato();
+            });
+            function fijaContrato(){
+                j$('[id$=versionContrato]').val('TVWT-001').prop('disabled', true);
+            }
+            
+            //Validacion TipoPago
+         
+            validaTipoPago();
+            j$('[id$=tipoPago]').change(function(){
+                validaTipoPago();
+            });
+            function validaTipoPago(){
+                if(j$('[id$=tipoPago]').val()==0){ 
+                    j$('[id$=condicionesPago]').val(0)
+                    j$('[id$=facturacionCargos]').val('R').prop('disabled', true);
+                    j$('[id$=facturacionPlastico]').val('R').prop('disabled', true);
+                    j$('[id$=auto]').hide().prop('disabled', true);
+                    j$('[id$=dia]').hide().prop('disabled', true);
+                    j$('[id$=garantia]').hide().prop('disabled', true);
+                    
+                    j$('[id$=frecuenciaPedido]').prop('disabled', false);
+                    j$('[id$=diaLiberacion]').prop('disabled', true);
+                    j$('[id$=claveFrecuenciaLiberacionAutomatica]').val('');
+                    j$('[id$=ventanaRiesgo]').val('');
+                    j$('[id$=lineaOperativa]').val('');
+                    j$('[id$=tipoGarantia]').val('');
+                    j$('[id$=monto]').val('');
+                    j$('[id$=observaciones]').val('');
+                    j$('[id$=diaLiberacion]').val('');
+                    j$('[id$=diaSemana]').val('');
+                    j$('[id$=diaInicio]').val('');
+                    j$('[id$=proximaCarga]').val('');
+                    j$('[id$=diaCampo]').val(''); 
+                }else{
+                    j$('select[id$=condicionesPago]').prop('disabled', false);
+                    j$('select[id$=frecuenciaPedido]').val(0);
+                    
+                    j$('[id$=frecuenciaPedido]').val(0);
+                    j$('[id$=facturacionCargos]').prop('disabled', false);
+                    j$('[id$=facturacionPlastico]').prop('disabled', false);
+                    j$('[id$=auto]').show().prop('disabled', false);
+                    j$('[id$=dia]').show().prop('disabled', false);
+                    j$('[id$=garantia]').show().prop('disabled', false);
+                    
+                    j$('[id$=diaLiberacion]').show().prop('disabled', false);
+                }
+            }
+            j$('[id$=facturacionCargos]').change(function(){
+                validaTipoPago();
+            })
+            j$('[id$=facturacionPlastico]').change(function(){
+                validaTipoPago();
+            })
+            
+            //Validacion Dia de liberacion
+            if(j$('[id$=diaLiberacion]').val()==''){
+                j$('[id$=diaSemana], [id$=diaInicio], [id$=proximaCarga], [id$=diaCampo]').val('').prop('disabled', true);
+            }else if(j$('[id$=diaLiberacion]').val()=='Diario'){
+                j$('[id$=diaSemana], [id$=diaInicio], [id$=proximaCarga], [id$=diaCampo]').prop('disabled', true);
+            }else if(j$('[id$=diaLiberacion]').val()=='Semanal'){
+                j$('[id$=diaSemana]').prop('disabled', false);
+                j$('[id$=diaInicio], [id$=proximaCarga], [id$=diaCampo]').prop('disabled', true);
+            }else if(j$('[id$=diaLiberacion]').val()=='Quincenal'){
+                j$('[id$=diaInicio], [id$=proximaCarga]').prop('disabled', false);
+                j$('[id$=diaCampo], [id$=diaSemana]').prop('disabled', true);
+            }else if(j$('[id$=diaLiberacion]').val()=='Mensual'){
+                j$('[id$=diaCampo]').prop('disabled', false);
+                j$('[id$=diaSemana], [id$=diaInicio], [id$=proximaCarga]').prop('disabled', true);
+            }
+            j$('[id$=diaLiberacion]').change(function(){
+                validaDiaLiberacion();
+            });
+            function validaDiaLiberacion(){
+                if(j$('[id$=diaLiberacion]').val()==''){
+                    j$('[id$=diaSemana], [id$=diaInicio], [id$=proximaCarga], [id$=diaCampo]').val('').prop('disabled', true);
+                }else if(j$('[id$=diaLiberacion]').val()=='Diario'){
+                    j$('[id$=diaSemana], [id$=diaInicio], [id$=proximaCarga], [id$=diaCampo]').val('').prop('disabled', true);
+                }else if(j$('[id$=diaLiberacion]').val()=='Semanal'){
+                    j$('[id$=diaSemana]').prop('disabled', false);
+                    j$('[id$=diaInicio], [id$=proximaCarga], [id$=diaCampo]').val('').prop('disabled', true);
+                }else if(j$('[id$=diaLiberacion]').val()=='Quincenal'){
+                    j$('[id$=diaInicio], [id$=proximaCarga]').prop('disabled', false);
+                    j$('[id$=diaCampo], [id$=diaSemana]').val('').prop('disabled', true);
+                }else if(j$('[id$=diaLiberacion]').val()=='Mensual'){
+                    j$('[id$=diaCampo]').prop('disabled', false);
+                    j$('[id$=diaSemana], [id$=diaInicio], [id$=proximaCarga]').val('').prop('disabled', true);
+                }
+            }
+            
+            //Valiación Facturación del Cliente
+            var ComoFact=j$('[id$=comoFactura]');
+             if(ComoFact.val()== 0){
+                j$('.ocultaConsolidador, .ocultaComoFactura, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                j$('select[id$=tipoCliente]').val('1').prop('disabled', true);
+                j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                j$('[id$=sucursalFacturacionGlobal], [id$=productoFacturacionGlobal], [id$=grupoFacturacionGlobal], [id$=clienteFacturacionGlobal]').val('');
+            
+            }else if(ComoFact.val()== 1){
+                j$('.ocultaConsolidador, .ocultaComoFactura, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                j$('select[id$=tipoCliente]').val('1').prop('disabled', true);
+                j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                j$('[id$=sucursalFacturacionGlobal], [id$=productoFacturacionGlobal], [id$=grupoFacturacionGlobal], [id$=clienteFacturacionGlobal]').val('');
+            }else if(ComoFact.val()== 2){
+                j$('.ocultaConsolidador , #ocultaEsConsolidador').css('display','inline').prop('disabled', false);
+                j$('.ocultaComoFactura').css('display','none').prop('disabled', true);
+                j$('select[id$=tipoCliente]').val('1').prop('disabled', true);
+                j$('[id$=productoConsolidacion]').val('30').prop('disabled', true);
+                j$('[id$=sucursalFacturacionGlobal], [id$=productoFacturacionGlobal], [id$=grupoFacturacionGlobal], [id$=clienteFacturacionGlobal]').val('');  
+                if(j$('[id$=esConsolidador]').prop( "checked" )){
+                    j$('.ocultaConsolidador').css('display','none').prop('disabled', true);
+                    j$('[id$=productoConsolidacion]').val('').prop('disabled', true);
+                    j$('[id$=esConsolidador]').trigger('onchange');
+                } else{
+                    j$('.ocultaConsolidador').css('display','inline').prop('disabled', false);
+                    j$('[id$=productoConsolidacion]').val('30').prop('disabled', true);
+                    j$('[id$=esConsolidador]').trigger('onchange');
+                }
+                j$('[id$=esConsolidador]').change(function(){
+                    if(j$('[id$=esConsolidador]').prop( "checked" )){
+                        j$('.ocultaConsolidador').css('display','none').prop('disabled', true);
+                        j$('[id$=productoConsolidacion]').val('').prop('disabled', true);
+                        j$('[id$=esConsolidador]').trigger('onchange');
+                        j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion] , [id$=clienteConsolidacion]').val('');
+                    } else{
+                        j$('.ocultaConsolidador').css('display','inline').prop('disabled', false);
+                        j$('[id$=productoConsolidacion]').val('30').prop('disabled', true);
+                        j$('[id$=esConsolidador]').trigger('onchange');
+                    } 
+                });
+            }else if(ComoFact.val()== 3){ 
+                j$('.ocultaConsolidador , #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                j$('select[id$=tipoCliente]').prop('disabled', false);
+                j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+            }else if(ComoFact.val()== 4){ 
+                j$('.ocultaConsolidador, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                j$('select[id$=tipoCliente]').prop('disabled', false);
+                j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+            }else if(ComoFact.val()== 5){ 
+                j$('.ocultaConsolidador, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                j$('select[id$=tipoCliente]').prop('disabled', false);
+                j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+            }
+                else if(ComoFact.val()== 6){ 
+                    j$('.ocultaConsolidador, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                    j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                    j$('select[id$=tipoCliente]').prop('disabled', false);
+                    j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                }
+            
+            ComoFact.change(function(){
+                validaComoFactura();
+            });
+            j$('[id$=tipoCliente]').change(function(){
+                validaComoFactura();
+            });
+            function validaComoFactura(){
+                console.log('validaComoFactura: ', ComoFact.val())
+                if(ComoFact.val()== 0){
+                j$('.ocultaConsolidador, .ocultaComoFactura, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                j$('select[id$=tipoCliente]').val('1').prop('disabled', true);
+                j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                j$('[id$=sucursalFacturacionGlobal], [id$=productoFacturacionGlobal], [id$=grupoFacturacionGlobal], [id$=clienteFacturacionGlobal]').val('');
+            
+            }else if(ComoFact.val()== 1){
+                    j$('.ocultaConsolidador, .ocultaComoFactura, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                    j$('select[id$=tipoCliente]').val('1').prop('disabled', true);
+                    j$('[id$=esConsolidador]').attr('checked', false);
+                    j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                    j$('[id$=sucursalFacturacionGlobal], [id$=productoFacturacionGlobal], [id$=grupoFacturacionGlobal], [id$=clienteFacturacionGlobal]').val('');
+                }else if(ComoFact.val()== 2){
+                    j$('.ocultaConsolidador , #ocultaEsConsolidador').css('display','inline').prop('disabled', false);
+                    j$('.ocultaComoFactura').css('display','none').prop('disabled', true);
+                    j$('select[id$=tipoCliente]').val('1').prop('disabled', true);
+                    j$('[id$=productoConsolidacion]').val('30').prop('disabled', true);
+                    j$('[id$=sucursalFacturacionGlobal], [id$=productoFacturacionGlobal], [id$=grupoFacturacionGlobal], [id$=clienteFacturacionGlobal]').val('');                    
+                    if(j$('[id$=esConsolidador]').prop( "checked" )){
+                        j$('.ocultaConsolidador').css('display','none').prop('disabled', true);
+                        j$('[id$=productoConsolidacion]').val('').prop('disabled', true);
+                        j$('[id$=esConsolidador]').trigger('onchange');
+                    }
+                    else{
+                        j$('.ocultaConsolidador').css('display','inline').prop('disabled', false);
+                        j$('[id$=productoConsolidacion]').val('30').prop('disabled', true);
+                        j$('[id$=esConsolidador]').trigger('onchange');
+                    }
+                    
+                    j$('[id$=esConsolidador]').change(function(){
+                        if(j$('[id$=esConsolidador]').prop( "checked" )){
+                            j$('.ocultaConsolidador').css('display','none').prop('disabled', true);
+                            j$('[id$=productoConsolidacion]').val('').prop('disabled', true);
+                            j$('[id$=esConsolidador]').trigger('onchange');
+                            j$('[id$=esConsolidador]').val( 'false' );
+                            j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion] , [id$=clienteConsolidacion]').val('');
+                        }
+                        else{
+                            j$('.ocultaConsolidador').css('display','inline').prop('disabled', false);
+                            j$('[id$=productoConsolidacion]').val('30').prop('disabled', true);
+                            j$('[id$=esConsolidador]').trigger('onchange');
+                        }
+                    });
+                }else if(ComoFact.val()== 3){ 
+                    j$('.ocultaConsolidador , #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                    j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                    j$('select[id$=tipoCliente]').prop('disabled', false);
+                    j$('[id$=esConsolidador]').attr('checked', false);
+                    j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                }else if(ComoFact.val()== 4){ 
+                    j$('.ocultaConsolidador, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                    j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                    j$('select[id$=tipoCliente]').prop('disabled', false);
+                    j$('[id$=esConsolidador]').attr('checked', false);
+                    j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                }else if(ComoFact.val()== 5){ 
+                    j$('.ocultaConsolidador, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                    j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                    j$('select[id$=tipoCliente]').prop('disabled', false);
+                    j$('[id$=esConsolidador]').attr('checked', false);
+                    j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                }
+                    else if(ComoFact.val()== 6){ 
+                        j$('.ocultaConsolidador, #ocultaEsConsolidador').css('display','none').prop('disabled', true);
+                        j$('.ocultaComoFactura').css('display','inline').prop('disabled', false);
+                        j$('select[id$=tipoCliente]').prop('disabled', false);
+                        j$('[id$=esConsolidador]').attr('checked', false);
+                        j$('[id$=sucursalConsolidacion], [id$=grupoConsolidacion], [id$=clienteConsolidacion]').val('');
+                    }
+            }
+            
+            // Valida financiamiento
+            j$('[id$=financiamiento]').val('P');
+            validaFinanciamiento();
+            j$('[id$=financiamiento]').change(function() {
+                validaFinanciamiento();
+            });
+            j$('[id$=tipoFinanciamiento]').change(function() {
+                validaFinanciamiento();
+            });
+            
+            function validaFinanciamiento(){
+                if(j$('[id$=financiamiento]').val()=='P'){
+                    j$('[id$=pagoCargosFinanciamiento ]').prop('checked',false).prop('disabled', true);
+                    j$('[id$=cargoRecurrenteConFinanciamiento]').prop('checked',false).prop('disabled', true);
+                    j$('[id$=tipoFinanciamiento]').val('').prop('disabled', true);
+                    j$('[id$=clasificacion]').val('').prop('disabled', true);
+                    j$('[id$=clasificacionDiv]>div').removeClass('has-error has-success has-feedback '); 
+                    
+                }else{
+                    if(j$('[id$=financiamiento]').val()=='M'){
+                        j$('[id$=pagoCargosFinanciamiento ]').prop('checked',true); 
+                        j$('[id$=cargoRecurrenteConFinanciamiento]').prop('checked',false).prop('disabled', false);
+                        j$('[id$=tipoFinanciamiento]').val('M').prop('disabled', false).prop('disabled', true);
+                        j$('[id$=clasificacion]').prop('disabled', false);
+                        if(j$('[id$=clasificacion]').val() != ''){
+                            j$('[id$=clasificacionDiv]>div').addClass('has-success has-feedback'); 
+                            j$('[id$=clasificacionDiv]>div').removeClass('has-error'); 
+                        }else{
+                            j$('[id$=clasificacionDiv]>div').addClass('has-error'); 
+                            j$('[id$=clasificacionDiv]>div').removeClass('has-success has-feedback'); 
+                        }
+                    }
+                }
+            }
+            
+            j$('[id$=tipoFacturacion]').val('1');
+            
+            //validación FrecuenciaFacturación
+            validaFrecuenciaFacturacion();
+            j$('[id$=frecuenciaFacturacion]').change(function() {
+                validaFrecuenciaFacturacion();
+            });
+            function validaFrecuenciaFacturacion(){
+                if(j$('[id$=frecuenciaFacturacion]').val()== 52 ){ j$('#fechas').css('display','inline'); }
+                else{ j$('#fechas').css('display','none'); }
+            }
+            
+            validaItemContratacion();
+            j$('[id$=itemContratacion]').change(function(){
+                validaItemContratacion(); 
+            });
+            j$('[id$=condicionesOp]').change(function(){
+                validaItemContratacion(); 
+            });
+            j$('[id$=manejaConductores]').change(function(){
+                validaItemContratacion(); 
+            });
+            if(j$('[id$=manejaNotaVale]').is(':checked')){ 
+                j$('[id$=operaTcTruck]').prop('disabled', false); 
+            } 
+            else { 
+                j$('[id$=operaTcTruck]').prop('checked',false).prop('disabled', true); 
+            }
+            j$('[id$=manejaNotaVale]').change(function(){
+                validaItemContratacion();
+                if(j$('[id$=manejaNotaVale]').is(':checked')) { j$('[id$=operaTcTruck]').prop('disabled', false); } 
+                else { j$('[id$=operaTcTruck]').prop('checked',false).prop('disabled', true) }
+            });
+            j$('[id$=operaTcTruck]').change(function(){
+                validaItemContratacion();
+            });
+            if(j$('[id$=controlaPresenciaVehiculoNFC]').is(':checked')){
+                    j$('[id$=modoTransaccion]').prop('disabled',false);
+                }else{                    
+                    j$('[id$=modoTransaccion]').val('Fisica').prop('disabled',true);
+                }
+            j$('[id$=controlaPresenciaVehiculoNFC]').change(function(){
+                if(j$('[id$=controlaPresenciaVehiculoNFC]').is(':checked')){
+                    j$('[id$=modoTransaccion]').prop('disabled',false);
+                }else{                    
+                    j$('[id$=modoTransaccion]').val('Fisica').prop('disabled',true);
+                }
+                validaItemContratacion(); 
+            });
+            j$('[id$=noMostrarKm]').change(function(){
+                validaItemContratacion(); 
+            });
+            j$('[id$=controlVolumetrico]').change(function(){
+                validaItemContratacion(); 
+            });
+            j$('[id$=bombaPropia]').click(function(){
+                validaItemContratacion(); 
+            });
+            
+            if(j$('[id$=controlaPresenciaVehiculoNFC]').is(':checked')){
+                j$('[id$=modoTransaccion]').prop('disabled',false);
+            }else{
+                j$('[id$=modoTransaccion]').val('Fisica').prop('disabled',true);
+            }
+            
+            function validaItemContratacion(){
+                if(j$('[id$=itemContratacion]').val()== '' ){
+                    j$('[id$=condicionesOp]').css('display','none'); 
+                    j$('.avanzadoOculta').val('').prop('checked',false).css('display','none');
+                    j$('[id$=manejaConductores]').prop('checked',false).css('display','none'); 
+                    j$('[id$=manejaNotaVale ]').prop('checked',false).css('display','none');
+                    j$('[id$=operaTcTruck ]').prop('checked',false).css('display','none');
+                    j$('[id$=controlaPresenciaVehiculoNFC ]').prop('checked',false).css('display','none');
+                    j$('[id$=noMostrarKm ]').prop('checked',false).css('display','none');
+                    j$('[id$=controlVolumetrico ]').prop('checked',false).css('display','none');
+                    j$('[id$=bombaPropia ]').prop('checked',false).css('display','none');
+                }
+                else if(j$('[id$=itemContratacion]').val()== 1){
+                    j$('.avanzadoOculta').css('display','inline');
+                    j$('[id$=condicionesOp]').css('display','none');
+                    j$('[id$=manejaConductores]').css('display','inline');
+                    j$('[id$=manejaNotaVale ]').css('display','inline');
+                    j$('[id$=operaTcTruck ]').css('display','inline');
+                    j$('[id$=controlaPresenciaVehiculoNFC ]').css('display','inline');
+                    j$('[id$=noMostrarKm ]').css('display','inline');
+                    j$('[id$=controlVolumetrico ]').css('display','inline');
+                    j$('[id$=bombaPropia ]').css('display','inline');
+                }
+                    else if(j$('[id$=itemContratacion]').val()== 2) { 
+                        j$('[id$=condicionesOp]').css('display','inline');
+                        j$('.avanzadoOculta').val('').prop('checked',false).css('display','none');
+                        j$('[id$=manejaConductores]').prop('checked',false).css('display','none');
+                        j$('[id$=manejaNotaVale ]').prop('checked',false).css('display','none');
+                        j$('[id$=operaTcTruck ]').prop('checked',false).css('display','none');
+                        j$('[id$=controlaPresenciaVehiculoNFC ]').prop('checked',false).css('display','none');
+                        j$('[id$=noMostrarKm ]').prop('checked',false).css('display','none');
+                        j$('[id$=controlVolumetrico ]').prop('checked',false).css('display','none');
+                        j$('[id$=bombaPropia ]').prop('checked',false).css('display','none');
+                    }
+                validaBomba();
+            }
+            
+            validaOperaOffline();
+            j$('[id$=operacionModoOffline ]').change(function(){
+                validaOperaOffline();
+            });
+            
+            function validaOperaOffline(){
+                if( j$('[id$=operacionModoOffline ]').val()==3 ){
+                    j$('.ocultaOffline').css('display','inline').prop('disabled', false);
+                }else{
+                    j$('.ocultaOffline').css('display','none').val('').prop('disabled',true).prop('checked',false);
+                }
+            }
+            //Valiación Bomba propia
+            j$('[id$=bombaPropia]').change(function(){
+                validaBomba();
+            });
+            validaBomba()
+            function validaBomba(){
+                if(j$('[id$=bombaPropia]').is(':checked')) { j$('.ocultaBombaPropia').show().prop('disabled', false); } 
+                else { j$('.ocultaBombaPropia').val('').hide().prop('disabled', true); } 
+            }
+            //Valiación imprime Logo
+            validaImprimerLogo();
+            j$('[id$=imprimeLogo]').click(function(){
+                validaImprimerLogo();
+            });
+            function validaImprimerLogo(){
+                if(j$('[id$=imprimeLogo]').is(':checked')) { 
+                    j$('.ocultaImprimeLogo').show().prop('disabled', false); 
+                } 
+                else { 
+                    j$('.ocultaImprimeLogo').val('').hide().prop('disabled', true); 
+                }
+            }
+            
+            
+            //Funciones de modales
+            dialogoCatalogoContacto = j$("#modalCatalogoContacto").dialog({
+                autoOpen: false,
+                maxHeight: 500,
+                minWidth: 900, 
+                modal: true,
+                buttons: {
+                    'Agregar': botonAgregarContacto,
+                    'Modificar': nuevoContactjs, 
+                    Cancel: function() {
+                        dialogoCatalogoContacto.dialog("close");
+                    }
+                },
+                close: function() {
+                },
+                open: function() {
+                }
+            });
+            dialogoContactoNuevo = j$("#modalContactoNuevo").dialog({
+                autoOpen: false,
+                height: 'auto',
+                minWidth: 900,
+                modal: true,
+                buttons: {
+                    'Agregar': botonCrearContacto,
+                    Cancel: function() {
+                        dialogoContactoNuevo.dialog("close");
+                    }
+                },
+                close: function() {
+                },
+                open: function() {
+                    j$('#modalContactoNuevoMensajeError').attr('style','display:none');
+                }
+            });
+            dialogoDireccion = j$("#modalDireccionEntrega").dialog({
+                autoOpen: false,
+                height: 'auto',
+                minWidth: 900,
+                modal: true,
+                buttons: {
+                    'Agregar direccion': botonCrearDireccion,
+                    Cancel: function() {
+                        dialogoDireccion.dialog("close");
+                    }
+                },
+                close: function() {
+                },
+                open: function() {
+                    j$('#modalDireccionNuevoMensajeError').attr('style','display:none');
+                }
+            });
+        });
+        
+        //Borrar de lista
+        j$("#borrarBtn").on( "click" , function(){
+            deleteContacto();
+        });
+        j$("#borrarDireccionBtn").on( "click" , function(){
+            deleteDireccion();
+        });
+        
+        //Catalogo contacto
+        j$("#agregarContactoBtn").on( "click" , function() {
+            dialogoCatalogoContacto.dialog( "open" );
+            llenar();
+        });
+        //Nuevo contacto
+        /* j$("#crearContactoBtn").on( "click" , function() {
+            dialogoContactoNuevo.dialog( "open" );
+            nuevoContacto();
+        });*/
+        //Agregar direccion
+        j$("#agregarDireccionBtn").on( "click" , function() {
+            dialogoDireccion.dialog( "open" );
+        });
+        //bonificacion
+        j$("#bonificacionBtn").on( "click" , function(){
+            dialogoBonificaciones.dialog( "open" );
+        });
+        
+        j$("#modificaBonificacionBtn").on( "click" , function(){
+            dialogoModificaBonificaciones.dialog( "open" );
+            modificaBonificacion();
+            
+        });
+        
+        function nuevoContactjs(){
+            dialogoCatalogoContacto.dialog( "close" );
+            dialogoContactoNuevo.dialog( "open" );
+            nuevoContact();
+        }
+        function botonNuevaFecha(){
+            agregarFechaFacturacion();
+            dialogoCatalogoContacto.dialog( "close" );
+        }
+        function botonFechaFin(){
+            agregarFechaFinFacturacion();
+            dialogoCatalogoContacto.dialog( "close" );
+        }
+        function botonAgregarContacto(){
+            addContactoExistente();
+            dialogoCatalogoContacto.dialog( "close" );
+        }
+        function botonCrearContacto(){
+            tipoModal = 'contacto';
+            revisaFormulario(this); 
+        }
+        function botonCrearDireccion(){
+            tipoModal = 'direccion';
+            revisaFormulario(this); 
+        }
+        function generarLayout(){
+            if({!lstContacto.size} !=3){
+                alert('Tienes que ingresar 3 contactos');
+            }else if('{!contrato.Id}' == ''){
+                alert('El contrato aun no esta insertado revisa los logs');
+            }else{
+                window.location.replace("../apex/GenerarXML?Tipo=TC3&idObjeto={!contrato.Id}");
+            }
+        }
+        //Cerrar Modal
+        
+        function closeModal(idModal){
+            var hasErrorDialog = false;
+             j$('#' + idModal).find('div.errorMsg').each(function(index){
+                hasErrorDialog = true;
+                console.log('Entr:' + hasErrorDialog);
+               });
+               if(hasErrorDialog == false){
+                  j$('#' + idModal).dialog("close");
+               }
+        }
+        
+        //validar Modal
+        function revisaFormulario(contexto){
+            var arreglo=[];
+            j$(contexto).find('input').each(function(index){
+                if(j$(this).prop('type')!= 'checkbox' && j$(this).prop('type')!= 'hidden')
+                    arreglo.push(this);
+            });
+            //--
+            if(tipoModal == 'contacto'){
+                j$(contexto).find('select').each(function(index){
+                    arreglo.push(this);
+                    });
+                for(var contador=0;contador<arreglo.length;contador++){
+                    console.debug('Pos: ' + contador + ' Valor:  ' + j$(arreglo[contador]).val());
+                    var mail = j$(arreglo[4]).val();
+                    if(!filtro.test(mail)){
+                        j$(arreglo[4]).focus();
+                        j$('#modalContactoNuevoMensajeError').html('El campo <strong>Email</strong> es incorrecto');
+                        j$('#modalContactoNuevoMensajeError').attr('style',''); 
+                        return;                   
+                    }
+                    if(j$(arreglo[5]).val().length > 3){
+                        j$(arreglo[5]).focus();
+                        j$('#modalContactoNuevoMensajeError').html('El campo <strong>Extensión</strong> debe tener 3 digitos o menos');
+                        j$('#modalContactoNuevoMensajeError').attr('style',''); 
+                        return; 
+                    }
+                    if((j$(arreglo[contador]).val() == '')){
+                        j$(arreglo[contador]).focus();
+                        j$('#modalContactoNuevoMensajeError').html('Llena los campos en <strong>rojo</strong>');
+                        j$('#modalContactoNuevoMensajeError').attr('style',''); 
+                        return;
+                    }
+                    else{
+                        j$(arreglo[contador]).closest('div').removeClass('has-error');
+                        j$(arreglo[contador]).closest('div').addClass('has-success');
+                        if(contador == arreglo.length -1){
+                            j$('#modalContactoNuevoMensajeError').attr('style','display:none');
+                            console.debug('Si entra');
+                            newContacto();
+                            dialogoContactoNuevo.dialog("close");
+                        }
+                    }
+                }
+            }else if(tipoModal == 'direccion'){
+                 arreglo.pop();
+                 arreglo.pop();
+                j$(contexto).find('select').each(function(index){
+                    arreglo.push(this);
+                    });
+                for(var contador=0 ;contador<arreglo.length; contador++){
+                    console.debug('Pos: ' + contador + ' Valor:  ' + j$(arreglo[contador]).val());
+                    if(j$(arreglo[0]).val().length < 4){
+                        j$(arreglo[0]).focus();
+                        j$('#modalDireccionNuevoMensajeError').html('El campo <strong>Clave direccion</strong> debe tener al menos 4 digitos');
+                        j$('#modalDireccionNuevoMensajeError').attr('style',''); 
+                        return; 
+                    }
+                    var mail = j$(arreglo[9]).val();
+                    if(!filtro.test(mail)){
+                        j$(arreglo[9]).focus();
+                        j$('#modalDireccionNuevoMensajeError').html('El campo <strong>Email</strong> es incorrecto');
+                        j$('#modalDireccionNuevoMensajeError').attr('style',''); 
+                        return;                   
+                    }
+                    if((j$(arreglo[contador]).val() == '')){
+                        j$(arreglo[contador]).focus();
+                        j$('#modalDireccionNuevoMensajeError').html('Llena los campos en <strong>rojo</strong>');
+                        j$('#modalDireccionNuevoMensajeError').attr('style',''); 
+                        return;
+                    }
+                    else{
+                        j$(arreglo[contador]).closest('div').removeClass('has-error');
+                        j$(arreglo[contador]).closest('div').addClass('has-success');
+                        if(contador == arreglo.length -1){
+                            j$('#modalDireccionNuevoMensajeError').attr('style','display:none'); 
+                            addDireccion();
+                        }
+                    }
+                }   
+            } 
+        } 
+        
+        function redirigir(){
+            if ( (typeof sforce != 'undefined') && (sforce != null) ) {
+                sforce.one.navigateToSObject("{!idOportunidad}");
+                
+            }else {
+                var screen = window.screen
+                var params  = 'width=' + screen.width - 30 + ', height=' + screen.height- 30 + ', top=15, left=15, fullscreen=yes';
+                //var dir="/apex/TarifaOportunidad?id="+"{!idOportunidad}&quote={!idProdCotizado}&muestraAnterior=No";
+                //comenta y agrega calvarez 25 feb 2017
+                //window.open(dir,'Tarifas, BonificacionesyEscalonamientos','width=900,height=600,left=50,top=50,toolbar=yes');
+                var dir="/apex/ContratoTC3_TarifasCotizacion?id={!idProdCotizado}"
+                window.open(dir,'Tarifas, BonificacionesyEscalonamientos', params);
+            } 
+        } 
+
+        (function() {
+            try {
+                var a = navigator.userAgent;
+                if ((a.indexOf('Salesforce') != -1) && (a.indexOf('iPhone') != -1 || a.indexOf('iPad') != -1) && (a.indexOf('OS/8') != -1 || a.indexOf('OS 8') != -1) && (a.indexOf('Safari') == -1)) {
+                    var s = document.createElement('style');
+                    s.innerHTML = "html, body{overflow: auto;-webkit-overflow-scrolling:touch;}body{position:absolute;left:0;right:0;top:0;bottom:0;}";
+                    document.getElementsByTagName('head')[0].appendChild(s);
+                }
+            } catch (e) {}
+        })();
+        </script>
+    </apex:outputPanel>
+    
+    <apex:outputPanel id="bloqueaContrato">
+    <script>
+
+
+        j$('[id$=checkContacto]').first().prop('checked',true);
+        
+        function valida(){
+            j$('#formaDiv').unblock();
+            //Valida los errores
+            var error =[]; 
+            j$('#formaDiv').find('.errorMsg').each(function(index){
+                error.push(this);
+            });
+            console.log('Error: ' + error.length);
+            for(var i=0; i<error.length; i++){
+                j$(error[i]).closest('.col-md-3').find('.valida').focus();
+            }
+            //Valida todo el contrato
+            var validaContrato=[];
+            j$('#formaDiv').find('.valida').each(function(index){
+                if(!(j$(this).attr('disabled'))){
+                    validaContrato.push(this);
+                }
+            }); 
+            for(var i=validaContrato.length ; i > 0 ; i--){
+                if((j$(validaContrato[i]).val() == ''))
+                    j$(validaContrato[i]).focus();
+            }
+        }
+        
+    j$("#generalayoutId").on( "click" , function(){
+        confirmar();
+        
+        }); 
+    
+    function confirmar(){
+        if(!confirm('Deseas generar el layout')){
+            return;
+        }else{
+            generarLayout();
+        }
+    }
+        
+    function bloquea(contenedor){
+        j$('#'+ contenedor).block({ message: ' ' ,
+                                   css: { backgroundColor: 'none', color: '#fff',border: 'none'},
+                                   overlayCSS: { cursor: 'no-drop',backgroundColor: 'rgba(255,255,255,0)'}
+                                  }); 
+    }
+        
+    function onstart(contenedor){
+        j$('#'+ contenedor).block({ message: '<h1><img src="{!$Resource.loading}"/></h1>' ,
+                                   css: { backgroundColor: 'none', color: '#fff',border: 'none'},
+                                   overlayCSS: { backgroundColor: '#fff'}
+                                  }); 
+    }
+    
+    function onstop(contenedor){
+        j$('#'+ contenedor).unblock(); 
+    } 
+    </script>
+   </apex:outputPanel>
+
+
+    
+</apex:page>

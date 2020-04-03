@@ -1,0 +1,7 @@
+<apex:page standardController="Opportunity"  extensions="ModificarOportunidadController" action="{!redirigirModificable}">
+	 
+	 <script>
+	 	setTimeout(function(){ window.location.href = '/{!Opportunity.Id}'; }, 1000);
+	 </script>
+	 <apex:pageMessages />
+</apex:page>

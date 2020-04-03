@@ -1,0 +1,77 @@
+<apex:component >
+        <script type="text/ng-template" id="SendApproval.html">
+    		        <div class="modal-header" id="SendApprovalCtrl">
+                    	<button type="button" class="close" ng-click="sc.close()"><span aria-hidden="true">&times;</span></button>
+                        <i  class="fa fa-user" aria-hidden="true"></i>
+                        <h4 align="center" class="modal-title">
+                            Tu cotización requiere aprobación    
+                        </h4>
+                    </div>
+                    <div class="modal-body"> 
+                        <form name="commentForm">
+                            <Label>Comentario para solicitar aprobación:</label>
+                            <textarea cols="77" rows="5" name="userComment" ng-model="sc.userComment" required></textarea>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <center>
+                            <a class="btnb btnb-primary" ng-click="sc.sendToApprove()">
+                                <span class="fa fa-envelope fa-fw"></span>
+                                <span ng-bind="sc.msjApprovalMsj"></span> 
+                            </a>
+                                
+                            <button type="button" ng-disabled="sc.processing" class="btnb btnb-default" ng-click="sc.close()" ng-if="!sc.email">
+                                <span class="fa fa-mail-reply fa-fw"></span>
+                                Cancelar
+                            </button>
+                        </center>  
+		        </div>
+        </script>
+        <script type="text/javascript">
+			(function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('SendApprovalCtrl', SendApprovalCtrl)
+
+            SendApprovalCtrl.$inject = ['ctcUtils', '$uibModal', '$uibModalInstance', 'cotizacion','$sce','$timeout']
+
+            function SendApprovalCtrl(ctcUtils, $uibModal, $uibModalInstance, cotizacion,$sce,$timeout) {
+
+                var vm = this
+                vm.cotizacion = cotizacion || {}
+                vm.forceRender = function() {
+                   vm.init(vm.soluciones)
+                 }
+                vm.init = function (){
+					
+                }
+                vm.msjApprovalMsj = 'Continuar'
+                vm.userComment = ''
+                vm.close = function (cotizacion) {
+                   	$uibModalInstance.dismiss('cancel')
+                	}
+                vm.sendToApprove = function() {
+                    if(vm.userComment){
+                        let quoteData = {};
+                        quoteData.Id = cotizacion.Id;
+                        quoteData.userComment = vm.userComment;
+                        quoteData.owner= cotizacion.OwnerId;
+                        //quoteData.ownerRole= cotizacion.Owner.UserRole.Name;
+                        quoteData.approvalLevel = ctcUtils.app.finalApprovalLevel;
+                        quoteData.approvalComision = ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel;
+                        quoteData.approvalEnvioRecurrente = ctcUtils.app.approvalEnvioRecurrente;
+                        quoteData.approvalPrimerEnvio = ctcUtils.app.approvalPrimerEnvio;
+                        quoteData.approvalTarjetaStock = ctcUtils.app.approvalStock;
+                        quoteData.approvalTarjetaStockPrimer = ctcUtils.app.approvalStockPrimerEnvio;
+                        ctcUtils.guardaCotizacionConAprobacion(cotizacion, quoteData)
+                		vm.close(cotizacion)
+                    } else {
+                        ctcUtils.showError( 'Favor de incluir los comentarios para solicitar aprobación.' )
+                        return
+                    }
+                }
+              	vm.init()     
+              }
+            })()
+	    </script>
+</apex:component>

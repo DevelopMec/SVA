@@ -1,0 +1,125 @@
+<apex:component >
+    <script type="text/ng-template" id="comisiones.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="com.close()"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">% de Comisiones para familia {{com.producto.Product2Id__o.Family}}</h4>
+        </div>
+        <div class="modal-body">
+            <ctc-error ctc-body="sc.errors"></ctc-error>
+            <table id="table-collapse" class="table table-striped">
+                <thead>
+	            	<tr>	
+                        <th class="text-center">Desde</th>	
+                        <th class="text-center">Hasta</th>	
+                        <th class="text-center">Nivel de aprobación</th>	
+                        <th class="text-center">Acelerador de pago</th>	
+                        <!--th>Porcentaje</th-->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="tab in com.comisiones" ng-class="{'success': (com.producto.UnitPrice >= tab.MontoInicial__c && com.producto.UnitPrice <= tab.MontoFinal__c) || (!tab.MontoFinal__c && com.producto.UnitPrice >= tab.MontoInicial__c)}">
+                        <td ng-if="tab.InitialPercentage__c" ng-bind="(tab.InitialPercentage__c | number : 2)  + ' %'" class="text-center"></td>
+                        <td ng-if="!tab.InitialPercentage__c" ng-bind="tab.InitialPercentage__c" class="text-center"></td>
+                        <td ng-if="tab.FinalPercentage__c" ng-bind="(tab.FinalPercentage__c | number : 2)  + ' %'" class="text-center"></td>
+                        <td ng-if="!tab.FinalPercentage__c" ng-bind="tab.FinalPercentage__c" class="text-center"></td>
+                        <td ng-if="tab.ApprovalLevel__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.ApprovalLevel__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.ApprovalLevel__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.ApprovalLevel__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                        <td ng-if="tab.PaymentAccelerator__c > 110" ng-bind="tab.PaymentAccelerator__c + ' %'" class="text-center text-green-bold"></td>
+                        <td ng-if="tab.PaymentAccelerator__c < 110" ng-bind="tab.PaymentAccelerator__c + ' %'" class="text-center"></td>
+                        <!--td ng-bind="com.verificaMoneda(tab.MontoInicial__c)"></td>
+                        <td ng-bind="com.verificaMoneda(tab.MontoFinal__c)"></td>
+                        <td >
+                            <span class="animated ng-animate-disabled fa" ng-class="{'bounce comision-sel': (com.producto.UnitPrice >= tab.MontoInicial__c && com.producto.UnitPrice <= tab.MontoFinal__c) || (!tab.MontoFinal__c && com.producto.UnitPrice >= tab.MontoInicial__c)}" ng-bind="tab.Porcentaje__c" ></span>
+                        </td-->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <table id="table-collapse" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Ejecutivo <span class="fa fa-circle greenCircle"></span></th>
+                        <th class="text-center">Gerente Nacional <span class="fa fa-circle yellowCircle"></span></th>
+                        <th class="text-center">Director Comercial <span class="fa fa-circle redCircle"></span></th>
+                        <th class="text-center">Director General <span class="fa fa-circle grayCircle"></span></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>                           
+        <div class="modal-footer">
+            <button type="button" ng-disabled="com.processing" class="btnb btnb-default" ng-click="com.close()">
+                <span class="fa fa-mail-reply fa-fw"></span>
+                Cerrar
+            </button>
+        </div>
+    </script>
+    <script type="text/javascript">
+        (function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('comisionesCtrl', ComisionesCtrl)
+
+            ComisionesCtrl.$inject = ['ctcUtils', '$filter', '$timeout', '$uibModalInstance', 'producto']
+            function ComisionesCtrl( ctcUtils, $filter, $timeout, $uibModalInstance, producto ) {
+                var vm = this
+                vm.producto = producto || ''
+                // vm.comisiones = ctcUtils.app.comisiones || []
+                vm.comisiones = []
+
+                //console.log('comisiones: ', vm)
+
+                vm.init = function() {
+                    var comisiones = []
+                    var productCode = vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : ''
+                    if(productCode != '30-B' && ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
+                        productCode='Transportista'
+                    }
+                    for( var comision of ctcUtils.app.comisiones ) {
+                        //console.log('El código del producto es: ' + comision.Codigos)
+                        if( comision.Codigos && comision.Codigos.hasOwnProperty(productCode) ) {
+                            comisiones.push( comision )
+                            //console.log('La comisión se está incluyendo: ' + comision)
+
+                        } else if (productCode != '30-B' && ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga'))  {
+                            comisiones.push( comision )
+
+                        }
+                    }
+                    vm.comisiones = comisiones
+                }
+
+                vm.verificaMoneda = function(value) {
+                    if(value && angular.isNumber(value)) {
+                        return $filter('currency')(value, '$ ')
+                    } else if(value){
+                        return value
+                    } else {
+                        return ''
+                    }
+                }
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+                vm.init()
+
+            }
+        })()
+    </script>
+    <style type="text/css">
+        .tr-comisiones > td {
+            vertical-align: middle !important;
+        }
+    </style>
+</apex:component>

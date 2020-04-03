@@ -1,0 +1,21 @@
+<aura:component access="global" controller="CON_ContractsContainer_CTRL">
+	<!-- Handlers -->
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<!-- Handlers -->
+	
+	<!-- Registered Events -->
+	<aura:registerEvent name="showCC" type="c:CON_MessageForCC_EVENT"/>
+	<!-- Registered Events -->
+	
+	<!-- Logical Flags -->
+	<aura:attribute name="isNextButtonVisible" type="Boolean" default="true"/>
+	<aura:attribute name="hasLegalRepresentative" type="Boolean"/>
+	<aura:attribute name="hasTaxRegime" type="Boolean"/>
+	<aura:attribute name="isCorrectOppsStageName" type="Boolean"/>
+	<aura:attribute name="isDataReady" type="Boolean" default="false"/>
+	<!-- Logical Flags -->
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="recordId" type="Id"/>
+	<aura:attribute name="data" type="Object"/>
+</aura:component>

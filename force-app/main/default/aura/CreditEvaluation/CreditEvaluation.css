@@ -1,0 +1,57 @@
+.THIS .labelInsertData {
+    color: #F22C18;
+    font-weight: bold;
+}
+
+.THIS .labelDataBlue {
+    color: rgb(48, 84, 150);
+    font-weight: bold;
+}
+
+.THIS .labelDataLightBlue {
+    color: rgb(0, 176, 240);
+    font-weight: bold;
+}
+
+.THIS .labelBackColor {
+    background-color: rgb(242, 242, 242);
+}
+
+.THIS .legend {
+    color: rgb(255, 255, 255);
+    background-color: rgb(68, 114, 196);
+    font-weight: bold;
+}
+
+.THIS .alignright input { 
+    text-align: right;
+}
+
+.THIS .aligncenter input { 
+    display: flex;
+  	align-items: center;
+  	justify-content: center;
+}
+
+.THIS .fileUploadEdenred .slds-file-selector__dropzone {
+    position: relative !important;
+    left: 25px !important;
+    top: -20px !important;
+    width: 130px !important;
+}
+.THIS .fileUploadEdenred .slds-file-selector__text {
+    display: none !important;
+}
+.THIS .btnsEdenred .slds-button_neutral {
+    padding-left: .2rem !important;
+    padding-right: .2rem !important;
+}
+.THIS .fileUploadEdenred .slds-file-selector__button {
+    height: 30px !important;
+    max-height: 30px !important;
+}
+.THIS .fileUploadEdenred .slds-button_neutral {
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+    width: 123px !important;
+}

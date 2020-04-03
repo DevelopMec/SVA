@@ -1,0 +1,13 @@
+<aura:component controller="NameLessConnection" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    <div class="slds-m-around_x-small">
+        <aura:if isTrue="{!v.spin}">
+            <lightning:spinner alternativeText="Cargando.." size="large" />
+        </aura:if>
+        <lightning:input class="slds-m-around_x-small" aura:id="Sucursal" label="Sucursal:" name="sucursal"/>
+        <lightning:input class="slds-m-around_x-small" aura:id="Producto" label="Producto:" name="producto"/>
+        <lightning:input class="slds-m-around_x-small" aura:id="Grupo" label="Grupo:" name="grupo"/>
+        <lightning:input class="slds-m-around_x-small" aura:id="Cliente" label="Cliente:" name="cliente"/>
+        <lightning:button class=" slds-m-around_x-small slds-align_absolute-center" variant="brand" label="Ejecutar" onclick="{!c.consultar}"/>
+    </div>
+</aura:component>

@@ -1,0 +1,38 @@
+<aura:component controller="SolicitarAprobacionBPfleet_CONT" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="habilitarAprobacion" type="boolean" default="false"/>
+    <aura:attribute name="verAprob" type="boolean" default="true"/>
+    <aura:attribute name="isLoad" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:card >
+        <aura:if isTrue="{!v.isLoad}">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+        <aura:if isTrue="{!v.verAprob}">
+            <aura:if isTrue="{!v.habilitarAprobacion}">            
+                <div>
+                    <ui:message title="Confirmar" severity="warning" closable="false">
+                        ¿Esta seguro de Solicitar la Aprobación del prospecto?
+                    </ui:message>
+                    <lightning:button class="slds-m-around_x-small" variant="brand" label="Confirmar" onclick="{!c.solicitarAprob}"/>
+                </div>
+                <aura:set attribute="else">
+                    <div>
+                        <ui:message title="Información" severity="confirm" closable="false">
+                            No se requiere de aprobación
+                        </ui:message>
+                    </div>
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+                <div>
+                    <ui:message title="Información" severity="confirm" closable="false">
+                        Solicitud enviada
+                    </ui:message>
+                </div>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+</aura:component>

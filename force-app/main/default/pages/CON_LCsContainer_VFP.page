@@ -1,0 +1,149 @@
+<apex:page applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" showHeader="false" sidebar="false" standardController="QuoteLineItem" standardStylesheets="false" extensions="PLAN_CuentaService">
+	<!-- <head>
+		<meta http-equiv="Content-Security-Policy" content="script-src 'frame-src' 'child-src' 'self' https://edenredmexico--std.lightning.force.com;"/>
+	</head> -->
+	<!-- <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'self' https://kendo.cdn.telerik.com;" />
+ -->
+	<!--JQUERY-->
+	<!-- <apex:includeScript value="{!URLFOR($Resource.jquery)}" /> -->
+	<!--JQUERYUI-->
+	<!-- <apex:includeScript value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.min.js')}" /> -->
+	<script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"/>
+	<script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
+	<!-- <apex:stylesheet value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.css')}" /> -->
+	<apex:stylesheet value="{!URLFOR($Resource.jqueryui_custom_theme,'jquery-ui-1.11.4.custom/jquery-ui.css')}" />
+	
+	<script src="{!URLFOR($Resource.kendoui,'/js/kendo.all.min.js')}"></script>
+	<script src="{!URLFOR($Resource.kendoui,'/js/pako_deflate.min.js')}"></script>
+	<script src="{!URLFOR($Resource.kendoui,'/js/jszip.min.js')}"></script>
+
+	<script src="{!URLFOR($Resource.CTC_BASE,'/lightning/ctcLightning.js')}"></script>
+	
+	<link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.default.min.css')}" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.common.min.css')}" />
+	<link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}" />
+	<!-- <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.3.1026/styles/kendo.material.min.css" />
+	<link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.3.1026/styles/kendo.common-material.min.css" /> -->
+	
+	<apex:includeLightning />
+	<apex:slds />
+	
+	<input id="isPDFReady" type="checkbox" style="display: none;"></input>
+	
+	<div id="occ"></div>
+	
+	<style>
+		body {
+			background-color: #F9F9FA;
+		}
+	</style>
+	
+	<script>
+		var pdfReadyEvent = {};
+		if(typeof jQuery == 'function' && typeof jQuery.fn.datepicker == 'function') {
+			jQuery.datepicker.regional.es = {
+				closeText: "Cerrar",
+				prevText: "Anterior",
+				nextText: "Siguiente",
+				currentText: "Hoy",
+				monthNames: [ "enero","febrero","marzo","abril","mayo","junio",
+				"julio","agosto","septiembre","octubre","noviembre","diciembre" ],
+				monthNamesShort: [ "ene","feb","mar","abr","may","jun",
+				"jul","ago","sep","oct","nov","dic" ],
+				dayNames: [ "domingo","lunes","martes","miércoles","jueves","viernes","sábado" ],
+				dayNamesShort: [ "dom","lun","mar","mié","jue","vie","sáb" ],
+				dayNamesMin: [ "D","L","M","M","J","V","S" ],
+				weekHeader: "Sm",
+				dateFormat: "dd/mm/yy",
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: "" 
+			};
+			jQuery.datepicker.setDefaults(jQuery.datepicker.regional.es);
+		}
+		ctcLightning.remote('PLAN_CuentaService.query')('SELECT Id, Name, Segmento__c FROM User WHERE Id=\'{!QuoteLineItem.Quote.Opportunity.OwnerId}\'')
+		.then( function( res ) {
+			var owner = res && res.length > 0 ? res[0] : {}
+			// console.log('success PLAN_CuentaService.query: ', res, '\nowner: ', owner )
+			$Lightning.use("c:CON_LCsContainer_APP", function() {
+				// $A.eventService.addHandler({
+				// 	event: 'force:refreshView',
+				// 	handler(event) {
+				// 		if (SfdcApp && SfdcApp.projectOneNavigator && SfdcApp.projectOneNavigator.fireContainerEvent) {
+				// 			SfdcApp.projectOneNavigator.fireContainerEvent("force:refreshView", event.getParams());
+				// 		}
+				// 	}
+				// });
+				$A.eventService.addHandler({
+					event: "force:showToast",
+					handler: function(event) {
+						if (SfdcApp && SfdcApp.projectOneNavigator && SfdcApp.projectOneNavigator.fireContainerEvent) {
+							SfdcApp.projectOneNavigator.fireContainerEvent("force:showToast", event.getParams());
+						} else {
+							alert(event.getParams().message);
+						}
+					}
+				});
+				$A.eventService.addHandler({
+					event: "force:navigateToSObject",
+					handler: function(event) {
+						if (SfdcApp && SfdcApp.projectOneNavigator && SfdcApp.projectOneNavigator.fireContainerEvent) {
+							SfdcApp.projectOneNavigator.fireContainerEvent("force:navigateToSObject", event.getParams());
+						} else {
+							console.log("Error al redigir la página");
+						}
+					}
+				});
+				$A.eventService.addHandler({
+					event: "force:navigateToURL",
+					handler: function(event) {
+						if (SfdcApp && SfdcApp.projectOneNavigator && SfdcApp.projectOneNavigator.fireContainerEvent) {
+							SfdcApp.projectOneNavigator.fireContainerEvent("force:navigateToURL", event.getParams());
+						} else {
+							console.log("Error al redigir la página");
+						}
+					}
+				});
+				$A.eventService.addHandler({
+					event: "c:CON_GeneratePDF_EVENT",
+					handler: function(event) {
+						$('[onclick="generaPDF()"]').trigger('click');
+						pdfReadyEvent = $A.get("e.c:CON_FileReady_EVENT");
+					}
+				});
+				$Lightning.createComponent("c:CON_ContractsContainer_LC", { recordId: "{!QuoteLineItem.Id}", ejecutivo: owner }, "occ", function(component, status, errorMessage) {
+					if (status === 'SUCCESS') {
+						console.log('The lightning component was successfully created.');
+						$A.eventService.addHandler({
+							event: "c:CON_CreateDatepicker_EVENT",
+							handler: function(event) {
+								$(".inputDatepicker").datepicker({
+									dateFormat: "dd/mm/yy",
+									onSelect: function(dateText) {
+										component.controller.saveAnnexFieldValue(component, this);
+									}
+								});
+							}
+						});
+					} else if (status === 'INCOMPLETE') {
+						console.log('No response from the server or client is offline.');
+					} else if (status === 'ERROR') {
+						console.log('Error: ', errorMessage);
+					}
+				});
+			});
+			
+		}).catch( function( err ) {
+			console.log('error PLAN_CuentaService.query: ', err )
+		})
+		var hidePDFSpinner = function() {
+			pdfReadyEvent.fire();
+		}
+
+	</script>
+	
+	<!-- <c:CON_FileReady_TEST /> -->
+	<c:CON_TC3PagoPorConsumo_LC QuoteLineItem="{!QuoteLineItem}" QuoteLineItemId="{!QuoteLineItem.Id}" QuoteLineItemName="{!QuoteLineItem.Product2.Name}" AccountId="{!QuoteLineItem.Quote.AccountId}" FormaPago="{!QuoteLineItem.FormaPago__c}"/>
+	
+</apex:page>

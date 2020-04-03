@@ -1,0 +1,100 @@
+<aura:component controller="BuscadorBPfleet_CONT" implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:attribute name="rfcInput" type="String"/>
+    
+    <aura:attribute name="listaEL" type="Object"/>
+    <aura:attribute name="isLoad" type="boolean" default="false"/>
+    <aura:attribute name="sinResultados" type="boolean" default="false"/>
+    
+    <lightning:card title="Búsqueda Avanzada" iconName="standard:account" class="slds-m-around_medium">
+        <div class="slds-m-around_medium">
+            <p class="slds-p-horizontal_small">
+                Ingresa los valores por los cuales quieres realizar la busqueda.
+            </p>
+            <aura:if isTrue="{!v.isLoad}">
+                <lightning:spinner alternativeText="Loading" size="large" />
+            </aura:if>
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_medium">
+                <div class="slds-size_1-of-2">
+                    <lightning:input style="width:85%" aura:id="rfc" type="text" label="Ingresa un RFC" value="{!v.rfcInput}"/>
+                </div>
+                <div class="slds-size_1-of-2">
+                    <lightning:input style="width:85%" aura:id="nombreEmpresa" type="text" label="Nombre de la empresa"/>
+                </div>
+                <div class="slds-size_2-of-2 slds-m-around_medium">
+                    <center>
+                        <lightning:button variant="brand" label="Buscar" onclick="{!c.buscarDatos}"/>
+                    </center>
+                </div>
+            </div>
+        </div>
+        <aura:if isTrue="{!and(v.listaEL!=null,v.listaEL.length>0)}">
+            <div class="slds-m-around_medium" style="overflow:auto; width:95%;">
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer" style="overflow:auto;">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col">
+                                <div class="slds-truncate" title="RFC">RFC</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Cuenta">Nombre de la empresa</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Estatus">Estatus</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Estatus">Acciones disponibles</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.listaEL}" var="enLeg">
+                            <tr>
+                                <td scope="row" data-label="RFC">
+                                    <div class="slds-truncate" >{!enLeg.enLe.RFCEL__c}</div>
+                                </td>
+                                <td data-label="Razón Social">
+                                    <div class="slds-truncate" >{!enLeg.enLe.Cuenta__r.Name}</div>
+                                </td>
+                                <td data-label="Estatus">
+                                    <div class="slds-truncate" >{!enLeg.status}</div>
+                                </td>
+                                <td data-label="acciones">
+                                    <aura:if isTrue="{!enLeg.estatusInt=='1'}">
+                                        <div class="slds-truncate" >
+                                            <center>
+                                                <lightning:button variant="brand" name="{!enLeg.enLe.RFCEL__c}" label="Crear colaboración" onclick="{!c.crearColaboracionCuenta}"/>
+                                            </center>
+                                        </div>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!enLeg.estatusInt=='0'}">
+                                                <div class="slds-truncate" >
+                                                    <center>
+                                                        <lightning:button variant="brand" name="{!enLeg.enLe.Cuenta__r.Name+';'+enLeg.enLe.RFCEL__c}" label="Crear Prospecto" onclick="{!c.crearLead}"/>
+                                                        <!--Para utilizar el RFC es necesario solicitar aprobación-->
+                                                    </center>
+                                                </div>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.sinResultados}">
+            <div class="slds-m-around_x-small">
+                <center>
+                    <img src="{!$Resource.imagenesGenericas+'/salesforce/busqueda.png'}" width="200" height="100" />
+                </center>
+                <div class="slds-text-heading_medium">
+                    <center>
+                        La empresa no existe en eforce<br/>
+                        <lightning:button variant="brand" label="Crear Prospecto" name="{!''+';'+v.rfcInput}" onclick="{!c.crearLead}"/>
+                    </center>
+                </div>
+            </div>
+        </aura:if>
+    </lightning:card>
+</aura:component>

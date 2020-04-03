@@ -1,0 +1,28 @@
+.THIS .modal-content {
+	height: 40vh;
+	overflow: scroll;
+}
+
+.THIS .spinner-relative-position {
+	position: relative;
+	height: 75px;
+}
+
+.THIS .spinner-container {
+	border-radius: 16px;
+	background-color: #F9F9FA;
+}
+
+.THIS .td-width {
+	width: 20%;
+}
+
+.THIS .selected-subsidiaries-scroller-wrapper {
+	height: 147px;
+	width: 100%;
+	overflow: auto;
+}
+
+/*.THIS .slds-table thead th {
+	position: absolute;
+}*/

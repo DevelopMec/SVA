@@ -1,0 +1,2139 @@
+<apex:page standardController="Opportunity" extensions="PLAN_CuentaService" standardStylesheets="false" showHeader="true" sidebar="false" applyBodyTag="false" docType="html-5.0">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/bootstrap.min.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/bootstrap/css/animate.css')}"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_LIGHTNING, '/styles/salesforce-lightning-design-system.min.css')}"/>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.css')}"/>
+
+        <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/bootstrap/js/bootstrap.min.js')}"/>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/ui-bootstrap-tpls-2.2.0.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular-animate.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/angular/angular-sanitize.min.js')}"></script>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/css/ctc_main.css')}"/>
+
+        <script src="{!URLFOR($Resource.CTC_BASE, '/premote/q.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/premote/premote.min.js')}"/>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.CTC_BASE, '/datatables/datatables.min.js')}"></script>
+        <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/datatables/datatables.min.css')}"/>
+        
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.module.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/datepicker.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.factory.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/formgroup.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/input.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/number.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/error.directive.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.component.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.component.vfc.js')}"/>
+        <script src="{!URLFOR($Resource.CTC_BASE, '/angular/directives/ctc.processing.js')}"/>
+
+        <script src="{!URLFOR($Resource.kendoui,'/js/kendo.all.min.js')}"></script>
+        <script src="{!URLFOR($Resource.kendoui,'/js/pako_deflate.min.js')}"></script>
+        <script src="{!URLFOR($Resource.kendoui,'/js/jszip.min.js')}"></script>
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.default.min.css')}" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.common.min.css')}" />
+
+        <link rel="stylesheet" href="{!URLFOR($Resource.jqueryui_custom_theme,'jquery-ui-1.11.4.custom/jquery-ui.css')}" />
+
+        <title>Bienvenido .:Plan de cuenta:.</title>
+    </head>
+    <body>
+        <script type="text/javascript">
+            (function() {
+                'use strict'
+                angular.module('appEdenred' , ['ctc.module', 'ui.bootstrap', 'ngAnimate', 'ngSanitize'])
+                .config(function($controllerProvider) {
+                    angular.module('appEdenred').controller = $controllerProvider.register
+                })
+
+                kendo.pdf.defineFont({
+                    "DejaVu Sans"             : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans.ttf')}",
+                    "DejaVu Sans|Bold"        : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Bold.ttf')}",
+                    "DejaVu Sans|Bold|Italic" : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Oblique.ttf')}",
+                    "DejaVu Sans|Italic"      : "{!URLFOR($Resource.kendoui,'/fonts/DejaVuSans-Oblique.ttf')}",
+                    "Helvetica"               : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Regular.ttf')}",
+                    "Helvetica|Bold"          : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Bold.ttf')}",
+                    "Helvetica|Bold|Italic"   : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-BoldItalic.ttf')}",
+                    "Helvetica|Italic"        : "{!URLFOR($Resource.kendoui,'/fonts/Helvetica-Italic.ttf')}"
+                })
+            })()
+        </script>
+        <apex:form id="form" styleClass="hidden">
+            <apex:inputField value="{!qli.Etapa__c}" required="true" id="SF_Etapa__c"/>
+            <apex:inputField value="{!qli.MotivoEtapa__c}" required="true" id="SF_MotivoEtapa__c"/>
+            
+            <apex:inputField value="{!qli.FormaPago__c}" required="true" id="SF_FormaPago__c"/>
+            <apex:inputField value="{!qli.OpcionesMetodoPago__c}" required="true" id="SF_OpcionesMetodoPago__c"/>
+
+            <apex:inputField value="{!Opportunity.Familia__c}" required="true" id="SF_Familia__c"/>
+            <apex:inputField value="{!Opportunity.Competidor__c}" required="true" id="SF_Competidor__c"/>
+        </apex:form>
+        <div class="container" ng-app="appEdenred" ng-controller="planCtrl as sc" id="planCtrl" ng-init="sc.init( sc.opportunity )">
+            <h3 class="page-header">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                Cotización
+                            </div>
+                            <div class="col-sm-6">
+                                <a ng-href="{{'/' + sc.opportunity.Id}}" class="regresar-opp" uib-tooltip="{{sc.opportunity.Name}}" tooltip-append-to-body="true" tooltip-placement="bottom">
+                                    <i class="fa fa-angle-double-left fa-fw"></i>
+                                    Regresar a la oportunidad
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8 text-right">
+                        <h3 style="margin: 0 !important;">
+                            <span ng-bind="sc.opportunity.NumeroOportunidad__c + '-'"></span>
+                            <a target="_blank" ng-href="/{{sc.opportunity.Account.Id}}" uib-tooltip="{{'Ver cuenta ' + sc.opportunity.Account.Name}}" ng-bind="sc.opportunity.Account.Name" tooltip-placement="bottom"></a>
+                            <span ng-bind="'-' + sc.opportunity.Familia__c"></span>
+                        </h3>
+                    </div>
+                </div>
+            </h3>
+
+            <div class="row hidden initContainer">
+                <div class="col-sm-12" ng-if="sc.cotizacionesLoaded">
+                    <c:PLAN_Escalonamiento ></c:PLAN_Escalonamiento>
+                    <c:PLAN_Cotizaciones ></c:PLAN_Cotizaciones>
+                    <c:PLAN_AgregarContacto ></c:PLAN_AgregarContacto>
+                </div>
+            </div>
+            
+            <c:PLAN_ModalGenerico ></c:PLAN_ModalGenerico>
+            <ctc-error ctc-body="sc.errors"></ctc-error>
+            <ctc-processing ctc-active="sc.processing" ctc-message="sc.message"></ctc-processing>
+            <c:PLAN_ModalGenericoCuenta ></c:PLAN_ModalGenericoCuenta>
+            
+        </div>
+        <script type="text/javascript">
+            (function() {
+                
+                'use sctrict'
+                angular.module('appEdenred')
+                .controller('planCtrl', planCtrl)
+                .directive('ctcHtmlElement', ElementHtml)
+
+                planCtrl.$inject = ['ctcUtils', '$timeout', '$interval', '$uibModal', '$filter', '$sce', '$q']
+                ElementHtml.$inject = ['$compile', '$interval', '$timeout']
+
+                function planCtrl(ctcUtils, $timeout, $interval, $uibModal, $filter, $sce, $q) {
+                    var vm = this
+                    vm.id = '{!Opportunity.Id}'
+                    vm.idCot = '{!$CurrentPage.parameters.q}'
+                    vm.loading = false
+                    vm.schema = {}
+                    vm.prefix = {}
+                    vm.errors = []
+                    vm.productos = []
+                    vm.opportunity = {
+                        Name: '{!JSENCODE(Opportunity.Name)}',
+                        Id: '{!Opportunity.Id}',
+                        Solicitar_validaci_n_descuentos__c: '{!Opportunity.Solicitar_validaci_n_descuentos__c}',
+                        CloseDate: '{!Opportunity.CloseDate}',
+                        NumeroOportunidad__c: '{!Opportunity.NumeroOportunidad__c}',
+                        LeadSource: '{!Opportunity.LeadSource}',
+                         Account: {
+                            Id: '{!Opportunity.Account}',
+                            Name: '{!JSENCODE(Opportunity.Account.Name)}',
+                            Text_Segment__c : '{!JSENCODE(Opportunity.Account.Text_Segment__c)}',
+                            Direccion__c: '{!JSENCODE(Opportunity.Account.Direccion__c)}',
+                            Sector__c: '{!JSENCODE(Opportunity.Account.Sector__c)}',
+                            Giro__c: '{!JSENCODE(Opportunity.Account.Giro__c)}',
+                            Subgiro__c: '{!JSENCODE(Opportunity.Account.Subgiro__c)}',
+                            Calle__c: '{!JSENCODE(Opportunity.Account.Calle__c)}',
+                            Ciudad__c: '{!JSENCODE(Opportunity.Account.Ciudad__c)}',
+                            Colonia__c: '{!JSENCODE(Opportunity.Account.Colonia__c)}',
+                            ColMpoCpEdo__c: '{!JSENCODE(Opportunity.Account.ColMpoCpEdo__c)}',
+                            NumeroExterior__c: '{!JSENCODE(Opportunity.Account.NumeroExterior__c)}',
+                            NumeroInterior__c: '{!JSENCODE(Opportunity.Account.NumeroInterior__c)}',
+                            Estado__c:'{!JSENCODE(Opportunity.Account.Estado__c)}',
+                            DelegacionMunicipioFiscal__c:'{!JSENCODE(Opportunity.Account.DelegacionMunicipioFiscal__c)}',
+                            CodigoPostal__c:'{!JSENCODE(Opportunity.Account.CodigoPostal__c)}',
+                        },
+                        StageName: '{!Opportunity.StageName}',
+                        Familia__c: '{!Opportunity.Familia__c}',
+                        Competidor__c: '{!Opportunity.Competidor__c}',
+                        SubOrigen__c: '{!Opportunity.SubOrigen__c}',
+                        Maquilador__c: '{!Opportunity.Maquilador__c}',
+                        PantallaIntermedia: '{!$Setup.Negocio__c.PantallaIntermediaCodigos__c}',
+                        MetodoPagoCodigos__c: '{!$Setup.Negocio__c.MetodoPagoCodigos__c}',
+                        Owner: {
+                            Name: '{!Opportunity.Owner.Name}',
+                            Phone: '{!Opportunity.Owner.Phone}',
+                            Email: '{!Opportunity.Owner.Email}',
+                            Segmento__c: '{!Opportunity.Owner.Segmento__c}'
+                        }
+                    }
+               
+                    vm.user = {
+                        Id: '{!$User.Id}',
+                        Name: '{!$User.FirstName}',
+                        profile: '{!$Profile.Name}',
+                        Segmento__c: '{!TEXT($User.Segmento__c)}'
+                    }
+
+                    // console.log('user: ', vm.user)
+
+                    vm.cotizacionesLoaded = false
+                    vm.processing = true
+                    vm.message = 'Cargando información'
+
+                    ctcUtils.config.methods.query = 'PLAN_CuentaService.query'
+
+
+                    vm.init = function( opportunity ) {
+                        
+                        vm.initFactory()
+                        vm.initOpportunity()
+
+                        var strError = ''
+                        var strError2 = ''
+                        if( vm.opportunity.Familia__c.length <= 0 ) {
+                            strError += '<p>Debe definir una solución en la Oportunidad: <a uib-tooltip="Test" href="/' + vm.opportunity.Id + '/e">' + vm.opportunity.Name + '</a></p>'
+                        } 
+                        if( vm.opportunity.Competidor__c.length <= 0 ) {
+                            strError += '<p>Debe definir un competidor en la Oportunidad: <a href="/' + vm.opportunity.Id + '/e">' + vm.opportunity.Name + '</a></p>'
+                            // strError += '<p>Convertir: <a href="/lead/leadconvert.jsp?id=00Q5B0000039pBCUAY">Convertir</a></p>'
+                        }
+                        
+                         //Req FWY HU - 2330 - 16/12/2019
+                        if( vm.opportunity.Account.Sector__c.length <= 0 || vm.opportunity.Account.Calle__c.length <= 0 || vm.opportunity.Account.NumeroExterior__c.length <= 0 || vm.opportunity.Account.ColMpoCpEdo__c.length <= 0 || vm.opportunity.Account.Giro__c.length <= 0) {
+                            strError2 += '<p>Debes completar algunos campos en la cuenta para continuar: Sector, Dirección, Giro y Sub Giro :  <a uib-tooltip="Test" href="/' + vm.opportunity.Account.Id + '/e">' + vm.opportunity.Account.Name + '</a> Cuando hayas completado los datos de la Cuenta , debes Guardar y dar clic al boton Cerrar de este mensaje para regresar a la Cotizacion</p>'
+                        }
+                        
+                        if( strError2.length > 0 ) {
+                            ctcUtils.showProcessCuenta(false, 'Cargando información')
+                            ctcUtils.showErrorCuenta(strError2, 'Falta información en la Cuenta')
+                       
+                        }else if( strError.length > 0 ) {
+                            ctcUtils.showProcess(false, 'Cargando información')
+                            ctcUtils.showError(strError, 'Falta información en la Oportunidad')
+                        } else {
+                            ctcUtils.showProcess(true, 'Cargando información')
+                            ctcUtils.showProcessCuenta(true, 'Cargando información')
+                            // Obtener metadatos de objetos
+                            ctcUtils.invoke('PLAN_CuentaService.describe', ['Contact', 'Opportunity', 'Quote', 'QuoteLineItem', 'Product2', 'Concepto__c', 'ProductoConcepto__c', 'User', 'OpportunityLineItem', 'Attachment', 'CompetidorOportunidad__c', 'ProductoCompetidor__c', 'PlantillaContrato__c', 'Contrato2__c', 'QuoteDocument', 'ProductoComparado__c'])
+                            .then(function( schema ) {
+                                // Asigna metadatos a fábrica de AngularJS
+                                ctcUtils.app = {
+                                    schema: ctcUtils.schema(schema), 
+                                    prefix: ctcUtils.prefix(schema),
+                                    quoteId: '{!$CurrentPage.parameters.q}',
+                                    account: opportunity.Account,
+                                    opportunity: {
+                                        Id: opportunity.Id,
+                                        Familia__c: opportunity.Familia__c,
+                                        Owner: opportunity.Owner,
+                                        Account: opportunity.Account,
+                                        CloseDate: opportunity.CloseDate,
+                                        StageName: opportunity.StageName,
+                                        Solicitar_validaci_n_descuentos__c: opportunity.Solicitar_validaci_n_descuentos__c
+                                    },
+                                    profile: '{!$Profile.Name}',
+                                    user: vm.user
+                                }
+                                ctcUtils.app.approvalLevels = vm.initApprovalLevels();
+                                vm.getPlantillaPropuesta()
+                                 console.log('entro a Asigna metadatos a fábrica de AngularJS 8888');
+                                 console.log('ctcUtils.app: ', ctcUtils.app)
+                                // console.log('test: ', ctcUtils.path('app.schema.User.EmailEncodingKey', ctcUtils))
+                                // console.log('test: ', ctcUtils.path('app.schema.User.EmailEncodingKey.values', ctcUtils))
+                                // console.log('test: ', ctcUtils.path('app.schema.User.EmailEncodingKey.values.9', ctcUtils))
+                                // console.log('test: ', ctcUtils.path('app.schema.User.EmailEncodingKey.values.9.label', ctcUtils))
+                                // console.log('test: ', ctcUtils.path('app.schema.User.EmailEncodingKey.values.9.value', ctcUtils))
+
+                                vm.verficarEscalonamiento()
+
+                                vm.initSchema( ctcUtils.app.schema )
+
+                                var segmento = ctcUtils.app.opportunity.Owner.Segmento__c == 'MLK' ? 'MLK' : 'Small'
+
+                                //Account segment
+                                var accountSegment = ctcUtils.app.opportunity.Account.Text_Segment__c;
+                                if (ctcUtils.app.opportunity.Account.Text_Segment__c == 'Small-S1' || ctcUtils.app.opportunity.Account.Text_Segment__c == 'Small-S2' || ctcUtils.app.opportunity.Account.Text_Segment__c == 'Small-S3') {
+                                    accountSegment = 'Small'
+                                } else if (ctcUtils.app.opportunity.Account.Text_Segment__c == 'Medium-M1' || ctcUtils.app.opportunity.Account.Text_Segment__c == 'Medium-M2') {
+                                    accountSegment = 'Medium'
+                                }
+                                
+                                //Account Giro__c and Subgiro__c
+                                var accountGiro = ctcUtils.app.opportunity.Account.Giro__c;
+                                //console.log('Giro de la cuenta: ' + accountGiro)
+
+                                var accountSubgiro = ctcUtils.app.opportunity.Account.Subgiro__c;
+                                //console.log('Subgiro de la cuenta: ' + accountSubgiro)
+
+                                var transportistaString = 'Transportista'
+
+                                if(ctcUtils.app.opportunity.Familia__c == 'Combustible' && accountGiro == 'Transportes, correos y almacenamiento' && (accountSubgiro == 'Servicios de mensajeria y paqueteria' || accountSubgiro == 'Autotransporte de carga')) {
+                                    //console.log('Está entrando a la excepción de transportista');
+                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Segmento__c=\'' + accountSegment +  '\' AND (CodigoProducto__c = \'' + transportistaString + '\' OR CodigoProducto__c = \'30-B\') ORDER BY PaymentAccelerator__c DESC')
+                                } else {
+                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Familia__c=\'' + ctcUtils.app.opportunity.Familia__c +  '\' AND Segmento__c=\'' + accountSegment + '\' ORDER BY  PaymentAccelerator__c DESC')
+                                }                                
+                                //return ctcUtils.query('SELECT Id, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, Segmento__c FROM ComisionServicio__c WHERE Familia__c=\'' + ctcUtils.app.opportunity.Familia__c + '\' AND Segmento__c=\'' + segmento + '\' ORDER BY MontoInicial__c ASC')
+                                //return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c FROM ComisionServicio__c WHERE Familia__c=\'' + ctcUtils.app.opportunity.Familia__c + '\' ORDER BY MontoInicial__c ASC')
+                            })
+                            .then( function( res ) {
+                                ctcUtils.app.comisiones = res || []
+                                //ctcUtils.app.comisionesTotal keep all ComisionServicio records queried.
+                                ctcUtils.app.comisionesTotal = res || []
+                                for( var comision of ctcUtils.app.comisiones ) {
+                                    var codigos = comision.CodigoProducto__c ? comision.CodigoProducto__c.split('\,') : []
+                                    comision.Codigos = {}
+                                    for( var codigo of codigos ) {
+                                        comision.Codigos[codigo] = true
+                                    }
+                                }
+
+                                var segmento = ''
+                                if( ctcUtils.app.opportunity.Owner.Segmento__c == 'MLK' ) {
+                                    segmento = '\'Medium\', ' + '\'Large\', ' + '\'Key\''
+                                } else {
+                                    segmento = '\'' + ctcUtils.app.opportunity.Owner.Segmento__c + '\''
+                                }
+
+                                return ctcUtils.query('SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c FROM Product2 WHERE IsActive=true AND SegmentoVenta__c includes(' + segmento + ') AND Family=\'' + ctcUtils.app.opportunity.Familia__c + '\' ORDER BY Name ASC')
+                            })
+                            .then( function( res ) {
+                                ctcUtils.app.soluciones = res || []
+
+                                return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, FirstName, LastName, Name, Puesto__c, Funcion__c FROM Contact WHERE Id in (select ContactId from AccountContactRelation WHERE AccountId=\'' + ctcUtils.app.account.Id + '\') ORDER BY Name ASC')
+                            })
+                            .then( function( res ) {
+
+                                ctcUtils.app.contacts = res || []
+
+                                // Obtener Cotizaciones asociadas a la Oportunidad
+                                return ctcUtils.query('SELECT Id, Name, QuoteNumber, Tax, Status, Description, Subtotal, TotalPrice, ExpirationDate, AccountId, GrandTotal, OwnerId, Owner.UserRole.Name, Email, Phone, OpportunityId, ContactId, Contact.Name, IsSyncing, Familia__c, VigenciaCotizacion__c, ApprovalStatus__c FROM Quote WHERE OpportunityId=\'' + ctcUtils.app.opportunity.Id + '\' ORDER BY Id ASC')
+                            })
+                            .then( function( res ) { 
+                                // Respuesta de las cotizaciones existentes asociadas a la Oportunidad
+                                //console.log('Cotizaciones: ', res)
+                                ctcUtils.app.cots = res || []
+                                var representante = ctcUtils.filter(ctcUtils.app.contacts, {Funcion__c: 'Representante Legal'}) 
+                                representante = representante.length > 0 ? representante[0] : {}
+                                ctcUtils.app.representante = representante
+
+                                ctcUtils.app.opportunity.CloseDateLong = new Date(ctcUtils.app.opportunity.CloseDate).getTime()
+
+                                if( ctcUtils.app.cots.length == 0 ) {
+
+                                    // Crear columnas por cada ProductoComparado__c
+                                    var nuevosCampos = [
+                                        angular.copy(ctcUtils.app.schema.Concepto__c.Importe__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.PrecioFinal__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.VigenciaDescuento__c),
+                                        angular.copy(ctcUtils.app.schema.ProductoConcepto__c.CantidadTarjetas__c)
+                                    ]
+                                    angular.forEach( nuevosCampos, function( nuevoCampo, nuevoCampo_index ) {
+                                        nuevoCampo.index = 0
+                                    })
+
+                                    var contactId = ctcUtils.app.representante.Id ? ctcUtils.app.representante.Id : (ctcUtils.app.contacts && ctcUtils.app.contacts[0] ? ctcUtils.app.contacts[0].Id : undefined)
+
+                                    ctcUtils.app.cots.push({Name: 'Cotización ', Editable: true, OpportunityId: ctcUtils.app.opportunity.Id, Familia__c: ctcUtils.app.opportunity.Familia__c, ContactId: contactId, Render: true, tab: 0, productos:[{comparados:[{}], ServiceDate: ctcUtils.app.opportunity.CloseDateLong, columnasComparado: nuevosCampos}]})
+                                }
+
+                                // Seleccionar un tab 
+                                var selected = false
+                                angular.forEach( ctcUtils.app.cots, function( cotizacion, index ) {
+
+                                    cotizacion.disabled = {
+                                        Familia__c: true
+                                    }
+                                    cotizacion.Editable2 = true;
+                                    if(cotizacion.ApprovalStatus__c  == 'Aprobada') {
+                                        //If is approved, the save button must not appear until there is a change.
+                                        cotizacion.Editable2 = false;
+                                    }
+                                    ctcUtils.app.quoteRejected = false;
+                                    if(cotizacion.ApprovalStatus__c  == 'Rechazada') {
+                                        //If is rejected, the user can save the quote again without changes.
+                                        ctcUtils.app.quoteRejected = true;
+                                    }
+                                    if(ctcUtils.app.quoteId == cotizacion.Id && !selected) {
+                                        ctcUtils.app.selectedTab = index
+                                        selected = true
+                                    } else if(ctcUtils.app.quoteId.length < 1 && cotizacion.IsSyncing && !selected) {
+                                        ctcUtils.app.selectedTab = index
+                                        selected = true
+                                    }
+                                })
+                                
+                                vm.cotizacionesLoaded = true
+
+                                // ctcUtils.showProcess(false, 'Cargando información')
+                                $('.initContainer').removeClass('hidden')
+                            }).catch( function( err ) {
+
+                                ctcUtils.showProcess(false, 'Cargando información')
+
+                                $('.initContainer').removeClass('hidden')
+ 
+                                ctcUtils.showError(err)
+
+                            })
+                        }
+                    }
+                    
+                    ctcUtils.changeButtonStatus = function() {
+                        //There is a change in the quote, so the save button is activated.
+                        angular.forEach( ctcUtils.app.cots, function( cotizacion, index ) {
+                        cotizacion.Editable2 = true;
+                        })
+                    }
+                    
+                    vm.initApprovalLevels = function() {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Concept__c, NumberOfShipments__c, Discount__c, MoreShipmentsMoreDiscountApproval__c, MoreShipmentsLessDiscountApproval__c, LessShipmentsMoreDiscountApproval__c, LessShipmentsLessDiscountApproval__c, MoreDiscountApproval__c, LessDiscountApproval__c FROM ConceptApprovalLevel__mdt')
+                    }
+
+                    /* Cotizador monofamilia calvarez 08/11/2017 */
+                    vm.initFactory = function() {
+                        ctcUtils.describe = function( listobjs ) {
+                            return ctcUtils.remote('PLAN_CuentaService.describe')(listobjs)
+                        }
+
+                        ctcUtils.query = function( query ) {
+                            return ctcUtils.remote('PLAN_CuentaService.query')(query)
+                        }
+                        ctcUtils.queryMod = function( query ) {
+                            return ctcUtils.remote('PLAN_CuentaService.query',{"escape":"false"})(query)
+                        }
+
+                        ctcUtils.upsert = function( typeobj, data ) {
+                            return ctcUtils.remote('PLAN_CuentaService.upsertSobjects')(typeobj, data)
+                        }
+
+                        ctcUtils.remove = function( dataids ) {
+                            return ctcUtils.remote('PLAN_CuentaService.deleteIds')(dataids)
+                        }
+
+                        ctcUtils.execute = function( method ) {
+                            return function() {
+                                return ctcUtils.remote('PLAN_CuentaService.' + method).apply(null, Array.prototype.slice.apply(arguments))
+                            }
+                        }
+
+                        ctcUtils.openModal = function( ctrl, resolve, size, alias ) {
+                            alias = alias || 'sc'
+                            var defered = $q.defer()
+                            var element = jQuery('[id="' + ctrl + '.html"]')
+                            if ( element.length > 0 ) {
+                                var modal = $uibModal.open({
+                                    animation: true,
+                                    keyboard: false,
+                                    backdrop: 'static',
+                                    templateUrl: ctrl + '.html',
+                                    controller: ctrl + 'Ctrl',
+                                    controllerAs: alias,
+                                    size: size || 'md',
+                                    resolve: resolve
+                                })
+
+                                modal.result.then(function (res) {
+                                    defered.resolve(res)
+                                }, function () {
+                                    defered.reject(resolve)
+                                })
+                            } else {
+                                ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                                var err = 'No se encontró componente: ' + ctrl;
+
+                                ctcUtils.openModal('modalGenerico', {instance: function () {return err}, title: function() {return 'Ocurrió un error'}, subTitle: function() {return err }}, 'md')
+                                .then( function( res ) { }).catch( function( err ) { })
+                            }
+                            return defered.promise
+                        }
+
+                        ctcUtils.showProcess = function(processing, msg) {
+                            msg = msg || 'Cargando información'
+                            vm.processing = processing
+                            vm.message = msg
+                        }
+                        
+                         ctcUtils.showProcessCuenta = function(processing, msg) {
+                            msg = msg || 'Cargando información'
+                            vm.processing = processing
+                            vm.message = msg
+                        }
+
+                        ctcUtils.changeFieldSF = function( fieldName, value, fieldDependent ) {
+                            value = value || ''
+                            fieldName = fieldName || ''
+                            jQuery('[id*="SF_' + fieldName + '"]').val(value)
+                            jQuery('[id*="SF_' + fieldName + '"]').trigger('change')
+                            return ctcUtils.getValues(fieldDependent)
+                        }
+
+                        ctcUtils.getValues = function( fieldDependent ) {
+                            fieldDependent = fieldDependent || ''
+                            return jQuery.map(jQuery('[id*="SF_' + fieldDependent + '"] option'), function(e) { return typeof e.value != 'undefined' && e.value.length > 0 && e.label != '--None--' && e.label != '--Ninguno--' ? {label: e.label, value: e.value} : null})
+                        }
+
+                        ctcUtils.renderPDF = function( idElement, pageTemplate, base64, margin ) {
+                            var defered = $q.defer()
+                            margin = margin || {left: "0cm", top: "0.5cm", right: "0cm", bottom: "0.75cm"}
+
+                            if( typeof kendo != 'undefined' ) {
+                                kendo.drawing.drawDOM( jQuery("#" + idElement ), {
+                                    paperSize: "A4",
+                                    margin: margin,
+                                    forcePageBreak: ".page-break",
+                                    multiPage: true,
+                                    template: pageTemplate,
+                                    scale: 0.8
+                                }).then(function( group ) {
+                                    console.log('render ok: ', arguments)
+                                    console.log('renderPDF: ', group)
+
+                                    if( base64 ) { // regresa el base64
+                                        
+                                        kendo.drawing.pdf.toDataURL(group, function(a) {
+                                            defered.resolve({render: $sce.trustAsResourceUrl(a), original: a})
+                                        })
+
+                                    } else {
+                                        // Regresa objeto de kendo
+                                        defered.resolve(group)
+                                    }
+                                }).fail(function( err ) {
+                                    defered.reject(err)
+                                })
+                            } else {
+                                defered.reject('kendo no está definido')
+                            }
+
+                            return defered.promise
+                        }
+
+                        ctcUtils.conceptoIniciaCon = function( str, pattern ) {
+                            return str && pattern && str.length > 0 && pattern.length > 0 && str.toLowerCase().startsWith(pattern.toLowerCase())
+                        }
+
+                        /**
+                            * @author calvarez@ctconsulting.com.mx
+                            * @date 2016
+                            * @param idsProduct2 string con Id´s de los Product2Id '\'Product2_123\', \'Product2_124\', \'Product2_125\''
+                            * @description Obtiene lista de Concepto__c por Producto, Conceptos y Características
+                        **/
+                        ctcUtils.obtenerConceptosCaracteristicasPorProducto = function( idsProduct2 ) {
+                            var defered = $q.defer()
+                            var conceptosProducto = {}
+                            var caracteristicasProducto = {}
+
+                            var conceptosUnicos = {}
+                            var stringToQuery = '';
+                            //Arreglar comisiones
+                            var accountSegment = ctcUtils.app.opportunity.Account.Text_Segment__c;
+                            if (ctcUtils.app.opportunity.Account.Text_Segment__c == 'Small-S1' || ctcUtils.app.opportunity.Account.Text_Segment__c == 'Small-S2' || ctcUtils.app.opportunity.Account.Text_Segment__c == 'Small-S3') {
+                                accountSegment = 'Small'
+                            } else if (ctcUtils.app.opportunity.Account.Text_Segment__c == 'Medium-M1' || ctcUtils.app.opportunity.Account.Text_Segment__c == 'Medium-M2') {
+                                accountSegment = 'Medium'
+                            }
+                            if(ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
+                                //console.log('Está entrando a la excepción de transportista');
+                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c, Carrier__c FROM Concepto__c WHERE ((Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR  ((Carrier__c = true OR Producto__r.ProductCode = \'30-B\') AND Segment__c=\'' + accountSegment +  '\'))) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\')) AND Activo__c=true ORDER BY Orden__c ASC'
+                            } else {
+                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE (Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR Segment__c=\'' + accountSegment +  '\')) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true AND Carrier__c = false ORDER BY Orden__c ASC'
+                            }
+                            ctcUtils.query(stringToQuery)
+                            //ctcUtils.query('SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE Producto__c IN(' + idsProduct2 +') AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true ORDER BY Obligatorio__c DESC')
+                            .then( function( res ) {
+                                //console.log('Los conceptos son: ' + JSON.stringify(res));
+                                var tipoCargoConcepto = {}
+                                angular.forEach( res, function( concepto, index ) {
+                                    if( concepto.Producto__c || concepto.Carrier__c == true ) {
+                                        //Asignar Conceptos
+                                        concepto.CantidadTarjetas__c__renderBase = angular.copy(concepto.CantidadTarjetas__c)
+                                        concepto.CantidadTarjetas__c__render  = false// angular.copy(concepto.CantidadTarjetas__c)
+                                        concepto.VigenciaDescuento__c__render = false // angular.copy(concepto.VigenciaDescuento__c)
+
+                                        concepto.CantidadTarjetas__c  = undefined
+                                        concepto.VigenciaDescuento__c = undefined
+
+                                        if( concepto.RecordType && concepto.RecordType.DeveloperName == 'Conceptos') {
+                                            if( !conceptosProducto.hasOwnProperty(concepto.Producto__c) ) {
+                                                conceptosProducto[concepto.Producto__c] = []
+                                            }
+                                            // if( !tipoCargoConcepto.hasOwnProperty(concepto.TipoCargo__c) ) {
+                                                conceptosProducto[concepto.Producto__c].push(concepto)
+                                                // tipoCargoConcepto[concepto.TipoCargo__c] = true
+                                            // }
+
+                                        } else if( concepto.RecordType && concepto.RecordType.DeveloperName == 'CaracteristicasSolucion' ) {
+                                            //Asignar Características
+                                            if( !caracteristicasProducto.hasOwnProperty(concepto.Producto__c) ) {
+                                                caracteristicasProducto[concepto.Producto__c] = []
+                                            }
+                                            concepto.CaracteristicasSolucion__c = ctcUtils.html(concepto.CaracteristicasSolucion__c)
+                                            caracteristicasProducto[concepto.Producto__c].push(concepto)
+
+                                        }
+                                    }
+                                })
+                                defered.resolve({conceptos: conceptosProducto, caracteristicas: caracteristicasProducto})
+                            }).catch( function( err ) {
+                                defered.reject(err)
+                            })
+                            return defered.promise
+                        }
+
+                        ctcUtils.obtenerConceptosUnicos = function( conceptos, producto, reRender ) {
+                            producto.conceptosUnicos = []
+                            producto.conceptosUnicosKey = {}
+                            var unicos = {}
+                            var conceptosUnicos = []
+                            conceptos = $filter('orderBy')(conceptos, 'Obligatorio__c', true)
+                            angular.forEach( conceptos, function( concepto, index ) {
+                                var key = concepto.TipoCargo__c + '_' + concepto.Obligatorio__c + '_' + concepto.Libre__c
+                                concepto.key = key
+
+                                concepto.Render = angular.copy(concepto.Obligatorio__c)
+                                if ( !unicos.hasOwnProperty(key) ) {
+                                    unicos[key] = concepto
+                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                        ctcUtils.app.conceptoAprobacion = concepto;
+                                        conceptosUnicos.unshift(concepto)
+                                    } else {
+                                        conceptosUnicos.push(concepto)
+                                    }
+                                }
+                                
+                                if( !reRender ) {
+                                    concepto.Bonificacion__c = 0
+                                    concepto.TieneBonificacion = true
+                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                        concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                        setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(concepto.Importe__c)))}, 500);
+                                    } else if (concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' ) {
+                                        concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                        setTimeout(function(){ctcUtils.getApprovalOtherConcepts(concepto, ctcUtils.number(angular.copy(concepto.Bonificacion__c)), producto, null)}, 500);
+                                    }else {
+                                        concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                    }
+                                }
+                            })
+                            // Ordenar Obligatorios
+
+                            var obligatorios = ctcUtils.filter(conceptosUnicos, {Obligatorio__c: true})
+                            obligatorios = $filter('orderBy')(obligatorios, 'TipoCargo__c')
+                            
+                            var opcionales = ctcUtils.filter(conceptosUnicos, {Obligatorio__c: false})
+                            opcionales = $filter('orderBy')(opcionales, 'TipoCargo__c')
+
+                            var todosConceptos = obligatorios.concat(opcionales)
+                            todosConceptos = $filter('orderBy')(todosConceptos, 'Orden__c')
+                            var ordenados = []
+                            angular.forEach( todosConceptos, function( concepto, index ) {
+                                if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                    ordenados.unshift(concepto)
+                                } else {
+                                    ordenados.push(concepto)
+                                }
+                            })
+
+                            producto.conceptosUnicos = ordenados
+                            producto.conceptosUnicosKey = unicos
+
+                            if( !reRender ) {
+                                var productoConceptoKeys = {}                              
+                                angular.forEach( producto.productoConcepto, function( productoConcepto, index ) {
+                                    var conceptoAux = producto.conceptosIds[productoConcepto.Concepto__c]
+                                    if( conceptoAux && conceptoAux.key ) {
+
+                                        var concepto = producto.conceptosKey[conceptoAux.key]
+                                        var key = concepto.key
+                                        if( !productoConceptoKeys.hasOwnProperty(key) ) {
+                                            productoConceptoKeys[key] = productoConcepto
+
+                                            concepto.IdProductoConcepto__c = productoConcepto.Id // Asigna Id de ProductoConcepto__c ya persistido
+                                            concepto.PrecioFinal__c = concepto.SinEdicion__c ? concepto.Importe__c : productoConcepto.PrecioFinal__c
+                                            concepto.PrecioLista__c = concepto.Importe__c
+                                            if( concepto.TipoCargo__c == 'Comisión por el servicio') {
+                                                concepto.PrecioFinal2__c = concepto.PrecioFinal__c
+                                            }
+                                            concepto.Bonificacion__c = concepto.SinEdicion__c ? 0 : productoConcepto.Bonificacion__c
+                                            concepto.schema.VigenciaDescuento__c.required = concepto.Bonificacion__c && concepto.Bonificacion__c != 0
+
+                                            concepto.VigenciaDescuento__c = concepto.Bonificacion__c ? $filter('date')(productoConcepto.VigenciaDescuento__c, 'dd/MM/yyyy', 'UTC') : undefined
+                                            concepto.CantidadTarjetas__c = productoConcepto.CantidadTarjetas__c
+
+                                            if( !concepto.Render && !concepto.Obligatorio__c ) {
+                                                concepto.Render = true
+                                            }
+                                            
+                                            if( concepto.schema ) {
+                                                concepto.schema.VigenciaDescuento__c.required = concepto.Bonificacion__c && typeof concepto.CantidadTarjetas__c == 'undefined'
+                                                concepto.schema.CantidadTarjetas__c.required = concepto.Bonificacion__c && typeof concepto.VigenciaDescuento__c == 'undefined'
+                                            }
+
+                                            if( concepto.Bonificacion__c ) {
+                                                concepto.VigenciaDescuento__c__render = true
+                                                concepto.CantidadTarjetas__c__render = concepto.CantidadTarjetas__c__renderBase
+                                            }
+                                        }
+                                    }
+                                })
+
+                                var comparados = producto.comparados ? producto.comparados : (producto.Productos_Comparados__r ? producto.Productos_Comparados__r : [])
+
+                                angular.forEach( comparados, function( comparado, index ) {
+                                    angular.forEach( comparado.productoConcepto, function( productoConcepto, index ) {
+                                        var conceptoAux = comparado.conceptosIds[productoConcepto.Concepto__c]
+                                        var concepto = comparado.conceptosKey[conceptoAux.key]
+
+                                        concepto.IdProductoConcepto__c = productoConcepto.Id // Asigna Id de ProductoConcepto__c ya persistido
+                                        concepto.PrecioFinal__c = concepto.SinEdicion__c ? concepto.Importe__c : productoConcepto.PrecioFinal__c
+                                        concepto.PrecioLista__c = concepto.Importe__c
+                                        if( concepto.TipoCargo__c == 'Comisión por el servicio') {
+                                            concepto.PrecioFinal2__c = concepto.PrecioFinal__c
+                                        }
+                                        concepto.Bonificacion__c = concepto.SinEdicion__c ? 0 : productoConcepto.Bonificacion__c
+                                        // concepto.TieneBonificacion = concepto.Bonificacion__c && concepto.Bonificacion__c != 0
+                                        concepto.TieneBonificacion = true
+                                        concepto.schema.VigenciaDescuento__c.required = concepto.Bonificacion__c && concepto.Bonificacion__c != 0
+
+                                        concepto.VigenciaDescuento__c = concepto.Bonificacion__c ? $filter('date')(productoConcepto.VigenciaDescuento__c, 'dd/MM/yyyy', 'UTC') : undefined
+                                        concepto.CantidadTarjetas__c = productoConcepto.CantidadTarjetas__c
+
+                                        if( !concepto.Render && !concepto.Obligatorio__c ) {
+                                            concepto.Render = true
+                                        }
+                                        if( concepto.schema ) {
+                                            concepto.schema.VigenciaDescuento__c.required = concepto.Bonificacion__c && typeof concepto.CantidadTarjetas__c == 'undefined'
+                                            concepto.schema.CantidadTarjetas__c.required = concepto.Bonificacion__c && typeof concepto.VigenciaDescuento__c == 'undefined'
+                                        }
+                                        if( concepto.Bonificacion__c ) {
+                                            concepto.VigenciaDescuento__c__render = true
+                                            concepto.CantidadTarjetas__c__render = concepto.CantidadTarjetas__c__renderBase
+                                        }
+                                    })
+                                })
+                                producto.productoConceptoKeys = productoConceptoKeys
+                            }
+                        }
+
+                        ctcUtils.defineConceptosKey = function( producto ) {
+                            var keys = {}
+                            var ids = {}
+                            angular.forEach( producto.conceptos, function( concepto, index ) {
+                                var key = concepto.TipoCargo__c + '_' + concepto.Obligatorio__c + '_' + concepto.Libre__c
+                                if( !keys.hasOwnProperty(key) ) {
+                                    keys[key] = concepto
+                                    keys[key].schema = {
+                                        VigenciaDescuento__c: angular.copy(ctcUtils.app.schema.ProductoConcepto__c.VigenciaDescuento__c),
+                                        CantidadTarjetas__c: angular.copy(ctcUtils.app.schema.ProductoConcepto__c.CantidadTarjetas__c)
+                                    }
+
+                                    keys[key].schema.VigenciaDescuento__c.required = keys[key].Bonificacion__c
+                                    keys[key].schema.CantidadTarjetas__c.required = keys[key].Bonificacion__c
+                                }
+
+                                if( !ids.hasOwnProperty(concepto.Id) ) {
+                                    ids[concepto.Id] = concepto
+                                }
+                            })
+                            producto.conceptosKey = keys
+                            producto.conceptosIds = ids
+                        }
+
+                        ctcUtils.obtenerSoluciones = function( productoId, soluciones ) {
+                            var lista = []
+                            angular.forEach( soluciones, function( solucion, index ) {
+                                if( productoId != solucion.Id) {
+                                    lista.push(solucion)
+                                }
+                            })
+                            return lista
+                        }
+
+                        ctcUtils.showError = function( err, modalTitle ) {
+                            modalTitle = modalTitle || 'Ocurrió un error'
+                            ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                            ctcUtils.openModal('modalGenerico', {instance: function () {return err}, title: function() {return modalTitle}, subTitle: function() {return err }}, 'md')
+                        }
+                        
+                         ctcUtils.showErrorCuenta = function( err, modalTitle ) {
+                            modalTitle = modalTitle || 'Ocurrió un error'
+                            ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
+                            ctcUtils.openModal('modalGenericoCuenta', {instance: function () {return err}, title: function() {return modalTitle}, subTitle: function() {return err }}, 'md')
+                        }
+
+                        ctcUtils.calculaComision = function( instance, fromCtc ) {
+                            if( !fromCtc ) {
+                                var comisiones = []                                
+                                if(instance.hasOwnProperty('Product2Id__o')){
+                                    var productCodeTem = instance && instance.Product2Id__o && instance.Product2Id__o.ProductCode ? instance.Product2Id__o.ProductCode : ''
+                                     var AplicaSegmento = instance && instance.Product2Id__o && instance.Product2Id__o.AplicaSegmento__c ? instance.Product2Id__o.AplicaSegmento__c : ''
+                                    var maquilador=false
+                                     productCodeTem=instance.Product2Id__o.ProductCode;
+                                    /* if(vm.opportunity.Maquilador__c!=null && vm.opportunity.Maquilador__c.toUpperCase().includes("CHEDRAUI")){
+                                        console.log("Chedraui  : " )      
+                                                        if(productCode=='48'||productCode=='101'){
+                                                           productCode='101'
+                                                           maquilador=true
+                                                        }
+                                                        if(productCode=='32'||productCode=='102'){
+                                                           productCode='102'
+                                                           maquilador=true
+                                                        }
+                                                        if(productCode=='18'||productCode=='12'||productCode=='105'){
+                                                            productCode='105'
+                                                             maquilador=true
+                                                         }                     
+                                    }
+                                    if(vm.opportunity.Maquilador__c!=null && vm.opportunity.Maquilador__c.toUpperCase().includes("WALMART")){  
+                                    console.log("Walmart : " )                                            
+                                                        if(productCode=='48'||productCode=='103'){
+                                                            productCode='103'
+                                                            maquilador=true
+                                                        }
+                                                        if(productCode=='32'||productCode=='104'){
+                                                            productCode='104'
+                                                            maquilador=true
+                                                        }
+                                                        if(productCode=='18'||productCode=='12'||productCode=='105'){
+                                                            productCode='105'
+                                                             maquilador=true
+                                                         } 
+                                                        
+                                    }*/
+                                    //console.log("Segmento:"+vm.opportunity.Owner.Segmento__c);
+                                    //console.log("Maquilador:"+maquilador);
+                                    //console.log("aplicaSe:"+AplicaSegmento);
+                                    //Se comenta la siguiente validación
+                                    /*if(vm.opportunity.Owner.Segmento__c =='Small'&&maquilador==false&&AplicaSegmento==false){                                              
+                                        productCodeTem='100'
+                                    }*/
+                                    if(productCodeTem != '30-B' && ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
+                                        productCodeTem='Transportista'
+                                        //console.log('Está entrando a excepción trnasportista');
+                                    }                                    //console.log("productCode : "+ maquilador )
+                                    //console.log("productCode : "+ productCode )
+                                    //console.log("maquila : "+ vm.opportunity.Maquilador__c )
+                                    //instance.Product2Id__o.ProductCode=productCode
+                                
+                            }
+                                //console.log('Código de producto:' + productCodeTem);
+                                for( var comision of ctcUtils.app.comisionesTotal ) {                                    
+                                    if ( comision.Codigos && comision.Codigos.hasOwnProperty(productCodeTem) ) {  
+                                        
+                                        comisiones.push( comision )
+                                        console.log("into : "+ comision.Porcentaje__c+" - "+ comision.MontoInicial__c+" - "+comision.MontoFinal__c )
+                                    }
+                                }
+                                ctcUtils.app.comisiones = comisiones
+                                //console.log('Comisiones filtradas: '+ comisiones)
+                                var comisionCalculada = {}
+                                angular.forEach(comisiones, function( comision, index ) {
+                                    if((instance.UnitPrice >= comision.MontoInicial__c && instance.UnitPrice <= comision.MontoFinal__c) || (!comision.MontoFinal__c && instance.UnitPrice >= comision.MontoInicial__c)) {
+                                         console.log("into : "+ comision.Porcentaje__c+" - "+ comision.MontoInicial__c+" - "+comision.MontoFinal__c )
+                                        comisionCalculada = angular.copy(comision)
+                                    }
+                                })
+
+                                
+                 
+
+                                console.log("into calculaComision: ", angular.copy(instance), 'comisionCalculada: ', comisionCalculada)
+                                if( instance && instance.conceptosKey ) {
+                                    angular.forEach( Object.keys(instance.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                        var concepto = instance.conceptosKey[conceptoKey]
+                                        if( concepto && concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+
+                                            if( comisionCalculada.Porcentaje__c > -1 ) {
+                                              concepto.Importe__c = comisionCalculada.Porcentaje__c
+                                               /*if(vm.opportunity.Owner.Segmento__c=='Small'){
+                                                    concepto.Importe__c = 3
+                                                    comisionCalculada.Porcentaje__c=3
+                                                }*/
+                                                concepto.PrecioLista2__c = comisionCalculada.Porcentaje__c
+                                                concepto.PrecioLista__c = comisionCalculada.Porcentaje__c
+                                                concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+
+                                                if( concepto.PrecioFinal__c && ctcUtils.number(concepto.PrecioFinal__c) > ctcUtils.number(comisionCalculada.Porcentaje__c) ) {
+                                                    concepto.PrecioFinal2__c = ctcUtils.number(concepto.PrecioFinal__c)
+                                                }
+
+                                                ctcUtils.calcularCostoFinal( concepto.Bonificacion__c, concepto, {}, {}, {}, fromCtc )
+                                            } else {
+                                                concepto.Importe__c = angular.copy(concepto.PrecioFinal2__c)
+                                            }
+                                        }  
+                                    })
+                                }
+
+                                var comparados = instance.comparados ? instance.comparados : (instance.Productos_Comparados__r ? instance.Productos_Comparados__r : [])
+                                angular.forEach( comparados, function( comparado, index_comparado ) {
+                                    if( comparado.conceptosKey ) {
+                                        angular.forEach( Object.keys(comparado.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                            var concepto = comparado.conceptosKey[conceptoKey]
+                                            if( concepto && concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                                if( comisionCalculada.Porcentaje__c ) {
+                                                    concepto.Importe__c = comisionCalculada.Porcentaje__c
+                                                    concepto.PrecioLista2__c = comisionCalculada.Porcentaje__c
+                                                    concepto.PrecioLista__c = comisionCalculada.Porcentaje__c
+                                                    concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+
+                                                    if( concepto.PrecioFinal__c && ctcUtils.number(concepto.PrecioFinal__c) > ctcUtils.number(comisionCalculada.Porcentaje__c) ) {
+                                                        concepto.PrecioFinal2__c = ctcUtils.number(concepto.PrecioFinal__c)
+                                                    }
+
+                                                    ctcUtils.calcularCostoFinal( concepto.Bonificacion__c, concepto, {}, {}, {}, fromCtc )
+                                                } else {
+                                                    concepto.Importe__c = angular.copy(concepto.PrecioFinal2__c)
+                                                }
+                                            }  
+                                        })
+                                    }
+                                })
+                            }
+                        }
+
+                        ctcUtils.bloquearCotizacion = function( cotizacion, bloquear ) {
+                            // console.log('1 -> bloquearCotizacion -> cotizacion: ', cotizacion, bloquear) 
+
+                            if( !cotizacion.hasOwnProperty('disabled') ) {
+                                cotizacion.disabled = {}
+                            }
+
+                            cotizacion.disabled.BotonAgregarContacto = bloquear
+                            cotizacion.disabled.BotonCargarContactos = bloquear
+
+                            cotizacion.disabled.ContactId               = bloquear
+                            cotizacion.disabled.VigenciaCotizacion__c   = bloquear
+
+                            angular.forEach( cotizacion.productos, function( producto, index ) {
+                                if( !producto.hasOwnProperty('disabled') ) {
+                                    producto.disabled = {}
+                                }
+
+                                producto.disabled.Product2Id                = bloquear
+                                producto.disabled.CantidadTarjetas__c       = bloquear
+                                producto.disabled.NumberOfShipments__c      = bloquear
+                                producto.disabled.UnitPrice                 = bloquear  
+                                
+                                producto.disabled.FormaPago__c              = bloquear
+                                producto.disabled.OpcionesMetodoPago__c     = bloquear
+                                producto.disabled.TarjetaAsociada__c        = bloquear
+                                producto.disabled.ClabeInterbancaria__c     = bloquear
+
+                                producto.disabled.TipoAmex__c               = bloquear
+                                producto.disabled.NivelConsumo__c           = bloquear
+                                producto.disabled.OtroMetodoPago__c         = bloquear
+                                producto.disabled.ComentariosCotizacion__c  = bloquear
+
+                                if( producto.conceptosKey && angular.isObject(producto.conceptosKey) ) {
+                                    angular.forEach(Object.keys(producto.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                        var concepto = producto.conceptosKey[conceptoKey]
+                                        if( concepto ) {
+                                            if( !concepto.hasOwnProperty('disabled') ) {
+                                                concepto.disabled = {}
+                                            }
+                                            concepto.disabled.PrecioFinal__c        = bloquear
+                                            concepto.disabled.PrecioFinal2__c       = bloquear
+                                            concepto.disabled.Bonificacion__c       = bloquear
+                                            concepto.disabled.VigenciaDescuento__c  = bloquear
+                                            concepto.disabled.CantidadTarjetas__c   = bloquear
+                                        }
+                                    })
+                                }
+
+                                var comparados = producto.comparados ? producto.comparados : (producto.Productos_Comparados__r ? producto.Productos_Comparados__r : [])
+
+                                // angular.forEach( producto.comparados, function( comparado, index_comparado ) {
+                                angular.forEach( comparados, function( comparado, index_comparado ) {
+                                    if( !comparado.hasOwnProperty('disabled') ) {
+                                        comparado.disabled = {}
+                                    }
+                                    comparado.disabled.ProductoComparado__c = bloquear
+                                    if( comparado.conceptosKey && angular.isObject(comparado.conceptosKey) ) {
+                                        angular.forEach(Object.keys(comparado.conceptosKey), function( conceptoKey, index_conceptoKey ) {
+                                            var concepto = comparado.conceptosKey[conceptoKey]
+                                            if( concepto ) {
+                                                if( !concepto.hasOwnProperty('disabled') ) {
+                                                    concepto.disabled = {}
+                                                }
+                                                concepto.disabled.PrecioFinal__c        = bloquear
+                                                concepto.disabled.PrecioFinal2__c       = bloquear
+                                                concepto.disabled.Bonificacion__c       = bloquear
+                                                concepto.disabled.VigenciaDescuento__c  = bloquear
+                                                concepto.disabled.CantidadTarjetas__c   = bloquear
+                                            }
+                                        })
+                                    }
+
+                                })
+
+                            })
+                            // console.log('2 -> bloquearCotizacion -> cotizacion: ', cotizacion, bloquear) 
+                        }
+
+                        ctcUtils.cotizacionSoloLectura = function( cotizacion ) {
+                            if( cotizacion ) {
+                                if( !cotizacion.hasOwnProperty('_readOnly') ) {
+                                    cotizacion._readOnly = {}
+                                }
+
+                                cotizacion._readOnly.ContactId = true
+
+                                cotizacion.ContactId = cotizacion.Contact.Name
+                            }
+                        }
+
+                        ctcUtils.calcularDescuento = function( model, instance, field, form, params, fromCtc ) {
+                            if( !fromCtc ) {
+                                // var concepto = params.concepto || {}
+                                let fieldPrecioLista = '';
+                                if(instance.TipoCargo__c == 'Comisión por el servicio'){
+                                    fieldPrecioLista = ctcUtils.number(instance['PrecioLista__c']) ? 'PrecioLista__c' : 'Importe__c';
+                                }else {
+                                    fieldPrecioLista = 'Importe__c';
+                                 }
+                                if( model ) {
+                                    var precioLista = ctcUtils.number(instance[fieldPrecioLista])
+                                    var precioFinal = ctcUtils.number(model)
+                                    var descuento = parseFloat(((precioLista - precioFinal) / precioLista) * 100).toFixed(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c.scale)
+                                    descuento = ctcUtils.number(descuento)
+                                    if( descuento < 0 ) {
+                                        descuento = 0
+                                    }
+                                    instance.Bonificacion__c = descuento
+
+                                    if( instance.Bonificacion__c == 0 ) {
+                                        instance.VigenciaDescuento__c = undefined
+                                        instance.CantidadTarjetas__c = undefined
+                                        instance.VigenciaDescuento__c__render = false
+                                        instance.CantidadTarjetas__c__render = false
+
+                                    } else {
+                                        instance.VigenciaDescuento__c__render = true
+                                        instance.CantidadTarjetas__c__render = instance.CantidadTarjetas__c__renderBase
+                                    }
+                                    ctcUtils.cambiaVigenciaCantidad( model, instance, field, form, params, fromCtc )
+                                    ctcUtils.getApprovalLevel(instance, precioFinal);
+                                    ctcUtils.getApprovalOtherConcepts( instance, descuento, null, null)
+
+                                }
+                            }
+                        }
+                        
+                        ctcUtils.getApprovalLevel = function( instance, precioFinal ) {
+                            
+                            let filteredValues = [];
+                            let comisionesMap = ctcUtils.app.comisiones.map(function (comision) {
+                                //console.log('NEW MAP: '+comision.FinalPercentage__c)
+                                if(comision.FinalPercentage__c != undefined) {
+                                    filteredValues.push(comision.FinalPercentage__c);
+                                }
+                            });
+                            
+                            //console.log('FILTERED: '+filteredValues)
+                            let minFinal = Math.min(...filteredValues);
+                            //let minFinal = Math.min(...ctcUtils.app.comisiones.map(val => ctcUtils.number(val.FinalPercentage__c) ) );
+                            let maxInicial = Math.max(...ctcUtils.app.comisiones.map(val => ctcUtils.number(val.InitialPercentage__c) ) );
+                            let hasFinalPercentage = ctcUtils.app.comisiones.map(comision => comision.FinalPercentage__c)[0] ? true : false;
+                            let hasInitialPercentage = ctcUtils.app.comisiones.map(comision => comision.InitialPercentage__c)[ctcUtils.app.comisiones.length - 1] ? true : false;
+
+                            for(i = 0; i <= ctcUtils.app.comisiones.length -1 ; i++) {
+                                if('{!OppRecordType}' != 'Migracion'){
+                                    if(ctcUtils.valueIsInRange(i,precioFinal, hasFinalPercentage, hasInitialPercentage,minFinal,maxInicial) ){
+                                        switch(ctcUtils.app.comisiones[i].ApprovalLevel__c) {
+                                            case 1: 
+                                                instance.PrecioFinal__c__approvalLevel = 1;
+                                                break;
+                                            case 2: 
+                                                instance.PrecioFinal__c__approvalLevel = 2;
+                                                break;
+                                            case 3: 
+                                                instance.PrecioFinal__c__approvalLevel = 3;
+                                                break;
+                                            case 4: 
+                                                instance.PrecioFinal__c__approvalLevel = 4;
+                                                break;
+                                        }
+                                        break;
+                                    } else {
+                                        instance.PrecioFinal__c__approvalLevel = 0;
+                                    }
+                                }
+                                else{
+                                    instance.PrecioFinal__c__approvalLevel = 0;
+                                }
+                            }
+                        }
+                        
+                        ctcUtils.valueIsInRange = function(index, precioFinal, hasFinalPercentage, hasInitialPercentage, minFinal, maxInicial) {
+                            if(!hasInitialPercentage && minFinal > precioFinal && (ctcUtils.app.comisiones[index].FinalPercentage__c == minFinal)  ) {
+                                return true;
+                            } else if(!hasFinalPercentage && precioFinal >= maxInicial  && (ctcUtils.app.comisiones[index].InitialPercentage__c == maxInicial) ) {
+                                return true;                            
+                            }else {                                
+                                return (precioFinal >= ctcUtils.app.comisiones[index].InitialPercentage__c && precioFinal <= ctcUtils.app.comisiones[index].FinalPercentage__c);
+                            }
+                        }
+                        
+                        ctcUtils.calcularCostoFinal = function( model, instance, field, form, params, fromCtc ) {
+                            if( !fromCtc ) {
+                                // console.log('calcularCostoFinal field: ', field)
+                                // var concepto = params.concepto || {}
+
+                                let fieldPrecioLista = '';
+                                if(instance.TipoCargo__c == 'Comisión por el servicio'){
+                                    fieldPrecioLista = ctcUtils.number(instance['PrecioLista__c']) ? 'PrecioLista__c' : 'Importe__c';
+                                }else {
+                                    fieldPrecioLista = 'Importe__c';
+                                 }
+                                var precioLista = ctcUtils.number(instance[fieldPrecioLista])
+                                var fieldPrecioFinal = instance.TipoCargo__c == 'Comisión por el servicio' ? 'PrecioFinal2__c' : 'PrecioFinal__c'
+                                /*if(instance.TipoCargo__c == 'Comisión por el servicio'&&instance.Producto__r.Name == '30-BPfleet'){
+                                    fieldPrecioLista='Importe__c';
+                                }*/
+                                
+                                var descuento = ctcUtils.number(instance['Bonificacion__c'])
+                                var precioFinal = parseFloat( ( precioLista - ( precioLista * ( descuento / 100 ) ) )).toFixed(ctcUtils.app.schema.ProductoConcepto__c[fieldPrecioFinal].scale)
+                                precioFinal = ctcUtils.number(precioFinal)
+                                if( field.name == 'Bonificacion__c' || precioLista >= ctcUtils.number(instance[fieldPrecioFinal]) ) {
+
+                                    instance[fieldPrecioFinal] = precioFinal
+
+                                    if( descuento == 0 ) {
+                                        instance.VigenciaDescuento__c = undefined
+                                        instance.CantidadTarjetas__c = undefined
+                                        instance.VigenciaDescuento__c__render = false
+                                        instance.CantidadTarjetas__c__render = false
+
+                                    } else {
+                                        instance.VigenciaDescuento__c__render = true
+                                        instance.CantidadTarjetas__c__render = instance.CantidadTarjetas__c__renderBase
+                                    }
+
+                                    ctcUtils.cambiaVigenciaCantidad( model, instance, field, form, params, fromCtc )
+                                    ctcUtils.getApprovalLevel(instance, precioFinal);
+                                    ctcUtils.getApprovalOtherConcepts( instance, descuento, null, null)
+                                }
+                            }
+                        }
+
+                        ctcUtils.getApprovalOtherConcepts = function( instance, descuento, producto, numeroEnvios ) {
+                            //console.log('Número de Envios: ' + numeroEnvios);
+                            var responseValue = ctcUtils.app.approvalLevels.$$state.value;
+                            if(producto != null) {
+                                ctcUtils.app.envios = producto.NumberOfShipments__c;
+                            }
+                            if (numeroEnvios != null) {
+                                ctcUtils.app.envios = numeroEnvios;
+                                var tipoDeCargo = 'Cargo por envío - Recurrente';
+                                instance = ctcUtils.app.instanceTemp;
+                            } else {
+                                var tipoDeCargo = instance.TipoCargo__c;
+                            }
+                            if (descuento == null) {
+                                descuento = ctcUtils.app.descuentoCargoRecurrente;
+                            }  
+                            var envios = ctcUtils.app.envios;
+                            //console.log('Envíos:' + envios);
+                            for(let approvalConcepto of responseValue){
+                                if (approvalConcepto.Concept__c == tipoDeCargo) {
+                                    //console.log('Está entrando a realizar el calculo: ' + JSON.stringify(approvalConcepto));
+                                    //console.log('Número de entregas: ' + approvalConcepto.NumberOfShipments__c);
+                                    //console.log('Rango descuento: ' + approvalConcepto.Discount__c);
+                                    if('{!OppRecordType}' != 'Migracion'){
+                                        if(envios != null && approvalConcepto.NumberOfShipments__c != undefined && approvalConcepto.NumberOfShipments__c != '' && approvalConcepto.Discount != ''){
+                                            if(envios <= approvalConcepto.NumberOfShipments__c && descuento <= approvalConcepto.Discount__c){
+                                                instance.PrecioFinal__c__approvalLevelConcepto = approvalConcepto.LessShipmentsLessDiscountApproval__c;
+                                            } else if (envios <= approvalConcepto.NumberOfShipments__c && descuento > approvalConcepto.Discount__c) { 
+                                                instance.PrecioFinal__c__approvalLevelConcepto = approvalConcepto.LessShipmentsMoreDiscountApproval__c;
+                                            } else if (envios > approvalConcepto.NumberOfShipments__c && descuento <= approvalConcepto.Discount__c) { 
+                                                if ( descuento > 0) {
+                                                    instance.PrecioFinal__c__approvalLevelConcepto = approvalConcepto.MoreShipmentsLessDiscountApproval__c;
+                                                } else {
+                                                    instance.PrecioFinal__c__approvalLevelConcepto = 1;
+                                                }
+                                            } else if (envios > approvalConcepto.NumberOfShipments__c && descuento > approvalConcepto.Discount__c) { 
+                                                instance.PrecioFinal__c__approvalLevelConcepto = approvalConcepto.MoreShipmentsMoreDiscountApproval__c;
+                                            }
+                                        } else if (approvalConcepto.NumberOfShipments__c == undefined && approvalConcepto.Discount != '') {
+                                            if(descuento <= approvalConcepto.Discount__c){
+                                                instance.PrecioFinal__c__approvalLevelConcepto = approvalConcepto.LessDiscountApproval__c;
+                                            } else if (descuento > approvalConcepto.Discount__c) { 
+                                                instance.PrecioFinal__c__approvalLevelConcepto = approvalConcepto.MoreDiscountApproval__c;
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        instance.PrecioFinal__c__approvalLevelConcepto = 0;
+                                    }
+                                }
+                            }
+                            if (instance.TipoCargo__c == 'Cargo por envío - Recurrente') {
+                                if(descuento != null){
+                                    ctcUtils.app.descuentoCargoRecurrente = descuento;
+                                    ctcUtils.app.instanceTemp = instance;
+                                }
+                                ctcUtils.app.approvalEnvioRecurrente = instance.PrecioFinal__c__approvalLevelConcepto; 
+                            } else if (instance.TipoCargo__c == 'Cargo del primer envío') {
+                                ctcUtils.app.approvalPrimerEnvio = instance.PrecioFinal__c__approvalLevelConcepto; 
+                            } else if (instance.TipoCargo__c == 'Tarjeta titular / Stock') {
+                                ctcUtils.app.approvalStock = instance.PrecioFinal__c__approvalLevelConcepto; 
+                            } else if (instance.TipoCargo__c == 'Tarjeta titular / Stock - primer envío') {
+                                ctcUtils.app.approvalStockPrimerEnvio = instance.PrecioFinal__c__approvalLevelConcepto; 
+                            }
+                        }   
+                            
+                        ctcUtils.cambiaVigenciaCantidad = function( model, instance, field, form, params, fromCtc ) {   
+                            if( !fromCtc ) {    
+                                // console.log('cambiaVigenciaCantidad: ', arguments)   
+                                var descuento = ctcUtils.number(instance['Bonificacion__c'])    
+                                var isRequired = descuento && descuento != 0    
+                                var vigenciaReq = false 
+                                var cantidadReq = false 
+                                if( isRequired && ( typeof instance.VigenciaDescuento__c == 'undefined' || instance.VigenciaDescuento__c == '' ) ) {    
+                                    cantidadReq = true  
+                                }   
+                                // if( (isRequired && !instance.CantidadTarjetas__c) || ( !instance.IniciaConTarjeta && descuento && descuento != 0 ) ) {   
+                                // if( (isRequired && !instance.CantidadTarjetas__c) || ( !instance.IniciaConTarjeta && descuento && descuento != 0 ) ) {   
+                                if( isRequired && ( typeof instance.CantidadTarjetas__c == 'undefined' || instance.CantidadTarjetas__c == '' ) ) {  
+                                    vigenciaReq = true  
+                                }   
+                                instance.schema.VigenciaDescuento__c.required = vigenciaReq 
+                                instance.schema.CantidadTarjetas__c.required = cantidadReq  
+                                // console.log('cantidadReq: ', cantidadReq, '\t vigenciaReq: ', vigenciaReq)   
+                                // instance.schema.VigenciaDescuento__c.required = (vigenciaReq && instance.IniciaConTarjeta) || (!instance.IniciaConTarjeta && descuento && descuento != 0)    
+                                // instance.schema.CantidadTarjetas__c.required = cantidadReq && instance.IniciaConTarjeta  
+                                // instance.schema.VigenciaDescuento__c.required = descuento && descuento != 0  
+                                // instance.TieneBonificacion = descuento && descuento != 0 
+                                // instance.TieneBonificacion = true    
+                            }   
+                        }   
+                    }
+                        
+                    vm.initSchema = function( schema ) {
+                        // console.log('schema: ', schema, ctcUtils);
+                        schema.Opportunity.Familia__c.editable = true
+
+                        schema.Product2.Name.type = 'picklist'
+                        schema.Product2.Name.required = true
+                        schema.Product2.Name.restrictedPicklist = true
+                        schema.Product2.Family.required = true
+                        schema.Product2.Family.restrictedPicklist = true
+                     
+                        schema.Contact.RazonSocial__c.required = true
+                        // schema.Contact.TipoSociedad__c.required = true
+                        schema.Contact.Email.required = true
+                        schema.Contact.Phone.required = true
+                        // schema.Contact.TipoSociedad__c.values = $filter('orderBy')(schema.Contact.TipoSociedad__c.values, 'label')
+
+                        schema.QuoteLineItem.CantidadTarjetas__c.required = true
+                        schema.QuoteLineItem.NumberOfShipments__c.required = true   
+                        schema.ProductoConcepto__c.VigenciaDescuento__c.label = 'Vigencia por Fecha'
+                        schema.ProductoConcepto__c.CantidadTarjetas__c.label = 'Vigencia por Tarjetas'
+                        schema.QuoteLineItem.ServiceDate.required = true
+                     
+                        schema.QuoteLineItem.TarjetaAsociada__c.required = true
+                        schema.QuoteLineItem.TarjetaAsociada__c.type = 'number'
+                        schema.QuoteLineItem.TarjetaAsociada__c.length = 4
+                        schema.QuoteLineItem.TarjetaAsociada__c.precision = 4
+
+                        schema.QuoteLineItem.ClabeInterbancaria__c.required = true
+                        schema.QuoteLineItem.ClabeInterbancaria__c.type = 'number'
+                        schema.QuoteLineItem.ClabeInterbancaria__c.length = 18
+                        schema.QuoteLineItem.ClabeInterbancaria__c.precision = 18
+                        schema.QuoteLineItem.ClabeInterbancaria__c.minlength = 18
+
+                        schema.QuoteLineItem.Description.type = 'textarea'
+
+                        schema.QuoteLineItem.TipoAmex__c.required = true
+                        schema.QuoteLineItem.NivelConsumo__c.required = true
+                     
+                        schema.QuoteLineItem.Product2Id.type = 'picklist'
+                        schema.QuoteLineItem.Product2Id.restrictedPicklist = true
+
+                        schema.QuoteLineItem.ProductoComparado__c = angular.copy(schema.QuoteLineItem.Product2Id)
+                        schema.QuoteLineItem.ProductoComparado__c.name = 'ProductoComparado__c'
+                        schema.QuoteLineItem.ProductoComparado__c.required = false
+
+                        schema.QuoteLineItem.OpcionesMetodoPago__c.required = true
+                        schema.QuoteLineItem.OtroMetodoPago__c.required = true
+                        //schema.QuoteLineItem.OtroMetodoPago__c = {}
+
+                        schema.QuoteLineItem.Etapa__c.required = true
+
+                        schema.Product2.clonProducto = angular.copy(schema.Product2.Name)
+                        schema.Product2.clonProducto.required = false
+
+                        schema.Quote.ContactId.type = 'picklist'
+                        schema.Quote.ContactId.label = 'Contacto'
+                        schema.Quote.ContactId.restrictedPicklist = true
+                        schema.Quote.ContactId.required = true
+                        schema.Quote.Familia__c.label = 'Solución';
+
+                        schema.Product2.Formato__c.type = 'picklist'
+
+                        schema.ProductoConcepto__c.PrecioLista__c.editable = true
+                     
+                        schema.ProductoConcepto__c.PrecioFinal__c.editable = true
+
+                        schema.ProductoConcepto__c.PrecioFinal2__c = angular.copy(schema.ProductoConcepto__c.PrecioFinal__c)
+                        schema.ProductoConcepto__c.PrecioFinal2__c.name = 'PrecioFinal2__c'
+                        schema.ProductoConcepto__c.PrecioFinal2__c.type = 'percent'
+                        
+                        schema.ProductoConcepto__c.VigenciaDescuento__c.minDate = new Date()
+                        //schema.ProductoConcepto__c.VigenciaDescuento__c = {}
+                        
+                        schema.Product2.Family.values = $filter('orderBy')(schema.Product2.Family.values, 'label')
+                        
+                        ctcUtils.errors.majorDate = 'Fecha debe ser mayor'
+                        ctcUtils.errors.minValue = 'Valor inválido'
+                    }
+
+                    vm.initOpportunity = function() {
+                        vm.opportunity.PantallaIntermedia = ctcUtils.toObject(vm.opportunity.PantallaIntermedia, ',')
+                        vm.opportunity.MetodoPagoCodigos__c = ctcUtils.toObject(vm.opportunity.MetodoPagoCodigos__c, ',')
+                    }
+
+                    vm.describir = function() {
+                        vm.opportunity.Competidores = []
+                        vm.initFactory()
+
+                        if( vm.opportunity.CloseDate ) {
+                            vm.opportunity.CloseDate = new Date(vm.opportunity.CloseDate).getTime()
+                        }
+
+                        vm.opportunity.PantallaIntermedia = ctcUtils.toObject(vm.opportunity.PantallaIntermedia, ',')
+                        vm.opportunity.MetodoPagoCodigos__c = ctcUtils.toObject(vm.opportunity.MetodoPagoCodigos__c, ',')
+
+                        // if(vm.opportunity.PantallaIntermedia && vm.opportunity.PantallaIntermedia.length > 0) {
+                        //     var strcodes = vm.opportunity.PantallaIntermedia.split('\,')
+                        //     vm.opportunity.PantallaIntermedia = {}
+                        //     angular.forEach(strcodes, function(v, k){
+                        //         vm.opportunity.PantallaIntermedia[v] = true
+                        //     })
+                        // } else {
+                        //    //vm.opportunity.PantallaIntermedia = {'60-D': true, '60-G': true, '60-M': true, '60-P': true} 
+                        // }
+
+                        // if(vm.opportunity.MetodoPagoCodigos__c && vm.opportunity.MetodoPagoCodigos__c.length > 0) {
+                        //     var strcodes = vm.opportunity.MetodoPagoCodigos__c.split('\,')
+                        //     vm.opportunity.MetodoPagoCodigos__c = {}
+                        //     angular.forEach(strcodes, function(v, k) {
+                        //         vm.opportunity.MetodoPagoCodigos__c[v] = true
+                        //     })
+                        // }
+
+                        // vm.opportunity.Competidores = ctcUtils.changeFieldSF('Familia__c', vm.opportunity.Familia__c, 'Competidor__c')
+
+                        //$timeout(function() {
+                            try {
+                                console.log('document: ', document)
+                                //if(document.body && document.body.style && document.body.style.zoom) {
+                                    // document.body.style.zoom = "90%"
+                                    console.log('set zomm: ', document.body.style.zoom)
+                                //}
+                            } catch(err) {
+                                console.log('error zoom')
+                            }
+                        //}, 2000)
+                        
+                        vm.loading = true
+                        var ids = ''
+                        ctcUtils.invoke('PLAN_CuentaService.describe', ['Contact', 'Opportunity', 'Quote', 'QuoteLineItem', 'Product2', 'Concepto__c', 'ProductoConcepto__c', 'User', 'OpportunityLineItem', 'Attachment', 'CompetidorOportunidad__c', 'ProductoCompetidor__c', 'PlantillaContrato__c', 'Contrato2__c', 'QuoteDocument'])
+                        .then(function(schema) {
+                            vm.schema = ctcUtils.schema(schema)
+                            vm.prefix = ctcUtils.prefix(schema)
+
+                            ctcUtils.localSchema = vm.schema || {}
+                            ctcUtils.localPrefix = vm.prefix || {}
+                            vm.initSchema( vm.schema )
+                            return vm.getUserInfo(vm.user.Id)
+                        })
+                        .then(function(info) {
+                            if(info && info.length > 0) {
+                                vm.user = info[0]
+                                var segmento = ''
+                                if(vm.user.Segmento__c == 'MLK') {
+                                    segmento = '\'Medium\', ' + '\'Large\', ' + '\'Key\''
+                                } else {
+                                    segmento = '\'' + vm.user.Segmento__c + '\''
+                                }
+                                return vm.listProducts(segmento)
+                            }
+                        })
+                        .then(function(familias) {
+                            vm.productos = familias
+                            vm.initFamilias(familias)
+                            return vm.listContacts()
+                        })
+                        .then(function(contacts) {
+                            vm.opportunity.Account.contacts = contacts
+                            return vm.listaCotizaciones(vm.opportunity.Id)
+                        })
+                        .then(function(cotizaciones) {
+
+                            vm.opportunity.cots = []
+                            
+                            if(cotizaciones && cotizaciones.length > 0) {
+                                var idsProductos = {}
+                                angular.forEach(cotizaciones, function(v, k) {
+                                    if(v.QuoteLineItems) {
+                                        v.productos = angular.copy(v.QuoteLineItems)
+                                        vm.inicializaProductos(v.productos, v)
+                                        if(v.idsProductos) {
+                                            idsProductos[v.Id] = v.idsProductos
+                                        }
+                                        delete v.QuoteLineItems
+                                    }
+                                    if( !v.hasOwnProperty('disabled') ) {
+                                        v.disabled = {}
+                                    }
+                                    v.disabled.Familia__c = true
+                                    vm.opportunity.cots.push(v)
+                                })
+                                if(Object.keys(idsProductos).length > 0) {
+                                    angular.forEach(Object.keys(idsProductos), function(v, k) {
+                                        if(ids.length > 0) {
+                                            ids += ', '
+                                        }
+                                        ids += idsProductos[v]
+                                    })
+                                    return vm.listaProductosComparados(ids)
+                                } else {
+                                    $('.initContainer').removeClass('hidden')
+                                    vm.loading = false
+                                }
+                            } else {
+
+                                // var contactId = vm.opportunity && vm.opportunity.Account && vm.opportunity.Account.contacts && vm.opportunity.Account.contacts[0] ? vm.opportunity.Account.contacts[0].Id : undefined
+                                var contactId = undefined
+                                var contactos = vm.opportunity && vm.opportunity.Account && vm.opportunity.Account.contacts ? vm.opportunity.Account.contacts : []
+
+                                var representante = ctcUtils.filter(contactos, {Puesto__c: 'Representante legal'})
+                                if( representante && representante.length > 0 ) {
+                                    contactId = representante[0].Id
+                                } else {
+                                    contactId = contactos && contactos.length > 0 ? contactos[0].Id : undefined
+                                }
+                                // vm.opportunity.cots.push({OpportunityId: vm.opportunity.Id, Name: 'Cotización 001', productos: [{Etapa__c: 'Cotización', Etapas__opts: [{label: 'Cotización', value: 'Cotización'}], render: true}], Familia__c: vm.opportunity.Familia__c, disabled: {Familia__c: true}, ContactId: contactId})
+                                vm.opportunity.cots.push({OpportunityId: vm.opportunity.Id, Name: 'Cotización ', productos: [{render: true}], Familia__c: vm.opportunity.Familia__c, disabled: {Familia__c: true}, ContactId: contactId})
+                                $('.initContainer').removeClass('hidden')
+                                vm.loading = false
+                            }
+
+                            //$('.initContainer').removeClass('hidden')
+                            //vm.loading = false
+                        })
+                        .then(function(comparados) {
+                            console.log('\n\n\n comparados: ', comparados)
+                            vm.inicializaProductosComparados(comparados)
+                            if(ids && ids.length > 0) {
+                                return vm.listaEscalonamientos(ids)
+                            }
+                        })
+                        .then(function(escalonamientos) {
+
+                            console.log('escalonamientos: ', angular.copy(escalonamientos))
+                            vm.inicializaEscalonamientos(escalonamientos)
+                            $('.initContainer').removeClass('hidden')
+                            vm.loading = false
+
+                            vm.opportunity.Competidores = ctcUtils.getValues('Competidor__c')
+                        })
+                        .catch(function(err) {
+                            vm.errors = [err]
+                            vm.loading = false
+                        })
+                    }
+
+                    vm.listProducts = function(segmento) {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c FROM Product2 WHERE IsActive=true AND SegmentoVenta__c includes(' + segmento + ')')
+                    }
+
+                    vm.listContacts = function() {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, FirstName, LastName, Name, Puesto__c FROM Contact WHERE Id in (select ContactId from AccountContactRelation where AccountId=\'' + vm.opportunity.Account.Id + '\') ORDER BY Name ASC')
+                    }
+
+                    vm.getUserInfo = function(id) {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, Name, Segmento__c,Profile.Name FROM User WHERE Id=\'' + id + '\'')
+                    }
+
+                    vm.initFamilias = function(familias) {
+                        vm.schema.Product2.Family.values.forEach(function(element) {
+                            element.label = ctcUtils.html(element.label)
+                            element.value = ctcUtils.html(element.value)
+                            familias.forEach(function(producto) {
+                                if(producto.Family === element.value) {
+                                    if(!element.values) {
+                                        element.values = [producto]
+                                    } else {
+                                        element.values.push(producto)
+                                    }
+                                }
+                            })
+                        })
+                    }
+
+                    vm.listaCotizaciones = function(idOpportunity) {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, Name, QuoteNumber, Tax, Status, Description, Subtotal,OwnerId, Owner.UserRole.Name TotalPrice, ExpirationDate, AccountId, GrandTotal, Email, Phone, OpportunityId, ContactId, IsSyncing, Familia__c, VigenciaCotizacion__c,ApprovalStatus__c, (SELECT Id, CantidadTarjetas__c, NumberOfShipments__c, Description, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c FROM QuoteLineItems WHERE Escalonamiento__c = NULL ORDER BY Id ASC) FROM Quote WHERE OpportunityId=\'' + idOpportunity + '\' ORDER BY CreatedDate ASC')
+                    }
+
+                    vm.inicializaProductos = function(productos, cotizacion, skip) {
+                        if(productos && productos.length > 0 && vm.schema.Product2) {
+                            angular.forEach(productos, function(v, k) {
+                                if(!skip) {
+                                    
+                                    var temp = ctcUtils.filter(vm.productos, {Id: v.Product2Id})
+                                    if(temp && temp.length > 0) {
+                                        temp = temp[0]
+                                        v.Family = angular.copy(temp.Family)
+                                        v.Name = angular.copy(temp.Id)
+                                        v.Products2 = [temp]
+
+                                        var fam = ctcUtils.filter(vm.schema.Product2.Family.values, {value: v.Family})
+                                        // console.log('fam: ', fam)
+                                        if(fam && fam.length > 0) {
+                                            var aux = fam[0]
+                                            // console.log('producto inicial: ', v)
+                                            v.ComparadosLista = []
+                                            var ComparadosLista = []
+                                            angular.forEach(aux.values, function(v1, k1) {
+                                                if(v.Product2Id != v1.Id) {
+                                                    ComparadosLista.push(v1)
+                                                }
+                                            })
+                                            v.ComparadosLista = ComparadosLista || []
+                                        }
+                                    }
+                                    v.render = true
+                                    // v.ServiceDate = v.ServiceDate ? ctcUtils.parseDate(v.ServiceDate) : ''
+                                    if(!cotizacion.idsProductos) {
+                                        cotizacion.idsProductos = ''
+                                    }
+                                    if(cotizacion.idsProductos.length > 0) {
+                                        cotizacion.idsProductos += ', '
+                                    }
+
+                                    // nueva funcionalidad monoproducto calvarez 22_11_2017
+                                    if( v.FormaPago__c ) {
+                                        v.DATA_OpcionesMetodoPago__c = ctcUtils.changeFieldSF('FormaPago__c', v.FormaPago__c, 'OpcionesMetodoPago__c')
+                                    }
+
+                                    if( v.TarjetaAsociada__c ) {
+                                        v.TarjetaAsociada__c = parseFloat(v.TarjetaAsociada__c)
+                                    }
+
+                                }
+
+                                cotizacion.idsProductos += '\'' + v.Id + '\'' 
+                            })
+                        }
+                    }
+
+                    vm.listaProductosComparados = function(idsProductos) {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, ProductoCotizado__c, ProductoCotizado__r.QuoteId, ProductoComparado__c FROM ProductoComparado__c WHERE ProductoCotizado__c IN(' + idsProductos + ')')
+                    }
+
+                    vm.inicializaProductosComparados = function(comparados) {
+                        if(comparados && comparados.length > 0) {
+                            angular.forEach(comparados, function(v, k) {
+                                var cot = ctcUtils.filter(vm.opportunity.cots, {Id: v.ProductoCotizado__r.QuoteId})
+                                if(cot && cot.length > 0) {
+                                    cot = cot[0]
+                                    var producto = ctcUtils.filter(cot.productos, {Id: v.ProductoCotizado__c})
+                                    if(producto && producto.length > 0) {
+                                        producto = producto[0]
+                                        if(!producto.productosComparar) {
+                                            producto.productosComparar = []
+                                        }
+                                        v.isDelete = true 
+                                        v.Name = v.ProductoComparado__c
+                                        v.parentReference = producto.$$hashKey
+                                        producto.productosComparar.push(v)
+                                    }
+                                }
+                            })
+                        }
+                        angular.forEach(vm.opportunity.cots, function(v, k) {
+                            angular.forEach(v.productos, function(p, i) {
+                                if(!p.productosComparar) {
+                                    p.productosComparar = []
+                                    p.productosComparar.push({isDelete: true, parentReference: v.$$hashKey})
+                                }
+                            })
+                        })
+                    }
+
+                    vm.listaEscalonamientos = function(idsProductos) {
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT COUNT(Id) escalonamientos, SUM(UnitPrice) total, Escalonamiento__c, MAX(ServiceDate) serviceDate FROM QuoteLineItem WHERE Escalonamiento__c IN('+ idsProductos + ') GROUP BY Escalonamiento__c')
+                    }
+
+                    vm.inicializaEscalonamientos = function(escalonamientos) {
+                        if(escalonamientos && escalonamientos.length > 0) {
+                            angular.forEach(escalonamientos, function(v, k) {
+                                angular.forEach(vm.opportunity.cots, function(c, ic) {
+                                    angular.forEach(c.productos, function(p, ip) {
+                                        if(p.Id == v.Escalonamiento__c) {
+                                            p.total = (p.UnitPrice + v.total)
+                                            p.ServiceDateEsc__c = p.ServiceDate
+                                        }   
+                                        p.render = true                                    
+                                    })
+                                })
+                            })
+                        }
+                    }   
+
+                    vm.verficarEscalonamiento = function() {
+                        ctcUtils.app.tieneAccesoEscalonamiento = ctcUtils.app.user.Segmento__c == 'MLK'
+                        // if( (ctcUtils.app.profile == 'Ventas' || ctcUtils.app.profile == 'Ventas_Exp_Reportes') && ctcUtils.app.PerfilesEscalonamiento__c[ctcUtils.app.profile] ) {
+                        //     ctcUtils.app.tieneAccesoEscalonamiento = ctcUtils.app.user.Segmento__c == 'MLK'
+                        // } else {
+                        //     ctcUtils.app.tieneAccesoEscalonamiento = ctcUtils.app.PerfilesEscalonamiento__c[ctcUtils.app.profile]
+                        // }
+                    }
+
+                    vm.cambiaEtapa = function(model, instance, field, form, params ) {
+                        console.log('in cambiaEtapa: ', arguments)
+                        var value = model && model.value ? model.value : ''
+                        jQuery('[id*="SF_' + field.name + '"]').val(value)
+                        jQuery('[id*="SF_' + field.name + '"]').trigger('change')
+                    }
+
+                    vm.getValues = function(idElement) {
+                        console.log('getValues: ', idElement)
+                        idElement = idElement || 'SubOrigenCandidato__c'
+                        return jQuery.map(jQuery('[id*="' + idElement + '"] option'), function(e) { return typeof e.value != 'undefined' && e.value.length > 0 && e.label != '--None--' && e.label != '--Ninguno--' ? {label: e.label, value: e.value} : null})
+                    }
+                    
+                    vm.getPlantillaPropuesta = function() {
+                        ctcUtils.query("SELECT Id FROM EmailTemplate WHERE DeveloperName='Propuesta_comercial'")
+                        .then( function( res ) {
+                            console.log('plantilla email: ', res)
+                            ctcUtils.app.emailTemplate = res && res.length > 0 ? res[0] : {}
+                        }).catch( function( err ) {
+                            console.log('error getPlantillaPropuesta: ', err )
+                            ctcUtils.showError(err)
+                        })
+                    }
+
+                    // if( vm.opportunity.Familia__c.length > 0 ) {
+                    //     //vm.describir()
+                    // } else {
+                    //     vm.errors.push('Debe definir una familia en la Oportunidad')
+                    // }
+
+                }
+
+                function ElementHtml($compile, $interval, $timeout) {
+                    var directive = {
+                        link: link,
+                        restrict: 'EA',
+                        replace: true,
+                        template: '<div/>',
+                    }
+
+                    return directive
+
+                    function link(scope, element, attrs, model) {
+
+                        scope.renderElement = function() {
+                            if(scope.producto && scope.producto.$$hashKey) {
+                                var count = 0
+                                var key = scope.producto.$$hashKey
+                                var html = '<tr id="trprod_' + key + '"><td/><td>Comparar con:</td><td colspan="3"><ctc-input ctc-instance="prodComp" ctc-field="sc.schema.Product2.clonProducto" ctc-form="cotizacion.formCotiza" ctc-opts="producto.ComparadosLista" ctc-label="[\'Name\']" ctc-on-change="prod.selectProductoChild"></ctc-input></td><td><a ng-if="producto.productosComparar.length > 1 && ( !cotizacion.Id || (cotizacion.Id && cotizacion.IsSyncing))" ng-click="prod.eliminarChildProduct(producto.productosComparar, $index, producto)" class="btnb btnb-sm btnb-danger" uib-tooltip="Eliminar producto comparado" > <span class="fa fa-trash"></span> </a> <a ng-if="prodComp.Name__o && sc.opportunity.StageName == \'Cotización\'" ng-click="prod.seleccionarChildProduct(producto, prodComp, cotizacion.soluciones)" class="btnb btnb-sm btnb-info" uib-tooltip="Utilizar éste producto como principal"  style="" tooltip-append-to-body="true" > <span class="fa fa-refresh"></span> </a></td></tr>'
+
+                                var interval = $interval(function() {
+                                    var tr = $('[id="trprod_' + scope.producto.$$hashKey + '"]:last')
+                                    if(tr && tr.length > 0 || count++ > 10) {
+                                        var el = angular.element(html)
+                                        tr.after(el)
+                                        var compile = $compile(el)(scope)
+                                        tr.after(compile)
+                                        $interval.cancel(interval)
+                                    }
+                                }, 300)
+                            }
+                        }
+                        $timeout(function() {
+                            scope.renderElement()
+                        }, 500)
+                    }
+                }
+            })()
+        </script>
+        <style type="text/css">
+            h1, h2, h3, h4, h5, h6 {
+                display: block;
+            }
+            .well {
+                min-height: 10px;
+                padding: 0px;
+                margin-bottom: 0px;
+            }
+            .ctc-famila {
+                font-weight: bold;
+            }
+            .ctc-column-product {
+                width: 300px;
+            }
+            .ctc-column {
+                width: 200px;
+            }
+            .btn-add-plan {
+                color: #3e8f3e;
+            }
+            .btn-info-plan {
+                color: #28a4c9;
+            }
+            .btn-success-plan {
+                color: #398439;
+            }
+            .ctc-select-date {
+                display: none;
+            }
+            .ctc-datepicker {
+                width: 100%;
+            }
+            .form-control {
+                /*text-align: center;*/
+            }
+            ul li, ol li {
+                margin-left: inherit;
+            }
+            .ctc-error {
+                position: fixed;
+                z-index: 99;
+                right: 20px;
+                width: 98%;
+                top: 10em;
+            }
+            .cot-actual {
+                color: #3e8f3e;
+            }
+
+            .producto-container {
+                margin-top: 15px;
+            }
+
+            .table-container {
+                padding-top: 10px;
+            }
+
+            .producto-comparar {
+                margin-top: 5px; 
+                padding-right: 70px; 
+                position: relative;
+            }
+
+            .producto-comparar-eliminar {
+                position: absolute;
+                right: 0;
+                margin-right: 51px;
+                margin-top: 2px;
+            } 
+
+            .producto-comparar-seleccionar {
+                position: absolute; 
+                right: 0;
+                margin-right: 16px;
+                margin-top: 2px;
+            }
+            .regresar-opp {
+                font-size: 12px;
+            }
+            td {
+                vertical-align: middle !important;
+            }
+            .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+                border-top: #337ab7 solid 3px;
+            }
+            .nav-tabs {
+                border-bottom: 3px solid #337ab7;
+                margin-bottom: 5px;
+            }
+            .nav-tabs>li {
+                margin-bottom: -3px;
+            }
+            .tr-conceptos > td{
+                /*height: 71px;
+                min-height: 71px;*/
+            }
+            .col-costo {
+                max-width: 100px;
+                word-wrap: break-word;
+                width: 100px;
+                white-space: normal;
+            }
+            .lbl-th {
+                vertical-align: middle !important;
+                max-width: 200px !important;
+                word-wrap: break-word;
+                white-space: normal;
+                min-width: 200px;
+                font-size: 12pt;
+            }
+            .btn-add-cot {
+                margin-left: 5px;
+            }
+            .lbl-date {
+                padding-top: 0px !important;
+                padding-bottom: 0px;
+                text-align: center !important;
+            }
+            @media (min-width: 1200px) {
+                .panel-costos {max-width: 1190px; }
+            }
+            @media (min-width: 1250px) {
+                .panel-costos {max-width: 1250px; }
+            } 
+            @media (min-width: 1300px) {
+                .panel-costos {max-width: 1290px; }
+            }
+            @media (min-width: 1350px) {
+                .panel-costos {max-width: 1350px; }
+            }  
+            @media (min-width: 1400px) {
+                .panel-costos {max-width: 1390px; }
+            }  
+            @media (min-width: 1450px) {
+                .panel-costos {max-width: 1450px; }
+            } 
+            @media (min-width: 1500px) {
+                .panel-costos {max-width: 1490px; }
+            } 
+            @media (min-width: 1550px) {
+                .panel-costos {max-width: 1550px; }
+            } 
+            @media (min-width: 1600px) {
+                .panel-costos {max-width: 1590px; }
+            } 
+            @media (min-width: 1650px) {
+                .panel-costos {max-width: 1650px; }
+            }   
+            @media (min-width: 1700px) {
+                .panel-costos {max-width: 1690px; }
+            }   
+            @media (min-width: 1750px) {
+                .panel-costos {max-width: 1750px; }
+            } 
+            @media (min-width: 1800px) {
+                .panel-costos {max-width: 1790px; }
+            }
+            @media (min-width: 1850px) {
+                .panel-costos {max-width: 1850px; }
+            }
+            @media (min-width: 1900px) {
+                .panel-costos {max-width: 1890px; }
+            }
+            @media (min-width: 1950px) {
+                .panel-costos {max-width: 1950px; }
+            }
+            @media (min-width: 2000px) {
+                .panel-costos {max-width: 1990px; } 
+            }
+            .separador-notas {
+                /*border-right: 3px solid !important;*/
+                border-right: 4px solid #337ab7 !important;
+                min-width: 75px;
+                max-width: 75px;
+                border-left: transparent !important;
+            }
+            .separador-notas-left {
+                border-left: 4px solid #337ab7 !important;
+                border-right: transparent !important;
+            }
+            .sep-rigth {
+                border-right: transparent !important;
+            }
+            .sep-left {
+                border-left: transparent !important;
+            }
+            .sep-concepto {
+                min-width: 200px;
+            }
+            ctc-input {
+                text-align: right !important;
+            }
+            .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+                /*vertical-align: middle;*/
+                padding: 2px;
+            }
+
+            .td-block {
+                background-color: #f9f9f9;
+            }
+            .lbl-libre {
+                position: absolute;
+                top: 10px;
+                right: -5px;
+            }
+            .btn-comision {
+                position: absolute;
+                top: -7px;
+                right: -2px;
+            }
+            .comision-sel {
+                font-weight: bold;
+                font-size: 18px;
+            }
+            .btn-white, .btn-white:focus, .btn-white:hover {
+                color: white;
+            }
+            .th-producto, .th-envios {
+                width: 120px;
+            }
+            .th-acciones {
+                width: 140px !important;
+            }
+            .popover {
+                min-width: 350px !important;
+                max-width: 400px !important;
+            }
+            .btnSaveCot {
+                position: fixed;
+                bottom: 5px;
+                width: 92%;
+            }
+            .lbl-no-aplica {
+                color: rgba(119, 119, 119, 0.72);
+                font-style: italic;            
+            }
+            .help-text {
+                position: absolute;
+                top: 7px;
+                left: -15px;
+            }
+            .text-green-bold {  
+                color: #70AD47; 
+                font-weight: bold;  
+            }
+
+            /******* LOGIN *****/
+            .ctc-panel-title {
+                background: #97ba59 !important; /* Old browsers */
+                background: -moz-linear-gradient(top, #97ba59 0%, #016800 100%) !important; /* FF3.6+ */
+                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#97ba59), color-stop(100%,#016800)) !important; /* Chrome,Safari4+ */
+                background: -webkit-linear-gradient(top, #97ba59 0%,#016800 100%) !important; /* Chrome10+,Safari5.1+ */
+                background: -o-linear-gradient(top, #97ba59 0%,#016800 100%) !important; /* Opera 11.10+ */
+                background: -ms-linear-gradient(top, #97ba59 0%,#016800 100%) !important; /* IE10+ */
+                background: linear-gradient(to bottom, #97ba59 0%,#016800 100%) !important; /* W3C */
+                filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#97ba59', endColorstr='#016800',GradientType=0 ) !important; /* IE6-9 */
+                border-bottom: 1px solid #fff;
+            }
+            .ctc-panel {
+                background: none repeat scroll 0 0 #FFFFFF;
+                border: 1px solid #767676;
+                box-shadow: 0 0 5px 2px #a0a0a0;
+            }
+            .ctc-panel-title h1 {
+                color: #fff;
+                font-size: 1.5em;
+                font-weight: bold;
+            }
+            .ctc-login {
+                margin-top: 10em;
+            }
+
+            .ctc-user {
+                padding-left: 30px;
+            }
+            .ctc-user-icon {
+                position: absolute;
+                top: 10px;
+                left: 25px;
+            }
+            .ctc-login-body {
+                margin-top: 2em;
+                margin-bottom: 2em;
+            }
+
+            /******* LOGIN *****/
+            .ctc-panel-title {
+                background: #97ba59 !important; /* Old browsers */
+                background: -moz-linear-gradient(top, #97ba59 0%, #016800 100%) !important; /* FF3.6+ */
+                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#97ba59), color-stop(100%,#016800)) !important; /* Chrome,Safari4+ */
+                background: -webkit-linear-gradient(top, #97ba59 0%,#016800 100%) !important; /* Chrome10+,Safari5.1+ */
+                background: -o-linear-gradient(top, #97ba59 0%,#016800 100%) !important; /* Opera 11.10+ */
+                background: -ms-linear-gradient(top, #97ba59 0%,#016800 100%) !important; /* IE10+ */
+                background: linear-gradient(to bottom, #97ba59 0%,#016800 100%) !important; /* W3C */
+                filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#97ba59', endColorstr='#016800',GradientType=0 ) !important; /* IE6-9 */
+                border-bottom: 1px solid #fff;
+            }
+            .ctc-panel {
+                background: none repeat scroll 0 0 #FFFFFF;
+                border: 1px solid #767676;
+                box-shadow: 0 0 5px 2px #a0a0a0;
+            }
+            .ctc-panel-title h1 {
+                color: #fff;
+                font-size: 1.5em;
+                font-weight: bold;
+            }
+            .ctc-login {
+                margin-top: 10em;
+            }
+
+            .ctc-user {
+                padding-left: 30px;
+            }
+            .ctc-user-icon {
+                position: absolute;
+                top: 10px;
+                left: 25px;
+            }
+            .ctc-login-body {
+                margin-top: 2em;
+                margin-bottom: 2em;
+            }
+
+            .container {
+                width: 99%;
+            }
+            .horizontal-collapse {
+                height: 70px ;
+            }
+            .navbar-collapse.in {
+                overflow-y: hidden ;
+            }
+            .navbar-inverse {
+                border-radius: 0px;
+            }
+            .ctc-btn {
+                cursor: pointer;
+            }
+            .animate-10sg {
+                -webkit-animation-iteration-count: 10;
+                animation-iteration-count: 10;
+            }
+            .ctc-icon-reference {
+                position: absolute;
+                top: 10px;
+                left: 8px;
+                opacity: .7;
+            }
+            .ctc-input-reference {
+                padding-left: 25px;
+            }
+            .msg-error-input {
+                position: absolute;
+                /*top: -2px;
+                right: 15px;*/
+                top: 0px;
+                right: 0px;
+            }
+            .modal-lg {
+                width: 98%;
+            }
+            .ctc-title {
+                font-size: 16px;
+            }
+            .ctc-lbl-default {
+                color: #777;
+            }
+            .ctc-lbl-success {
+                color: #5cb85c;
+            }
+            .ctc-lbl-danger {
+                color: #d9534f;
+            }
+            .ctc-datepicker {
+                width: 65%;
+            }
+            .ctc-select-date {
+                position: absolute;
+                top: 15px;
+                right: 0px;
+                font-size: 9pt;
+                /*opacity: .12;*/
+                /*text-decoration: underline;*/
+            }
+            .ctc-select-date:hover, .ctc-select-date:focus, .ctc-select-date:active {
+                opacity: 1;
+            }
+            .label {
+                font-size: 70%;
+            }
+            .page-header {
+                margin: 15px 0 20px;
+            }
+            .ctc-input-base {
+                position: relative;
+            }
+            .btn-ctc-edit {
+                position: absolute;
+                top: 15%;
+                right: 0px;
+            }
+            .ctc-input-edit {
+                width: 95%;
+            }
+            .ctc-modal{margin-top: 15em; color: white;}
+            ul li, ol li {
+                margin-left: 0px;
+            }
+            .modal-header-danger {
+                color:#fff;
+                padding:9px 15px;
+                border-bottom:1px solid #eee;
+                background-color: #d9534f;
+                -webkit-border-top-left-radius: 5px;
+                -webkit-border-top-right-radius: 5px;
+                -moz-border-radius-topleft: 5px;
+                -moz-border-radius-topright: 5px;
+                 border-top-left-radius: 5px;
+                 border-top-right-radius: 5px;
+            }
+            .nombreProducto {
+                width: 15%;
+            }
+            .precioProducto {
+                width: 15%;
+            }
+            .fechaProducto, .nombreConcepto {
+                width: 10%;
+            }
+            .competidorProducto {
+                width: 5%;
+            }
+
+            .conceptoCostoFinal {
+                width: 8%;
+            }
+            .conceptoFecha {
+                width: 9%;
+            }
+            .conceptoDescuento {
+                width: 8%;
+            }
+            .greenCircle {
+                color:#76A797;
+            }
+            .yellowCircle {
+                color:#EAC282;
+            }
+            .redCircle {
+                color:#D86344;
+            }
+            .grayCircle {
+                color:#505050;
+            }
+        </style>
+    </body>
+</apex:page>

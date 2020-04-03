@@ -1,0 +1,91 @@
+<aura:component controller="Tickets_ValidaNumTarjeta_CONT" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="objDatosTarjeta" type="Tickets_ValidaNumTarjeta_CONT" /> 	
+    <aura:attribute name="Mensaje" type="String"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="datosVisibles" type="boolean" default="true"/>
+    
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   
+    <aura:if isTrue="{!!v.objDatosTarjeta.ValePapel}"> 
+        <lightning:card iconName="action:new_contact">
+            <aura:set attribute="title">
+                Datos de Tarjeta Tag
+            </aura:set>
+
+             <div class="slds-form-element">
+                <label class="slds-form-element__label" for="text-input-id-1">Número de Tarjeta o Tag</label>
+                <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                    <aura:if isTrue="{!!v.objDatosTarjeta.BloqueaNumTarjeta}">
+                    <lightning:buttonIcon class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" iconName="utility:search" size="x-small" alternativeText="Evaluar Tarjeta o Tag" onclick="{!c.EvaluarNumTarjetaTag}"/>
+                    <input id ="txtNumTarjeta" class="slds-input" type="text" value="{!v.objDatosTarjeta.numTarjetaTag}" name="{!v.objDatosTarjeta.RealNumTarjetaTag}" />
+                     <aura:set attribute="else">
+                          <strong>{!v.objDatosTarjeta.numTarjetaTag}</strong>
+                     </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            <aura:if isTrue="{!v.Spinner}">
+                        <div aura:id="spinnerId" class="slds-spinner_container">
+                            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </aura:if>
+            <strong>{!v.Mensaje}</strong>
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_small">      
+                
+                <aura:if isTrue="{!v.datosVisibles}">
+                         <span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                            Producto
+                    </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            {!v.objDatosTarjeta.NomProducto}	
+                         </span>
+                    <span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                            Cuenta
+                    </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            {!v.objDatosTarjeta.NomCuenta}	
+                         </span>
+                        <span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                            Estatus de la Cuenta
+                        </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            {!v.objDatosTarjeta.StatusCuenta}	
+                        </span>
+                        <span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                            Estatus de la tarjeta
+                         </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            {!v.objDatosTarjeta.Status}
+                        </span>
+                    	<span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                            Saldo
+                         </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            {!v.objDatosTarjeta.Saldo}
+                        </span>
+                    	<span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                            Referencia
+                         </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            {!v.objDatosTarjeta.Referencia}
+                        </span>
+
+                     <aura:if isTrue="{!and(notequals(v.objDatosTarjeta.IdSubCuenta, null))}">
+                    	 <span class="slds-list__item slds-size_1-of-2 test-id__field-label-container slds-form-element__label"> 
+                           <strong> SubCuenta </strong>
+                         </span>
+                        <span class="slds-list__item slds-size_1-of-2"> 
+                            <strong>{!v.objDatosTarjeta.IdSubCuenta}</strong>
+                        </span>
+                     </aura:if>
+                </aura:if>
+            </div>
+        </lightning:card>
+    </aura:if>
+</aura:component>

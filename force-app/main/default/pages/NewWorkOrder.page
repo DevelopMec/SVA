@@ -1,0 +1,45 @@
+<apex:page controller="NewWorkOrderController" tabStyle="WorkOrder" >
+    <apex:form >
+
+        <apex:pageBlock title="Nueva orden de trabajo" mode="edit">
+            <apex:pageMessages />
+
+            <apex:pageBlockButtons >
+                <apex:commandButton rendered="{!isEtapaImplementacion}" value="Guardar" action="{!insertWorkOrder}"/>
+                <apex:commandButton value="Cancelar" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+           
+            <apex:pageBlockSection title="Información de Cuenta y Opp" columns="2"> 
+                <apex:inputField value="{!newWorkOrder.AccountId}"/>
+                <apex:inputField value="{!newWorkOrder.Oportunidad__c}"/>        
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Información de Cuenta y Opp" columns="2"> 
+                <apex:inputField value="{!newWorkOrder.ParentWorkOrderId}"/>
+                <apex:inputField value="{!newWorkOrder.Estatus__c}"/>        
+                <apex:inputField value="{!newWorkOrder.FechaPedidoFondos__c }" />
+                <apex:inputField value="{!newWorkOrder.FechaPrimerTransaccion__c }"/>
+                <apex:inputField value="{!newWorkOrder.NumPedido__c }"/>     
+                <apex:inputField value="{!newWorkOrder.EmailContacto__c }"/>  
+                <apex:inputField value="{!newWorkOrder.TipoTarjetaControlesTC__c}"/>  
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Detalle de Capacitación" columns="2"> 
+                <apex:inputField value="{!newWorkOrder.FechaCapacitacion__c}"/>
+               <!-- <apex:inputField value="{!newWorkOrder.OwnerId}"/>    -->    
+                <apex:inputField value="{!newWorkOrder.FechaPrevistaCapacitaci_n__c }" />
+                <apex:inputField value="{!newWorkOrder.EstatusCapacitacion__c}"/>
+                <apex:inputField value="{!newWorkOrder.Description }"/>     
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Detalle de Logística" columns="2"> 
+                <apex:inputField value="{!newWorkOrder.FechaPedido__c }"/>
+                <apex:inputField value="{!newWorkOrder.FechaEstimadaEntrega__c }"/>        
+                <apex:inputField value="{!newWorkOrder.FechaEntrega__c  }" />  
+            </apex:pageBlockSection>
+            
+           
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

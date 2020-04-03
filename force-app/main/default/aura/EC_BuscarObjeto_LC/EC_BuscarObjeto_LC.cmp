@@ -1,0 +1,33 @@
+<aura:component controller="EC_ListaEntidadLegal_LC_Ctrl">
+<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js',
+										$Resource.CTC_BASE + '/jquery/jquery331.min.js',
+										$Resource.CTC_BASE + '/bootstrap/typeahead/typeahead.bundle.js'
+    						)}"
+    				styles="{!join(',', $Resource.CTC_BASE + '/bootstrap/typeahead/typeahead.css',
+    									$Resource.CTC_BASE + '/font-awesome/css/font-awesome.min.css'
+    						)}"
+    						afterScriptsLoaded="{!c.init}"
+    				/> 
+	<aura:attribute name="field" type="Map" default="{}" />
+    <aura:attribute name="instance" type="Map" default="{}" />
+    <aura:attribute name="auraAction" type="String"  />
+    <aura:attribute name="params" type="String"  />
+    <aura:attribute name="renderProperties" type="String"  />
+    <aura:attribute name="selectedProperty" type="String"  />
+    <aura:attribute name="hasError" type="Boolean"  />
+    <aura:attribute name="messageError" type="String"  />
+    <aura:attribute name="paramSearch" type="String"  default="query"/>
+    <aura:attribute name="minLength" type="Integer"  default="1"/>
+    <aura:attribute name="fireEvent" type="String" />
+
+    <aura:registerEvent name="Event_Selected" type="c:EC_SeleccionaCodigoPostal_LE" />
+
+
+
+	<div class="has-feedback containerInputTypeahead">
+        <input id="{!globalId + '_inputSearch'}" type="text" class="slds-input inputSearchTypeAhead" value="{!v.instance.Contacto__r.Name}" onchange="{!c.changeInput}" />
+        <span class="fa fa-search iconSearchTypeAhead"></span>
+        <span class="glyphicon glyphicon-search form-control-feedback"></span>
+    </div>
+			
+</aura:component>

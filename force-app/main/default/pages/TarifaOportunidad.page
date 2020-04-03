@@ -1,0 +1,693 @@
+<apex:page standardController="Opportunity" extensions="TarifaOportunidadController" docType="html-5.0" standardStylesheets="false" showHeader="false" sidebar="false" >
+    
+    <!--JQUERY-->
+    <apex:includeScript value="{!URLFOR($Resource.jquery)}" />
+    <apex:includeScript value="{!$Resource.jqueryblock}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.min.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.css')}" />
+    <!--BOOTSTRAP-->
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap,'dist/js/bootstrap.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap,'dist/css/bootstrap.css')}" />
+    <!--MULTISELECT-->
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapMultiselectMaster,'bootstrap-multiselect-master/dist/js/bootstrap-multiselect.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrapMultiselectMaster,'bootstrap-multiselect-master/dist/css/bootstrap-multiselect.css')}" />
+    <script>
+    
+    j$ = jQuery.noConflict();
+    
+            function validaDescuento(este,clase){
+                var cadena = '#'+j$(este).attr('id');
+                clase=clase.trim();
+                //var importeFijo=j$(este).attr('valor');
+                var importe=j$(este).attr('valor');
+                var desc =j$(este).val();
+				var producto =j$(este).attr('numeroProducto');
+                
+                importe=importe-(importe*desc)/100;
+                
+                console.log(importe);
+                console.log(producto);
+                if(j$(este).val()>100){
+                    alert('El importe aplicable debe ser positivo');
+                    j$('.valorPorcentual'+clase).val(null);
+                }else{
+                    if((producto==60||producto==52)&&importe<30){
+                        alert('El importe aplicable debe ser mayor a 30');
+                        j$('.valorPorcentual'+clase).val(null);
+                    }
+                }
+                console.log(j$(este).val());
+            }
+    
+    </script>
+    <style>
+        .alignText{
+        text-align: right;
+        } 
+        .pad{ 
+        padding: 1em;
+        }
+        .inputField{
+        width: 90%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        }
+        .format{
+        border: none !important;
+        background-color: white !important;
+        }
+        .campoEntrada{
+        color: #444 !important;
+        }
+        .multiselect {
+        background-color:rgba(255,255,255,1) !important;
+        white-space: normal !important;
+        }
+        .has-error .form-control{
+        border-color: #CC090F;
+        }
+        .has-error .form-control:focus {
+        border-color: #CC090F;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 15px #CC090F;
+        box-shadow: inset 0 1px px rgba(0, 0, 0, 0.075), 0 0 15px #CC090F;
+        }
+        .alert-danger, .alert-success{
+        position:   fixed;
+        z-index:    100;
+        }
+        .error{
+        position: inherit !important;
+        }
+        .errorMsg{
+         color: #CC090F;
+        }
+        .aplicaTarifa-false{
+        display:none;
+        }
+    </style>
+    
+    <div class="container bs-docs-container" id="contenedorPrincipal">
+        <apex:form id="forma"  >
+            
+            <apex:actionFunction name="buscar" action="{!buscar}" status="statusBuscar" reRender="forma,sinTipoSolucion,panelBonificaciones,JSTable" oncomplete="ocultarColumnas();" />
+            <apex:actionFunction name="buscarTipoSolucion" action="{!buscar}" status="statusBuscar" reRender="forma,lsTarifas,panelBonificaciones,JSTable" />
+            <apex:actionFunction name="buscarSubproductos" action="{!buscar}" reRender="JSTable, lsTarifas, subproductosSeleccionados"/>
+            <apex:actionFunction name="guardar" action="{!guardar}" reRender="" status="guardarEstatus" />
+            <apex:actionFunction name="agregarTarifasSeleccionadas" action="{!agregarTarifas}" reRender="lsTarifas,JSTable,panelBonificaciones" status="statusAgregarTarifas">
+            	<apex:param name="tarifaId" value=""/>
+            	<apex:param name="index" value=""/>
+            </apex:actionFunction>
+            
+            <apex:actionStatus onstart="j$('.guardarBoton').attr('disabled','disabled');onstart('contenedorPrincipal');"  onstop="onstop('contenedorPrincipal');" id="guardarEstatus" />
+            <apex:actionFunction name="agregarTarifas" action="{!agregarTarifas}" reRender="Anualidad,tipoCargoid,precio,JSTable,seleccionaTarifa,AjusteInflacion,precioEditable,porcentaje" />
+            <apex:actionFunction name="renderea" reRender="precio,porcentajeDescuento" />
+            
+            
+            <apex:actionStatus onstart="onstart('contenedorPrincipal');"  onstop="onstop('contenedorPrincipal');" id="statusAgregarTarifas" />
+            
+            <div class="row" id="contenedorPrincipal" >
+                <div class="col-md-12 ">
+                    <apex:outputPanel id="panelTabla">
+                        <div class="container bs-docs-container" id="contenedorSecundario">
+                        <section class="section">
+                            <h2 class="section-head" id="cabeceraSeccion">Selección de productos y tarifas</h2>
+                            <c:PageMessages id="errores" closableErrors="true"/>
+                            <c:Panel title="Tarifas" idCollapse="panelGeneral"  id="adme" idParent="panelParent" expanded="true">
+                                <div class="row pad">
+                                    <c:PanelCell label="Volumen de comisión" for="volEmision">
+                                        <div class="text-left">
+                                            <apex:outputText value="${!IF(oportunidad.VolumenComision__c==null,0,oportunidad.VolumenComision__c)}"  styleClass="form-control-static" id="volEmision" />
+                                        </div>
+                                    </c:PanelCell>
+                                    <c:PanelCell label="Comisión por emisión" for="comisionEmision">
+                                        <div class="text-left">
+                                            <apex:outputText value="{!IF(oportunidad.ComisionEmision__c==null,0,oportunidad.ComisionEmision__c)}%"  styleClass="form-control-static" id="comisionEmision" />
+                                        </div>
+                                    </c:PanelCell>
+                                </div>
+                                
+                                <div class="row pad">
+                                    <c:PanelCell label="Ingresa el nombre del producto" for="productos"> 
+                                        <apex:inputText disabled="{!!esNuevo}" value="{!productoSeleccionado}"  styleClass="form-control"  id="productoSeleccionado" />
+                                    </c:PanelCell> 
+                                    <button id="buscarTarifas" type="button" class="btn btn-primary" onclick="buscar();">Obtener tarifas de producto</button>
+                                    <apex:actionStatus onstart="onstart('contenedorPrincipal');"  onstop="onstop('contenedorPrincipal');" startText=" ( buscando...)" stopText="" id="statusBuscar" />
+                                </div>
+                                
+                                <div class="row pad">
+                                    <c:PanelCell label="Producto seleccionado" for="productoSeleccionado">
+                                        <div class="text-left">
+                                            <apex:outputText value="{!productoSeleccionado}"  styleClass="form-control-static" id="productoSeleccionado" />
+                                        </div>
+                                    </c:PanelCell> 
+                                    <c:PanelCell label="Uso" for="uso">
+                                        <div class="text-left">
+                                            <apex:selectList disabled="{!IF(NOT(esNuevo)||desactivaUso,true,false)}" id="uso" size="1" multiselect="false" styleClass="form-control" value="{!usoActual}" >
+                                                <apex:selectOptions value="{!usos}"/>
+                                            </apex:selectList>
+                                        </div>
+                                    </c:PanelCell>
+                                </div>
+                                <div class="row pad">
+                                    <c:PanelCell label="Familia necesidades" for="familia"> 
+                                        <div class="text-left">
+                                            <apex:outputField value="{!producto.FamiliaNecesidades__c}"  styleClass=" format form-control-static" id="familia" />
+                                        </div>
+                                    </c:PanelCell>
+                                    <c:PanelCell rendered="{!activaTipoSolucion}" label="Tipo de solución" for="tipoSolucion">
+                                        <div class="text-left {!IF(tarifaOportunidadGlobal.TipoSolucion__c == null,'has-error','')}">
+                                            <apex:inputField id="tipoSolucion" value="{!tarifaOportunidadGlobal.TipoSolucion__c}" styleClass="form-control" rendered="{!activaTipoSolucion}" onchange="buscarTipoSolucion();" />
+                                        </div>
+                                    </c:PanelCell>
+                                </div>
+                                
+                                <apex:outputPanel rendered="{!tieneSubproducto}">
+                                
+                                <div class="row pad">
+                                    <c:PanelCell label="SubProductos" for="subproducto">
+                                        <div class="text-left">
+                                            <apex:selectList id="subproducto" size="4" disabled="{!!esNuevo}" onchange="buscarSubproductos();" html-multiple="multiple" multiselect="true"  value="{!subproductosSeleccionados}" rendered="{!tieneSubproducto}" styleClass="form-control subprod" >
+                                                <apex:selectOptions value="{!subproductos}"/>
+                                            </apex:selectList>
+                                        </div>
+                                    </c:PanelCell>
+                                    <apex:outputPanel id="subproductosSeleccionados" >
+                                        <c:PanelCell label="SubProductos seleccionados" for="subproductos">
+                                            <apex:outputText id="subproductoS" value="{!subproductosSeleccionados}"/>
+                                        </c:PanelCell>
+                                    </apex:outputPanel>
+                                </div> 
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel id="lsTarifas">
+                                    <div>
+                                        <table id="listaNecesidades" class=" campoEntrada table table-bordered table-striped table-responsive" >
+                                            <thead>
+                                                <tr  >
+                                                    <th class="sinSubproductos text-center" >
+                                                        <label style="display:block; "> ¿Aplica tarifa? </label>
+                                                        <!--
+                                                        <apex:inputCheckbox value="{!seleccionaTodo}" onchange="selectAll();" />
+-->
+                                                    </th>
+                                                    
+                                                    <th> 
+                                                        <label> Nombre de tarifa </label>
+                                                    </th>
+                                                    <th>
+                                                        <label> Tarifa base </label>
+                                                    </th>
+                                                    
+                                                    <th class="sinSubproductos" >
+                                                        <label> Ajuste por inflación </label>
+                                                    </th>
+                                                    
+                                                    <th class="conSubproductos">
+                                                        <label> Porcentaje de descuento </label>
+                                                    </th>
+                                                    
+                                                    <th>
+                                                        <label> Importe / Porcentaje </label>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <apex:variable value="{!0}" var="cnt"/>
+                                            <apex:repeat id="repetidor" value="{!catalogoTarifas}" var="tar" >
+                                                <tr > 
+                                                    <td  class="text-center sinSubproductos">
+                                                        <apex:inputCheckbox value="{!tar.aplicaTarifa }" disabled="{!esEnviado}" onchange="agregarTarifasSeleccionadas('{!tar.tarifaSeleccionada}','{!cnt}');" />
+                                                    </td>
+                                                        
+                                                    <td>
+                                                        <apex:outputField value="{!tar.tarifaOportunidad.TipoTarifa__c}"  styleClass="form-control-static" />
+                                                    </td>
+                                                    
+                                                    <td>
+                                                        <apex:selectList id="seleccionaTarifa" disabled="{!NOT(tar.aplicaTarifa)}" onchange="agregarTarifasSeleccionadas(this.value,'{!cnt}');" html-valor="{!tar.tarifa.Importe__c}" value="{!tar.tarifaSeleccionada}" multiselect="false" size="1" styleClass="form-control" readonly="{!IF(tar.tarifas.size==1,true,false)}" > 
+                                                            <apex:selectOptions value="{!tar.tarifas}"/>
+                                                        </apex:selectList>
+                                                    </td>
+                                                    
+                                                    <td class="text-center sinSubproductos" >
+                                                        <apex:inputField id="AjusteInflacion" styleClass="aplicaTarifa-{!tar.aplicaTarifa}" rendered="{!IF( tar.tarifaOportunidad.ClaveReferencia__c=='CTB1' ||tar.tarifaOportunidad.ClaveReferencia__c=='CA04'||tar.tarifaOportunidad.ClaveReferencia__c=='CG01' || (tar.tarifa.Importe__c==null ||tar.tarifa.Importe__c==0),false,true)}" value="{!tar.tarifaOportunidad.AjusteInflacion__c }" />
+                                                    </td>
+                                                    
+                                                    <td class="text-center conSubproductos" >
+                                                        <div class="{!tar.importeInvalido}">
+                                                        <apex:inputField onchange="if(j$(this).val()>100 || j$(this).val()<0){alert('Sólo se puede aplicar un descuento entre 0 y 100');j$(this).val(0);} renderea();" rendered="{!IF(tar.tarifa.Importe__c==null ||tar.tarifa.Importe__c==0,false,true)}" html-valor="{!tar.tarifa.Importe__c}" html-numeroProducto="{!tar.tarifaOportunidad.Producto__r.NumeroProducto__c }"  id="porcentajeDescuento" value="{!tar.tarifaOportunidad.Porcentaje__c }"  html-contador="{!cnt}" styleClass="form-control valorPorcentual{!cnt}" />
+                                                        </div>
+                                                        
+                                                        </td>
+                                                    
+                                                    <td class="text-center">
+                                                        <div class="{!tar.importeInvalido}">
+                                                         <apex:inputText disabled="{!esEnviado}" rendered="{!IF(tar.tarifaOportunidad.ClaveReferencia__c!='T30_4' &&(tieneSubproducto|| tar.tarifa.Importe__c==null ||tar.tarifa.Importe__c==0),false,true)}" id="precioEditable" value="{!tar.tarifaOportunidad.Importe__c}" onchange="if(j$(this).val()<{!tar.tarifa.Importe__c}){alert('El importe aplicado no puede ser menor al importe base'); j$(this).val(j$(this).closest('tr').find('.precioFijo').attr('valor'));}" styleClass="form-control text-center PrecioEditable PrecioEditable{!cnt} aplicaTarifa-{!tar.aplicaTarifa}"  />
+                                                        <apex:outputText rendered="{!IF(tar.tarifa.Importe__c==null ||tar.tarifa.Importe__c==0,false,true)}" id="precio" html-valor="{!tar.Precio}" value="${!tar.Precio} MXN" styleClass="form-control-static precioFijo precioFijo{!cnt}"/>
+                                                        <apex:inputField rendered="{!IF(tar.tarifaOportunidad.ClaveReferencia__c!='T30_4'&&( tar.tarifa.Importe__c==null ||tar.tarifa.Importe__c==0),true, false)}" html-placeholder="Ingrese un porcentaje" id="porcentaje" value="{!tar.tarifaOportunidad.Porcentaje__c}" styleClass="form-control porcentaje enviado{!esEnviado} aplicaTarifa-{!tar.aplicaTarifa}" />
+                                                        </div>
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <apex:variable var="cnt" value="{!cnt + 1}" />
+                                            </apex:repeat>
+                                        </table>
+                                    </div>
+                                    <apex:outputPanel id="Anualidad">
+                                        <apex:outputPanel id="cosasAnualidad" rendered="{!aplicaAnualidad}" >
+                                            
+                                            <h2 class="section-head"> Opciones para anualidad</h2>
+                                            
+                                            <div class="row">
+                                                <c:PanelCell label="Aplica en aniversario" for="aplicaAniversario" >
+                                                    <apex:inputCheckbox id="aplicaAniversario" value="{!aplicaAniversario}" > 
+                                                        <apex:actionSupport event="onchange" reRender="mesAplica" />
+                                                    </apex:inputCheckbox>
+                                                </c:PanelCell>
+                                                <c:PanelCell label="Mes en que aplica" for="mesAplica" >
+                                                    <apex:selectList disabled="{!NOT(aplicaAniversario)}" id="mesAplica"  value="{!mesSeleccionado}" multiselect="false" size="1"  styleClass="form-control">
+                                                        <apex:selectOptions value="{!mesAplica}"/>
+                                                    </apex:selectList>
+                                                </c:PanelCell>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                    
+                                    <!--
+                                    <div class="row" style="padding: 2em 0 !important">
+                                        <div class="col-md-4 col-md-offset-4">
+                                            <button id="mostrarBonificaciones" onclick="agregarTarifas();"   class="btn btn-success" type="button">Actualizar Tarifas en Bonificaciones</button>
+                                        </div>
+                                    </div>
+									-->
+                                </apex:outputPanel>
+                            </c:Panel>
+                            
+                            
+                            <div id="contenedorBonificaciones" >
+                                
+                            
+                            <apex:actionRegion id="areaBonificacionesEscalonamientos">
+                                <apex:actionFunction status="statusBonificaciones" name="agregarBonificaciones" action="{!agregarBonificaciones}" reRender="errores,tablaDeBonificaciones,JSTable, panelBotones" />
+                                <apex:actionFunction name="borrarBonificacion" action="{!borrarBonificacion}" reRender="panelBotones,errores,tablaDeBonificaciones,JSTable" />
+                                <apex:actionFunction name="agregarEscalonamientos" status="statusBonificaciones" action="{!agregarEscalonamientos}" reRender="panelBotones,errores,tablaDeEscalonamientos,JSTable" />
+                                <apex:actionFunction name="borrarEscalonamiento" action="{!borrarEscalonamiento}" reRender="errores,tablaDeEscalonamientos,JSTable" />
+                                <apex:actionFunction name="seleccionarTarifa" action="{!seleccionarTarifa}" reRender="tipoCargoid,escondeBonificaciones, panelBotones,panelBonificaciones,JSTable" status="statusBonificaciones" />
+                                
+                                <apex:actionStatus onstart="onstart('contenedorPrincipal');"  onstop="onstop('contenedorPrincipal');" id="statusAgregarBonificaciones" />
+                                <apex:actionStatus onstart="onstart('contenedorPrincipal');"  onstop="onstop('contenedorPrincipal');" id="statusAgregarEscalonamientos" />
+                                <apex:actionStatus onstart="onstart('contenedorBonificaciones');"  onstop="onstop('contenedorBonificaciones');" id="statusBonificaciones" />
+                                
+                                <c:Panel rendered="{!NOT(tieneSubproducto)}" title="Bonificaciones y escalonamientos" idCollapse="bonificaciones"  id="bonificaciones" idParent="panelParent" expanded="true" >
+                                    <apex:outputPanel rendered="{!sinTipoSolucion}" id="panelBonificaciones">
+                                        
+                                        <apex:outputPanel id="panelBotones">
+                                        <div class="row pad">
+                                            <c:PanelCell label="Nombre de la tarifa" for="nombreTarifa" >
+                                                <apex:selectList id="tipoCargoid" onchange="seleccionarTarifa();" value="{!tarifaBonificacion}" multiselect="false" size="1"  styleClass="form-control">
+                                                    <apex:selectOptions value="{!tarifasBonificaciones}"/>
+                                                </apex:selectList>
+                                            </c:PanelCell>
+                                            <c:PanelCell label="Valor porcentual" for="valorPorcentual" >
+                                                <apex:inputField value="{!bonificacion.ValorPorcentual__c}" type="number" styleClass="form-control" />
+                                            </c:PanelCell>
+                                        </div>
+                                            <apex:outputPanel rendered="{!IF(tarifaActual.tipoEscalonamiento=='monto',true,false)}" >
+                                        <div class="row pad">
+                                            <c:PanelCell label="Valor inicio" for="valorInicio" >
+                                                <apex:inputField value="{!bonificacion.MontoInicial__c }" type="number" styleClass="form-control" />
+                                            </c:PanelCell>
+                                            <c:PanelCell label="Valor final" for="valorFinal" >
+                                                <apex:inputField value="{!bonificacion.MontoFinal__c }" type="number" styleClass="form-control" />
+                                            </c:PanelCell>
+                                        </div>
+                                            </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!IF(tarifaActual.tarifaOportunidad.ClaveReferencia__c=='CA04',false,true)}" >
+                                        <div class="row pad">
+                                            <c:PanelCell label="Fecha de inicio" for="fechaInicio" >
+                                                <apex:inputField id="fechaInicial" value="{!bonificacion.FechaInicio__c}" showDatePicker="false" type="date" styleClass="form-control" />
+                                            </c:PanelCell>
+                                            <c:PanelCell label="Fecha final" for="fechaFinal" >
+                                                <apex:inputField id="fechaFinal" value="{!bonificacion.FechaFinal__c}" showDatePicker="false" type="date" styleClass="form-control" />
+                                            </c:PanelCell>
+                                        </div>
+                                        </apex:outputPanel>
+                                            
+                                        </apex:outputPanel>
+                                        
+                                        <div class="tabbable">
+                                            <ul class="nav nav-tabs">
+                                                <li class="active"><a href="#pane1Bonificacion" data-toggle="tab"> Bonificaciones</a></li>
+                                                <li><a href="#pane2" data-toggle="tab">Escalonamientos</a></li>
+                                                
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div id="pane1Bonificacion" class="tab-pane active">
+                                                    <apex:outputPanel id="tablaDeBonificaciones">
+                                                    <table id="lsBonificaciones" class="table table-bordered table-striped table-responsive" >
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th > 
+                                                                    <label> Nombre de tarifa </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Valor Porcentual </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Valor Inicio </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Valor Final </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Fecha de Inicio </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Fecha Final </label>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <apex:repeat id="boni" value="{!bonificacionesActuales}" var="bon" >
+                                                            <tr>
+                                                                <td class="text-center" >
+                                                                    <apex:inputCheckbox value="{!bon.checked}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputText value="{!bon.nombreTarifa}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!bon.bonificacion.ValorPorcentual__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!bon.bonificacion.MontoInicial__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!bon.bonificacion.MontoFinal__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField rendered="{!IF( bon.bonificacion.TarifaOportunidad__r.ClaveReferencia__c=='CA04',false,true)}" value="{!bon.bonificacion.FechaInicio__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!bon.bonificacion.FechaFinal__c}"/>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        </apex:repeat>
+                                                    </table>
+                                                    </apex:outputPanel>
+                                                    
+                                                    <div class="row" style="padding: 2em 0 !important">
+                                                        <div class="col-md-offset-2 col-md-4">
+                                                            <button id="bonificacionBtn" onclick="agregarBonificaciones();" class="btn btn-success" type="button">Agregar bonificación </button>
+                                                        </div>
+                                                        <div class="col-md-4 col-md-offset-1">
+                                                            <button id="borrarBonificacionBtn" onclick="borrarBonificacion();"  class="btn btn-danger" type="button">Borrar bonificación</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="pane2" class="tab-pane">
+                                                    <apex:outputPanel id="tablaDeEscalonamientos">
+                                                    <table id="lsEscalonamientos" class="table table-bordered table-striped table-responsive" >
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th>
+                                                                    <label> Tipo de Escalonamiento </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Valor Porcentual </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Valor Inicio </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Valor Final </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Fecha de Inicio </label>
+                                                                </th>
+                                                                <th>
+                                                                    <label> Fecha Final </label>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <apex:repeat id="esci" value="{!escalonamientosActuales}" var="esc" >
+                                                            <tr>
+                                                                <td class="text-center" >
+                                                                    <apex:inputCheckbox value="{!esc.checked}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputText value="{!esc.bonificacion.TipoEscalonamiento__c }"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!esc.bonificacion.ValorPorcentual__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!esc.bonificacion.MontoInicial__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!esc.bonificacion.MontoFinal__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!esc.bonificacion.FechaInicio__c}"/>
+                                                                </td>
+                                                                <td>
+                                                                    <apex:outputField value="{!esc.bonificacion.FechaFinal__c}"/>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        </apex:repeat>
+                                                    </table>
+                                                    </apex:outputPanel>
+                                                    <script>
+                                                    	console.log('Se renderizo panelBonificaciones y la tarifa actual {!tarifaActual.esTarifaEscalonamiento} \n con tarifa {!tarifaActual.tarifa.TipoCargo__c}');
+                                                    </script>
+                                                    <apex:outputPanel id="escondeBonificaciones" >
+                                                    <apex:outputPanel rendered="{!tarifaActual.esTarifaEscalonamiento}">
+                                                    <div class="row">
+                                                        <div class="col-md-offset-2 col-md-4">
+                                                            <button id="" onclick="agregarEscalonamientos();" class="btn btn-success" type="button">Agregar escalonamiento </button>
+                                                        </div>
+                                                        <div class="col-md-4 col-md-offset-1">
+                                                            <button id="" class="btn btn-danger" onclick="borrarEscalonamiento();" type="button">Borrar escalonamiento</button>
+                                                        </div>
+                                                    </div>
+                                                    </apex:outputPanel>
+                                                    </apex:outputPanel>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        
+                                    </apex:outputPanel>
+                                </c:Panel>
+                                
+                            </apex:actionRegion>
+                                </div>
+                        </section> 
+                        </div>
+                        <apex:outputPanel rendered="{!IF(muestraAnterior=='No',false,true)}" >
+                            <button style="margin-left:auto;margin-right:2%;" type="button" onclick="redirigir();" class="btn btn-danger">Anterior</button>
+                        </apex:outputPanel>
+                        
+                        
+                        <apex:commandButton styleClass="btn btn-success guardarBoton" action="{!guardar}" value="Guardar tarifas" status="guardarEstatus" reRender="forma,lsTarifas,JSTable,panelBonificaciones,JSTable" />
+                        
+                    </apex:outputPanel> 
+                </div>
+            </div>
+            
+        </apex:form>
+    </div>
+    
+    <apex:outputPanel id="JSTable">
+        <script>
+        
+        
+        
+        j$(document).ready(function(){
+            
+            var PLACEHOLDER='';
+            var nombreProducto;
+            
+            j$('[id$=forma]').bind("keypress", function(e) {
+                if (e.keyCode == 13) {               
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+            
+            
+            
+            
+            if({!esEnviado}){
+                bloquea('contenedorSecundario');
+                
+            }
+            function bloquea(contenedor){
+                j$('#'+ contenedor).block({ message: ' ' ,
+                                           css: { backgroundColor: 'none', color: '#fff',border: 'none'},
+                                           overlayCSS: { cursor: 'no-drop',backgroundColor: 'rgba(255,255,255,0)'}
+                                          }); 
+            }
+            
+            ocultarColumnas();
+            function ocultarColumnas(){
+                if({!NOT(tieneSubproducto)}){
+                    j$('.conSubproductos').css('display','none');
+                    j$('.sinSubproductos').css('display','table-cell');
+                }else{
+                    j$('.conSubproductos').css('display','table-cell');
+                    j$('.sinSubproductos').css('display','none');
+                }
+            }
+            
+            
+            if({!esNuevo}){
+            	j$('[id$=tipoSolucion]').prop('disabled', false);
+            }else{
+                j$('[id$=tipoSolucion]').prop('disabled', true);
+            }
+            
+            
+            j$('[id$=fechaFinal]').change(function(){
+                var fechaFinAct = new Date(j$('[id$=fechaFinal]').val());
+                var fechaIniAct = new Date(j$('[id$=fechaInicial]').val())
+                
+                if(fechaFinAct < fechaIniAct){
+                    alert('La fecha Final debe ser mayor o igual a la fecha Inicial');
+                    j$(this).val(null);
+                }
+            });
+            j$('[id$=fechaInicial]').change(function(){
+                var fechaFinAct = new Date(j$('[id$=fechaFinal]').val());
+                var fechaIniAct = new Date(j$('[id$=fechaInicial]').val());
+                
+                var f =new Date('{!fechaActual}');
+                
+                if(fechaIniAct < f){ 
+                   alert('La fecha Inicial debe ser mayor o igual a la fecha actual');
+                    j$(this).val(null);
+                }
+                
+                //var fecha = new Date(j$(this).val().split('-')[0],parseInt(j$(this).val().split('-')[1])-1,j$(this).val().split('-')[2]);
+                
+                if(fechaFinAct < fechaIniAct){
+                    alert('La fecha Final debe ser mayor o igual a la fecha Inicial');
+                    j$(this).val(null);
+                }
+            });
+            
+            
+            j$('[id$=subproducto]').multiselect();
+            
+            j$('[id$=productoSeleccionado]').autocomplete({
+                minLength: 1,
+                source: function(request, response) {
+                    queryTerm = request.term;
+                    TarifaOportunidadController.buscaProducto(request.term, function(result, event){
+                        if(event.type == 'exception') {
+                            alert(event.message);
+                        } else {
+                            console.log('Resultados');
+                            console.log(result);
+                            grupoObjects = result;
+                            response(grupoObjects);
+                        }
+                    });
+                },
+                focus: function( event, ui ) {
+                    nombreProducto=ui.item.Name;
+                    nombreProducto=nombreProducto.replace("&amp", "&");
+                    nombreProducto=nombreProducto.replace(";", "");
+                    j$('[id$=productoSeleccionado]').val( nombreProducto );
+                    return false;
+                },
+                select: function( event, ui ) {
+                    nombreProducto=ui.item.Name;
+                    nombreProducto=nombreProducto.replace("&amp", "&");
+                    nombreProducto=nombreProducto.replace(";", "");
+                    j$('[id$=productoSeleccionado]').val( nombreProducto );
+                    j$('[id$=familiaSelect]').val( ui.item.FamiliaNecesidades__c );
+                    j$('[id$=familia]').val( ui.item.FamiliaNecesidades__c );
+                    
+                    return false;
+                }
+            })
+            
+            .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+                nombreProducto=item.Name;
+                nombreProducto=nombreProducto.replace("&amp", "&");
+                nombreProducto=nombreProducto.replace(";", "");
+                console.debug(nombreProducto);    
+                entry = ""  + nombreProducto + "";
+                entry = entry.replace(queryTerm, "<a>" + queryTerm + "</a>");
+                return j$( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( entry )
+                .appendTo( ul );
+            };
+            
+            
+            
+            if( j$('[id$=productoSeleccionado]').val()=='')
+                j$('[id$=productoSeleccionado]').val(PLACEHOLDER);
+            j$('[id$=productoSeleccionado]').on("focus",  function(event){
+                $tgt = j$(event.target);
+                if($tgt.val() === PLACEHOLDER ){
+                    $tgt.val('');
+                    $tgt.removeClass('placeHolder');
+                }
+            });
+            j$('[id$=productoSeleccionado]').on( "blur",  function(event){
+                $tgt = j$(event.target);
+                if($tgt.val() === '' ){
+                    $tgt.val(PLACEHOLDER);
+                    $tgt.addClass('placeHolder');
+                }
+            });
+            
+        });
+        
+        
+        </script>
+    </apex:outputPanel>
+    <script>
+    function onstart(contenedor){
+        j$('#'+ contenedor).block({ message: '<h1><img src="{!$Resource.loading}"/></h1>' ,
+                                   css: { backgroundColor: 'none', color: '#fff',border: 'none'},
+                                   overlayCSS: { backgroundColor: '#fff'}
+                                  }); 
+    }
+    
+    function onstop(contenedor){
+        j$('#'+ contenedor).unblock(); 
+    }
+    </script>
+    
+    <script> 
+    
+    function regresar(){
+        location.href = document.referrer;
+    }
+    
+    function redirigir(){
+        if ( (typeof sforce != 'undefined') && (sforce != null) ) {
+            sforce.one.navigateToSObject("{!idOportunidad}");
+            
+        }else{
+            var dir="/"+"{!idOportunidad}";
+            window.location.href=dir;
+        } 
+    }
+    
+    </script>
+    
+</apex:page>

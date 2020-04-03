@@ -1,0 +1,93 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="CON_OppDocChecklist_CTRL">
+	
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	
+	<!-- Displayed Data -->
+	<aura:attribute name="documents" type="Object[]"/>
+	<aura:attribute name="documentsEL" type="Object[]"/>
+	<!-- Displayed Data -->
+	
+	<!-- Logical Flags -->
+	<aura:attribute name="loading" type="Boolean" default="false"/>
+	<aura:attribute name="typeOfPerson" type="String" default=""/>
+	<aura:attribute name="isForeign" type="Boolean"/>
+	<!-- Logical Flags -->
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="alerts" type="Object[]"/>
+	<!-- Utility Attributes -->
+	
+	<lightning:card iconName="standard:document">
+		<aura:iteration items="{!v.alerts}" var="alert">
+			<aura:if isTrue="{!alert.isVisible}">
+				<div class="slds-m-horizontal_medium">
+					<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+						<span class="slds-assistive-text">warning</span>
+						<span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small">
+							<lightning:icon iconName="utility:warning" size="small"/>
+						</span>
+						<h2>{!alert.description}</h2>
+					</div>
+				</div>
+			</aura:if>
+		</aura:iteration>
+		<aura:set attribute="title">
+			<strong class="slds-text-heading_small">Documentos Adjuntos</strong>
+		</aura:set>
+		<div class="slds-p-horizontal_small">
+			<aura:iteration items="{!v.documents}" var="document" indexVar="index">
+				<aura:if isTrue="{!v.loading}">
+					<lightning:spinner variant="brand" size="large" alternativeText="Cargando Documento"/>
+				</aura:if>
+				<aura:if isTrue="{!document.isVisible}">
+					<lightning:layout horizontalAlign="center" multipleRows="true" verticalAlign="center">
+						<lightning:layoutItem flexibility="shrink" padding="around-small" size="3">
+							<div>
+								<!-- <lightning:helptext content="{!document.name}"/> -->
+								<strong>{!document.name}</strong>
+							</div>
+						</lightning:layoutItem>
+						<aura:if isTrue="{!!document.loaded}">
+
+							<lightning:layoutItem flexibility="shrink" padding="around-small" size="9" class="slds-align_absolute-center">
+								<lightning:fileUpload recordId="{!v.recordId}" label="" name="{!document.name + '-' + document.apiName}" accept=".pdf,.PDF" onuploadfinished="{!c.handleUploadDoc}"/>
+							</lightning:layoutItem>
+
+							<aura:set attribute="else">
+								<lightning:layoutItem flexibility="shrink" padding="around-small" size="9" class="doc-buttons-position">
+									<lightning:layout horizontalAlign="center" multipleRows="false">
+										<lightning:layoutItem size="6">
+											<lightning:fileUpload recordId="{!v.recordId}" label="" name="{!document.Id + '-' + document.name + '-' + document.apiName}" accept=".pdf,.PDF" onuploadfinished="{!c.handleEditDoc}" class="slds-align_absolute-center fileUploadEdenred"/>
+										</lightning:layoutItem>
+
+										<lightning:layoutItem size="6">
+											<lightning:buttonGroup class="slds-align_absolute-center btnsEdenred">
+												<lightning:button label="Descargar" name="{!document.Id + '-' + document.contentVersionId}" variant="neutral" onclick="{!c.handleDownloadDoc}"/>
+												<lightning:button label="Eliminar" name="{!document.Id + '-' + document.name + '-' + document.apiName}" variant="neutral" onclick="{!c.handleDeleteDoc}"/>
+											</lightning:buttonGroup>
+										</lightning:layoutItem>
+									</lightning:layout>
+
+								</lightning:layoutItem>
+							</aura:set>
+						</aura:if>
+					</lightning:layout>
+				</aura:if>
+			</aura:iteration>
+			<aura:if isTrue="{!v.documentsEL.length > 0}">
+				<div class="slds-section slds-is-open">
+					<h3 class="slds-section__title slds-theme_shade">
+							<span class="slds-truncate slds-p-horizontal_small" title="Section Title">Documentos de entidad legal</span>
+					</h3>
+				</div>
+				<lightning:layout multipleRows="true">
+					<aura:iteration items="{!v.documentsEL}" var="document" indexVar="index">
+						<lightning:layoutItem flexibility="shrink" padding="around-small" size="12" class="ctcItem">
+							<lightning:button label="{!document.ContentDocument.Title}" name="{! document.ContentDocumentId + '-' + document.ContentDocument.LatestPublishedVersionId}" variant="base" onclick="{!c.handleDownloadDoc}"/>
+						</lightning:layoutItem>
+					</aura:iteration>
+				</lightning:layout>
+			</aura:if>
+		</div>
+	</lightning:card>
+</aura:component>

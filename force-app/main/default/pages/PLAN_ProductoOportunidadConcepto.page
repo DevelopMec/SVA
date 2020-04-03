@@ -1,0 +1,13 @@
+<apex:page showHeader="true" sidebar="true" standardController="OpportunityLineItem" extensions="PLAN_ProductoOportunidadConceptoCtrl">
+
+	<apex:pageBlock title="Productos Concepto" mode="view" rendered="{!If(productos != null,true,false)}">
+    	<apex:pageBlockTable value="{!productos}" var="producto">
+            <apex:column value="{!producto.Concepto__r.TipoCargo__c}"/>
+            <apex:column value="{!producto.Concepto__r.Name}"/>
+            <apex:column value="{!producto.Bonificacion__c}"/>
+            <apex:column value="{!producto.PrecioLista__c}"/>
+            <apex:column value="{!producto.PrecioFinal__c}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    <!-- <h3 rendered="{!If(productos == null,true,false)}">Sin información</h3> -->
+</apex:page>

@@ -1,0 +1,61 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TicketValidacionCampos_CONT">
+    <aura:attribute name="campos" type="List" access="global"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="mensaje" type="String"/>
+    <aura:attribute name="tipo" type="String"/>
+    <aura:attribute name="spin" type="boolean" default="false"/>
+    <aura:attribute name="mostrar" type="boolean" default="false"/>
+    <aura:attribute name="esPropietario" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    <lightning:card>
+        <aura:if isTrue="{!v.spin}">
+            <lightning:spinner size="large"/>
+        </aura:if>
+        <aura:if isTrue="{!v.mostrar}">
+            <div class="slds-m-around_medium">                
+                <center>
+                    <div class="slds-text-title_caps slds-m-around_small" style="font-weight:bold;">Campos obligatorios</div>
+                </center>
+                <aura:if isTrue="{!!v.esPropietario}">
+                    <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="Case">
+                        <div>
+                            <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                                <aura:iteration items="{!v.campos}" var="campo">
+                                    <div class="slds-size_1-of-2">
+                                        <lightning:outputField fieldName="{!campo}" />
+                                    </div>                          
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </lightning:recordViewForm>
+                </aura:if>
+                <aura:if isTrue="{!v.esPropietario}">
+                    <lightning:recordEditForm  recordId="{!v.recordId}" objectApiName="Case" onsuccess="{!c.guardadoTerminado}" onsubmit="{!c.inicioGuardar}" onerror="{!c.errorGuardar}">                    
+                        <div>
+                            <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                                <aura:iteration items="{!v.campos}" var="campo">
+                                    <div class="slds-size_1-of-2">
+                                        <lightning:inputField fieldName="{!campo}" />
+                                    </div>                          
+                                </aura:iteration>
+                            </div>
+                        </div>
+                        <div class="slds-m-top_medium">
+                            <center>
+                                <lightning:button disabled="{!v.disabled}" variant="brand" type="submit" name="Guardar" label="Guardar" />
+                            </center>                    
+                        </div>
+                    </lightning:recordEditForm>
+                </aura:if>
+            </div>
+            <aura:set attribute="else">
+                <ui:message class="slds-m-around_large" title="Información" severity="{!v.tipo}" closable="false">
+                    {!v.mensaje}
+                </ui:message>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+</aura:component>

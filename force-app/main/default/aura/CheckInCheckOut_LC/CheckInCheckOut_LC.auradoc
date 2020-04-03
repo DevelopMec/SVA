@@ -1,0 +1,27 @@
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="ExampleName" ref="exampleComponentName" label="Label">
+		Example Description
+    <p>Changes</p>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Author</th>
+            <th>Change</th>
+        </tr>
+        <tr>
+            <td>24/10/2019</td>
+            <td>Desarrollo Freeway</td>
+            <td>Se da acceso a la funcionalidad a usuarios con perfil 'Implementación' y segmento 'MLK'.</td>
+        </tr>
+        <tr>
+            <td>30/01/2020</td>
+            <td>Desarrollo Freeway</td>
+            <td>Se solicita valoración obligatoria antes de activar el botón de CheckOut. Se agrega la 
+                función checkButtonActivation para sólo activar el botón CheckOut cuando ya se completó 
+                el llenado de la valoración. Lo que había en la función saveEventAssessment se integra a
+                la función saveCheckOutData.</td>
+        </tr>
+    </table>
+	</aura:example>
+</aura:documentation>

@@ -1,0 +1,126 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride" access="global" controller="EC_ListaEntidadLegal_LC_Ctrl">
+	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js',
+										$Resource.CTC_BASE + '/jquery/jquery331.min.js',
+										$Resource.CTC_BASE + '/bootstrap/typeahead/typeahead.bundle.js'
+    						)}"
+    				styles="{!join(',', $Resource.CTC_BASE + '/bootstrap/typeahead/typeahead.css',
+    									$Resource.CTC_BASE + '/font-awesome/css/font-awesome.min.css'
+    						)}"
+    						afterScriptsLoaded="{!c.init}"
+    				/> 
+    <aura:attribute name="app_ctc" type="Map" default="{}"/>
+	<aura:attribute name="field" type="Map" default="{}" />
+	<aura:attribute name="instance" type="Map" default="{}" />
+	<aura:attribute name="renderInput" type="Boolean" default="false" />
+	<aura:attribute name="params" type="String" />
+	<aura:attribute name="showDialog" type="Boolean" default="false"/>
+	<aura:handler name="change" value="{!v.app_ctc.hasError}" action="{!c.renderError}" />
+	
+	<aura:handler event="c:EC_ActualizaEntidadContacto_LE" action="{!c.init}" />
+
+	<lightning:card title="Contactos" iconName="standard:account">
+        
+        <aura:set attribute="actions">
+            <lightning:button label="Agregar" onclick="{!c.editRecord}" name="add"/>
+        </aura:set>
+
+        <p class="slds-p-horizontal_small">
+
+        	<table class="slds-table slds-table_bordered slds-table_cell-buffer">
+				<thead>
+					<tr class="slds-text-title_caps">
+						<th scope="col" colspan="7">
+							<div class="slds-truncate" title="Opportunity Name">Nombre</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<aura:iteration items="{!v.app_ctc.contactos}" var="contacto">
+						<tr>
+							<td data-label="Contact" colspan="6">
+								<div class="slds-truncate" title="{!contacto.Contacto__r.Name}">
+									<!-- <a name="{!contacto.Id}" onclick="{!c.navToRecord}">{!contacto.Contacto__r.Name}</a> -->
+									 <lightning:button variant="base" label="{!contacto.Contacto__r.Name}" name="{!contacto.Contacto__c}" onclick="{!c.navToRecord}" />
+								</div>
+							</td>
+							<td colspan="1">
+								<lightning:buttonIcon name="{!contacto.Id}" iconName="utility:edit" class="slds-col_bump-left" variant="bare" alternativeText="Editar" onclick="{!c.editRecord}" />
+                    			<lightning:buttonIcon name="{!contacto.Id}" iconName="utility:delete" class="slds-col_bump-left" variant="bare" alternativeText="Eliminar" onclick="{!c.removeRecord}" />
+							</td>
+						</tr>
+					</aura:iteration>
+				</tbody>
+			</table>
+        </p>
+		
+		<lightning:spinner aura:id="spinner" variant="brand" size="large"/>
+    	
+    	<div aura:id="editDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-modal--large">
+	        <div class="slds-modal__container">
+	            <div class="slds-modal__header">
+	                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.toggleDialog}">
+	                    <lightning:icon iconName="utility:close" variant="bare" ></lightning:icon>
+	                    <span class="slds-assistive-text">Close</span>
+	                </button>
+	                <h2 class="slds-text-heading_medium">{!v.app_ctc.modal.title}</h2>
+	            </div>
+	            <div class="slds-modal__content slds-p-around_medium slds-grid slds-wrap slds-grid_align-spread">
+
+
+	            	<div class="slds-form slds-form_stacked">
+						
+						<aura:if isTrue="{!v.renderInput}">
+
+							<div class="slds-form-element" id="formElementContacto">
+					            <abbr class="slds-required" title="required">*</abbr>
+						        <span class="slds-form-element__label">Contacto</span>
+						        <div class="slds-form-element__control">
+
+									<c:EC_BuscarObjeto_LC field="{!v.app_ctc.schema.ContactoEntidad__c.Contacto__c}" instance="{!v.instance}" auraAction="c.getContactoByAccount" params="{!v.params}" renderProperties="Contact.Name" selectedProperty="ContactId" hasError="{!v.app_ctc.hasError}" messageError="{!v.app_ctc.messageContacto}"></c:EC_BuscarObjeto_LC>
+						            
+						        </div>
+								<aura:if isTrue="{!v.app_ctc.hasError}">
+						        	<div id="error-message" class="slds-form-element__help">{!v.app_ctc.messageContacto}</div>
+						        </aura:if>
+						    </div>
+
+						</aura:if>
+
+		            	<div class="slds-form-element">
+							<span class="slds-form-element__label">Cuenta</span>
+							<div class="slds-form-element__control">
+								<span class="slds-form-element__static" aura:id="ctcInput">{!v.instance.Cuenta}</span>
+							</div>
+						</div>
+
+					</div>
+
+	            </div>
+	            <div class="slds-modal__footer">
+	                <button class="slds-button slds-button_neutral" onclick="{!c.toggleDialog}">Cancelar</button>
+	                <button class="slds-button slds-button_brand" onclick="{!c.saveRecord}" disabled="{!v.app_ctc.hasError}">Guardar</button>
+	            </div>
+	        </div>
+	    </div>
+
+	    <div aura:id="removeDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal">
+	        <div class="slds-modal__container">
+	            <div class="slds-modal__header">
+	                <button class="slds-button slds-modal__close " title="Close" onclick="{!c.toggleDialogRemove}">
+	                    <lightning:icon iconName="utility:close" variant="bare" ></lightning:icon>
+	                    <span class="slds-assistive-text">Close</span>
+	                </button>
+	                <h2 class="slds-text-heading_medium">{!v.app_ctc.removeMsg}?</h2>
+	            </div>
+	            <div class="slds-modal__content slds-p-around_medium slds-grid slds-wrap slds-grid_align-spread">
+	            </div>
+	            <div class="slds-modal__footer">
+	                <button class="slds-button slds-button_neutral" onclick="{!c.toggleDialogRemove}">Cancelar</button>
+	                <button class="slds-button slds-button_destructive" onclick="{!c.confirmRemoveRecord}">Eliminar</button>
+	            </div>
+           	</div>
+       	</div>
+	    <div aura:id="overlay" class="slds-backdrop"></div>
+
+    </lightning:card>
+</aura:component>

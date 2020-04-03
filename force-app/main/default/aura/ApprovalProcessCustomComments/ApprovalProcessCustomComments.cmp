@@ -1,0 +1,38 @@
+<!--
+
+- Developer Name : Cindy Hernández
+
+-->
+
+<aura:component controller="ApprovalProcessCustomCommentsController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="commentsInfo" type="sObject[]"/>
+    <aura:attribute name="newComment" type="String" default=""/>
+    <aura:attribute name="isQuote" type="Boolean"/>
+    <aura:attribute name="isPending" type="Boolean"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="force:refreshView" action="{! c.doInit}" />
+    
+    <aura:if isTrue="{!v.isQuote}">
+        <lightning:card title="Más información">
+            <div class="slds-m-left_medium slds-m-right_medium slds-m-bottom_xx-large">
+                <aura:iteration items="{!v.commentsInfo}" var="item">
+                    
+                    <p>{!item.CreatedBy.Name}</p>
+                    <p>{!item.Comment__c}</p>
+                    <p class="slds-text-body_small dateClass slds-m-bottom_medium"><lightning:formattedDateTime value="{!item.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit"
+                                                                                                                
+                                                                                                                minute="2-digit" hour12="true"/></p>        
+                </aura:iteration>
+                <aura:if isTrue="{!v.isPending}">
+                    <lightning:textarea name="input1" required="true" value="{!v.newComment}" placeholder="Escriba aquí sus comentarios..." messageWhenValueMissing="Favor de ingresar el comentario." />
+                    <div class="slds-float_right slds-m-top_xx-small">
+                        <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{! c.sendComments }"/>
+                    </div>
+                </aura:if>
+            </div>
+        </lightning:card>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,20 @@
+.THIS .ctcAlert {
+    border-radius: 4px;
+    text-align: left;
+}
+.THIS .ctcListEntidadLegal {
+    max-height: 343px;
+    overflow-y: scroll;
+}
+.THIS .ctcElEstatus {
+    margin-top: 6px;
+}
+.THIS .ctcAlignRight {
+    text-align: right;
+}
+.THIS .containerInputTypeahead {
+    top: -32px;
+}
+.THIS .derecha{
+    float:right;
+}

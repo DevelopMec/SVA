@@ -1,0 +1,46 @@
+<aura:component controller="AccountShared" implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:hasRecordId" >
+    <aura:attribute name="dataAccountShare" type="Object"/>
+    <aura:attribute name="isLoad" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	    
+     <aura:html tag="style">
+        .slds-modal__container {
+             width : 50% !important;
+             max-width : 50% !important;
+         }
+    </aura:html>
+    
+        <div class="c-container">
+            <lightning:layout verticalAlign="center" class="x-large">
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                        <tr class="slds-text-title_caps">                          
+                            <th scope="col">
+                                <div class="slds-truncate" title="Nombre">Nombre</div>
+                            </th>                        
+                            <th scope="col">
+                                <div class="slds-truncate" title="Acceso a Cuentas">Gestor</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.dataAccountShare}" var="account">
+                            <tr>                                 
+                                <td data-label="Name">
+                                    <div class="slds-truncate" >{! account.UserName.Name }</div>
+                                </td>                                    
+                                <td data-label="AccountAccessLevel">
+                                    <div class="slds-truncate" >{!account.UserName.Manager.Name}</div>
+                                </td>
+                               
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </lightning:layout>
+        </div>
+ 
+    
+    
+</aura:component>

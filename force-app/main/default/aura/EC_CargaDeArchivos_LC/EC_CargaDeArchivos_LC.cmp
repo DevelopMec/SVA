@@ -1,0 +1,89 @@
+<aura:component implements="flexipage:availableForRecordHome" access="global" controller="EC_CargaDeArchivos_CTRL">
+
+<!-- <ltng:require 	scripts="{!join(',', $Resource.CTC_BASE + '/lightning/ctcLightning.js')}"
+                afterScriptsLoaded="{!c.init}"/> -->
+	
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	
+	<!-- Displayed Data -->
+	<aura:attribute name="documents" type="Object[]"/>
+	<!-- Displayed Data -->
+	
+	<!-- Logical Flags -->
+	<aura:attribute name="loading" type="Boolean" default="false"/>
+	<aura:attribute name="typeOfPerson" type="String" default=""/>	
+	<aura:attribute name="readOnly" type="Boolean" default="false"/>
+	<aura:attribute name="foreignContact" type="Boolean" default="false"/>
+	<!-- Logical Flags -->
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="alerts" type="Object[]"/>
+	<aura:attribute name="recordId" type="Id"/>
+	<!-- Utility Attributes -->
+	
+	<lightning:card iconName="standard:document">
+		<aura:iteration items="{!v.alerts}" var="alert">
+			<aura:if isTrue="{!alert.isVisible}">
+				<div class="slds-m-horizontal_medium">
+					<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+						<span class="slds-assistive-text">warning</span>
+						<span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small">
+							<lightning:icon iconName="utility:warning" size="small"/>
+						</span>
+						<h2>{!alert.description}</h2>
+					</div>
+				</div>
+			</aura:if>
+		</aura:iteration>
+		<aura:set attribute="title">
+			<strong class="slds-text-heading_small">
+				Documentos Adjuntos - {!v.typeOfPerson}
+			</strong>
+		</aura:set>
+		<div class="slds-p-horizontal_small slds-text-body_small">
+			<aura:iteration items="{!v.documents}" var="document" indexVar="index">
+				<aura:if isTrue="{!v.loading}">
+					<lightning:spinner variant="brand" size="large" alternativeText="Cargando Documento"/>
+				</aura:if>
+				<aura:if isTrue="{!document.isVisible}">
+					<lightning:layout horizontalAlign="center" multipleRows="true">
+						<lightning:layoutItem flexibility="shrink" padding="around-small" size="4">
+							<div>
+								<strong>{!document.name}</strong>
+							</div>
+						</lightning:layoutItem>
+
+						<aura:if isTrue="{!!document.loaded}">
+							<lightning:layoutItem flexibility="shrink" padding="around-small" size="8" class="slds-align_absolute-center">
+
+								<lightning:fileUpload recordId="{!v.recordId}" label="" name="{!document.name + '-' + document.apiName}" accept=".pdf,.PDF" onuploadfinished="{!c.handleUploadFinished}"/>
+
+							</lightning:layoutItem>
+
+							<aura:set attribute="else">
+
+								<lightning:layoutItem flexibility="shrink" padding="around-small" size="8" class="doc-buttons-position">
+									<lightning:layout horizontalAlign="center" multipleRows="false">
+
+										<lightning:layoutItem size="6">
+											<lightning:fileUpload recordId="{!v.recordId}" label="" name="{!document.Id + '-' + document.name + '-' + document.apiName}" accept=".pdf,.PDF" onuploadfinished="{!c.editAttachment}" class="slds-align_absolute-center fileUploadEdenred" />
+										</lightning:layoutItem>
+
+										<lightning:layoutItem size="6">
+											<lightning:buttonGroup class="slds-align_absolute-center">
+												<lightning:button label="Descargar" name="{!document.Id}" variant="neutral" onclick="{!c.downloadAttachment}" />
+												<lightning:button label="Eliminar" name="{!document.Id + '-' + document.apiName}" variant="neutral" onclick="{!c.deleteAttach}"/>
+											</lightning:buttonGroup>
+										</lightning:layoutItem>
+
+									</lightning:layout>
+
+								</lightning:layoutItem>
+							</aura:set>
+						</aura:if>
+					</lightning:layout>
+				</aura:if>
+			</aura:iteration>
+		</div>
+	</lightning:card>
+</aura:component>

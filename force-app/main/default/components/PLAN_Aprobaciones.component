@@ -1,0 +1,197 @@
+<apex:component >
+    <script type="text/ng-template" id="aprobaciones.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="com.close()"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Niveles de aprobación</h4>
+        </div>
+
+        <div class="modal-body" ng-if= "com.tieneEntregas">
+
+            <ctc-error ctc-body="sc.errors"></ctc-error>                 
+
+            <table id="table-collapse" class="table table-striped">
+                <thead>
+	            	<tr>	
+                        <th class="text-center">Direcciones de Entrega</th>	
+                        <th class="text-center">%</th>	
+                        <th class="text-center">Nivel de Aprobación</th>	
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="tab in com.aprobacionesFinal">
+                        <td ng-if="tab.NumberOfShipments__c" ng-bind="'<= ' + tab.NumberOfShipments__c + ' Direcciones'" class="text-center"></td>
+                        <td ng-if="!tab.Dicount__c" ng-bind="'Descuento <= ' + tab.Discount__c" class="text-center"></td>
+                        <td ng-if="tab.LessShipmentsLessDiscountApproval__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessShipmentsLessDiscountApproval__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessShipmentsLessDiscountApproval__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessShipmentsLessDiscountApproval__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="tab in com.aprobacionesFinal">
+                        <td ng-if="tab.NumberOfShipments__c" ng-bind="'<= ' + tab.NumberOfShipments__c + ' Direcciones'" class="text-center"></td>
+                        <td ng-if="!tab.Dicount__c" ng-bind="'Descuento > ' + tab.Discount__c" class="text-center"></td>
+                        <td ng-if="tab.LessShipmentsMoreDiscountApproval__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessShipmentsMoreDiscountApproval__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessShipmentsMoreDiscountApproval__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessShipmentsMoreDiscountApproval__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="tab in com.aprobacionesFinal">
+                        <td ng-if="tab.NumberOfShipments__c" ng-bind="'> ' + tab.NumberOfShipments__c + ' Direcciones'" class="text-center"></td>
+                        <td ng-if="!tab.Dicount__c" ng-bind="'Descuento <= ' + tab.Discount__c" class="text-center"></td>
+                        <td ng-if="tab.MoreShipmentsLessDiscountApproval__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreShipmentsLessDiscountApproval__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreShipmentsLessDiscountApproval__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreShipmentsLessDiscountApproval__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="tab in com.aprobacionesFinal">
+                        <td ng-if="tab.NumberOfShipments__c" ng-bind="'> ' + tab.NumberOfShipments__c + ' Direcciones'" class="text-center"></td>
+                        <td ng-if="!tab.Dicount__c" ng-bind="'Descuento > ' + tab.Discount__c" class="text-center"></td>
+                        <td ng-if="tab.MoreShipmentsMoreDiscountApproval__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreShipmentsMoreDiscountApproval__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreShipmentsMoreDiscountApproval__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreShipmentsMoreDiscountApproval__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                    </tr>
+                 </tbody>
+            </table>
+        </div>
+                                
+        <div class="modal-body" ng-if= "com.tieneEntregas == false">
+
+            <ctc-error ctc-body="sc.errors"></ctc-error>                 
+
+            <table id="table-collapse" class="table table-striped">
+                <thead>
+	            	<tr>	
+                        <th class="text-center">%</th>	
+                        <th class="text-center">Nivel de Aprobación</th>	
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="tab in com.aprobacionesFinal">
+                        <td ng-if="!tab.Dicount__c" ng-bind="'Descuento <= ' + tab.Discount__c" class="text-center"></td>
+                        <td ng-if="tab.LessDiscountApproval__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessDiscountApproval__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessDiscountApproval__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.LessDiscountApproval__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="tab in com.aprobacionesFinal">
+                        <td ng-if="!tab.Dicount__c" ng-bind="'Descuento > ' + tab.Discount__c" class="text-center"></td>
+                        <td ng-if="tab.MoreDiscountApproval__c == 1" class="text-center">
+                                <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreDiscountApproval__c == 2" class="text-center">
+                                <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreDiscountApproval__c == 3" class="text-center">
+                                <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <td ng-if="tab.MoreDiscountApproval__c == 4" class="text-center">
+                                <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                    </tr>
+                 </tbody>
+            </table>
+        </div>
+                                
+        <div>
+            <table id="table-collapse" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">Ejecutivo <span class="fa fa-circle greenCircle"></span></th>
+                        <th class="text-center">Gerente Nacional <span class="fa fa-circle yellowCircle"></span></th>
+                        <th class="text-center">Director Comercial <span class="fa fa-circle redCircle"></span></th>
+                        <th class="text-center">Director General <span class="fa fa-circle grayCircle"></span></th>
+                    </tr>
+                </thead>
+        </div>                           
+            </table>
+        <div class="modal-footer">
+            <button type="button" ng-disabled="com.processing" class="btnb btnb-default" ng-click="com.close()">
+                <span class="fa fa-mail-reply fa-fw"></span>
+                Cerrar
+            </button>
+        </div>
+    </script>
+    <script type="text/javascript">
+        (function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('aprobacionesCtrl', AprobacionesCtrl)
+
+            AprobacionesCtrl.$inject = ['ctcUtils', '$filter', '$timeout', '$uibModalInstance', 'producto']
+            function AprobacionesCtrl( ctcUtils, $filter, $timeout, $uibModalInstance, producto ) {
+                var responseValue = ctcUtils.app.approvalLevels.$$state.value;
+                //console.log('Approval levels: ' + JSON.stringify(responseValue))
+                //console.log('Concepto seleccionado: ' + JSON.stringify(ctcUtils.app.conceptoActual))
+                var vm = this
+                vm.aprobacionesFinal = []
+                vm.tieneEntregas = false
+
+                vm.init = function() {
+                let aprobacionesFinal = []
+                let tieneEntregas = false;
+                    for( var aprobacion of responseValue ) {
+                        if (aprobacion.Concept__c == ctcUtils.app.conceptoActual.TipoCargo__c) {
+                            aprobacionesFinal.push(aprobacion);
+                            if (aprobacion.NumberOfShipments__c != null) {
+                                tieneEntregas = true;
+                            }
+                        }
+                    }
+                    vm.aprobacionesFinal = aprobacionesFinal;
+                    vm.tieneEntregas = tieneEntregas; 
+                    //console.log('Final approval level final: ' + JSON.stringify(vm.aprobacionesFinal));
+                }
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+                vm.init()
+
+            }
+        })()
+    </script>
+    <style type="text/css">
+        .tr-comisiones > td {
+            vertical-align: middle !important;
+        }
+    </style>
+</apex:component>

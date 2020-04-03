@@ -1,0 +1,17 @@
+<aura:component controller="ContactosAP" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="contactosAP" type="Contact[]"/>
+    <aura:attribute name="columnas" type="List"/>
+    <aura:attribute name="Objeto" type="String" default="WorkOrder"/>
+    <aura:attribute name="oppId" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <lightning:card iconName="standard:contact">
+
+        <p class="slds-p-horizontal_small">
+            <lightning:datatable data="{! v.contactosAP }" columns="{! v.columnas }" keyField="constss" hideCheckboxColumn="true"/>
+        </p>
+    </lightning:card>
+    
+</aura:component>

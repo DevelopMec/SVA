@@ -1,0 +1,58 @@
+<aura:component >
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="data" type="Object"/>
+	<!-- /Utility Attributes -->
+	
+	<lightning:layout horizontalAlign="center" class="slds-p-vertical_large slds-text-align_center">
+		<lightning:layoutItem size="3">
+			<ul>
+				<li class="slds-text-heading_small">
+					<lightning:icon iconName="standard:account" size="small"/>
+					<span class="slds-truncate">&nbsp;Nombre de la Cuenta:</span>
+				</li>
+				<li class="slds-text-body_regular slds-p-top_medium">
+					<a onclick="{!c.navigateToRecord}">
+						<strong id="{!v.data.Quote.Opportunity.Account.Id}" class="slds-truncate">{!v.data.Quote.Opportunity.Account.Name}</strong>
+					</a>
+				</li>
+			</ul>
+		</lightning:layoutItem>
+		<lightning:layoutItem size="3">
+			<ul>
+				<li class="slds-text-heading_small">
+					<lightning:icon iconName="standard:opportunity" size="small"/>
+					<span class="slds-truncate">&nbsp;Nombre de la Oportunidad:</span>
+				</li>
+				<li class="slds-text-body_regular slds-p-top_medium">
+					<a onclick="{!c.navigateToRecord}">
+						<strong id="{!v.data.Quote.Opportunity.Id}" class="slds-truncate">{!v.data.Quote.Opportunity.Name}</strong>
+					</a>
+				</li>
+			</ul>
+		</lightning:layoutItem>
+		<lightning:layoutItem size="3">
+			<ul>
+				<li class="slds-text-heading_small">
+					<lightning:icon iconName="standard:omni_supervisor" size="small"/>
+					<span class="slds-truncate">&nbsp;Solución de la Oportunidad</span>
+				</li>
+				<li class="slds-text-body_regular slds-p-top_medium">
+					<strong class="slds-truncate">{!v.data.Quote.Opportunity.Familia__c}</strong>
+				</li>
+			</ul>
+		</lightning:layoutItem>
+		<lightning:layoutItem size="3">
+			<ul>
+				<li class="slds-text-heading_small">
+					<lightning:icon iconName="standard:product" size="small"/>
+					<span class="slds-truncate">&nbsp;Nombre del Producto</span>
+				</li>
+				<li class="slds-text-body_regular slds-p-top_medium">
+					<strong class="slds-truncate">{!v.data.Product2.Name}</strong>
+				</li>
+			</ul>
+		</lightning:layoutItem>
+	</lightning:layout>
+	
+</aura:component>

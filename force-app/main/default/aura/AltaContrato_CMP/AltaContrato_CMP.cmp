@@ -1,0 +1,291 @@
+<aura:component controller="AltaContrato_CONT" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="dependencias" type="Map"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="entidadSel" type="Object"/>
+    <aura:attribute name="representantes" type="List"/>
+    <aura:attribute name="secciones" type="List"/>
+    <aura:attribute name="entidadesFiliales" type="List"/>
+    <aura:attribute name="filialesAdd" type="List"/>
+    <aura:attribute name="direcciones" type="List"/>
+    
+    <aura:attribute name="listGrupos" type="List"/>
+    <aura:attribute name="grupoPrimeNoConsultados" type="Boolean" default="true"/>
+    <aura:attribute name="showSpinnerPrime" type="Boolean" default="false"/>
+    <aura:attribute name="personalizacionDeTarjetas" type="Boolean" default="false"/>
+    
+    <aura:attribute name="recordId" type="String" default=""/>
+    
+    <aura:attribute name="advInfo" type="Map"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="saved" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="cargo" type="Boolean" default="false" />
+    <aura:attribute name="isFinishButtonDisabled" type="Boolean" default="false"/>
+    <aura:attribute name="isCreditEvaluationButtonVisible" type="Boolean" default="false"/>
+    <aura:attribute name="StatusCreditEval_InProcess" type="Boolean" default="false"/>
+    <aura:attribute name="StatusCreditEval_Approved" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.getInfoHeader}"/>
+    <!--aura:handler name="init" value="{!this}" action="{!c.getInfo}"/-->
+    
+    <lightning:card title="">
+        <aura:if isTrue="{!v.showSpinnerPrime}">
+            <lightning:spinner size="large"/>
+        </aura:if>
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner size="large"/>
+        </aura:if>
+        <div>  <!--style="background-color:#DDF1FC;border:1px solid #A9DFFE;border-radius:5px;"-->
+            <div name="titulo" style="margin-bottom:1em;">
+                <div class="slds-m-top_medium">
+                    <img style="display:block;margin-left:auto;margin-right:5%;" src="{!$Resource.CotizacionesPDF + '/Encabezados/'+v.data.headerData.Product2.ProductLogo__c}" width="200" height="100" />
+                </div>
+                <center>
+                    <span class="titulo">Contrato {!v.data.headerData.Product2.Name}</span>
+                </center>
+            </div>
+            <div name="contenedor" class="slds-m-left_x-large slds-m-right_x-large  bordeAzul">
+                <div name="Infomación" >
+                    <c:CON_ContractHeader_LC data="{!v.data.headerData}"/>
+                </div>
+                <div name="Estructura de Cuentas" class="slds-m-around_x-large bordeGris">
+                    <div class="slds-m-around_medium">Estructura de Cuentas</div>
+                    <div>
+                        <div class="slds-m-around_medium">
+                            <div class="seccionDiv">
+                                <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                                    Entidad Legal
+                                </h2>
+                            </div>
+                            <div>
+                                <div name="Busqueda Entidad Legal" class="slds-m-around_medium">
+                                    <div>
+                                        <div style="width:25%;display:inline-block;vertical-align:middle;">
+                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" required="true" class="{!if(or(v.data.contrato.Entidad_Cuenta__c=='',v.data.contrato.Entidad_Cuenta__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.data.ECdisp}" value="{!v.data.contrato.Entidad_Cuenta__c}" label="Entidades Legales" onchange="{!c.cambioEntidad}"/>
+                                        </div>
+                                        <div style="width:70%;display:inline-block;margin-left:5%;vertical-align:middle;">
+                                            <div style="width:30%;display:inline-block;vertical-align:middle;" class="slds-align_absolute-center">
+                                                <div>TIPO DE PERSONA</div>
+                                                <div>{!v.entidadSel.EntidadLegal__r.RecordType.Name}</div>
+                                            </div>
+                                            <div style="width:30%;display:inline-block;vertical-align:middle;" class="slds-align_absolute-center">
+                                                <div>RAZÓN SOCIAL</div>
+                                                <div>{!v.entidadSel.EntidadLegal__r.RazonSocial__c}</div>
+                                            </div>
+                                            <div style="width:30%;display:inline-block;vertical-align:middle;" class="slds-align_absolute-center">
+                                                <div>RFC</div>
+                                                <div>{!v.entidadSel.Name}</div>
+                                            </div>  
+                                        </div>                                                                
+                                    </div>
+                                    <div>
+                                        <div style="width:25%;display:inline-block;margin-top:1px;vertical-align:top;">
+                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" required="true" class="{!if(or(v.data.contrato.Contacto__c=='',v.data.contrato.Contacto__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.representantes}" label="Representante legal" value="{!v.data.contrato.Contacto__c}"/>
+                                        </div>                                
+                                    </div>
+                                    <div>
+                                        <div style="width:25%;display:inline-block;margin-top:1px;vertical-align:top;">
+                                            <lightning:combobox required="true" class="{!if(or(v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c=='',v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.data.contactosCuenta}" label="Administrador de Plataforma" value="{!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c}" disabled="true"/>
+                                        </div>                                
+                                    </div>
+                                    <div>
+                                        <div style="width:95%;display:inline-block;vertical-align:middle;">
+                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" required="true" class="{!if(or(v.data.contrato.FiscalAddress__c=='',v.data.contrato.FiscalAddress__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.direcciones}" label="Dirección Fiscal" value="{!v.data.contrato.FiscalAddress__c }" onchange="{!c.cambioDireccion}"/>
+                                        </div>       
+                                        <!--div style="width:70%;display:inline-block;vertical-align:middle;margin-left:5%;">
+                                            <lightning:input type="text" label="Dirección seleccionada" aura:id="dirSel" disabled="true"/>                                                                       
+                                        </div-->  
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-m-around_medium">
+                            <div class="seccionDiv">
+                                <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                                    Filiales
+                                </h2>
+                            </div>
+                            <div>
+                                <div name="Filiales" class="slds-m-around_medium" style="height:12em;overflow:auto;">
+                                    <table>
+                                        <thead>
+                                            <tr style="border-bottom:1px solid gray;">
+                                                <th>TIPO DE PERSONA</th>
+                                                <th>RAZON SOCIAL</th>
+                                                <th>RFC</th>
+                                                <th><center>ADMINISTRADOR DE PLATAFORMA</center></th>
+                                                <th><center>Agregar</center></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.entidadesFiliales}" var="item" indexVar="index">
+                                                <tr style="border-bottom:1px solid gray;">
+                                                    <td>{!item.EntidadLegal__r.RecordType.Name}</td>
+                                                    <td>{!item.EntidadLegal__r.RazonSocial__c}</td>
+                                                    <td>{!item.Name}</td>
+                                                    <td style="vertical-align:middle;" >
+                                                        <center>
+                                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" style="width:80%;" options="{!v.data.contactosCuenta}" variant="label-hidden" value="{!item.filial.PlatformAdministrator__c}"/>                                                       
+                                                        </center>
+                                                    </td>
+                                                    <td>
+                                                        <center>
+                                                            <lightning:input disabled="{!v.data.etapa!='Contrato'}" style="margin-top:0.5em;" type="checkbox-button" label="" id="{!index}" name="{!item.Id}" checked="{!item.check}" onchange="{!c.agregarFilial}"/>
+                                                        </center>                                                        
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--div name="seccionFunciones" class="slds-m-around_medium">                            
+                            <div class="seccionDiv">
+                                <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                                    Funciones de Contactos
+                                </h2>
+                            </div>
+                            <div class="slds-m-around_medium">
+                                <aura:iteration items="{!v.data.funcionesContactos}" var="funcion">
+                                    <div style="width:100%;margin-top:1em;">
+                                        <div style="width:40%;vertical-align:middle;display:inline-block;">
+                                            <div class="slds-text-heading_small" style="vertical-align:middle;">{!funcion.Role__c}</div>
+                                        </div>
+                                        <div style="width:40%;vertical-align:middle;display:inline-block;">
+                                            <lightning:combobox required="true" options="{!v.data.contactosCuenta}" label="Seleccione una Opción" value="{!funcion.ContactId__c}" class="{!if(or(funcion.ContactId__c=='',funcion.ContactId__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" onchange="{!c.seleccionarContacto}"/>
+                                        </div>
+                                    </div>
+                                </aura:iteration>
+                            </div>
+                        </div-->                        
+                        <div>
+                            <aura:iteration items="{!v.secciones}" var="seccion" indexVar="indice">
+                                <div name="seccionFacturacion" class="slds-m-around_medium">                            
+                                    <div class="seccionDiv">
+                                        <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                                            {!seccion.nombreSeccion}
+                                        </h2>
+                                    </div>
+                                    <div class="slds-m-around_medium">
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="display:inline-block;vertical-align:middle;width:100%;">
+                                            <aura:iteration items="{!seccion.listaCampos}" var="campo" indexVar="indiceCampo">
+                                                <!--div class="{!if(campo.ocultar,'slds-hide','slds-show '+if(seccion.sizeSecc>6,'slds-size_1-of-6','slds-size_1-of-'+seccion.sizeSecc))}" style="display:inline-block;vertical-align:middle;"-->
+                                                <div class="{!if(campo.ocultar,'slds-hide','slds-show slds-size_1-of-6')}" style="display:inline-block;vertical-align:middle;">
+                                                    <aura:if isTrue="{!campo.tipo=='PICKLIST'}">
+                                                        <lightning:combobox disabled="{!or(and(campo.deshabilitado,and(campo.value!=null,campo.value!='')),v.data.etapa!='Contrato')}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" id="{!seccion.nombreSeccion+';'+indice}" name="{!campo.api+';'+indiceCampo}" label="{!campo.etiqueta}" value="{!campo.value}" placeholder="Seleccione una opción" options="{!campo.listaValores}" onchange="{!c.handleChange}"/>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!campo.tipo=='MULTIPICKLIST'}">
+                                                                <ui:inputSelect disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" required="{!campo.requerido}" label="{!campo.etiqueta}" multiple="true" value="{!campo.value}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small slds-select','slds-m-around_small slds-select')}">                                                                   
+                                                                    <aura:iteration items="{!campo.listaValores}" var="it">
+                                                                        <ui:inputSelectOption label="{!it.label}" text="{!it.value}"/>
+                                                                    </aura:iteration>
+                                                                </ui:inputSelect>
+                                                                
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!or(campo.tipo=='CURRENCY',campo.tipo=='DOUBLE')}">
+                                                                        <lightning:input disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" type="number" formatter="{!if(campo.tipo=='CURRENCY','currency','')}"  step="{!if(campo.tipo=='CURRENCY','0.01','1')}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
+                                                                        <aura:set attribute="else">
+                                                                            <aura:if isTrue="{!campo.tipo=='BOOLEAN'}">
+                                                                                <lightning:input disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" class="slds-m-around_small" id="{!seccion.nombreSeccion+';'+indice}" style="display:inline-block;vertical-align:middle;" type="checkbox" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" checked="{!campo.value}" onchange="{!c.handleChange}"/>
+                                                                                <aura:set attribute="else">
+                                                                                    <div onkeypress="{!c.ingresoValor}" name="{!campo.api}">
+                                                                                        <lightning:input maxlength="{!if(or(campo.api=='Sucursal_Facturacion_Global__c',or(campo.api=='GrupoFacturacionGlobal_Text__c',campo.api=='Cliente_Facturacion_Global__c')),3,255)}"  disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" style="display:inline-block;vertical-align:middle;" type="{!campo.tipo}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
+                                                                                    </div>
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </div>
+                                                <!--aura:if isTrue="{!and(campo.api=='EmpresaPrincipal_PL__c',v.grupoPrimeVisible)}">
+                                                    <div class="{!if(campo.ocultar,'slds-hide','slds-show '+if(seccion.sizeSecc>6,'slds-size_1-of-6','slds-size_1-of-'+seccion.sizeSecc))}" style="display:inline-block;vertical-align:middle;">                                                    
+                                                        <lightning:combobox label="Grupos Prime" options="{!v.listGrupos}" onchange="{!c.seleccionarGrupo}"/>                                                    
+                                                    </div>
+                                                </aura:if-->
+                                            </aura:iteration>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <aura:if isTrue="{!and(v.personalizacionDeTarjetas,seccion.nombreSeccion=='Detalles del Pedido')}">
+                                            <lightning:layout horizontalAlign="center" multipleRows="true" class="slds-m-top_large">
+                                                <lightning:layoutItem size="6" padding="horizontal-medium">
+                                                    <c:CON_DownloadUploadLayout_LC opportunityId="{!v.data.headerData.Quote.OpportunityId}" productCode="{!v.data.contrato.PartidaPresupuesto__r.Product2.IDInterno__c}" field="{label: 'Layout de Personalización de Tarjetas', name: 'Personalizacion_de_Tarjetas__c'}" />
+                                                </lightning:layoutItem>
+                                            </lightning:layout>                                   
+                                        </aura:if>
+                                    </div>
+                                </div>
+                            </aura:iteration>
+                        </div>                                                
+                    </div>
+                </div>
+                                
+                
+                <div>
+                    <lightning:buttonGroup class="button-group-container">
+                        <aura:if isTrue="{!v.isCreditEvaluationButtonVisible}">
+                            <lightning:button class="slds-m-around_small" variant="bare" name="EvaluacionCredito" onclick="{!c.abrirEvaluacionCredito}" >
+                                <lightning:icon iconName="utility:locker_service_api_viewer" title="Evaluación Crédito" class="creditEvaluation-button"/>
+                            </lightning:button>                    
+                        </aura:if>                        
+                        <lightning:button disabled="{!or(v.isFinishButtonDisabled,v.data.etapa!='Contrato')}" class="slds-m-around_small" variant="bare" name="Finalizado" onclick="{!c.guardar}" >
+                            <lightning:icon iconName="utility:success" title="Finalizar" class="finish-button"/>
+                        </lightning:button>
+                        <lightning:button disabled="{!v.data.etapa!='Contrato'}" class="slds-m-around_small" variant="bare" name="En proceso" onclick="{!c.guardar}" >
+                            <lightning:icon iconName="utility:save" title="Guardar" class="save-button"/>
+                        </lightning:button>
+                        <lightning:button class="slds-m-around_small" variant="bare" onclick="{!c.sendEmail}" >
+                            <lightning:icon iconName="utility:email" title="Enviar" class="send-button"/>
+                            <aura:if isTrue="{!v.isSending}">
+                                <lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
+                            </aura:if>
+                        </lightning:button>
+                        <lightning:button class="slds-m-around_small" variant="bare" onclick="{!c.generarPDF}" >
+                            <lightning:icon iconName="utility:page" title="Descargar PDF" class="pdf-button"/>
+                            <aura:if isTrue="{!v.isPDFGenerated}">
+                                <lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
+                            </aura:if>
+                        </lightning:button>
+                    </lightning:buttonGroup>
+                </div>
+                
+                 <aura:if isTrue="{!v.isCreditEvaluationButtonVisible}">
+                <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
+                                <div class="slds-modal__container">
+                                    <div class="slds-modal__header">
+                                        <h2 id="header43" class="slds-text-heading--medium">Evaluación Crédito</h2>
+                                    </div>
+                                    <div class="slds-modal__content slds-p-around--medium">
+                                        <div style="overflow:scroll; height:300px;">
+                                            <c:CreditEvaluation aura:id="evalcredito" IdOportunidad="{! v.data.IdOpp }"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-modal__footer">
+                                         <aura:if isTrue="{!v.StatusCreditEval_InProcess}">
+                                             <div class="slds-text-align_left slds-text-heading_small">La Evaluación de Crédito se encuentra en proceso de aprobación</div>
+                                             <aura:set attribute="else">
+                                                 <aura:if isTrue="{!v.StatusCreditEval_Approved}"> 
+                                                 <div class="slds-text-align_left slds-text-heading_small">Evaluación de Crédito aprobada</div>
+                                                  <aura:set attribute="else">
+                                              			<lightning:button variant="brand" label="Guardar" name="GuardarEvaluacionCredito" onclick="{!c.GuardarEvaluacionCredito}"/>
+                                                        <lightning:button variant="brand" label="Enviar a Aprobación" name="GuardarEvaluacionCredito" onclick="{!c.AprobacionEvaluacionCredito}"/>       
+                                                     </aura:set> 
+                                                 </aura:if>
+                                              
+                                            </aura:set> 
+                                        </aura:if>
+                                        
+                                        <button class="slds-button slds-button_neutral" onclick="{!c.cerrarEvaluacionCredito}">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-backdrop " aura:id="Modalbackdrop"></div> 
+                 </aura:if>    
+            </div>            
+        </div>                
+    </lightning:card>
+</aura:component>

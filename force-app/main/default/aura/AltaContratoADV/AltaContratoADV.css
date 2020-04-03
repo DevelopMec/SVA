@@ -1,0 +1,108 @@
+.THIS .classError .slds-input{
+    border-color:red;
+}
+.THIS .cont{
+    width:95em;
+}
+.THIS .seccionDiv{
+    background-color:#E1E6E9;
+    border-radius:5px;
+    height:1.5em;
+}
+.THIS .bordeAzul{
+    border:5px solid #E1E6E9;
+    border-radius:10px;
+    width:95%;
+    background-color:white;
+}
+.THIS .titulo{
+    font-weight:bold;
+    font-size:2em;    
+}
+.THIS .subTitulo{
+    font-size:1em;
+}
+.THIS .bordeGris{
+    border:1px solid #E1E6E9;
+    border-radius:10px;
+}
+.THIS .slds-accordion__content {
+    /* Some visibility/opacity styling to override the default SLDS styling */
+    visibility: visible;
+    opacity: 1;
+    height: 0;
+    transition: height .5s ease-in-out;
+}
+.THIS .slds-is-open > .slds-accordion__summary {
+    margin-bottom: 0;
+}
+.THIS .slds-is-open > .slds-accordion__content {
+    overflow: hidden;
+}
+.THIS .celdaInfo{
+    width:20%;
+}
+.THIS .slds-form-element .slds-form-element__control .slds-dropdown{
+    /*background-color:red;position: absolute;*/
+}
+.THIS .contract-container-border {
+	border: 5px solid #0070D2;
+	border-radius: 16px;
+	background-color: white;
+}
+
+/*.THIS .contract-container-body {
+	background-color: white;
+}*/
+
+.THIS .creditEvaluation-button .slds-icon {
+	fill: green;
+}
+
+.THIS .finish-button .slds-icon {
+	fill: green;
+}
+
+.THIS .save-button .slds-icon {
+	fill: blue;
+}
+
+.THIS .send-button .slds-icon {
+	fill: orange;
+}
+
+.THIS .pdf-button .slds-icon {
+	fill: red;
+}
+
+.THIS .button-size {
+	height: 48px;
+	width: 48px;
+}
+
+.THIS .slds-button:focus {
+	/*outline: 0;
+	border: 0;*/
+	color: #FFFFFF;
+	box-shadow: none;
+}
+
+.THIS button[disabled] {
+	cursor: not-allowed;
+}
+
+.THIS .slds-button_icon-border-filled[disabled]:hover {
+	background-color: #FFFFFF;
+}
+
+.THIS button[disabled] .slds-icon {
+	fill: gray;
+}
+
+.THIS .button-group-container {
+	position: fixed;
+	bottom: 1%;
+	right: 3%;
+	border: 0px solid #F9F9FA;
+	border-radius: 16px;
+}

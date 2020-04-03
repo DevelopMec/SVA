@@ -1,0 +1,218 @@
+<aura:component controller="CreditEvaluation" implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <!--Style-->
+    <aura:html tag="style">
+        .slds-modal__container{
+        height : auto;
+        width: 80%;
+        max-width: 80%;
+        }
+        .modal-body{   
+        height : 200px !important;
+        max-height: 200px !important;
+        }
+        
+        .customFooter{
+        display: inline !important;
+        }
+    </aura:html> 
+    
+    <!-- Id of the Opportunity the page hosting this component is showing -->
+    <aura:attribute name="IdOportunidad" type="String" access="public"  />
+    <aura:attribute name="IsReadOnly" type="boolean" default="false"/>
+	<aura:attribute name="NombreCliente" type="String"/>
+    <aura:attribute name="NumCliente" type="String"/>
+    <aura:attribute name="Producto" type="String"/>
+    <aura:attribute name="Sector" type="String"/>
+    <aura:attribute name="SemanasCredito" type="String"/>
+    <aura:attribute name="DiasCredito" type="String"/>
+    <aura:attribute name="FrecuenciaFacturacion" type="String"/>
+    <aura:attribute name="TotalDiasCredito" type="String"/>
+    <aura:attribute name="PorcComision" type="String"/>
+    <aura:attribute name="NoLiberaciones" type="String"/>
+    <aura:attribute name="ValeGarantia" type="String"/>
+    <aura:attribute name="Periodofact" type="String"/>
+    <aura:attribute name="Comision" type="String"/>
+    <aura:attribute name="CostoFinanciero" type="String"/>
+    <aura:attribute name="UtilidaPerdida" type="String"/>
+    <aura:attribute name="Conclusion" type="String"/>
+    <aura:attribute name="DebeEnviar" type="String"/>
+    <aura:attribute name="DebeEntregar" type="String"/>
+    <aura:attribute name="LineaOperativa" type="String"/>
+    <aura:attribute name="GarantiaNegociando" type="String"/>
+     <aura:attribute name="Aprobar" type="Boolean" default="false" />
+    
+    <aura:attribute name="documents" type="Object[]"/>
+    
+    <aura:method name="GuardarEvalCredito" action="{!c.Guardar}" />
+    <aura:method name="AprobarEvalCredito" action="{!c.Aprobar}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+ 
+         <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_small">
+            
+            <!--Datos del cliente-->
+        <div class="slds-size_1-of-2">
+            <div class="clearFloats slds-align--absolute-left"> 
+                <dl class="slds-dl_horizontal">
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:input label="Nombre del cliente"  disabled="true" value="{!v.NombreCliente}"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                       <lightning:input label="Producto"  disabled="true" value="{!v.Producto}"/> 
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <div class="slds-size_1-of-2">
+            <div class="clearFloats slds-align--absolute-center">        
+                
+            </div>
+            <div class="clearFloats slds-align--absolute-left"> 
+                <dl class="slds-dl_horizontal">
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:input label="No. De Cliente"  disabled="true" value="{!v.NumCliente}"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:input label="Privado / Gobierno"  disabled="true" value="{!v.Sector}"/> 
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        </div>
+ 
+    
+    <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_small">
+        <!--Datos Credito-->
+        <div class="slds-size_1-of-2">
+            <div class="clearFloats slds-align--absolute-left"> 
+                <div><p class="slds-truncate legend" >Datos crédito</p></div>
+                <dl class="slds-dl_horizontal">
+ 
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta label-hidden">
+                        <lightning:select name="selectPeriodoLiberacion" aura:id="selectPeriodoLiberacion" label="Periodo de Liberación" disabled="{!v.IsReadOnly}" value="{!v.FrecuenciaFacturacion}" onchange="{!c.cambiaPeriodoLiberacion}">
+                        <option value="Semanal">Semanal</option>
+                        <option value="Quincenal">Quincenal</option>
+                        <option value="Mensual">Mensual</option>
+                    </lightning:select>
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtLineaOperativa" aura:id="txtLineaOperativa" type="number" disabled="{!v.IsReadOnly}" label="Línea Operativa" value="{!v.LineaOperativa}" onchange="{! c.ActualizaDatos }" messageWhenValueMissing="**Campo Obligatorio" required="true"/>
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright" >
+                        <lightning:input name="txtdiasCredito" aura:id="txtdiasCredito" type="number" max="31" disabled="{!v.IsReadOnly}" label="Días de crédito" value="{!v.DiasCredito}" onchange="{! c.ActualizaDiaCredito }" messageWhenValueMissing="**Campo Obligatorio" required="true" />
+                    </dd>
+                    
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtSemanaCredito" aura:id="txtSemanaCredito" label="Semanas de crédito"  disabled="true" value="{!v.SemanasCredito}"/>
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtNoLiberaciones" aura:id="txtNoLiberaciones" label="No. De Liberaciones Totales"  disabled="true" value="{!v.NoLiberaciones}"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:input name="txtFrecuencia" aura:id="txtFrecuencia" label="Frecuencia de Facturación"  disabled="true" value="{!v.FrecuenciaFacturacion}"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtTotalDiasCredito" aura:id="txtTotalDiasCredito" label="Total de Días a Crédito" disabled="true" value="{!v.TotalDiasCredito}" /> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input type="decimal" name="txtPorcComision" aura:id="txtPorcComision" label="% de Comisión" disabled="{!v.IsReadOnly}" value="{!v.PorcComision}" onchange="{! c.ActualizaDatos }" messageWhenValueMissing="**Campo Obligatorio" required="true"/> 
+                    </dd>
+                    
+                </dl>
+            </div>
+            <div class="clearFloats slds-align--absolute-left"> 
+                <br/>
+                <div><p class="slds-truncate legend" >Evaluación</p></div>
+                <dl class="slds-dl_horizontal">
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtCostoFinanciero"  type="number" aura:id="txtCostoFinanciero" label="Costo financiero/punto equilibrio"  disabled="true" value="{!v.CostoFinanciero}"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                      <lightning:input name="txtUtilidadPerdida"  aura:id="txtUtilidadPerdida" label="Utilidad/Pérdida"  disabled="true" value="{!v.UtilidaPerdida}"/>   
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:input name="txtConclusion" aura:id="txtConclusion" label="Conclusión"  disabled="true" value="{!v.Conclusion}"/>   
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <div class="slds-size_1-of-2">
+            <div class="clearFloats slds-align--absolute-center">        
+
+            </div>
+            <div class="clearFloats slds-align--absolute-left"> 
+                
+                 <div><p class="slds-truncate legend" >Garantía y Documentos para Análisis de Crédito</p></div>
+                <dl class="slds-dl_horizontal">
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:select name="selectGarantia" aura:id="selectGarantia" label="¿Qué Garantía Estoy Negociando?" disabled="{!v.IsReadOnly}" value="{!v.GarantiaNegociando}" onchange="{!c.DebeEnviarEntregar}">
+                        <option value="Depósito en Efectivo">Depósito en Efectivo</option>
+                        <option value="Carta Stand By">Carta Stand By</option>
+                        <option value="Fianza">Fianza</option>
+                            <option value="**Pagaré**">**Pagaré**</option>
+                            <option value="Garantía Mixta">Garantía Mixta</option>
+                            <option value="Sin Garantía (VR)">Sin Garantía (VR)</option>
+                    </lightning:select>
+                    </dd>
+                    
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtValeGarantia" aura:id="txtValeGarantia" label="¿Cuánto Debe Valer la Garantía?"  disabled="true" value="{!v.ValeGarantia}" type="number" formatter="currency"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:textarea name="txtDebeEnviar" aura:id="txtDebeEnviar" label="¿Qué Debo Enviar al Área de Crédito?"  disabled="true" value="{!v.DebeEnviar}"/>   
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                        <lightning:textarea name="txtDebeEntregar" aura:id="txtDebeEntregar" label="Autorizado el Crédito ¿Qué Debe Entregar el Cliente?"  disabled="true" value="{!v.DebeEntregar}"/>   
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtPeriodofact" aura:id="txtPeriodofact" label="Días periodo de fact"  disabled="true" value="{!v.Periodofact}"/> 
+                    </dd>
+                    <dd class="slds-dl_horizontal__detail slds-tile__meta alignright">
+                        <lightning:input name="txtComision" type="number" formatter="currency" aura:id="txtComision" label="$ Comisión"  disabled="true" value="{!v.Comision}"/> 
+                    </dd>
+                     </dl>
+                 <br/>
+                    <div><strong class="slds-text-heading_small slds-p-left_small">Documentos Adjuntos</strong></div>
+                <br/>
+                     <dl class="slds-dl_horizontal">
+                    <dd>
+                       <aura:iteration items="{!v.documents}" var="document" indexVar="index">
+				<aura:if isTrue="{!v.loading}">
+					<lightning:spinner variant="brand" size="large" alternativeText="Cargando Documento"/>
+				</aura:if>
+				<aura:if isTrue="{!document.isVisible}">
+					<lightning:layout horizontalAlign="center" multipleRows="true" verticalAlign="center">
+						
+							<div class="slds-p-left_small">
+								<!-- <lightning:helptext content="{!document.name}"/> -->
+                                <strong>{!document.name}</strong>
+							</div>
+						
+						<aura:if isTrue="{!!document.loaded}">
+
+							<div class="slds-p-left_small">
+                                <lightning:fileUpload recordId="{!v.IdOportunidad}" label="" name="{!document.name + '-' + document.apiName}" accept=".pdf,.PDF" onuploadfinished="{!c.handleUploadDoc}" class="fileUploadEdenred"/>
+                            </div>
+							<aura:set attribute="else">
+								<div class="slds-p-left_x-small">
+											<lightning:buttonGroup class="slds-align_absolute-center btnsEdenred">
+												<lightning:button label="Descargar" name="{!document.Id}" variant="neutral" onclick="{!c.handleDownloadDoc}"/>
+												<aura:if isTrue="{!!v.IsReadOnly}">
+                                                	<lightning:button label="Eliminar" name="{!document.Id}" variant="neutral" onclick="{!c.handleDeleteDoc}"/>
+                                                </aura:if>   
+											</lightning:buttonGroup>
+                                </div>	
+							</aura:set>
+						</aura:if>
+					</lightning:layout>
+				</aura:if>
+			</aura:iteration>
+					</dd>					
+                        
+                </dl>
+            </div>
+        </div>
+        
+    </div>
+    
+</aura:component>

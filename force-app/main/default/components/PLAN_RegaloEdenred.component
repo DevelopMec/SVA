@@ -1,0 +1,595 @@
+<apex:component >
+    <div id="{{'markupPDF_' + solucion.producto.IdElement}}" >
+    
+    	<!-- INICIO PAGINADOR-->
+    	<div class="div0pm" ng-repeat="pagina in sc.documento.paginas">
+			<img class="logoPrincipal" ng-src="{{solucion.urlHeader}}" ng-if="pagina.secciones[0].nombre == 'HeaderLogo'"/>
+			<div class="pageContainer">
+				<br/>
+				<div class="row" ng-repeat="seccion in pagina.secciones track by $index" ng-if="seccion.nombre != 'HeaderLogo'">
+					 <div class="col-sm-12" ng-if="seccion.nombre == 'Fecha'">
+			            <div class="col-sm-3 col-sm-offset-9 text-center dateContainer" ng-style="solucion.dateBorder">
+			                <span class="dateLabel" ng-style="solucion.fontColor">Fecha</span>
+			                <span class="dateValue" ng-bind="solucion.fechaHoy | date: 'dd / MM / yyyy': 'UTC'"></span>
+			            </div>
+		        	</div>
+		        	<div class="col-sm-12" ng-if="seccion.nombre == 'tPropuesta'">
+			            <div class="col-sm-12">
+			                <div ng-style="solucion.titlePipe" id="wallet-mxn-bar" class="barraEncabezado"></div>
+			                <span class="tituloSeccion" ng-if="solucion.owner.Segmento__c != 'Small'">PROPUESTA COMERCIAL</span>
+			                <span class="tituloSeccion" ng-if="solucion.owner.Segmento__c == 'Small'">PROPUESTA COMERCIAL Y CONDICIONES</span>
+			                <span class="subtituloSeccion">Regalo&reg;</span>
+			            </div>
+		        	</div>
+       				<br/>
+		        	<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'Datos Cliente'">
+			            <div class="col-sm-12">
+			                <span class="dataLabelPDF">Nombre: </span> <span ng-bind="solucion.Quote.Contact.Name"></span><br/>
+			                <!--span class="dataLabelPDF">Puesto: </span> <span ng-bind="solucion.Quote.Contact.Puesto__c"></span><br/-->
+			                <span class="dataLabelPDF">Cliente: </span> <span ng-bind="solucion.Quote.Contact.Account.Name"></span><br/>
+                            <span class="dataLabelPDF">Razón social: </span> <span ng-bind="solucion.Quote.Opportunity.Razon_social__c"></span><br/>
+			            </div>
+		        	</div>
+
+			        <div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'textoPropuesta'">
+			             <div class="col-sm-12">
+		                    <p>
+		                        <span class="dataLabelPDF" ng-style="solucion.fontColor">Estimado (a) </span><br/>
+		                    </p>
+		
+		                    <p>
+		                        Por medio de la presente, le enviamos la propuesta comercial de nuestra solución <b>{{solucion.Product2.Name}}</b>, basada en la información que amablemente nos proporcionó:
+		                    </p>
+		
+		                    <br/>
+		
+		                    <p>
+		                        <span class="dataLabelPDF" ng-style="solucion.fontColor">Volumen de compra mensual: <span ng-bind="solucion.UnitPrice | currency: '$ ': 2"></span></span>
+		
+		                        <br/>
+		                        
+		                        <span class="dataLabelPDF" ng-style="solucion.fontColor">Comisión: <span ng-bind="(solucion.Comision | number: 2) + ' %'"></span> </span>
+		                    </p>
+		
+		                    <br/>
+		
+		                    <p>
+		                       Con el fin de ofrecer una atractiva propuesta, hemos otorgado diferentes bonificaciones, quedando la propuesta final de la siguiente forma:
+		                    </p>
+		                </div>
+			        </div>
+			        			        
+			        <div class="col-sm-12" ng-if="seccion.nombre == 'tablaPrecios'">
+			        	<!-- INICIO PRECIOS-->
+		                <table class="table letraTablas" id="encabezado">
+		                        <thead>
+		                            <tr>
+		                                <th></th>
+		                                <th></th>
+		                                <th></th>
+		                                <th colspan="{{solucion.AnchoHeader}}" style="color: black;" ng-if="solucion.ExisteComparados == true"><center>{{solucion.Product2.Name}}</center></th>
+		                                <th colspan="{{solucion.AnchoHeader}}" style="color: black;" ng-if="solucion.ExisteComparados == true"><center>{{solucion.Productos_Comparados__r[0].ProductoComparado__r.Name}}</center></th>
+		                            </tr>
+		                        </thead>
+		                        <thead class="headerTable">
+		    
+		                            <tr class="headerFontSizeTable">
+		                                <th class="headerLeftBorder anchoTipoConTarjeta" ng-style="solucion.titlePipe" colspan="3"></th>
+		
+		                                <th ng-class="(solucion.blockTarjetas == false || solucion.blockTarjetas == undefined) && solucion.blockVigenciaDescuento == false && !solucion.ExisteComparados ? 'headerRightBorder text-center' : 'text-center'"  ng-if="solucion.CambioAlgunaTarifa == true" ng-style="solucion.titlePipe">Precio original</th>
+		
+		                                <th ng-class="(solucion.blockTarjetas == false || solucion.blockTarjetas == undefined) && solucion.blockVigenciaDescuento == false && !solucion.ExisteComparados ? 'headerRightBorder text-center' : 'text-center'" ng-if="solucion.CambioAlgunaTarifa == false" ng-style="solucion.titlePipe">Costo final</th>
+		
+		                                <th class="text-center" ng-if="solucion.blockVigenciaDescuento" ng-style="solucion.titlePipe">Bonificación / Descuento</th>
+		
+		                                <th class="text-center" ng-if="solucion.blockVigenciaDescuento" ng-style="solucion.titlePipe">Precio final</th>
+		
+		                                <th ng-class="(solucion.blockTarjetas == false || solucion.blockTarjetas == undefined) && !solucion.ExisteComparados ? 'headerRightBorder text-center' : 'text-center'" ng-if="solucion.blockVigenciaDescuento" ng-style="solucion.titlePipe">Vigencia de Descuento</th>
+		
+		                                <th ng-class="!solucion.ExisteComparados ? 'headerRightBorder text-center' : 'text-center'" ng-if="solucion.blockTarjetas" ng-style="solucion.titlePipe">Cantidad de tarjetas o chequeras</th>
+		
+		                                <div  ng-if="solucion.ExisteComparados == true">
+		
+		                                    <th ng-class="(solucion.blockTarjetas == false || solucion.blockTarjetas == undefined) && solucion.blockVigenciaDescuento == false ? 'headerRightBorder text-center' : 'text-center'"  ng-if="solucion.CambioAlgunaTarifa == true && solucion.ExisteComparados" ng-style="solucion.titlePipe">Precio original</th>
+		
+		                                    <th ng-class="(solucion.blockTarjetas == false || solucion.blockTarjetas == undefined) && solucion.blockVigenciaDescuento == false ? 'headerRightBorder text-center' : 'text-center'" ng-if="solucion.CambioAlgunaTarifa == false && solucion.ExisteComparados" ng-style="solucion.titlePipe">Costo final</th>
+		
+		                                    <th class="text-center" ng-if="solucion.blockVigenciaDescuento && solucion.ExisteComparados" ng-style="solucion.titlePipe">Bonificación / Descuento</th>
+		
+		                                    <th class="text-center" ng-if="solucion.blockVigenciaDescuento && solucion.ExisteComparados" ng-style="solucion.titlePipe">Precio final</th>
+		
+		                                    <th ng-class="(solucion.blockTarjetas == false || solucion.blockTarjetas == undefined) ? 'headerRightBorder text-center' : 'text-center'" ng-if="solucion.blockVigenciaDescuento && solucion.ExisteComparados" ng-style="solucion.titlePipe">Vigencia de Descuento</th>
+		
+		                                    <th class="headerRightBorder text-center" ng-if="solucion.blockTarjetas && solucion.ExisteComparados" ng-style="solucion.titlePipe">Cantidad de tarjetas o chequeras</th>
+		
+		                                </div>
+		                            </tr>
+		                        </thead>
+		                        <tbody class="tablePDFValores">
+		                            <tr ng-repeat="concepto in seccion.listaContenido">
+		
+		                                <td class="text-center tableBordeValores " ng-bind="concepto.TipoCargo__c" colspan="3"></td>
+		
+		                                <!-- concepto == solucion.conceptosKey[concepto.key] para el cotizado
+		                                comparado == solucion.Productos_Comparados__r[0].conceptosKey[concepto.key] -->
+		
+		                                <td class="text-center tableBordeValores" >
+		
+		                                    <span ng-bind="(solucion.conceptosKey[concepto.key].Importe__c | number: 2) + ' %'" ng-if="concepto.TipoCargo__c == 'Comisión por el servicio' && solucion.conceptosKey[concepto.key].Importe__c"></span>
+		
+		                                    <span ng-bind="solucion.conceptosKey[concepto.key].Importe__c | currency: '$ '" ng-if="concepto.TipoCargo__c != 'Comisión por el servicio' && solucion.conceptosKey[concepto.key].Importe__c"></span>
+		
+		                                    <span ng-if="!solucion.conceptosKey[concepto.key].Importe__c">-</span>
+		                                
+		                                </td>
+		
+		                                <td class="text-center tableBordeValores" ng-if="solucion.blockVigenciaDescuento " >
+		
+		                                    <span ng-if="solucion.conceptosKey[concepto.key].Bonificacion__c && solucion.conceptosKey[concepto.key].Bonificacion__c != 0" ng-bind="(solucion.conceptosKey[concepto.key].Bonificacion__c | number: 2) + ' %'"></span>
+		
+		                                    <span ng-if="(!solucion.conceptosKey[concepto.key] || solucion.conceptosKey[concepto.key].Bonificacion__c == 0 || solucion.conceptosKey[concepto.key].Bonificacion__c == undefined)" ><center>-</center></span>
+		
+		                                </td>
+		
+		                                <td class="text-center tableBordeValores" ng-if="solucion.blockVigenciaDescuento" >
+		
+		                                    <span ng-if="concepto.TipoCargo__c == 'Comisión por el servicio' && solucion.conceptosKey[concepto.key].PrecioFinal2__c && solucion.conceptosKey[concepto.key].PrecioFinal2__c != 0" ng-bind="(solucion.conceptosKey[concepto.key].PrecioFinal2__c | number: 2) + ' %'"></span>
+		
+		                                    <span ng-if="concepto.TipoCargo__c == 'Comisión por el servicio' && solucion.conceptosKey[concepto.key].Bonificacion__c == 100"><center>0%</center></span>
+		
+		                                    <span ng-if="concepto.TipoCargo__c != 'Comisión por el servicio' && solucion.conceptosKey[concepto.key].PrecioFinal2__c && solucion.conceptosKey[concepto.key].PrecioFinal2__c != 0" ng-bind="solucion.conceptosKey[concepto.key].PrecioFinal2__c | currency: '$ ': 2"></span>
+		
+		                                    <span ng-if="concepto.TipoCargo__c != 'Comisión por el servicio' && solucion.conceptosKey[concepto.key].Bonificacion__c == 100"><center>$ 0</center></span>
+		
+		                                    <span ng-if="!solucion.conceptosKey[concepto.key] || solucion.conceptosKey[concepto.key].PrecioFinal2__c == undefined "><center>-</center></span>
+		
+		                                </td>
+		
+		                                <td class="text-center tableBordeValores" ng-if="solucion.blockVigenciaDescuento ">
+		
+		                                    <span ng-if="solucion.conceptosKey[concepto.key].VigenciaDescuento__c" ng-bind="solucion.conceptosKey[concepto.key].VigenciaDescuento__c | date: 'dd / MM / yyyy': 'UTC'"></span>
+		
+		                                    <span ng-if="!solucion.conceptosKey[concepto.key].VigenciaDescuento__c" ><center>-</center></span>
+		
+		                                </td>   
+		
+		                                <td class="text-center tableBordeValores" ng-if="solucion.blockTarjetas ">
+		
+		                                    <span ng-if="solucion.conceptosKey[concepto.key].CantidadTarjetas__c" ng-bind="solucion.conceptosKey[concepto.key].CantidadTarjetas__c"></span>
+		
+		                                    <span ng-if="!solucion.conceptosKey[concepto.key].CantidadTarjetas__c"><center>-</center></span>
+		
+		                                </td>
+		
+		
+		                                <span ng-if="solucion.ExisteComparados">
+		                                    <td class="text-center tableBordeValores" ng-if="solucion.ExisteComparados">
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Importe__c" ng-bind="(solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Importe__c | number: 2) + ' %'"></span>
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Importe__c" ng-bind="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Importe__c | currency: '$ '" ></span>
+		
+		                                        <span ng-if="!solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Importe__c"><center>-</center></span>
+		                                    
+		                                    </td>
+		
+		                                    <td class="text-center tableBordeValores" ng-if="solucion.blockVigenciaDescuento && solucion.ExisteComparados" >
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c != 0 " ng-bind="(solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c | number: 2) + ' %'"></span>
+		
+		                                        <span ng-if="(solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c == 0 || solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c == undefined)" ><center>-</center></span>
+		                                    </td>
+		
+		                                    <td class="text-center tableBordeValores" ng-if="solucion.blockVigenciaDescuento && solucion.ExisteComparados" >
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].PrecioFinal2__c != 0" ng-bind="(solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].PrecioFinal2__c | number: 2) + ' %'"></span>
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].TipoCargo__c == 'Comisión por el servicio' && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c == 100"><center>0%</center></span>
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].PrecioFinal2__c != 0" ng-bind="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].PrecioFinal2__c | currency: '$ '"></span>
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].TipoCargo__c != 'Comisión por el servicio' && solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].Bonificacion__c == 100"><center>$ 0</center></span>
+		
+		                                        <span ng-if="!solucion.Productos_Comparados__r[0].conceptosKey[concepto.key] || solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].PrecioFinal2__c == undefined"><center>-</center></span>
+		 
+		                                    </td>
+		
+		                                    <td class="text-center tableBordeValores" ng-if="solucion.blockVigenciaDescuento && solucion.ExisteComparados">
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].VigenciaDescuento__c" ng-bind="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].VigenciaDescuento__c | date: 'dd / MM / yyyy': 'UTC'"></span>
+		
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key] == undefined || solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].VigenciaDescuento__c == undefined" ><center>-</center></span>
+		
+		                                    </td>   
+		                                    
+		                                    <td class="text-center tableBordeValores" ng-if="solucion.blockTarjetas && solucion.ExisteComparados">
+		                                        <span ng-if="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].CantidadTarjetas__c" ng-bind="solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].CantidadTarjetas__c"></span>
+		
+		                                        <span ng-if="!solucion.Productos_Comparados__r[0].conceptosKey[concepto.key]|| solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].CantidadTarjetas__c == 0 || solucion.Productos_Comparados__r[0].conceptosKey[concepto.key].CantidadTarjetas__c == undefined"><center>-</center></span>
+		                                    </td>
+		                                </span>
+		                            </tr>
+		                        </tbody>
+		                </table>
+		                <!-- FIN PRECIOS-->
+			        </div>
+					
+					<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'vigenciaIva'">
+                		<div class="col-sm-12 text-right boldEdenred sizeIva">
+                    		<span>Esta propuesta tiene una vigencia de {{solucion.Quote.VigenciaCotizacion__c}}</span><br/>
+                    		<span>Los costos no incluyen IVA</span>
+                		</div>
+            		</div>
+            		
+            		<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'comentarios'">
+	                	<div class="col-sm-2">
+	                    	<span class="dataLabelPDF" ng-style="solucion.fontColor">Comentarios:</span>
+	                	</div>
+	                	<div class="col-sm-10" >
+	                    	<div ng-bind="solucion.ComentariosCotizacion__c"></div><br/>
+	                	</div>
+	            	</div>
+	            	
+	            	<!-- FORMA PAGO -->
+                	<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'formaPago'">
+		                <div class="col-sm-6">
+		                    <p class="dataLabelPDF" ng-style="solucion.fontColor">Forma de pago del pedido:</p>
+		                    <p>
+		                        <span ng-if="solucion.FormaPago__c == 'TransferenciaElectronica'" class="fa fa-check-square-o"></span>
+		                        <span ng-if="solucion.FormaPago__c != 'TransferenciaElectronica'" class="fa fa-square-o"></span>
+		                        Transferencia electrónica &nbsp;&nbsp;
+		
+		                        <br/>
+		
+		                        <span ng-if="solucion.FormaPago__c == 'American Express'" class="fa fa-check-square-o"></span>
+		                        <span ng-if="solucion.FormaPago__c != 'American Express'" class="fa fa-square-o"></span>
+		                        American Express &nbsp;&nbsp;
+		                        
+		                        <br/>
+		
+		                        <span ng-if="solucion.FormaPago__c == 'Deposito'" class="fa fa-check-square-o"></span>
+		                        <span ng-if="solucion.FormaPago__c != 'Deposito'" class="fa fa-square-o"></span>
+		                        Depósito Bancario &nbsp;&nbsp;
+		
+		                        <br/>
+		
+		                        <span ng-if="solucion.FormaPago__c == 'Otros'" class="fa fa-check-square-o"></span>
+		                        <span ng-if="solucion.FormaPago__c != 'Otros'" class="fa fa-square-o"></span>
+		                        Otros:
+		                        <span ng-if="solucion.FormaPago__c == 'Otros'" ng-bind="solucion.OtroMetodoPago__c"></span>
+		                    
+		                    </p>
+		                </div>
+		                <div class="col-sm-6 text-right boldEdenred">
+		                    <div class="col-sm-2"></div>
+		                    <div class="col-sm-10">
+		                        <span class="dataLabelPDF" ng-style="solucion.fontColor">Notas:</span><br/>
+		                        <p class="letraNotas">
+		                            <span>• Contraprestación mínima, 3 UMAS si el importe de la comisión es inferior a ese monto.</span><br/>
+		                            <span>• Condiciones especiales (tarjetas de reposición) de acuerdo con la negociación.</span>
+		                        </p>
+		                    </div>
+                		</div>
+		            </div>
+		            <!-- FIN FORMA PAGO -->
+            		            		
+            		<!-- INICIO DIFERENCIALES -->
+            		<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'pipeDiferenciales'">
+		                <div class="col-sm-12">
+		                    <div ng-style="solucion.titlePipe" id="wallet-mxn-bar" class="pipeDiferencial"></div>
+		                    <span class="tituloSeccion">DIFERENCIALES</span>
+		                    <span class="subtituloSeccion">de Regalo&reg;</span>
+		                </div>
+			        </div>
+			        
+			        <div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'tablaDiferenciales'">
+		                <div class="col-sm-12">
+		                    <table class="table">
+		                        <thead class="headerTable">
+		                            <tr>
+		                                <th class="headerLeftBorder text-center" ng-style="solucion.titlePipe" width="90%">
+		                                    Descripción
+		                                </th>
+		                                <th class="headerRightBorder text-center" ng-style="solucion.titlePipe"></th>
+		                            </tr>
+		                        </thead>
+		                        <tbody class="tablePDFValores">
+		
+		                            <tr ng-repeat="diferencial in seccion.listaContenido | limitTo: 1000">
+		                                <td width="90%" ng-bind="diferencial.CaracteristicasSolucion__c"> 
+		                                </td>
+		                                <td class="text-center">
+		                                    <span class="fa fa-check text-purple" ng-style="solucion.fontColor"></span>
+		                                </td>
+		                            </tr>
+		
+		                        </tbody>
+		                    </table>
+		                </div>
+			        </div>
+					<div class="col-sm-12 seccionDatosCliente " ng-if="seccion.nombre == 'pipeDiferenciales2'">
+                        <div class="col-sm-12 seccionDiferenciales">
+                            <div class="footerPageDiferenciales" ng-style="solucion.titlePipe">Disfrute de estos servicios con una fácil contratación.</div>
+                        </div>
+                    </div>
+					<!-- FIN DIFERENCIALES -->
+				</div>
+			</div>
+			<div class="page-break" ng-if="sc.documento.paginas.numPaginas != pagina.numPagina"></div>
+		</div>
+    	
+    	<!-- FIN PAGINADOR -->
+        
+        <div class="pageContainer">
+
+            <!-- <div class="row seccionDatosCliente">
+                <div class="col-sm-12" >
+                    <div ng-bind="" class="lineaComentario"></div><br/>
+                </div>
+            </div> -->
+
+            <!-- <span class="page-break" ng-if="solucion.Productos_Concepto__r.length > 10 && solucion.Productos_Concepto__r.length < 14"></span> -->
+
+    
+
+            <!-- <span class="page-break" ng-if="(solucion.diferenciales && solucion.diferenciales.length > 0) && (solucion.PreciosDosTablas || solucion.PreciosTabla1.length < 10)"></span> -->
+
+            <div ng-if="solucion.terminos != undefined">
+                <div class="row seccionDatosCliente justificado">
+                    <span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Términos y Condiciones del Servicio:</span>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <div ng-bind-html="solucion.terminos"></div>
+                </div>     
+
+                <br/>
+
+                <div class="row seccionDatosCliente">
+                    <span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Responsabilidades:</span><br/><br/>
+                    <p>
+                        Es entendido y convenido que la empresa cliente es responsable por la veracidad de la información que nos sea suministrada para la prestación de los servicios anteriormente identificados.
+                    </p>
+                    <p>
+                        La empresa cliente es responsable del pago oportuno (dentro del lapso acordado) de las facturas por el servicio.
+                    </p>
+                    <p>
+                        La empresa cliente es responsable de leer y seguir los instructivos y manuales de operación que están disponibles en la página web de Edenred, necesarios para la operatividad de los monederos electrónicos y tarjetas.
+                    </p>
+
+                    <p>
+                        Edenred es responsable de la entrega en los tiempos acordados de las tarjetas electrónicas y monederos, así como de efectuar la dispersión de los fondos transmitidos por la empresa en la fecha indicada por la empresa cliente.
+                    </p>
+
+
+                    <p>
+                        La Empresa Cliente es responsable de designar a un Administrador Único del Sistema en la plataforma de Edenred, quien será el único responsable de las instrucciones que al efecto girará para las transacciones y operaciones que se efectúen en dicha plataforma desde el mismo momento en que ingrese con su clave de usuario. El cambio de ese Administrador Único deberá ser notificado por escrito mediante carta firmada por el Representante Legal.
+                    </p>
+                </div>
+
+                <br/>
+
+                <div class="row seccionDatosCliente">
+                    <span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Jurisdicción</span><br/><br/>
+                    <p>
+                        La empresa cliente <u>{{}}</u> conviene que los términos de esta propuesta estarán regidos e interpretados de acuerdo con las leyes de la República Mexicana.
+                    </p>
+                </div>
+
+                <br/>
+
+                <div class="row seccionDatosCliente">
+                    <span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Declaración de Acuerdo Total</span><br/><br/>
+                    <p>
+                        Esta propuesta constituye el único entendimiento y acuerdo total entre Edenred y <u>{{}}</u> con respecto a los servicios aquí descritos. Esta propuesta reemplaza cualquier otro convenio previo entre las partes con respecto al asunto de esta propuesta, cuyos efectos cesarán desde el momento de la firma de la presente.
+                    </p>
+                </div>
+
+                <br/>
+
+                <div class="row seccionDatosCliente">
+                    <span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Misceláneos</span><br/><br/>
+                    <p>
+                        Al aceptar la presente propuesta la empresa cliente por intermedio de su Representante Legal, autoriza a <b>{{solucion.Quote.Opportunity.Contacto__r.Name}}</b> como Administrador UNICO del sistema para comunicarse con ella por correo electrónico o para a transmitir documentos en forma electrónica, aceptando los riesgos inherentes a este tipo de comunicación y acuerda que puede confiar solamente en la versión final impresa del documento u otra comunicación que <u>{{}}</u> envíe a la Compañía.
+                    </p>
+
+                    <p>
+                        Esta propuesta será válida por un período de siete (7) días contados a partir de su recepción por parte de la empresa cliente.
+                    </p>
+
+                    <p>
+                        Será para nosotros motivo de gran satisfacción contar con <u>{{}}</u>, entre nuestros clientes y confiamos que los términos de nuestra propuesta sean de su conformidad. Si desean alguna información adicional gustosamente se la suministraremos a su solicitud. En la copia anexa a esta carta puede darnos su aceptación a esta propuesta, si esa fuera su decisión, aunque la firma al calce de la presente a o una respuesta escrita de ustedes servirá para el mismo propósito.
+                    </p>
+                </div>
+
+                <br/>
+
+                <div class="row" ng-if="solucion.anexoA != 'undefined'">
+                    <span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Anexo:</span><br/><br/>
+                    <div ng-bind-html="solucion.anexoA" class="justificado"></div>
+                </div>
+
+                <br/><br/><br/>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p class="dataLabelPDF">Por Edenred México, S. A. de C.V. </p>  
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="leftLabel">Por: {{solucion.Quote.Opportunity.Razon_social__c}}</p> 
+                        <div class="promiseLine"></div>
+                    </div>
+                </div>
+
+                <br/><br/><br/><br/><br/>
+
+                <div class="row">
+                    <div class="col-sm-5-5 text-center">
+                        <div class="fontwhite">\s1\</div>
+                        <center>{{solucion.Quote.Opportunity.Owner.Manager.Name}}</center>
+                        <div class="promiseLine"></div>
+                        <center><strong>Nombre y Firma del Apoderado </strong></center>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-5-5 text-center">
+                        <center>{{solucion.Quote.Contact.Name}}</center>
+                        <div class="promiseLine"></div>
+                        <center><strong>Aceptada por la Empresa Cliente: </strong></center>
+                    </div>
+                </div>
+
+                <!-- <span class="dataLabelPDF" ng-style="solucion.fontColor">Por Edenred México, S.A. de C.V.</span><br/>
+
+                <div class="row">
+                    <div class="col-sm-5-5 text-center">
+                        <strong>Nombre y Firma del Apoderado </strong>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-5-5 text-center">
+                        <strong>Aceptada por la Empresa Cliente: </strong>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-5-5 text-center seccionFirma" ng-style="solucion.dateBorder">
+                        
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-5-5 text-center seccionFirma" ng-style="solucion.dateBorder">
+                        
+                    </div>
+                </div>
+
+                <br/><br/><br/>
+
+                <div class="row seccionDatosCliente">
+                    <div class="col-sm-6 col-sm-offset-6 text-center">
+                        <strong>Nombre y Firma Representante Legal</strong>
+                    </div>
+                </div>
+
+                <div class="row seccionDatosCliente">
+                    <div class="col-sm-7 col-sm-offset-5 seccionFirmaApoderado" ng-style="solucion.dateBorder">
+                        
+                    </div>
+                </div> -->
+                <span class="page-break"></span>    
+            </div>
+                        
+            <div class="row">
+                <div class="col-sm-12">
+                    <div ng-style="solucion.titlePipe" id="wallet-mxn-bar"></div>
+                    <div class="tituloSeccion seccionSoluciones">SOLUCIONES</div>
+                </div>
+            </div>
+            <div class="seccionDatosCliente">
+            	<br/>
+                <h3>Conoce otras  soluciones  que  te  ayudarán  a  administrar  tu  empresa  de  forma más  eficiente </h3>
+                <br/>
+            </div>
+
+            <div class="row seccionDatosCliente separaccionFooterOndulado">
+                <div class="col-sm-8">
+                    <div class="row">
+                        <div class="col-sm-12 seccionSolucionesContenedor">
+                            <br/>
+                            <span class="labelBeneficioEmpleados">
+                                BENEFICIOS PARA EMPLEADOS
+                            </span>
+                            <br/><br/>
+                            <p>
+                                La prestación mejor valorada por los trabajadores y que, además, los libera de impuestos y cargas sociales.
+                            </p>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row seccionDatosCliente separaccionFooterOndulado">
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-12 seccionSolucionesContenedor">
+                            <br/>
+                            <span class="labelGastosProfesionales">
+                                GASTOS PROFESIONALES
+                            </span>
+                            <br/><br/>
+                            <p>
+                                Soluciones para optimizar con total transparencia, la gestión de los gastos profesionales, mejorando así sus resultados.
+                            </p>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row seccionDatosCliente separaccionFooterOndulado">
+                <div class="col-sm-10 ">
+                    <div class="row">
+                        <div class="col-sm-12 seccionSolucionesContenedor">
+                            <br/>
+                            <span class="labelHerramientasTrabajo">
+                                HERRAMIENTAS DE TRABAJO
+                            </span>
+                            <br/><br/>
+                            <p>
+                                Soluciones para otorgar herramientas de trabajo como la ayuda de alimentación y vestimenta; con el fin de mejorar la calidad de vida de los empleados y su imagen en la organización
+                            </p>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row seccionDatosCliente">
+                <div class="col-sm-8 ">
+                    <div class="row">
+                        <div class="col-sm-11 seccionSolucionesContenedor">
+                            <br/>
+                            <span class="labelMotivacionRecompensas">
+                                MOTIVACIÓN Y RECOMPENSAS
+                            </span>
+                            <br/><br/>
+                            <p>
+                                Ve más allá de sólo dar regalos con la solución más cómoda para otorgar incentivos y reconocer a los colaboradores.
+                            </p>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-5 seccionContactanos">
+                    <!--
+                    <br/><br/><br/>
+                    <h1>Contáctanos</h1>
+                    <p>• (55) 5262 8889 </p>
+                    <p>• Telesales-mx@edenred.com.mx</p>
+                    -->
+                </div>
+
+                <div class="col-sm-7 informacionEjecutivo" ng-style="solucion.titlePipe">
+                    <p>Sin más por el momento, quedo de usted para cualquier asunto al respecto</p><br/>
+                    
+                    <p>Atentamente</p><br/>
+                    <p><strong>Ejecutivo comercial</strong></p><br/>
+
+                    <p>Nombre: <span class="infoEjecutivoDatos" ng-bind="solucion.owner.Name"></span></p>
+                    <p>Teléfono: <span class="infoEjecutivoDatos" ng-bind="solucion.owner.Phone"></span></p>
+                    <p>E-mail: <span class="infoEjecutivoDatos" ng-bind="solucion.owner.Email"></span></p>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</apex:component>

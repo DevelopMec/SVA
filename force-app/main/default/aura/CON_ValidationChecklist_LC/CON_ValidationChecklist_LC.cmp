@@ -1,0 +1,123 @@
+<aura:component controller="CON_ContractsContainer_CTRL">
+	
+	<!-- Handlers -->
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+	<!-- Handlers -->
+	
+	<!-- Registered Events -->
+	<aura:registerEvent name="showCC" type="c:CON_MessageForCC_EVENT"/>
+	<!-- Registered Events -->
+	
+	<!-- Logical Flags -->
+	<!-- <aura:attribute name="isNextButtonVisible" type="Boolean" default="true"/> -->
+	<!-- <aura:attribute name="documentationComplete" type="Boolean"/> -->
+	<!-- <aura:attribute name="hasLegalRepresentative" type="Boolean" default="true"/> -->
+	<!-- <aura:attribute name="isCorrectOppsStageName" type="Boolean" default="true"/> -->
+	<aura:attribute name="isDataReady" type="Boolean" default="false"/>
+	<!-- Logical Flags -->
+	
+	<!-- Utility Attributes -->
+	<aura:attribute name="recordId" type="Id"/>
+	<aura:attribute name="opportunityId" type="Id"/>
+    <aura:attribute name="AccountID" type="Id"/>
+	<aura:attribute name="headerData" type="Object"/>
+    <aura:attribute name="leyenda" type="string" default="La Etapa de la Oportunidad debe estar en Contrato para poder Continuar"/>
+	<!-- <aura:attribute name="legalRepresentativeData" type="Object"/> -->
+	<!-- Utility Attributes -->
+	
+	<aura:if isTrue="{!v.isDataReady}">
+		<div class="slds-p-horizontal_large slds-p-vertical_large">
+			<!-- <div class="slds-align_absolute-center">
+				<span class="slds-text-heading_medium slds-p-bottom_large">Validación de Datos</span>
+			</div> -->
+			<div class="validation-checklist-border slds-m-horizontal_xx-large slds-p-around_x-large">
+				<lightning:layout horizontalAlign="center" class="slds-m-bottom_medium">
+					<lightning:layoutItem size="12">
+						<div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+							<span class="slds-assistive-text">warning</span>
+							<lightning:icon iconName="utility:warning" size="small" class="slds-m-right_x-small"/>
+							<h2 class="slds-text-heading_small slds-truncate">{!v.leyenda}</h2>
+						</div>
+					</lightning:layoutItem>
+				</lightning:layout>
+				<div class="slds-p-vertical_xx-small slds-section">
+					<h3 class="slds-section__title slds-theme_shade">
+						<span class="slds-truncate slds-p-horizontal_small">Información General</span>
+					</h3>
+				</div>
+				<c:CON_ContractHeader_LC data="{!v.headerData}"/>
+				<!-- <div class="slds-p-vertical_xx-small slds-section">
+					<h3 class="slds-section__title slds-theme_shade">
+						<span class="slds-truncate slds-p-horizontal_small">Datos Requeridos</span>
+					</h3>
+				</div> -->
+				<!-- <div class="slds-m-horizontal_xx-large"> -->
+					<!-- <lightning:layout horizontalAlign="center" class="slds-m-top_medium">
+						<lightning:layoutItem size="4" class="slds-p-left_xx-large">
+							<strong class="slds-truncate">Etapa de la Oportunidad</strong>
+						</lightning:layoutItem>
+						<lightning:layoutItem size="4" class="slds-align_absolute-center">
+							<strong class="slds-truncate">{!v.headerData.Quote.Opportunity.StageName}</strong>
+						</lightning:layoutItem>
+						<lightning:layoutItem size="4" class="slds-grid slds-grid_align-end slds-p-right_xx-large">
+							<aura:if isTrue="{!v.isCorrectOppsStageName}">
+								<lightning:icon iconName="action:approval" size="small"/>
+								<aura:set attribute="else">
+									<lightning:icon iconName="action:close" size="small"/>
+								</aura:set>
+							</aura:if>
+						</lightning:layoutItem>
+					</lightning:layout>
+					<lightning:layout horizontalAlign="center" class="slds-m-top_medium">
+						<lightning:layoutItem size="4" class="slds-p-left_xx-large">
+							<strong class="slds-truncate">¿La Oportunidad Tiene Representante Legal?</strong>
+						</lightning:layoutItem>
+						<lightning:layoutItem size="4" class="slds-align_absolute-center">
+							<strong class="slds-truncate">{!v.hasLegalRepresentative ? 'Tiene Representante Legal' : 'No Tiene Representate Legal'}</strong>
+						</lightning:layoutItem>
+						<lightning:layoutItem size="4" class="slds-grid slds-grid_align-end slds-p-right_xx-large">
+							<aura:if isTrue="{!v.hasLegalRepresentative}">
+								<lightning:icon iconName="action:approval" size="small"/>
+								<aura:set attribute="else">
+									<lightning:icon iconName="action:close" size="small"/>
+								</aura:set>
+							</aura:if>
+						</lightning:layoutItem>
+					</lightning:layout> -->
+					<!-- <lightning:layout horizontalAlign="center" class="slds-m-top_medium">
+						<lightning:layoutItem size="4" class="slds-p-left_xx-large">
+							<strong class="slds-truncate">¿La Documentación está Completa?</strong>
+						</lightning:layoutItem>
+						<lightning:layoutItem size="4" class="slds-align_absolute-center">
+							<strong class="slds-truncate">{!v.documentationComplete ? 'Documentación Completa' : 'Faltan Documentos'}</strong>
+						</lightning:layoutItem>
+						<lightning:layoutItem size="4" class="slds-grid slds-grid_align-end slds-p-right_xx-large">
+							<aura:if isTrue="{!v.documentationComplete}">
+								<lightning:icon iconName="action:approval" size="small"/>
+								<aura:set attribute="else">
+									<lightning:icon iconName="action:close" size="small"/>
+								</aura:set>
+							</aura:if>
+						</lightning:layoutItem>
+					</lightning:layout> -->
+					<!-- <lightning:layout horizontalAlign="center" class="slds-m-top_medium">
+						<lightning:layoutItem size="12" class="slds-align_absolute-center">
+							<p class="slds-text-align_center">
+								<strong>Si falta algún documento, este se podrá anexar más adelante</strong>
+							</p>
+						</lightning:layoutItem>
+					</lightning:layout> -->
+				<!-- </div> -->
+			</div>
+			<!-- <aura:if isTrue="{!v.isNextButtonVisible}">
+				<div class="slds-align_absolute-center slds-p-top_large">
+					<lightning:button variant="success" label="Continuar" onclick="{!c.doNext}"/>
+				</div>
+			</aura:if> -->
+		</div>
+		<aura:set attribute="else">
+			<lightning:spinner size="medium" variant="brand" title="Cargando" alternativeText="Cargando"/>
+		</aura:set>
+	</aura:if>
+	
+</aura:component>

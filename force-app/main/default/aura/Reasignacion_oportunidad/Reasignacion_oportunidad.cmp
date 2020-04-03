@@ -1,0 +1,57 @@
+<aura:component controller="Reasignacion_oportunidad_CONT" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="idSeleccionado" type="String"/>
+    <aura:attribute name="mensaje" type="Object"/>
+    <aura:attribute name="listaUsuarios" type="List"/>
+    <aura:attribute name="listaUsuariosBusqueda" type="List"/>
+    <aura:attribute name="habilitarAsig" type="boolean" default="true"/>
+    <aura:attribute name="issearching" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarAlerta" type="Boolean" default="false"/>
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.mostrarAlerta}">
+        <ui:message class="snackbar" title="{!v.mensaje.titulo}" severity="{!v.mensaje.tipo}" closable="true">
+            {!v.mensaje.msj}
+        </ui:message>
+    </aura:if>
+    <div class="margenes" style="position:relative">
+        <aura:if isTrue="{!v.spinner}">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+        <!--lightning:recordEditForm aura:id="recordViewForm"
+                                     recordId="0063D000009NOD0QAO"
+                                     recordTypeId="01261000000j3NEAAY"
+                                     objectApiName="Opportunity">
+            <lightning:messages />
+            <lightning:inputField  aura:id="asigna" fieldName="OwnerId" onchange="{!c.onCh}" default=""  />
+        </lightning:recordEditForm-->
+        
+        
+        
+        
+        <!--lightning:combobox aura:id="usuariosSeleccionado" name="usuarios" label="Usuarios disponibles" placeholder="Seleccione una opción" options="{!v.listaUsuarios}" onchange="{!c.habilidarReasignar}"/-->
+        
+        <lightning:button variant="success" class="alinerDerecha" disabled="{!v.habilitarAsig}" label="Reasignar" onclick="{!c.reasignarOportunidad}"/>
+        <br/>
+        <lightning:input aura:id="usuarioSelec" disabled="true" value="Sin usuario seleccionado" label="Usuario seleccionado:" />
+        <br/>
+        
+        <div onkeyup="{!c.buscar}">
+            <lightning:input
+                             aura:id="enter-search"
+                             label="Buscar usuario(presiona Enter ↲ para buscar)"
+                             isLoading="{!v.issearching}"
+                             type="search"
+                             />
+        </div><br/>
+        <div style="height: 180px">
+            <lightning:datatable
+                                 keyField="id"
+                                 data="{!v.listaUsuariosBusqueda}"
+                                 columns="{!v.columns}"
+                                 hideCheckboxColumn="true"
+                                 onrowaction="{!c.seleccionar}"/>
+        </div>        
+    </div>
+</aura:component>

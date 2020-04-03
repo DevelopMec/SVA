@@ -1,0 +1,16 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="IngresarIdLlamadaTicket_CONT">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="spin" type="String" default=""/>
+    
+    <div style="width:100%;height:100%;background-color:white;" class="slds-p-around_medium">
+        <div>
+            <aura:if isTrue="{!v.spin}">
+                <lightning:spinner size="large"/>
+            </aura:if>
+            <lightning:input type="text" label="Id de Llamada" aura:id="idLlamada" />
+            <div class="slds-p-around_medium">
+                <lightning:button class="derecha" variant="brand" label="Confirmar" onclick="{!c.ingresarId}"/>
+            </div>
+        </div>
+    </div>
+</aura:component>
