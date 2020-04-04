@@ -21,7 +21,7 @@ public class Vista_DinamicaController_Test {
         
         Product2 prod = new Product2();
         prod.Name = 'Producto Test';
-        prod.Family = 'Comida';
+        prod.Family = 'Ticket Restaurante';
         prod.ProductCode = '1';
         insert prod;
         
@@ -47,7 +47,7 @@ public class Vista_DinamicaController_Test {
         	Vista_DinamicaController.updateAccountSolutions(entidadadesList);
         Test.stopTest();
         acc = [SELECT Id, SolutionsText__c FROM Account WHERE Name = 'ABCTest'];
-		System.assertEquals('Comida', acc.SolutionsText__c, 'The account has the correct solution.');
+		System.assertEquals('Ticket Restaurante', acc.SolutionsText__c, 'The account has the correct solution.');
     }
     
 }

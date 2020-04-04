@@ -790,6 +790,8 @@
 					<lightning:layoutItem padding="horizontal-small" size="1" smallDeviceSize="1" mediumDeviceSize="1" largeDeviceSize="1" flexibility="auto">
 						<aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
 							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
+							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Comentarios del comercial para ADC" name="comentariosComercial" value="{!rechazo.ADV_Comments__c}" />
+							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Comentarios Adimistración de ventas" name="comentariosAdmin" value="" />
 						</aura:iteration>
 					</lightning:layoutItem>
 				</lightning:layout>

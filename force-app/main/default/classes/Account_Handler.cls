@@ -4,6 +4,8 @@ public class Account_Handler {
         for(String accId : triggerOld.keySet()){
             if(isFrozenAccount(triggerNew.get(accId),triggerOld.get(accId)) ) {
                 triggerNew.get(accId).Frozen_Segment__c = triggerNew.get(accId).Text_Segment__c;
+                triggerNew.get(accId).business__c = '';
+                triggerNew.get(accId).Funcion__c = '';
             } else if(isExFrozenAccount(triggerNew.get(accId),triggerOld.get(accId))) {
                 triggerNew.get(accId).Frozen_Segment__c = '';
             }
