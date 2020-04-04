@@ -1,9 +1,6 @@
 <aura:component access="global" implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName" controller="CON_ContractsContainer_CTRL" >
 	<!-- <ltng:require scripts="{!join(',', $Resource.BOOTSTRAP4 + '/js/jquery-3.2.1.slim.min.js', $Resource.BOOTSTRAP4 + '/js/popper.min.js', $Resource.BOOTSTRAP4 + '/js/bootstrap.min.js')}" styles="{!$Resource.BOOTSTRAP4 + '/css/bootstrap.min.css'}"/> -->
-	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js'
-    						)}"
-    						afterScriptsLoaded="{!c.init}"
-    				/>
+	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js')}" afterScriptsLoaded="{!c.init}"/>
 	<aura:attribute name="cuenta" type="String"/>
 	<aura:attribute name="oppId" type="String"/>
 	<aura:attribute name="dataSource" type="Object"/>
@@ -787,7 +784,16 @@
 					<lightning:input label="Modo de offline" name="modoOffline" type="text"  step="any" value="" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
 				</lightning:layoutItem>
 			</lightning:layout> -->
-            
+			<aura:if isTrue="{!v.historicoMotivosRechazo.length > 0}">
+				<h3 class="slds-section-title--divider dividerTable">Histórico de motivos de rechazo.</h3>
+				<lightning:layout >
+					<lightning:layoutItem padding="horizontal-small" size="1" smallDeviceSize="1" mediumDeviceSize="1" largeDeviceSize="1" flexibility="auto">
+						<aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
+							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
+						</aura:iteration>
+					</lightning:layoutItem>
+				</lightning:layout>
+			</aura:if>
             <lightning:layout >
 				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
 					<lightning:textarea name="comentariosAdministracion" value="{!v.dataSource.Opportunity.Comentarios_Ejecutivo__c}" label="Comentarios del Comercial para ADC" maxlength="300" />
