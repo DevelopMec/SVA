@@ -58,8 +58,6 @@
           component.set('v.app_edenred.documentos', documentos);
           helper.getInitialData(component, contratoId);
           helper.getFiliales(component, contratoId);
-          if(component.get("v.oppId"))
-            helper.getMotivosRechazoHistorial(component,component.get("v.oppId"));
         }
 
       })).catch( $A.getCallback( function( err ) {

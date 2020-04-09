@@ -35,7 +35,7 @@
                 console.log('dataSource.Product2__c:',dataSource.Product2__c);
 			 	component.set("v.cuenta", dataSource.AccountId);
 			 	component.set("v.oppId",dataSource.OpportunityId);
-
+				this.getMotivosRechazoHistorial(component,dataSource.OpportunityId);
 			 	if(dataSource.Opportunity.EnvioXMLTC30__c){
                      component.set("v.isSendXML", true);
                  }
@@ -91,14 +91,15 @@
 	},
 	getMotivosRechazoHistorial : function(component,oppId){
 		var action = component.get("c.executeQuery");
-		var consulta="SELECT Id, Opportunity__c, ADV_Start_Date__c, ADV_End_Date__c, Rejection_Reason__c, ADV_Comments__c FROM Rejection_history__c WHERE Opportunity__c =" + oppId;
-        action.setParams({
+		var consulta="SELECT Id, Opportunity__c,Opportunity__r.Estatus__c, ADV_Start_Date__c, ADV_End_Date__c, Rejection_Reason__c, ADV_Comments__c,Comentarios_del_Comercial_para_ADC__c	 FROM Rejection_history__c WHERE Opportunity__c = '"+oppId+"' ORDER BY CreatedDate DESC";
+		action.setParams({
 			query : consulta
 		});
 		action.setCallback(this,function(response){
-			if(response.getState === 'SUCCESS')
+			var state = response.getState();
+			if(state == 'SUCCESS') {
 				component.set('v.historicoMotivosRechazo',response.getReturnValue());
-			console.table(response.getReturnValue());
+			}
 		});
 		$A.enqueueAction(action);
 
@@ -871,6 +872,7 @@
 		console.log('***********-**_******'+dataSource.Opportunity.StageName);
 		dataSource.Opportunity.EnvioCSVOPAM__c = false
 		dataSource.Opportunity.EnvioXMLTC30__c = false
+        dataSource.Opportunity.RejectedContract__c = true
 		dataSource.Opportunity.ComentariosADV__c = dataSource.Contrato2__c.Comentarios_ADV__c
         dataSource.Opportunity.RejectionReasons__c = textM
 		action.setParams({

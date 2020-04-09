@@ -785,16 +785,23 @@
 				</lightning:layoutItem>
 			</lightning:layout> -->
 			<aura:if isTrue="{!v.historicoMotivosRechazo.length > 0}">
-				<h3 class="slds-section-title--divider dividerTable">Histórico de motivos de rechazo.</h3>
-				<lightning:layout >
-					<lightning:layoutItem padding="horizontal-small" size="1" smallDeviceSize="1" mediumDeviceSize="1" largeDeviceSize="1" flexibility="auto">
-						<aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
-							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
-							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Comentarios del comercial para ADC" name="comentariosComercial" value="{!rechazo.ADV_Comments__c}" />
-							<lightning:input disabled="true" style="display:inline-block;vertical-align:middle;" type="text" label="Comentarios Adimistración de ventas" name="comentariosAdmin" value="" />
-						</aura:iteration>
-					</lightning:layoutItem>
-				</lightning:layout>
+			<h3 class="slds-section-title--divider dividerTable">Última solicitud.</h3>
+					<aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
+						<lightning:layout >
+							<lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
+								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
+							</lightning:layoutItem>
+							<lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
+								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Estatus" name="Estatus" value="{!rechazo.Opportunity__r.Estatus__c}" />
+							</lightning:layoutItem>
+							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
+								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Fecha inicio ADV" name="FechaInicioADV" value="{!rechazo.ADV_Start_Date__c}" />
+							</lightning:layoutItem>
+							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
+								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Fecha Fin ADV" name="FechaFinADV" value="{!rechazo.ADV_End_Date__c}" />
+							</lightning:layoutItem>
+						</lightning:layout>
+					</aura:iteration>
 			</aura:if>
             <lightning:layout >
 				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">

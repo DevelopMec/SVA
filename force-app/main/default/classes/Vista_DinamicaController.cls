@@ -348,5 +348,4 @@ public class Vista_DinamicaController {
         	database.update(accsToUpdate, false);
         }
     }
-    
 }
