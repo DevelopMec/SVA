@@ -478,8 +478,8 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 				Comercial_comments__c = newOpp.Comentarios_Ejecutivo__c,
 				Opportunity_status__c	= newOpp.Estatus__c,
 				Rejection_reason__c = newOpp.RejectionReasons__c,
-				ADV_End_Date__c	= onewOpp.FechaFinADV__c,
-				ADV_Start_Date__c = onewOpp.FechaInicioADV__c,
+				ADV_End_Date__c	= Date.newinstance(newOpp.FechaFinADV__c.year(), newOpp.FechaFinADV__c.month(), newOpp.FechaFinADV__c.day()),
+				ADV_Start_Date__c = Date.newinstance(newOpp.FechaInicioADV__c.year(), newOpp.FechaInicioADV__c.month(), newOpp.FechaInicioADV__c.day()),
 				Name = newOpp.NumeroAltaCliente__c + ': Rechazo- ' + rejections + 1 ,
 				Assignment_folio__c = newOpp.NumeroAltaCliente__c,
 				Opportunity__c	 = newOpp.Id
