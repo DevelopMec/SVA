@@ -472,7 +472,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 			update opp;
 			if(contrato.EtapaContrato__c == 'Rechazado para corrección'){
 				Opportunity newOpp = [SELECT Id,  FechaInicioADV__c, FechaFinADV__c, ComentariosADV__c, Estatus__c, RejectionReasons__c, Comentarios_Ejecutivo__c,NumeroAltaCliente__c FROM Opportunity WHERE Id =:opp.Id];
-				Integer rejections = [SELECT COUNT() FROM Rejection_history__c WHERE Opportunity__c = :newOpp.Id];
+				Integer rejections = [SELECT COUNT() FROM Rejection_history__c WHERE Opportunity__c = :newOpp.Id] + 1;
 				Rejection_history__c rechazo = new Rejection_history__c(
 				ADV_Comments__c = newOpp.ComentariosADV__c,
 				Comercial_comments__c = newOpp.Comentarios_Ejecutivo__c,
@@ -480,7 +480,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 				Rejection_reason__c = newOpp.RejectionReasons__c,
 				ADV_End_Date__c	= Date.newinstance(newOpp.FechaFinADV__c.year(), newOpp.FechaFinADV__c.month(), newOpp.FechaFinADV__c.day()),
 				ADV_Start_Date__c = Date.newinstance(newOpp.FechaInicioADV__c.year(), newOpp.FechaInicioADV__c.month(), newOpp.FechaInicioADV__c.day()),
-				Name = newOpp.NumeroAltaCliente__c + ': Rechazo- ' + rejections + 1 ,
+				Name = newOpp.NumeroAltaCliente__c + ': Rechazo- ' + String.valueOf(rejections),
 				Assignment_folio__c = newOpp.NumeroAltaCliente__c,
 				Opportunity__c	 = newOpp.Id
 				);			

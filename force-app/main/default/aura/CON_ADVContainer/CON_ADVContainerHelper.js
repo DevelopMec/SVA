@@ -91,7 +91,7 @@
 	},
 	getMotivosRechazoHistorial : function(component,oppId){
 		var action = component.get("c.executeQuery");
-		var consulta="SELECT Id, Opportunity__c,Opportunity__r.Estatus__c, ADV_Start_Date__c, ADV_End_Date__c, Rejection_Reason__c, ADV_Comments__c,Comentarios_del_Comercial_para_ADC__c	 FROM Rejection_history__c WHERE Opportunity__c = '"+oppId+"' ORDER BY CreatedDate DESC";
+		var consulta="SELECT Id, Opportunity__c,Opportunity_status__c, ADV_Start_Date__c, ADV_End_Date__c, Rejection_Reason__c, ADV_Comments__c,Comercial_comments__c	 FROM Rejection_history__c WHERE Opportunity__c = '"+oppId+"' ORDER BY CreatedDate DESC";
 		action.setParams({
 			query : consulta
 		});

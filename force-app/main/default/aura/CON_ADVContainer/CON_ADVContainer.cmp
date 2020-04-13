@@ -789,16 +789,16 @@
 					<aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
 						<lightning:layout >
 							<lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
+								<lightning:input  disabled="true"    type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
 							</lightning:layoutItem>
 							<lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Estatus" name="Estatus" value="{!rechazo.Opportunity__r.Estatus__c}" />
+								<lightning:input  disabled="true"    type="text" label="Estatus" name="Estatus" value="{!rechazo.Opportunity_status__c}" />
 							</lightning:layoutItem>
 							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Fecha inicio ADV" name="FechaInicioADV" value="{!rechazo.ADV_Start_Date__c}" />
+								<lightning:input  disabled="true"    type="text" label="Fecha inicio ADV" name="FechaInicioADV" value="{!rechazo.ADV_Start_Date__c}" />
 							</lightning:layoutItem>
 							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"   class="slds-m-around_small" type="text" label="Fecha Fin ADV" name="FechaFinADV" value="{!rechazo.ADV_End_Date__c}" />
+								<lightning:input  disabled="true"    type="text" label="Fecha Fin ADV" name="FechaFinADV" value="{!rechazo.ADV_End_Date__c}" />
 							</lightning:layoutItem>
 						</lightning:layout>
 					</aura:iteration>
