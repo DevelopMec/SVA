@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SemaforoAtencion__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( NOT(ISNULL(PartidaPresupuesto__r.Quote.Opportunity.FechaInicioADV__c)) ,
+IF(((IF(ISNULL(PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c),NOW(),PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c)-PartidaPresupuesto__r.Quote.Opportunity.FechaInicioADV__c)*24)&lt;=18,
+IMAGE(&quot;/servlet/servlet.FileDownload?file=01561000002zaUF&quot;,&quot;&quot;, 40, 40),
+IF(AND(((IF(ISNULL(PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c),NOW(),PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c)-PartidaPresupuesto__r.Quote.Opportunity.FechaInicioADV__c)*24)&gt;18,((IF(ISNULL(PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c),NOW(),PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c)-PartidaPresupuesto__r.Quote.Opportunity.FechaInicioADV__c)*24)&lt;=24),
+IMAGE(&quot;/servlet/servlet.FileDownload?file=01561000002zaUK&quot;,&quot;&quot;, 40, 40),
+IMAGE(&quot;/servlet/servlet.FileDownload?file=01561000002zaUP&quot;,&quot;&quot;, 40, 40))),
+IMAGE(&quot;/servlet/servlet.FileDownload?file=01561000002zaUU&quot;,&quot;&quot;, 40, 40))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Semáforo de Atención</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

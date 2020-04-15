@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TipoPago__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo de Pago</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pospago</fullName>
+                <default>false</default>
+                <label>Pospago</label>
+            </value>
+            <value>
+                <fullName>Prepago</fullName>
+                <default>false</default>
+                <label>Prepago</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

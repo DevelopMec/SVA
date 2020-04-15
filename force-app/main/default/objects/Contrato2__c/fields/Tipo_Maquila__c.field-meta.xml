@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tipo_Maquila__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo Maquila</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>BP Fleet</fullName>
+                <default>false</default>
+                <label>BP Fleet</label>
+            </value>
+            <value>
+                <fullName>BP Migrados</fullName>
+                <default>false</default>
+                <label>BP Migrados</label>
+            </value>
+            <value>
+                <fullName>Element</fullName>
+                <default>false</default>
+                <label>Element</label>
+            </value>
+            <value>
+                <fullName>G500 FLEET</fullName>
+                <default>false</default>
+                <label>G500 FLEET</label>
+            </value>
+            <value>
+                <fullName>Hidrosina</fullName>
+                <default>false</default>
+                <label>Hidrosina</label>
+            </value>
+            <value>
+                <fullName>Servifacil</fullName>
+                <default>false</default>
+                <label>Servifacil</label>
+            </value>
+            <value>
+                <fullName>Chedraui</fullName>
+                <default>false</default>
+                <label>Chedraui</label>
+            </value>
+            <value>
+                <fullName>Walmart</fullName>
+                <default>false</default>
+                <label>Walmart</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

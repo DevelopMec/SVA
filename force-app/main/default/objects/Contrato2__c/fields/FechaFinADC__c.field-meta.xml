@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FechaFinADC__c</fullName>
+    <externalId>false</externalId>
+    <formula>PartidaPresupuesto__r.Quote.Opportunity.FechaFinADV__c</formula>
+    <label>Fecha de Fin ADC</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

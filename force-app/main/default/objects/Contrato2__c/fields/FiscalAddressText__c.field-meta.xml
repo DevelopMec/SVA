@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FiscalAddressText__c</fullName>
+    <externalId>false</externalId>
+    <formula>FiscalAddress__r.Calle_Tt__c &amp; &#39; &#39; &amp; FiscalAddress__r.NumeroExterior_Tt__c &amp; &#39; &#39; &amp; FiscalAddress__r.NumeroInterior_Tt__c  &amp; &#39; &#39; &amp; FiscalAddress__r.Colonia_Tt__c &amp; &#39; &#39; &amp; FiscalAddress__r.DelegacionMunicipio_Tt__c &amp; &#39; &#39; &amp; FiscalAddress__r.Estado_Tt__c &amp; &#39; C.P &#39; &amp;  FiscalAddress__r.CodigoPostal_Tt__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Dirección Fiscal Texto</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

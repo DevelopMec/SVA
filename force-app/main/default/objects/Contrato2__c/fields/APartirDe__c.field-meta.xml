@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>APartirDe__c</fullName>
+    <description>Mantenimiento. Inicio de cobro de fee por vehiculo</description>
+    <externalId>false</externalId>
+    <label>A partir de</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>1 mes</fullName>
+                <default>false</default>
+                <label>1 mes</label>
+            </value>
+            <value>
+                <fullName>2 meses</fullName>
+                <default>false</default>
+                <label>2 meses</label>
+            </value>
+            <value>
+                <fullName>3 meses</fullName>
+                <default>false</default>
+                <label>3 meses</label>
+            </value>
+            <value>
+                <fullName>4 meses</fullName>
+                <default>false</default>
+                <label>4 meses</label>
+            </value>
+            <value>
+                <fullName>5 meses</fullName>
+                <default>false</default>
+                <label>5 meses</label>
+            </value>
+            <value>
+                <fullName>6 meses</fullName>
+                <default>false</default>
+                <label>6 meses</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

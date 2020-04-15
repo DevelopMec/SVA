@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Combustibles_mobil__c</fullName>
+    <externalId>false</externalId>
+    <label>Combustibles</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Mobil Extra</fullName>
+                <default>false</default>
+                <label>Mobil Extra</label>
+            </value>
+            <value>
+                <fullName>Mobil Supreme</fullName>
+                <default>false</default>
+                <label>Mobil Supreme</label>
+            </value>
+            <value>
+                <fullName>Mobil Diesel</fullName>
+                <default>false</default>
+                <label>Mobil Diesel</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

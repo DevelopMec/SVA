@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IsCreditCard__c</fullName>
+    <externalId>false</externalId>
+    <formula>ISPICKVAL( Bank_Account__r.PaymentType__c , &#39;Tarjeta&#39;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Es Tarjeta Crédito</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

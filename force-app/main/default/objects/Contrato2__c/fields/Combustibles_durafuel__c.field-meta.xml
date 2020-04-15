@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Combustibles_durafuel__c</fullName>
+    <externalId>false</externalId>
+    <label>Combustibles</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Rendi Ultra</fullName>
+                <default>false</default>
+                <label>Rendi Ultra</label>
+            </value>
+            <value>
+                <fullName>Rendi Mega</fullName>
+                <default>false</default>
+                <label>Rendi Mega</label>
+            </value>
+            <value>
+                <fullName>Hiperdiesel</fullName>
+                <default>false</default>
+                <label>Hiperdiesel</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -82,7 +82,7 @@
 			 	component.set("v.dataSource", dataSource);
 			 	this.getContacts(component,dataSource.Opportunity.AccountId);
                 this.getContactosAP(component); //DVM 2 Julio, para atender el requerimiento de mostrar todos los contactos con funcion AP en la pantalla ADV
-                
+                this.getFiliales(component, contratoId);
 
 			 }
 		});
@@ -263,9 +263,16 @@
 		$A.enqueueAction(action);
 	},
 	getFiliales: function(component,contratoId){
+        var tipoReg=component.get("v.dataSource.Opportunity.RecordType.DeveloperName");        
 		var action = component.get("c.executeQuery");
-		var query = "SELECT Id, Name,PlatformAdministrator__r.Name,PlatformAdministrator__r.Email, Contrato_2__c, Entidad_Cuenta__c,Entidad_Cuenta__r.EntidadLegal__c,Entidad_Cuenta__r.EntidadLegal__r.Id,Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name,Entidad_Cuenta__r.EntidadLegal__r.Name,Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c,Entidad_Cuenta__r.EntidadLegal__r.Estatus__c,Entidad_Cuenta__r.EntidadLegal__r.Direccion__c, CodigoAS400__c FROM ContratoFilial__c WHERE Contrato_2__c = '"+contratoId+"'";
-		var filiales;	
+		var query = "";		
+        if(tipoReg=='RT_NuevaAfiliacion'){
+            query = "SELECT Id, Name,PlatformAdministrator__r.Name,PlatformAdministrator__r.Email, Contract_2__c , AccountEntity__c ,AccountEntity__r.EntidadLegal__c,AccountEntity__r.EntidadLegal__r.Id,AccountEntity__r.EntidadLegal__r.RecordType.Name,AccountEntity__r.EntidadLegal__r.Name,AccountEntity__r.EntidadLegal__r.RazonSocial__c,AccountEntity__r.EntidadLegal__r.Estatus__c,AccountEntity__r.EntidadLegal__r.Direccion__c, codeAS400__c  FROM Affiliate__c  WHERE Contract_2__c  = '"+contratoId+"'";
+        }else{
+            query = "SELECT Id, Name,PlatformAdministrator__r.Name,PlatformAdministrator__r.Email, Contrato_2__c, Entidad_Cuenta__c,Entidad_Cuenta__r.EntidadLegal__c,Entidad_Cuenta__r.EntidadLegal__r.Id,Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name,Entidad_Cuenta__r.EntidadLegal__r.Name,Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c,Entidad_Cuenta__r.EntidadLegal__r.Estatus__c,Entidad_Cuenta__r.EntidadLegal__r.Direccion__c, CodigoAS400__c FROM ContratoFilial__c WHERE Contrato_2__c = '"+contratoId+"'";
+        }
+        console.log("QUER::"+query);
+        var filiales;	
 		action.setParams({
 			query: query
 		})
@@ -281,9 +288,22 @@
 				var returnedValue = response.getReturnValue();
 				
 				for(var x = 0; x < returnedValue.length ; x++){
-					console.log('returnedValue',returnedValue[x]);
-					
-					filiales.push(returnedValue[x]);
+					console.log('returnedValue',tipoReg);
+                    var temAf={};
+                    if(tipoReg=='RT_NuevaAfiliacion'){
+                        console.log('AFILIACION');
+                        temAf.Id=returnedValue[x].Id;
+                        temAf.Contrato_2__c=returnedValue[x].Contract_2__c ;
+                        temAf.Entidad_Cuenta__c=returnedValue[x].AccountEntity__c;
+                        temAf.Entidad_Cuenta__r=returnedValue[x].AccountEntity__r;
+                        temAf.PlatformAdministrator__r=returnedValue[x].PlatformAdministrator__r;
+                        temAf.CodigoAS400__c=returnedValue[x].codeAS400__c ;
+                        console.log('AFILIACION:',temAf);
+                        filiales.push(temAf);
+                        
+                    }else{
+                        filiales.push(returnedValue[x]);
+                    }
 				}
 
 				for(var y = 0; y < filiales.length; y++){
@@ -294,7 +314,9 @@
 				
 				
 				component.set("v.filialesSource",filiales);
-			}
+            }else{
+                alert("Error");
+            }
 		})
 		$A.enqueueAction(action);
 	},
@@ -410,6 +432,7 @@
 
 	},
 	getAttachment : function(component,entidadLegal){
+        var tipoReg=component.get("v.dataSource.Opportunity.RecordType.DeveloperName");
 		var executeQuery = component.get("c.executeQuery");
 		var toastEvent1 = $A.get("e.force:showToast");
 		var splitName;
@@ -424,7 +447,10 @@
 				var elegal = res && res.length > 0 ? res[0] : {}
 				var tipoPersonaEL = elegal.LinkedEntity && elegal.LinkedEntity.RecordType ? elegal.LinkedEntity.RecordType.Name : ''
 				var tipoPersonaLabel = tipoPersonaEL == 'Persona Moral' ? 'Persona Moral EL' : 'Persona Física EL'
-				var { [tipoPersonaLabel]: tipoPersona = {} } = component.get('v.app_edenred.documentos')
+                if(tipoReg=='RT_NuevaAfiliacion'){
+                    tipoPersonaLabel = tipoPersonaEL == 'Persona Moral' ? 'Persona Moral Afiliación EL' : 'Persona Física Afiliación EL'
+                }
+                var { [tipoPersonaLabel]: tipoPersona = {} } = component.get('v.app_edenred.documentos')
 				var fileNames = tipoPersona.label || {}
 
 				var documents = [];
@@ -746,7 +772,14 @@
 		//console.log('Contrato: ',contrato.CodigoAS400__c);
 	},
 	aprobar : function(component,dataSource,filiales){
-		var action = component.get('c.saveS400Filiales');
+        var metodo='';
+        var tipoReg=component.get("v.dataSource.Opportunity.RecordType.DeveloperName");        
+        if(tipoReg=='RT_NuevaAfiliacion'){
+            metodo='c.saveS400FilialesAfiliados';
+        }else{
+            metodo='c.saveS400Filiales';
+        }
+		var action = component.get(metodo);
 		console.log('Filiales SAVE:',filiales);
 		action.setParams({
 			jsonFiliales: JSON.stringify(filiales)
@@ -777,7 +810,14 @@
 	},
 	aprobarContrato: function(component,dataSource){
 		var toastEvent = $A.get("e.force:showToast");
-		var action = component.get("c.updateContratoADV2");
+        var metodo='';
+        var tipoReg=component.get("v.dataSource.Opportunity.RecordType.DeveloperName");        
+        if(tipoReg=='RT_NuevaAfiliacion'){
+            metodo='c.updateContratoAfiliadoADV2';
+        }else{
+            metodo='c.updateContratoADV2';            
+        }
+		var action = component.get(metodo);
 		var res;
 		var subcuent = component.get("v.subCuentas");
 		
@@ -872,7 +912,6 @@
 		console.log('***********-**_******'+dataSource.Opportunity.StageName);
 		dataSource.Opportunity.EnvioCSVOPAM__c = false
 		dataSource.Opportunity.EnvioXMLTC30__c = false
-        dataSource.Opportunity.RejectedContract__c = true
 		dataSource.Opportunity.ComentariosADV__c = dataSource.Contrato2__c.Comentarios_ADV__c
         dataSource.Opportunity.RejectionReasons__c = textM
 		action.setParams({

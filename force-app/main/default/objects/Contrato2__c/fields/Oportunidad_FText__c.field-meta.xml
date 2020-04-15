@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Oportunidad_FText__c</fullName>
+    <externalId>false</externalId>
+    <formula>HYPERLINK(&#39;https://edenredmexico.lightning.force.com/lightning/r/Opportunity/&#39;+PartidaPresupuesto__r.Quote.Opportunity.Id+&#39;/view&#39;, PartidaPresupuesto__r.Quote.Opportunity.Name)</formula>
+    <label>Oportunidad</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

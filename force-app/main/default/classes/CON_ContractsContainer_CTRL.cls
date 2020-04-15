@@ -403,7 +403,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 		String strSql;
 		List<Contrato2__c> listContrato = new List<Contrato2__c>();
 		strSql = getStrCampos(Contrato2__c.SObjectType);
-		strSql = 'SELECT ' + strSql + ',Cuenta__r.Giro__c,Cuenta__r.Telefono2__c,Cuenta__r.Subgiro__c,Cuenta__r.Phone,Cuenta__r.CodigoClienteAS400__c,PartidaPresupuesto__r.FormaPago__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,Contacto__r.Name,Contacto__r.Email, Entidad_Legal__r.RecordType.Name FROM Contrato2__c WHERE PartidaPresupuesto__c = \'' + quoteLineItemId + '\'';
+		strSql = 'SELECT ' + strSql + ',Cuenta__r.Giro__c,Cuenta__r.Telefono2__c,Bank_Account__r.Reference__c,Bank_Account__r.Bank__c,Bank_Account__r.StandardiziedBankKey__c,Bank_Account__r.AccountHolder__c,Cuenta__r.Name,Cuenta__r.Subgiro__c,Cuenta__r.Phone,Cuenta__r.CodigoClienteAS400__c,PartidaPresupuesto__r.FormaPago__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,Contacto__r.Name,Contacto__r.Email, Entidad_Legal__r.RecordType.Name FROM Contrato2__c WHERE PartidaPresupuesto__c = \'' + quoteLineItemId + '\'';
 		System.debug('SQLQuery: ' + strSql);
 		listContrato = Database.query(strSql);
 		if(listContrato.size() > 0){
@@ -506,34 +506,31 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 			return response;
 		}
 	}
-
-
-
-	@AuraEnabled
-	public static Map<String, String> updateContratoADV2( String jsonContrato, String jsonOportunidad,String extras ) {
-        
-		Map<String,String> response = new Map<String,String>();
-		Contrato2__c contrato = new Contrato2__c();
-		Opportunity opp = new Opportunity();
-		List<Sub> subs = new List<Sub>();
-		List<ContratoFilial__c> filiales = new List<ContratoFilial__c>();
-
-		Savepoint sp=Database.setSavepoint();
-		try{
+    
+    @AuraEnabled
+    public static Map<String, String> updateContratoAfiliadoADV2( String jsonContrato, String jsonOportunidad,String extras ) {        
+        System.debug('updateContratoAfiliadoADV2');
+        Map<String,String> response = new Map<String,String>();
+        Contrato2__c contrato = new Contrato2__c();
+        Opportunity opp = new Opportunity();
+        List<Sub> subs = new List<Sub>();
+        List<Affiliate__c > filiales = new List<Affiliate__c >();        
+        Savepoint sp=Database.setSavepoint();
+        try{
             List<String> lisErrors=new List<String>();
-			contrato = (Contrato2__c)JSON.deserialize(jsonContrato,Contrato2__c.class);
-			opp = (Opportunity)JSON.deserialize(jsonOportunidad,Opportunity.class);
-			subs=(List<Sub>)JSON.deserialize(extras,List<Sub>.class);
-				
-            Opportunity opp2= [SELECT id,Contacto__c,AccountId,OwnerId from Opportunity where id=:opp.id LIMIT 1];
-            QuoteLineItem qli=[Select Id,Product2.IDInterno__c from QuoteLineItem where Quote.OpportunityId=:opp2.Id and Quote.IsSyncing=true and Escalonamiento__c=null LIMIT 1];
+            contrato = (Contrato2__c)JSON.deserialize(jsonContrato,Contrato2__c.class);
+            opp = (Opportunity)JSON.deserialize(jsonOportunidad,Opportunity.class);
+            subs=(List<Sub>)JSON.deserialize(extras,List<Sub>.class);
             
-			for(Sub extra:subs){
+            Opportunity opp2= [SELECT id,Contacto__c,AccountId,OwnerId,RecordType.DeveloperName from Opportunity where id=:opp.id LIMIT 1];
+            QuoteLineItem qli=[Select Id,Product2.IDInterno__c,Product2Id from QuoteLineItem where Quote.OpportunityId=:opp2.Id and Quote.IsSyncing=true and Escalonamiento__c=null LIMIT 1];
+            
+            for(Sub extra:subs){
                 System.debug('SUBB::'+extra.CodigoAS400);
-				filiales.add(new ContratoFilial__c(CodigoAS400__c=extra.CodigoAS400,Name=extra.CodigoAS400
-					,PlatformAdministrator__c=opp2.Contacto__c ,Contrato_2__c=contrato.id,Entidad_Cuenta__c=contrato.Entidad_Cuenta__c,OwnerId=opp2.OwnerId));
-			}
-			
+                filiales.add(new Affiliate__c (Account__c=opp2.AccountId,Product__c =qli.Product2Id,codeAS400__c =extra.CodigoAS400,Name=extra.CodigoAS400
+                                                   ,PlatformAdministrator__c=opp2.Contacto__c ,Contract_2__c =contrato.id,AccountEntity__c =contrato.Entidad_Cuenta__c,OwnerId=opp2.OwnerId));
+            }
+            
             contrato.EtapaContrato__c = 'Finalizado';
             Integer ind=[Select Count() from Contrato2__c where Id!=:contrato.Id and CodigoAS400__c=:contrato.CodigoAS400__c];
             if(ind>0){
@@ -542,14 +539,14 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
                 response.put('Response','Error al guardar la informacion: El Codigo ingresado ya se encuentra en otro contrato('+contrato.CodigoAS400__c+')');
                 return response;
             }
-			update contrato;
-			insert filiales;			
-
-            ContratoFilial__c tem;
-			if(!string.isEmpty(contrato.CodigoAS400__c)&&contrato.id!=null){
-				system.debug('hello '+contrato);
-				 tem= new ContratoFilial__c(OwnerId=opp2.OwnerId,CodigoAS400__c=contrato.CodigoAS400__c,Name=contrato.CodigoAS400__c
-					,Contrato_2__c=contrato.id,Entidad_Cuenta__c=contrato.Entidad_Cuenta__c,isPrime__c=true,PlatformAdministrator__c=opp2.Contacto__c);
+            update contrato;
+            insert filiales;			
+            
+            Affiliate__c  tem;
+            if(!string.isEmpty(contrato.CodigoAS400__c)&&contrato.id!=null){
+                system.debug('hello '+contrato);
+                tem= new Affiliate__c (Account__c=opp2.AccountId,Product__c =qli.Product2Id,OwnerId=opp2.OwnerId,codeAS400__c =contrato.CodigoAS400__c,Name=contrato.CodigoAS400__c
+                                           ,Contract_2__c=contrato.id,AccountEntity__c =contrato.Entidad_Cuenta__c,isPrime__c=true,PlatformAdministrator__c=opp2.Contacto__c);
                 insert tem;
 			}
 
@@ -559,40 +556,120 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
             if(!string.isEmpty(contrato.CodigoAS400__c)&&contrato.CodigoAS400__c.split('-')[1]!='30'&&contrato.CodigoAS400__c.split('-')[1]!='31'){
                 update opp;//DYAMPI
             }
-			//Opportunity opp2= [SELECT id,AccountId,OwnerId,(Select Id from Funciones_de_Contactos_en_Oportunidad__r) from Opportunity where id=:opp.id LIMIT 1];
-			Account thisAccount = [SELECT id,CodigoClienteAS400__c,CodigoClienteOPAM__c  from Account where Id=:opp2.AccountId LIMIT 1];
-			String grupo=contrato.CodigoAS400__c;
-			List<String> codigoGrupo= grupo.split('-');
+            Account thisAccount = [SELECT id,CodigoClienteAS400__c,CodigoClienteOPAM__c  from Account where Id=:opp2.AccountId LIMIT 1];
+            String grupo=contrato.CodigoAS400__c;
+            List<String> codigoGrupo= grupo.split('-');
             
             String codProd=qli.Product2.IDInterno__c!=null ? (qli.Product2.IDInterno__c.length()==1 ? '0'+qli.Product2.IDInterno__c : qli.Product2.IDInterno__c) : '';
             if(codProd.contains('-')){
                 codProd=codProd.split('-')[0];
             }
-            if(codigoGrupo.size()==4&&codProd!=codigoGrupo.get(1)){
-                //Database.rollback(sp);
-                //response.put('Code','-1');                    
-                //response.put('Response','Error al guardar la informacion: El producto ingresado en el código AS400, no corresponde al producto de la Oportunidad');
-                //return response;
+            
+            //if(String.isBlank(thisAccount.CodigoClienteAS400__c)&&codigoGrupo.size()==4){
+              //  Integer numAcc=[Select count() from Account where CodigoClienteAS400__c=:codigoGrupo.get(2)];                                
+                //if(numAcc>0){
+                  //  lisErrors.add('El grupo capturado ya se encuentra generado en otra Cuenta('+grupo+')');
+                //}else{                    
+                    thisAccount.AffiliateCodeAS400__c =codigoGrupo.get(2);
+                    update thisAccount;
+                //}
+            /*}else if((!String.isBlank(thisAccount.CodigoClienteAS400__c))&&codigoGrupo.size()==4&&thisAccount.CodigoClienteAS400__c!=codigoGrupo.get(2)){
+                lisErrors.add('El grupo capturado es diferente al grupo de la cuenta('+grupo+')');
+            }
+            else if(codigoGrupo.size()==2){
+                thisAccount.CodigoClienteOPAM__c=grupo;
+                update thisAccount;
+            }*/
+            
+            if(lisErrors!=null&&lisErrors.size()>0){
+                Database.rollback(sp);
+                response.put('Code','-1');                    
+                response.put('Response','Error al guardar la informacion: '+String.join(lisErrors, ','));
+                return response;
+            }
+            
+            response.put('Code','0');
+            response.put('Response','Informacion Guardada con exito');
+            return response;
+        }
+        catch(Exception e){
+            Database.rollback(sp);
+            response.put('Code','-1');
+            response.put('Response','Error al guardar la informacion: '+ e.getMessage()+', linea: '+e.getStackTraceString());
+            return response;
+        }
+    }
+
+	@AuraEnabled
+    public static Map<String, String> updateContratoADV2( String jsonContrato, String jsonOportunidad,String extras ) { 
+        System.debug('updateContratoADV2');
+        Map<String,String> response = new Map<String,String>();
+        Contrato2__c contrato = new Contrato2__c();
+        Opportunity opp = new Opportunity();
+        List<Sub> subs = new List<Sub>();
+        List<ContratoFilial__c> filiales = new List<ContratoFilial__c>();        
+        Savepoint sp=Database.setSavepoint();
+        try{
+            List<String> lisErrors=new List<String>();
+            contrato = (Contrato2__c)JSON.deserialize(jsonContrato,Contrato2__c.class);
+            opp = (Opportunity)JSON.deserialize(jsonOportunidad,Opportunity.class);
+            subs=(List<Sub>)JSON.deserialize(extras,List<Sub>.class);
+            
+            Opportunity opp2= [SELECT id,Contacto__c,AccountId,OwnerId,RecordType.DeveloperName from Opportunity where id=:opp.id LIMIT 1];
+            QuoteLineItem qli=[Select Id,Product2.IDInterno__c from QuoteLineItem where Quote.OpportunityId=:opp2.Id and Quote.IsSyncing=true and Escalonamiento__c=null LIMIT 1];
+            
+            for(Sub extra:subs){
+                System.debug('SUBB::'+extra.CodigoAS400);
+                filiales.add(new ContratoFilial__c(CodigoAS400__c=extra.CodigoAS400,Name=extra.CodigoAS400
+                                                   ,PlatformAdministrator__c=opp2.Contacto__c ,Contrato_2__c=contrato.id,Entidad_Cuenta__c=contrato.Entidad_Cuenta__c,OwnerId=opp2.OwnerId));
+            }
+            
+            contrato.EtapaContrato__c = 'Finalizado';
+            Integer ind=[Select Count() from Contrato2__c where Id!=:contrato.Id and CodigoAS400__c=:contrato.CodigoAS400__c];
+            if(ind>0){
+                Database.rollback(sp);
+                response.put('Code','-1');                    
+                response.put('Response','Error al guardar la informacion: El Codigo ingresado ya se encuentra en otro contrato('+contrato.CodigoAS400__c+')');
+                return response;
+            }
+            update contrato;
+            insert filiales;			
+            
+            ContratoFilial__c tem;
+            if(!string.isEmpty(contrato.CodigoAS400__c)&&contrato.id!=null){
+                system.debug('hello '+contrato);
+                tem= new ContratoFilial__c(OwnerId=opp2.OwnerId,CodigoAS400__c=contrato.CodigoAS400__c,Name=contrato.CodigoAS400__c
+                                           ,Contrato_2__c=contrato.id,Entidad_Cuenta__c=contrato.Entidad_Cuenta__c,isPrime__c=true,PlatformAdministrator__c=opp2.Contacto__c);
+                insert tem;
+            }
+            
+            contrato.EtapaContrato__c = 'Autorizado';
+            opp.FechaFinADV__c = system.now();	
+            update contrato;
+            if(!string.isEmpty(contrato.CodigoAS400__c)&&contrato.CodigoAS400__c.split('-')[1]!='30'&&contrato.CodigoAS400__c.split('-')[1]!='31'){
+                update opp;//DYAMPI
+            }
+            Account thisAccount = [SELECT id,CodigoClienteAS400__c,CodigoClienteOPAM__c  from Account where Id=:opp2.AccountId LIMIT 1];
+            String grupo=contrato.CodigoAS400__c;
+            List<String> codigoGrupo= grupo.split('-');
+            
+            String codProd=qli.Product2.IDInterno__c!=null ? (qli.Product2.IDInterno__c.length()==1 ? '0'+qli.Product2.IDInterno__c : qli.Product2.IDInterno__c) : '';
+            if(codProd.contains('-')){
+                codProd=codProd.split('-')[0];
+            }
+            if(codigoGrupo.size()==4&&codProd!=codigoGrupo.get(1)&&opp2.RecordType.DeveloperName!='RT_NuevaAfiliacion'){
                 lisErrors.add('No puede generarse el alta de cliente con número de producto distinto al producto cotizado('+grupo+')');
             }
             
 			if(String.isBlank(thisAccount.CodigoClienteAS400__c)&&codigoGrupo.size()==4){
                 Integer numAcc=[Select count() from Account where CodigoClienteAS400__c=:codigoGrupo.get(2)];                                
                 if(numAcc>0){
-                    /*Database.rollback(sp);
-                    response.put('Code','-1');                    
-                    response.put('Response','Error al guardar la informacion: El Grupo Ingresado se encuentra en otra cuenta');
-                    return response;*/
                     lisErrors.add('El grupo capturado ya se encuentra generado en otra Cuenta('+grupo+')');
                 }else{                    
                     thisAccount.CodigoClienteAS400__c=codigoGrupo.get(2);
                     update thisAccount;
                 }
-			}else if((!String.isBlank(thisAccount.CodigoClienteAS400__c))&&codigoGrupo.size()==4&&thisAccount.CodigoClienteAS400__c!=codigoGrupo.get(2)){
-                /*Database.rollback(sp);
-                response.put('Code','-1');                    
-                response.put('Response','Error al guardar la informacion: El Grupo Ingresado es diferente al grupo de la cuenta');
-                return response;*/
+            }else if((!String.isBlank(thisAccount.CodigoClienteAS400__c))&&codigoGrupo.size()==4&&thisAccount.CodigoClienteAS400__c!=codigoGrupo.get(2)){
                 lisErrors.add('El grupo capturado es diferente al grupo de la cuenta('+grupo+')');
             }
 			else if(codigoGrupo.size()==2){
@@ -606,19 +683,12 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
                 response.put('Response','Error al guardar la informacion: '+String.join(lisErrors, ','));
                 return response;
             }
-			
-			response.put('Code','0');
-			response.put('Response','Informacion Guardada con exito');
-
-		/*	if([SELECT Codigo_Producto_cotizacion__c  FROM Opportunity where id =:opp.id LIMIT 1].Codigo_Producto_cotizacion__c=='30'&& (!filiales.isEmpty())){
-				for(ContratoFilial__c filial : filiales){
-					generaXML(opp,contrato);
-				}				
-			}*/
-
-			return response;
-		}
-		catch(Exception e){
+            
+            response.put('Code','0');
+            response.put('Response','Informacion Guardada con exito');
+            return response;
+        }
+        catch(Exception e){
             Database.rollback(sp);
 			response.put('Code','-1');
 			response.put('Response','Error al guardar la informacion: '+ e.getMessage()+', linea: '+e.getStackTraceString());
@@ -1029,7 +1099,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
                 cf.Name=cf.CodigoAS400__c;
             }
             upsert cFilial;
-            List<ContratoFilial__c> cFiliales=[SELECT name,Contrato_2__c,Contrato_2__r.PartidaPresupuesto__r.Quote.Opportunity.AccountId,Entidad_Cuenta__r.Cuenta__c,CodigoAS400__c,Contrato_2__r.PartidaPresupuesto__r.Product2.IDInterno__c,Entidad_Cuenta__r.Cuenta__r.CodigoClienteAS400__c FROM ContratoFilial__c where id=:cFilial and  isPrime__c=false];
+            List<ContratoFilial__c> cFiliales=[SELECT name,Contrato_2__c,Contrato_2__r.PartidaPresupuesto__r.Quote.Opportunity.AccountId,Contrato_2__r.PartidaPresupuesto__r.Quote.Opportunity.RecordType.DeveloperName,Entidad_Cuenta__r.Cuenta__c,CodigoAS400__c,Contrato_2__r.PartidaPresupuesto__r.Product2.IDInterno__c,Entidad_Cuenta__r.Cuenta__r.CodigoClienteAS400__c FROM ContratoFilial__c where id=:cFilial and  isPrime__c=false];
             List<String> lisErr=new List<String>();
             
             Set<String> setAcc=new Set<String>();
@@ -1052,15 +1122,6 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
                     lisErr.add('No se ha seleccionado una dirección en el contrato');
                 }
             }
-            
-            /*Map<String,String> setAcc=new Map<String,String>();
-            for(ContratoFilial__c cf : cFiliales){
-                if(cf.Entidad_Cuenta__r.Cuenta__c!=null&&cf.CodigoAS400__c!=null){
-                    setAcc.put(cf.Entidad_Cuenta__r.Cuenta__c,cf.CodigoAS400__c.split('-')[2]);
-                }
-            }*/            
-            
-            
             for(ContratoFilial__c cf : cFiliales){                
                 String codProd=cf.Contrato_2__r.PartidaPresupuesto__r.Product2.IDInterno__c!=null ? (cf.Contrato_2__r.PartidaPresupuesto__r.Product2.IDInterno__c.length()==1 ? '0'+cf.Contrato_2__r.PartidaPresupuesto__r.Product2.IDInterno__c : cf.Contrato_2__r.PartidaPresupuesto__r.Product2.IDInterno__c) : '';
                 if(codProd.contains('-')){
@@ -1069,7 +1130,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
                 if(cf.CodigoAS400__c!=null&&cf.CodigoAS400__c.split('-')[2]!=cf.Entidad_Cuenta__r.Cuenta__r.CodigoClienteAS400__c&&cf.Entidad_Cuenta__r.Cuenta__r.CodigoClienteAS400__c!=null&&cf.Entidad_Cuenta__r.Cuenta__r.CodigoClienteAS400__c!=''){
                     lisErr.add('El grupo capturado no corresponde a la cuenta ('+cf.CodigoAS400__c+')');
                 }
-                if(cf.CodigoAS400__c!=null&&cf.CodigoAS400__c.split('-')[1]!=codProd){
+                if(cf.CodigoAS400__c!=null&&cf.CodigoAS400__c.split('-')[1]!=codProd&&cf.Contrato_2__r.PartidaPresupuesto__r.Quote.Opportunity.RecordType.DeveloperName!='RT_NuevaAfiliacion'){
                     lisErr.add('No puede generarse el alta de cliente con número de producto distinto al producto cotizado('+cf.CodigoAS400__c+')');
                 }
             }
@@ -1078,15 +1139,76 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
             }else{
                 respuesta=String.join(lisErr, ',');
             }
-            /*for(ContratoFilial__c filial:cFiliales){
-if(filial.Contrato_2__r.PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c=='30'){
-GenerarXMLController xml = new GenerarXMLController( filial.Contrato_2__r.PartidaPresupuesto__r.Quote.OpportunityId ,filial.Contrato_2__c,filial );
-} 	
-}*/
         }	
         catch(Exception e){
             respuesta = 'Exception Cause saveS400Filiales status: '+e.getCause() +'Line: '+ e.getLineNumber()+' Message: '+e.getMessage();	
 			
+		}
+
+		return respuesta;
+
+	}
+    @AuraEnabled
+    public static String saveS400FilialesAfiliados(String jsonFiliales){
+        String respuesta = '';
+        try{
+            //System.debug('jsonFiliales:'+jsonFiliales);            
+            List<ContratoFilial__c> cFilialTem = (List<ContratoFilial__c>)JSON.deserialize(jsonFiliales,List<ContratoFilial__c>.class);
+            List<Affiliate__c > cFilial = new List<Affiliate__c >();
+            
+            for(ContratoFilial__c cf : cFilialTem){
+                cFilial.add(new Affiliate__c(Id=cf.Id,Name=cf.Name,PlatformAdministrator__c=cf.PlatformAdministrator__c,
+                                            Contract_2__c=cf.Contrato_2__c,codeAS400__c=cf.CodigoAS400__c,
+                                            AccountEntity__c=cf.Entidad_Cuenta__c,isPrime__c=cf.isPrime__c,
+                                            Product__c=cf.Producto__c));
+            }
+            System.debug('Filiales:'+cFilial);
+            
+            for(Affiliate__c cf : cFilial){
+                cf.Name=cf.codeAS400__c;
+            }
+            upsert cFilial;
+            List<Affiliate__c> cFiliales=[SELECT name,Contract_2__c,Contract_2__r.PartidaPresupuesto__r.Quote.Opportunity.AccountId,Contract_2__r.PartidaPresupuesto__r.Quote.Opportunity.RecordType.DeveloperName
+                                          ,AccountEntity__r.Cuenta__c,codeAS400__c,Contract_2__r.PartidaPresupuesto__r.Product2.IDInterno__c,AccountEntity__r.Cuenta__r.CodigoClienteAS400__c FROM Affiliate__c where id=:cFilial and  isPrime__c=false];
+            List<String> lisErr=new List<String>();
+            
+            Set<String> setAcc=new Set<String>();
+            Set<String> setAdv=new Set<String>();
+            for(Affiliate__c cf : cFiliales){
+                if(cf.Contract_2__r.PartidaPresupuesto__r.Quote.Opportunity.AccountId!=null){
+                    setAcc.add(cf.Contract_2__r.PartidaPresupuesto__r.Quote.Opportunity.AccountId);
+                }
+                if(cf.Contract_2__c!=null){
+                    setAdv.add(cf.Contract_2__c);
+                }
+            }
+            for(Account acc:[Select Id,Name,Sector__c from Account where Id IN :setAcc]){
+                if(acc.Sector__c==null){
+                    lisErr.add('La cuenta '+acc.Name+' no contiene sector');
+                }
+            }
+            for(Contrato2__c adv:[Select Id,FiscalAddress__c,PartidaPresupuesto__r.Product2.IDInterno__c from Contrato2__c where Id IN :setAdv and PartidaPresupuesto__r.Product2.IDInterno__c IN ('30','31')]){
+                if(adv.FiscalAddress__c	==null){
+                    lisErr.add('No se ha seleccionado una dirección en el contrato');
+                }
+            }
+            for(Affiliate__c cf : cFiliales){                
+                String codProd=cf.Contract_2__r.PartidaPresupuesto__r.Product2.IDInterno__c!=null ? (cf.Contract_2__r.PartidaPresupuesto__r.Product2.IDInterno__c.length()==1 ? '0'+cf.Contract_2__r.PartidaPresupuesto__r.Product2.IDInterno__c : cf.Contract_2__r.PartidaPresupuesto__r.Product2.IDInterno__c) : '';
+                if(codProd.contains('-')){
+                    codProd=codProd.split('-')[0];
+                }
+                /*if(cf.codeAS400__c!=null&&cf.codeAS400__c.split('-')[2]!=cf.AccountEntity__r.Cuenta__r.CodigoClienteAS400__c&&cf.AccountEntity__r.Cuenta__r.CodigoClienteAS400__c!=null&&cf.AccountEntity__r.Cuenta__r.CodigoClienteAS400__c!=''){
+                    lisErr.add('El grupo capturado no corresponde a la cuenta ('+cf.codeAS400__c+')');
+                }*/
+            }
+            if(lisErr.size()==0){
+                respuesta = 'Exito';
+            }else{
+                respuesta=String.join(lisErr, ',');
+            }
+        }	
+        catch(Exception e){
+            respuesta = 'Exception Cause saveS400FilialesAfiliado status: '+e.getCause() +'Line: '+ e.getLineNumber()+' Message: '+e.getMessage();				
 		}
 
 		return respuesta;

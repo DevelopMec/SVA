@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ModoOffline__c</fullName>
+    <externalId>false</externalId>
+    <label>Modo Offline</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Cliente NO opera offline</fullName>
+                <default>false</default>
+                <label>Cliente NO opera offline</label>
+            </value>
+            <value>
+                <fullName>Cliente elige cómo operar</fullName>
+                <default>false</default>
+                <label>Cliente elige cómo operar</label>
+            </value>
+            <value>
+                <fullName>Cliente opera offline</fullName>
+                <default>false</default>
+                <label>Cliente opera offline</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

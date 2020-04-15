@@ -31,7 +31,7 @@
         component.set('v.app_edenred.schema', res); 
 
         var executeQuery = component.get("c.executeQuery");
-        executeQuery.setParams({query: "SELECT Id, Name, ActaConstitutivaCliente__c, AdjuntoA__c, AltaSHCP__c, CURP__c, CedulaRFC__c, ComprobanteDomicilioCliente__c, ComprobanteDomicilioFiscal__c, ConstanciaRFCCliente__c, ConstanciaRFC__c, ContratoFirmado__c, FM3__c, IdentificacionOficialCliente__c, PoderNotarial__c, RFCDoc__c, RFC__c, RegistroPatronal__c FROM TiposDocumento__c WHERE Name IN('DocumentosOportunidad', 'Persona Física EL', 'Persona Moral EL')"})
+        executeQuery.setParams({query: "SELECT Id, Name, ActaConstitutivaCliente__c, AdjuntoA__c, AltaSHCP__c, CURP__c, CedulaRFC__c, ComprobanteDomicilioCliente__c, ComprobanteDomicilioFiscal__c, ConstanciaRFCCliente__c, ConstanciaRFC__c, ContratoFirmado__c, FM3__c, IdentificacionOficialCliente__c, PoderNotarial__c, RFCDoc__c, RFC__c, RegistroPatronal__c, Comprobante_de_Domicilio_Afiliado__c, Constancia_de_Situaci_n_Fiscal__c, Estado_de_Cuenta__c, ActaConstitutiva__c FROM TiposDocumento__c WHERE Name LIKE '%EL' or Name LIKE '%DocumentosOportunidad%'"})
         return ctcLightning.aura( executeQuery, component )
       }))
       .then( $A.getCallback( function( res ) {

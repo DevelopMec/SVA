@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TipoPlastico__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo Plástico (Tarjeta stock)</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Ticket Car</fullName>
+                <default>false</default>
+                <label>Ticket Car</label>
+            </value>
+            <value>
+                <fullName>Ticket Car Stock</fullName>
+                <default>false</default>
+                <label>Ticket Car Stock</label>
+            </value>
+            <value>
+                <fullName>Fedex Stock</fullName>
+                <default>false</default>
+                <label>Fedex Stock</label>
+            </value>
+            <value>
+                <fullName>Lala Stock</fullName>
+                <default>false</default>
+                <label>Lala Stock</label>
+            </value>
+            <value>
+                <fullName>Comercializadora Pepsico Stock</fullName>
+                <default>false</default>
+                <label>Comercializadora Pepsico Stock</label>
+            </value>
+            <value>
+                <fullName>Cervezas C Moctezuma Stock</fullName>
+                <default>false</default>
+                <label>Cervezas C Moctezuma Stock</label>
+            </value>
+            <value>
+                <fullName>Sabritas Stock</fullName>
+                <default>false</default>
+                <label>Sabritas Stock</label>
+            </value>
+            <value>
+                <fullName>Maquila Hidrosina Stock</fullName>
+                <default>false</default>
+                <label>Maquila Hidrosina Stock</label>
+            </value>
+            <value>
+                <fullName>Maquila Oxxo Gas Stock</fullName>
+                <default>false</default>
+                <label>Maquila Oxxo Gas Stock</label>
+            </value>
+            <value>
+                <fullName>Maquila Servifacil  Stock</fullName>
+                <default>false</default>
+                <label>Maquila Servifacil  Stock</label>
+            </value>
+            <value>
+                <fullName>Gasolina Ribereña Stock</fullName>
+                <default>false</default>
+                <label>Gasolina Ribereña Stock</label>
+            </value>
+            <value>
+                <fullName>Diesel Marino Stock</fullName>
+                <default>false</default>
+                <label>Diesel Marino Stock</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

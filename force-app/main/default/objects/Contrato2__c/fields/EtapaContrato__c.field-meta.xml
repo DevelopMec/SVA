@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EtapaContrato__c</fullName>
+    <externalId>false</externalId>
+    <label>Estatus Alta del Cliente</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>En proceso</fullName>
+                <default>false</default>
+                <label>En proceso</label>
+            </value>
+            <value>
+                <fullName>Finalizado</fullName>
+                <default>false</default>
+                <label>Iniciado</label>
+            </value>
+            <value>
+                <fullName>Rechazado para corrección</fullName>
+                <default>false</default>
+                <label>Pausada</label>
+            </value>
+            <value>
+                <fullName>Autorizado</fullName>
+                <default>false</default>
+                <label>Cerrada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

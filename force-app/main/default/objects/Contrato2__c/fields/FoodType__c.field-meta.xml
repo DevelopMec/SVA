@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FoodType__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo de Comida</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Restaurante</fullName>
+                <default>false</default>
+                <label>Restaurante</label>
+            </value>
+            <value>
+                <fullName>Comida Rápida/Fast Food</fullName>
+                <default>false</default>
+                <label>Comida Rápida/Fast Food</label>
+            </value>
+            <value>
+                <fullName>Fonda/Cocina Económica</fullName>
+                <default>false</default>
+                <label>Fonda/Cocina Económica</label>
+            </value>
+            <value>
+                <fullName>Cafetería</fullName>
+                <default>false</default>
+                <label>Cafetería</label>
+            </value>
+            <value>
+                <fullName>Panadería/Pastelería</fullName>
+                <default>false</default>
+                <label>Panadería/Pastelería</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

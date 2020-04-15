@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Item_Contratacion__c</fullName>
+    <externalId>false</externalId>
+    <label>Item Contratación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>TC Avanzado</fullName>
+                <default>false</default>
+                <label>TC Avanzado</label>
+            </value>
+            <value>
+                <fullName>TC Basico</fullName>
+                <default>false</default>
+                <label>TC Basico</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

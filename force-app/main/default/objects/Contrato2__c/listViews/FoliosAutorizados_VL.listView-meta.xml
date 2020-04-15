@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FoliosAutorizados_VL</fullName>
+    <columns>FolioADV_FText__c</columns>
+    <columns>Cuenta__c</columns>
+    <columns>SegmentoCuenta_FText__c</columns>
+    <columns>Oportunidad_FText__c</columns>
+    <columns>PropietarioOportunidad_FText__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>Ejecutivo_ADV__c</columns>
+    <columns>EstatusADV_FTt__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>EstatusADV_FTt__c</field>
+        <operation>equals</operation>
+        <value>Cerrada</value>
+    </filters>
+    <label>Folios autorizados</label>
+</ListView>

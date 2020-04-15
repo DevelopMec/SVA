@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CEO__c</fullName>
+    <externalId>false</externalId>
+    <label>CEO</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Grupo de Región</fullName>
+                <default>false</default>
+                <label>Grupo de Región</label>
+            </value>
+            <value>
+                <fullName>Región</fullName>
+                <default>false</default>
+                <label>Región</label>
+            </value>
+            <value>
+                <fullName>Centro de Costos</fullName>
+                <default>false</default>
+                <label>Centro de Costos</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

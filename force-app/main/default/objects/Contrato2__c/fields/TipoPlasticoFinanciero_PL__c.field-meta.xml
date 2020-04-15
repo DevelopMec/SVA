@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TipoPlasticoFinanciero_PL__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo de Plástico Financiero</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Ticket Car Financiero</fullName>
+                <default>false</default>
+                <label>Ticket Car Financiero</label>
+            </value>
+            <value>
+                <fullName>Plastico Tarjeta Ticket</fullName>
+                <default>false</default>
+                <label>Plastico Tarjeta Ticket</label>
+            </value>
+            <value>
+                <fullName>Fedex</fullName>
+                <default>false</default>
+                <label>Fedex</label>
+            </value>
+            <value>
+                <fullName>Lala</fullName>
+                <default>false</default>
+                <label>Lala</label>
+            </value>
+            <value>
+                <fullName>Comercializadora Pepsico</fullName>
+                <default>false</default>
+                <label>Comercializadora Pepsico</label>
+            </value>
+            <value>
+                <fullName>Cervezas C Moctezuma</fullName>
+                <default>false</default>
+                <label>Cervezas C Moctezuma</label>
+            </value>
+            <value>
+                <fullName>Sabritas</fullName>
+                <default>false</default>
+                <label>Sabritas</label>
+            </value>
+            <value>
+                <fullName>Maquila Hidrosina</fullName>
+                <default>false</default>
+                <label>Maquila Hidrosina</label>
+            </value>
+            <value>
+                <fullName>Maquila Oxxo Gas</fullName>
+                <default>false</default>
+                <label>Maquila Oxxo Gas</label>
+            </value>
+            <value>
+                <fullName>Maquila Servifacil</fullName>
+                <default>false</default>
+                <label>Maquila Servifacil</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

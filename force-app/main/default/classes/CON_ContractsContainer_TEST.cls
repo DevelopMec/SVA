@@ -254,6 +254,7 @@ public class CON_ContractsContainer_TEST {
 		String jsonOportunidad = '{}';
 		String extras = '{}';
 		Map<String, String> mapUcadv = CON_ContractsContainer_CTRL.updateContratoADV2(jsonContrato, jsonOportunidad, extras);
+        Map<String, String> mapUcadv2 = CON_ContractsContainer_CTRL.updateContratoAfiliadoADV2(jsonContrato, jsonOportunidad, extras);
 	}
 	
 	// Calling updateContratoADV with a created instance of contract
@@ -306,7 +307,25 @@ public class CON_ContractsContainer_TEST {
 		String jsonOportunidad = '{ "Id": "' + opp.Id + '" }';
 		Map<String, String> mapUcadv = CON_ContractsContainer_CTRL.updateOportunidadADV(jsonOportunidad);
 	}
-	
+		
+	// Calling updateContratoADV with a created instance of contract
+	@isTest
+	static void updateContratoADVTest3() {
+        test.startTest();
+		Map<String, Object> mapOppQuoP2PeQli = (Map<String, Object>)TestDataFactory_TEST.createQuoteLineItem();
+		QuoteLineItem qli = (QuoteLineItem)mapOppQuoP2PeQli.get('QuoteLineItem');
+		Contrato2__c contrato = new Contrato2__c(PartidaPresupuesto__c = qli.Id,EtapaContrato__c = 'Rechazado para corrección');
+		insert contrato;
+		String jsonContrato = JSON.serialize(contrato);
+		Opportunity opp = TestDataFactory_TEST.createOpportunity();
+        opp.FechaFinADV__c = system.today();
+        opp.FechaInicioADV__c = system.today();
+        opp.NumeroAltaCliente__c = '1234567';
+        update opp;
+		String jsonOportunidad = JSON.serialize(opp);
+		Map<String, String> mapUcadv = CON_ContractsContainer_CTRL.updateContratoADV(jsonContrato, jsonOportunidad);
+        test.stopTest();
+    }
 	@isTest
     static void validateOppAttachmentsTest() {
 		Opportunity opp = TestDataFactory_TEST.createOpportunity();
@@ -392,10 +411,10 @@ public class CON_ContractsContainer_TEST {
 	// Calling with an invalid Contract Id
 	@isTest
 	static void getContractSubsidiariesTest2() {
-		Opportunity opp = TestDataFactory_TEST.createOpportunity();
-		try {
-			List<ContratoFilial__c> cf = (List<ContratoFilial__c>)CON_ContractsContainer_CTRL.getContractSubsidiaries(opp.Id);
-		} catch(System.Exception e) {}
+            Opportunity opp = TestDataFactory_TEST.createOpportunity();
+            try {
+                List<ContratoFilial__c> cf = (List<ContratoFilial__c>)CON_ContractsContainer_CTRL.getContractSubsidiaries(opp.Id);
+            } catch(System.Exception e) {}
 	}
 	
 	@isTest
@@ -411,6 +430,8 @@ public class CON_ContractsContainer_TEST {
 		insert cf2;
 		String jsonFiliales = '[{ "Id": "' + cf1.Id + '" }, { "Id": "' + cf2.Id + '" }]';
 		String response = CON_ContractsContainer_CTRL.saveS400Filiales(jsonFiliales);
+        
+        String responsew = CON_ContractsContainer_CTRL.saveS400FilialesAfiliados(jsonFiliales);
 		//System.assertNotEquals('Exito al guardar codigos AS400 en filiales', response);
 	}
 	
@@ -422,10 +443,4 @@ public class CON_ContractsContainer_TEST {
 		} catch(System.Exception e) {}
 	}
 	
-	@isTest 
-	static void getContactosAPTest() {
-		//Case c = new Case();        
-		//insert c;
-		//List<Object> listGCAP = CON_ContractsContainer_CTRL.getContactosAP(c.Id, 'Case');
-	}
 }

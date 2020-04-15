@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EtapaOportunidad_Tt__c</fullName>
+    <description>Muestra la etapa de la Oportunidad relacionada a Contrato2 (ADV) para garantizar que todos los registros que el Ejecutivo ADV ve sean de Oportunidades que están en etapa de Alta de Cliente</description>
+    <externalId>false</externalId>
+    <formula>TEXT( PartidaPresupuesto__r.Quote.Opportunity.StageName )</formula>
+    <label>Etapa de la Oportunidad</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

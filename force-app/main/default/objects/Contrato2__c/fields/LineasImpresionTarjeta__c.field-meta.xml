@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LineasImpresionTarjeta__c</fullName>
+    <externalId>false</externalId>
+    <label>Líneas de Impresión en Tarjeta</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Blanco (9)</fullName>
+                <default>false</default>
+                <label>Blanco (9)</label>
+            </value>
+            <value>
+                <fullName>Nombre de Empresa (4)</fullName>
+                <default>false</default>
+                <label>Nombre de Empresa (4)</label>
+            </value>
+            <value>
+                <fullName>Placa Vehículo (6)</fullName>
+                <default>false</default>
+                <label>Placa Vehículo (6)</label>
+            </value>
+            <value>
+                <fullName>Centro de Costos (14)</fullName>
+                <default>false</default>
+                <label>Centro de Costos (14)</label>
+            </value>
+            <value>
+                <fullName>Nombre en Tarjeta (20)</fullName>
+                <default>false</default>
+                <label>Nombre en Tarjeta (20)</label>
+            </value>
+            <value>
+                <fullName>Nombre de la Base (3)</fullName>
+                <default>false</default>
+                <label>Nombre de la Base (3)</label>
+            </value>
+            <value>
+                <fullName>Nombre del Consolidador (5)</fullName>
+                <default>false</default>
+                <label>Nombre del Consolidador (5)</label>
+            </value>
+            <value>
+                <fullName>Dato Personalizado (7)</fullName>
+                <default>false</default>
+                <label>Dato Personalizado (7)</label>
+            </value>
+            <value>
+                <fullName>Número de Tarjeta (12)</fullName>
+                <default>false</default>
+                <label>Número de Tarjeta (12)</label>
+            </value>
+            <value>
+                <fullName>Patio (13)</fullName>
+                <default>false</default>
+                <label>Patio (13)</label>
+            </value>
+            <value>
+                <fullName>Unidad de Entrega (15)</fullName>
+                <default>false</default>
+                <label>Unidad de Entrega (15)</label>
+            </value>
+            <value>
+                <fullName>Región (18)</fullName>
+                <default>false</default>
+                <label>Región (18)</label>
+            </value>
+            <value>
+                <fullName>Grupo Región (19)</fullName>
+                <default>false</default>
+                <label>Grupo Región (19)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

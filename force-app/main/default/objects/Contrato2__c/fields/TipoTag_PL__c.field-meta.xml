@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TipoTag_PL__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo de Tag / Etiqueta de Presencia</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>TC GO</fullName>
+                <default>false</default>
+                <label>TC GO</label>
+            </value>
+            <value>
+                <fullName>TC GO INTRANSFERIBLE</fullName>
+                <default>false</default>
+                <label>TC GO INTRANSFERIBLE</label>
+            </value>
+            <value>
+                <fullName>TC4</fullName>
+                <default>false</default>
+                <label>TC4</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
