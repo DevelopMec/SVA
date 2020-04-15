@@ -248,6 +248,7 @@ public class Vista_EjecutivosAsignadosController {
         activeContracts = contratos.size() == nonActiveContracts;
         return activeContracts;
     }
+    
     @InvocableMethod
     public static void ProcessAccounts(List<Id> accountIds)
     {

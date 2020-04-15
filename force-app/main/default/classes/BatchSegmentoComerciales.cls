@@ -6,10 +6,10 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
     global Database.QueryLocator start(Database.BatchableContext BC) {
         String query; 
         if (test.isRunningTest()){
-            query = 'SELECT Id, NumeroEmpleados__c, Segmento3__c, CodigoClienteAS400__c FROM Account WHERE CodigoClienteAS400__c= \'1627\'';
+            query = 'SELECT Id,Funcion__c, business__c,Owner.Name,OwnerId,type, NumeroEmpleados__c, Segmento3__c,Frozen_Segment__c, CodigoClienteAS400__c,Type FROM Account WHERE CodigoClienteAS400__c= \'1627\'';
         }
         else{
-            query = 'SELECT Id, NumeroEmpleados__c, Segmento3__c, CodigoClienteAS400__c FROM Account WHERE CodigoClienteAS400__c != null ORDER BY CodigoClienteAS400__c DESC';
+            query = 'SELECT Id,Funcion__c, business__c,Owner.Name,OwnerId,type, NumeroEmpleados__c, Segmento3__c, CodigoClienteAS400__c,Frozen_Segment__c,Type FROM Account WHERE CodigoClienteAS400__c != null ORDER BY CodigoClienteAS400__c DESC';
         }
         Database.QueryLocator resultados=  Database.getQueryLocator(query);
         return resultados;
@@ -18,6 +18,10 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
     global void execute(Database.BatchableContext BC, List<sObject> cuentas){ 
         List<Account> listCuentas=(List<Account>) cuentas;
         List<Account> lupdateCuentas=new List<Account>();
+
+        List<Account> channelBUAccounts = new List<Account>();
+        Boolean hasAllContractsInactive = false;
+
         List<Segmento_Comerciales__c> listSegPatrimonio=new List<Segmento_Comerciales__c>();
         List <Id> listCuentasUsar = new List<Id>();
         List <decimal> listCuentasUsarIdGroup = new List<decimal>();
@@ -31,7 +35,6 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
         Map<String,decimal> mapaEntidadCuenta=new Map<String,decimal>();
         Map<String,decimal> mapaCuentas=new Map<String,decimal>();
         integer cont = 0;
-        
         //Por número de empleados
         for(Segmento_Comerciales__c seg:[SELECT Name, Prospect__c FROM Segmento_Comerciales__c]){
             mapaNumEmpleados.put(seg.Prospect__c, seg.Name);
@@ -64,7 +67,7 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
             }
         }
         
-        contratoF = [SELECT Id, Name, average_turnover_volume__c, Entidad_Cuenta__c, CodigoAS400__c,Last_order_date__c from ContratoFilial__c WHERE Entidad_Cuenta__r.Cuenta__r.ID IN: listCuentasUsar];
+        contratoF = [SELECT Id, Name, average_turnover_volume__c, Entidad_Cuenta__c,Entidad_Cuenta__r.Cuenta__c, CodigoAS400__c,Last_order_date__c from ContratoFilial__c WHERE Entidad_Cuenta__r.Cuenta__r.ID IN: listCuentasUsar];
         for (ContratoFilial__c ent: contratoF ){
             listSubcuentas.add(ent.Name);
             contratosFiliales.add(ent.Id);
@@ -287,6 +290,8 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
         }
         
         Database.update(lupdateCuentas,false) ;
+        Vista_EjecutivosAsignadosBatchProcess accountViews = new Vista_EjecutivosAsignadosBatchProcess(listCuentas,contratoF);
+        Database.update(accountViews.updateAccountView(),false);
         
     }
     
