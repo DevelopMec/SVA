@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BPStationNumberMandatory</fullName>
+    <active>false</active>
+    <description>El campo Número de estación BP sólo es para oportunidades con tipo de registro BPfleet y es obligatorio para los siguientes orígenes: Cliente Actual Dealer BP, Referido Dealer BP, Migración, Migración COCO WA y Empleado BP.</description>
+    <errorConditionFormula>OR(AND (OR ( TEXT( LeadSource ) = &#39;Cliente Actual Dealer BP&#39;,  TEXT(LeadSource) = &#39;Referido Dealer BP&#39;, TEXT(LeadSource) = &#39;Migracion&#39;, TEXT(LeadSource) = &#39;Migración COCO WA&#39;, TEXT(LeadSource) = &#39;Empleado BP&#39; ), BPStationNumber__c =&#39;&#39;,  RecordType.DeveloperName = &#39;BPfleet&#39; ), AND( RecordType.DeveloperName  != &#39;BPfleet&#39;, NOT(ISBLANK(BPStationNumber__c ))))</errorConditionFormula>
+    <errorDisplayField>BPStationNumber__c</errorDisplayField>
+    <errorMessage>Captura el Número de Estación BP  para continuar</errorMessage>
+</ValidationRule>

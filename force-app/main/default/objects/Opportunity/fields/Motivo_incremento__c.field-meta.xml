@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Motivo_incremento__c</fullName>
+    <externalId>false</externalId>
+    <label>Motivo incremento</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Type</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Ampliación de operación</fullName>
+                <default>false</default>
+                <label>Ampliación de operación</label>
+            </value>
+            <value>
+                <fullName>Aumento del consumo de combustible</fullName>
+                <default>false</default>
+                <label>Aumento del consumo de combustible</label>
+            </value>
+            <value>
+                <fullName>Aumento del valor facial</fullName>
+                <default>false</default>
+                <label>Aumento del valor facial</label>
+            </value>
+            <value>
+                <fullName>Aumento de número de empleados</fullName>
+                <default>false</default>
+                <label>Aumento de número de empleados</label>
+            </value>
+            <value>
+                <fullName>Estacionalidad</fullName>
+                <default>false</default>
+                <label>Estacionalidad</label>
+            </value>
+            <value>
+                <fullName>Fusión y adquisición</fullName>
+                <default>false</default>
+                <label>Fusión y adquisición</label>
+            </value>
+            <value>
+                <fullName>Navideños</fullName>
+                <default>false</default>
+                <label>Navideños</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Tomada de la competencia</fullName>
+                <default>false</default>
+                <label>Tomada de la competencia</label>
+            </value>
+            <value>
+                <fullName>Afiliados</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Afiliados</label>
+            </value>
+            <value>
+                <fullName>Aumento del precio de combustible</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aumento del precio de combustible</label>
+            </value>
+            <value>
+                <fullName>Cobranza</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cobranza</label>
+            </value>
+            <value>
+                <fullName>Control Transaccional</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Control Transaccional</label>
+            </value>
+            <value>
+                <fullName>Dificultad financiera</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Dificultad financiera</label>
+            </value>
+            <value>
+                <fullName>Disminuición de la operación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Disminuición de la operación</label>
+            </value>
+            <value>
+                <fullName>Disminuición del número empleados</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Disminuición del número empleados</label>
+            </value>
+            <value>
+                <fullName>Facturación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Facturación</label>
+            </value>
+            <value>
+                <fullName>Logística</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Logística</label>
+            </value>
+            <value>
+                <fullName>Optimización del consumo de combustible</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Optimización del consumo de combustible</label>
+            </value>
+            <value>
+                <fullName>Piloto/Migración a la competencia</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Piloto/Migración a la competencia</label>
+            </value>
+            <value>
+                <fullName>Plataformas</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Plataformas</label>
+            </value>
+            <value>
+                <fullName>Prevención a Fraudes</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Prevención a Fraudes</label>
+            </value>
+            <value>
+                <fullName>Problemas operativos</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Problemas operativos</label>
+            </value>
+            <value>
+                <fullName>SAC</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SAC</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Ampliación de operación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Aumento del consumo de combustible</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Aumento del valor facial</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Aumento de número de empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Estacionalidad</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Fusión y adquisición</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Navideños</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Otros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Incremento</controllingFieldValue>
+            <valueName>Tomada de la competencia</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Escalonamiento__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Indica a que partida esta relacionado el escalonamiento</description>
+    <externalId>false</externalId>
+    <label>Escalonamiento</label>
+    <referenceTo>QuoteLineItem</referenceTo>
+    <relationshipLabel>Partidas de presupuesto</relationshipLabel>
+    <relationshipName>PartidasPresupuesto</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

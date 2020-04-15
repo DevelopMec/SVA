@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AccountApproachLevel__c</fullName>
+    <description>Logo del nivel de acercamiento de la cuenta.</description>
+    <externalId>false</externalId>
+    <formula>Entidad_Cuenta__r.Cuenta__r.Approach_level__c</formula>
+    <label>Nivel de acercamiento de la cuenta</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

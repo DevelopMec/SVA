@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ImplementacionAS400</fullName>
+    <active>false</active>
+    <description>Valida que si la etapa es igual a Implementación en la cuenta se tenga el código AS400</description>
+    <errorConditionFormula>(ISBLANK(Account.CodigoClienteAS400__c)  &amp;&amp;  ISBLANK(Account.IdCuentaOPAM__c))  &amp;&amp;   ISPICKVAL(StageName, &quot;Implementación&quot;)</errorConditionFormula>
+    <errorMessage>No puedes pasar a etapa de implementación si la cuenta no tiene código AS400 / OPAM</errorMessage>
+</ValidationRule>

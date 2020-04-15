@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Metodo_Pago__c</fullName>
+    <description>Catalago con los diferentes metodos de pagos aceptados por el SAT</description>
+    <externalId>false</externalId>
+    <label>Metodo de Pago</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Efectivo</fullName>
+                <default>false</default>
+                <label>Efectivo</label>
+            </value>
+            <value>
+                <fullName>Cheque nominativo</fullName>
+                <default>false</default>
+                <label>Cheque nominativo</label>
+            </value>
+            <value>
+                <fullName>Transferencia electrónica de fondos</fullName>
+                <default>false</default>
+                <label>Transferencia electrónica de fondos</label>
+            </value>
+            <value>
+                <fullName>Tarjeta de Crédito</fullName>
+                <default>false</default>
+                <label>Tarjeta de Crédito</label>
+            </value>
+            <value>
+                <fullName>Monedero electrónico</fullName>
+                <default>false</default>
+                <label>Monedero electrónico</label>
+            </value>
+            <value>
+                <fullName>Dinero electrónico</fullName>
+                <default>false</default>
+                <label>Dinero electrónico</label>
+            </value>
+            <value>
+                <fullName>Vales de despensa</fullName>
+                <default>false</default>
+                <label>Vales de despensa</label>
+            </value>
+            <value>
+                <fullName>Tarjeta de débito</fullName>
+                <default>false</default>
+                <label>Tarjeta de débito</label>
+            </value>
+            <value>
+                <fullName>Tarjeta de servicios</fullName>
+                <default>false</default>
+                <label>Tarjeta de servicios</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>NA</fullName>
+                <default>false</default>
+                <label>NA</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Elapsed_days__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(MinStart__c),
+  BLANKVALUE(TimestampGanada__c, BLANKVALUE(TimestampPerdida__c, NOW())) - CreatedDate,
+  IF(MaxEnd__c &gt; MaxStart__c,
+    MaxEnd__c,
+    NOW()) - CreatedDate)</formula>
+    <label>Días transcurridos</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>1</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NoChangeOwner</fullName>
+    <active>true</active>
+    <description>El propietario no se puede cambiar al menos que sea un contrato filial del producto BP Fleet o que el propietario tenga el rol Ejecutivo Trademarketing. Un usuario con perfil &#39;Administrador el sistema&#39; sí puede cambiar al propietario.</description>
+    <errorConditionFormula>AND( $Profile.Name != &#39;Administrador del sistema&#39;,   
+$Profile.Name != &#39;System Administrator&#39;,
+ModifyOwner__c = false,  ISCHANGED(OwnerId),
+Producto__r.ProductCode != &#39;30-B&#39;,  Owner:User.UserRole.DeveloperName != &#39;Ejecutivo_Trademarketing&#39;)</errorConditionFormula>
+    <errorMessage>No se puede modificar el propietario del contrato filial.</errorMessage>
+</ValidationRule>

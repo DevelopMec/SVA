@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Verifica_Implementacion_As400</fullName>
+    <active>false</active>
+    <description>Verifica que cuando se cambia a etapa de Implementación la oportunidad tenga un código AS400</description>
+    <errorConditionFormula>AND(ISPICKVAL( StageName , &#39;Implementación&#39;),  OR(CodigoClienteAS400__c == null,CodigoClienteAS400__c == &#39;&#39;))</errorConditionFormula>
+    <errorMessage>No se ha completado la etapa de Alta de cliente correctamente (Falta campo: Código cliente AS400)</errorMessage>
+</ValidationRule>

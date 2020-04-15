@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Facturacion1__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo de contrato</description>
+    <externalId>false</externalId>
+    <label>Facturación 1</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Partidas de presupuesto</relationshipLabel>
+    <relationshipName>PartidasPresupuestoFacturacion1</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OrigenNuevoNegocio</fullName>
+    <active>true</active>
+    <description>El origen es obligatorio cuando se trata de un nuevo negocio.</description>
+    <errorConditionFormula>AND(ISPICKVAL( Type, &quot;Nuevo negocio&quot;), ISBLANK(TEXT(LeadSource)))</errorConditionFormula>
+    <errorDisplayField>LeadSource</errorDisplayField>
+    <errorMessage>Indique el origen del nuevo tipo de negocio</errorMessage>
+</ValidationRule>

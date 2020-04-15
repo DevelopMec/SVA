@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>isCelulaCitas__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>indica si la oportunidad es de celula de citas</description>
+    <externalId>false</externalId>
+    <label>Célula de Citas</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

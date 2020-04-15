@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VolumenComision__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(AND( Producto__r.NumeroProducto__c  &lt;&gt; 31,ComisionEmision__c* Amount&lt;219.12)  , 219.12,(ComisionEmision__c* Amount))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Volumen de comisión</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

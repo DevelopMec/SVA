@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Valida_Etapa_Cotizacion</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(ISPICKVAL(PRIORVALUE(StageName),&#39;Cotización&#39;), $Profile.Name&lt;&gt;&#39;Administrador del sistema&#39; ,
+$Profile.Name&lt;&gt;&#39;Ventas Extranjeras&#39; ,
+$Profile.Name&lt;&gt;&#39;Extranjero_Exp_Reportes&#39; , ISCHANGED(StageName),NOT (OR(Text(StageName)=&#39;Contrato&#39;, Text(StageName)=&#39;Perdida&#39;,Text(StageName)=&#39;Cotización&#39;)))</errorConditionFormula>
+    <errorDisplayField>StageName</errorDisplayField>
+    <errorMessage>La oportunidad solo puede pasar a etapa Contrato o Perdida.</errorMessage>
+</ValidationRule>

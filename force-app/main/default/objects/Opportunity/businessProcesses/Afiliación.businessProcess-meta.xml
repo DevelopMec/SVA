@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Afiliación</fullName>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Alta de cliente</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Contrato</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Cotización</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Ganada</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Implementación</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Perdida</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pre Análisis</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

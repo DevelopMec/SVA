@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ApprovedQuoteToChangeStage</fullName>
+    <active>true</active>
+    <description>Si una cotización relacionada a la oportunidad se encuentra en un proceso de aprobación pendiente o rechazado, no se puede cambiar la etapa.</description>
+    <errorConditionFormula>AND(OR(QuotesInApprovalProcess__c &gt;= 1, QuotesWithRejectedApproval__c &gt;= 1), ISCHANGED(StageName))</errorConditionFormula>
+    <errorMessage>Tu cotización requiere aprobación, consulta el historial de aprobación.</errorMessage>
+</ValidationRule>

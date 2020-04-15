@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Motivo__c</fullName>
+    <externalId>false</externalId>
+    <label>¿Porque Ganaste/Perdiste la Oportunidad?</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>StageName</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Abandono proceso</fullName>
+                <default>false</default>
+                <label>Abandono proceso</label>
+            </value>
+            <value>
+                <fullName>Cobertura</fullName>
+                <default>false</default>
+                <label>Cobertura</label>
+            </value>
+            <value>
+                <fullName>Cobertura no satisfactoria</fullName>
+                <default>false</default>
+                <label>Cobertura no satisfactoria</label>
+            </value>
+            <value>
+                <fullName>Comisión / Precio</fullName>
+                <default>false</default>
+                <label>Comisión / Precio</label>
+            </value>
+            <value>
+                <fullName>Condiciones Comerciales</fullName>
+                <default>false</default>
+                <label>Condiciones Comerciales</label>
+            </value>
+            <value>
+                <fullName>Contacto no quiso atender</fullName>
+                <default>false</default>
+                <label>Contacto no quiso atender</label>
+            </value>
+            <value>
+                <fullName>Continuara con proveedor</fullName>
+                <default>false</default>
+                <label>Continuara con proveedor</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Control</fullName>
+                <default>false</default>
+                <label>Control</label>
+            </value>
+            <value>
+                <fullName>Conveniencia Fiscal</fullName>
+                <default>false</default>
+                <label>Conveniencia Fiscal</label>
+            </value>
+            <value>
+                <fullName>Descuento no es suficiente</fullName>
+                <default>false</default>
+                <label>Descuento no es suficiente</label>
+            </value>
+            <value>
+                <fullName>Eligio otro proveedor</fullName>
+                <default>false</default>
+                <label>Eligio otro proveedor</label>
+            </value>
+            <value>
+                <fullName>Experiencias anteriores</fullName>
+                <default>false</default>
+                <label>Experiencias anteriores</label>
+            </value>
+            <value>
+                <fullName>Financiamiento AMEX</fullName>
+                <default>false</default>
+                <label>Financiamiento AMEX</label>
+            </value>
+            <value>
+                <fullName>Financiamiento con Amex</fullName>
+                <default>false</default>
+                <label>Financiamiento con Amex</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad de Apps</fullName>
+                <default>false</default>
+                <label>Funcionalidad de Apps</label>
+            </value>
+            <value>
+                <fullName>Funcionalidades del Producto</fullName>
+                <default>false</default>
+                <label>Funcionalidades del Producto</label>
+            </value>
+            <value>
+                <fullName>Funcionalidades y Controles de Plataforma</fullName>
+                <default>false</default>
+                <label>Funcionalidades y Controles de Plataforma</label>
+            </value>
+            <value>
+                <fullName>Funcionalidades y diferenciales del producto</fullName>
+                <default>false</default>
+                <label>Funcionalidades y diferenciales del producto</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad y Controles de Plataforma</fullName>
+                <default>false</default>
+                <label>Funcionalidad y Controles de Plataforma</label>
+            </value>
+            <value>
+                <fullName>Inconsistencia en Plataforma</fullName>
+                <default>false</default>
+                <label>Inconsistencia en Plataforma</label>
+            </value>
+            <value>
+                <fullName>Mal servicio</fullName>
+                <default>false</default>
+                <label>Mal servicio</label>
+            </value>
+            <value>
+                <fullName>No pago</fullName>
+                <default>false</default>
+                <label>No pago</label>
+            </value>
+            <value>
+                <fullName>No pidio</fullName>
+                <default>false</default>
+                <label>No pidio</label>
+            </value>
+            <value>
+                <fullName>No quiso decir la razón</fullName>
+                <default>false</default>
+                <label>No quiso decir la razón</label>
+            </value>
+            <value>
+                <fullName>No se pudo contactar</fullName>
+                <default>false</default>
+                <label>No se pudo contactar</label>
+            </value>
+            <value>
+                <fullName>Otro motivo</fullName>
+                <default>false</default>
+                <label>Otro motivo</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Plataformas</fullName>
+                <default>false</default>
+                <label>Plataforma</label>
+            </value>
+            <value>
+                <fullName>Plazo para pago</fullName>
+                <default>false</default>
+                <label>Plazo para pago</label>
+            </value>
+            <value>
+                <fullName>Precio</fullName>
+                <default>false</default>
+                <label>Precio</label>
+            </value>
+            <value>
+                <fullName>Prefiere otra marca</fullName>
+                <default>false</default>
+                <label>Prefiere otra marca</label>
+            </value>
+            <value>
+                <fullName>Recomendación</fullName>
+                <default>false</default>
+                <label>Recomendación</label>
+            </value>
+            <value>
+                <fullName>Red de afiliados</fullName>
+                <default>false</default>
+                <label>Red de afiliados</label>
+            </value>
+            <value>
+                <fullName>Valores agregados-SAC 24/7</fullName>
+                <default>false</default>
+                <label>SAC</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Seguridad</fullName>
+                <default>false</default>
+                <label>Seguridad</label>
+            </value>
+            <value>
+                <fullName>Servicio de implementación</fullName>
+                <default>false</default>
+                <label>Servicio de implementación</label>
+            </value>
+            <value>
+                <fullName>Servicio de logistica</fullName>
+                <default>false</default>
+                <label>Servicio de logistica</label>
+            </value>
+            <value>
+                <fullName>Servicio de venta</fullName>
+                <default>false</default>
+                <label>Servicio de venta</label>
+            </value>
+            <value>
+                <fullName>Precio del combustible BP</fullName>
+                <default>false</default>
+                <label>Precio del combustible BP</label>
+            </value>
+            <value>
+                <fullName>No quiere cambiar de proveedor</fullName>
+                <default>false</default>
+                <label>No quiere cambiar de proveedor</label>
+            </value>
+            <value>
+                <fullName>Vencida por falta de seguimiento</fullName>
+                <default>false</default>
+                <label>Vencida por falta de seguimiento</label>
+            </value>
+            <value>
+                <fullName>Sin operaciones de Cliente</fullName>
+                <default>false</default>
+                <label>Sin operaciones de Cliente</label>
+            </value>
+            <value>
+                <fullName>Asesoria Fiscal</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Asesoria Fiscal</label>
+            </value>
+            <value>
+                <fullName>Asesoría fiscal</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Asesoría fiscal</label>
+            </value>
+            <value>
+                <fullName>Comisión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Comisión</label>
+            </value>
+            <value>
+                <fullName>Comisión más baja</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Comisión más baja</label>
+            </value>
+            <value>
+                <fullName>Crédito</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Crédito</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Cobertura</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Funcionalidad-Cobertura</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Cobertura.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Funcionalidad-Cobertura.</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Plataformas.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Funcionalidad-Plataformas.</label>
+            </value>
+            <value>
+                <fullName>No acepta migración</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No acepta migración</label>
+            </value>
+            <value>
+                <fullName>No quiso pagar comisión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No quiso pagar comisión</label>
+            </value>
+            <value>
+                <fullName>No quiso pagar la comisión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No quiso pagar la comisión</label>
+            </value>
+            <value>
+                <fullName>Recomendación BBVA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Recomendación BBVA</label>
+            </value>
+            <value>
+                <fullName>Recomendación Chedraui</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Recomendación Chedraui</label>
+            </value>
+            <value>
+                <fullName>Valores agregados-Apps</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Valores agregados-Apps</label>
+            </value>
+            <value>
+                <fullName>Valores agregados-Beneficio club</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Valores agregados-Beneficio club</label>
+            </value>
+            <value>
+                <fullName>Valores agregados-Servicio Posventa</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Valores agregados-Servicio Posventa</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Comisión / Precio</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Contacto no quiso atender</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Conveniencia Fiscal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Experiencias anteriores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Financiamiento AMEX</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Funcionalidades y Controles de Plataforma</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Funcionalidades y diferenciales del producto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Mal servicio</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Plazo para pago</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Recomendación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Red de afiliados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Servicio de implementación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Servicio de logistica</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Implementación</controllingFieldValue>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <controllingFieldValue>Alta de cliente</controllingFieldValue>
+            <valueName>Servicio de venta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Funcionalidad-Control</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Financiamiento con Amex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Funcionalidad-Plataformas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Valores agregados-SAC 24/7</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Funcionalidad-Seguridad</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Descuento no es suficiente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>No quiso decir la razón</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Prefiere otra marca</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Precio del combustible BP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>No quiere cambiar de proveedor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Vencida por falta de seguimiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Sin operaciones de Cliente</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

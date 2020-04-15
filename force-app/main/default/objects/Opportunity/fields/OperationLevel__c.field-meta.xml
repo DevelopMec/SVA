@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OperationLevel__c</fullName>
+    <externalId>false</externalId>
+    <label>Nivel de Operación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Familia__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Medio de pago</fullName>
+                <default>false</default>
+                <label>Medio de pago</label>
+            </value>
+            <value>
+                <fullName>Integración con API’s</fullName>
+                <default>false</default>
+                <label>Integración con API’s</label>
+            </value>
+            <value>
+                <fullName>Medio de pago + Comprobación de gastos</fullName>
+                <default>false</default>
+                <label>Medio de pago + Comprobación de gastos</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Medio de pago</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Integración con API’s</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Medio de pago + Comprobación de gastos</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

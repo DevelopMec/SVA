@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Comision_por_Servicio__c</fullName>
+    <externalId>false</externalId>
+    <label>Comisión por Servicio</label>
+    <summarizedField>QuoteLineItem.Comision_por_Servicio__c</summarizedField>
+    <summaryForeignKey>QuoteLineItem.QuoteId</summaryForeignKey>
+    <summaryOperation>max</summaryOperation>
+    <type>Summary</type>
+</CustomField>

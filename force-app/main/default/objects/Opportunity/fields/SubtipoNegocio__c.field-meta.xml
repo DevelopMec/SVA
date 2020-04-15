@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SubtipoNegocio__c</fullName>
+    <description>Campo dependiente de tipo</description>
+    <externalId>false</externalId>
+    <label>Subtipo de negocio</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Type</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pedido único</fullName>
+                <default>false</default>
+                <label>Pedido único</label>
+            </value>
+            <value>
+                <fullName>Virgen</fullName>
+                <default>false</default>
+                <label>Virgen</label>
+            </value>
+            <value>
+                <fullName>Mercado</fullName>
+                <default>false</default>
+                <label>Mercado</label>
+            </value>
+            <value>
+                <fullName>Grupo</fullName>
+                <default>false</default>
+                <label>Grupo</label>
+            </value>
+            <value>
+                <fullName>Cruzada</fullName>
+                <default>false</default>
+                <label>Cruzada</label>
+            </value>
+            <value>
+                <fullName>Trade Marketing</fullName>
+                <default>false</default>
+                <label>Trade Marketing</label>
+            </value>
+            <value>
+                <fullName>Renegociación</fullName>
+                <default>false</default>
+                <label>Renegociación</label>
+            </value>
+            <value>
+                <fullName>Migración</fullName>
+                <default>false</default>
+                <label>Migración</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Nuevo negocio</controllingFieldValue>
+            <controllingFieldValue>Negocio existente</controllingFieldValue>
+            <valueName>Pedido único</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Nuevo negocio</controllingFieldValue>
+            <valueName>Virgen</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Nuevo negocio</controllingFieldValue>
+            <valueName>Mercado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Nuevo negocio</controllingFieldValue>
+            <valueName>Grupo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Nuevo negocio</controllingFieldValue>
+            <valueName>Trade Marketing</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Negocio existente</controllingFieldValue>
+            <valueName>Cruzada</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Negocio existente</controllingFieldValue>
+            <valueName>Renegociación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Negocio existente</controllingFieldValue>
+            <valueName>Migración</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

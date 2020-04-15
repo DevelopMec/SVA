@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CantidadTarjetasDescuento__c</fullName>
+    <description>Campo para ingreso de Cantidad de tarjetas referente al % de descuento  de las tarifas editables</description>
+    <externalId>false</externalId>
+    <label>Cantidad de tarjetas</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

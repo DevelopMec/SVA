@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fecha_de_cierre_mayor_a_fecha_creacion</fullName>
+    <active>false</active>
+    <errorConditionFormula>OR(AND(ISNEW(),CloseDate&lt;Today()), AND (CloseDate &lt; DATEVALUE(CreatedDate), DATEVALUE ( CreatedDate )&gt;DATE (2015,12,10)))</errorConditionFormula>
+    <errorDisplayField>CloseDate</errorDisplayField>
+    <errorMessage>La fecha de cierre debe ser mayor a la fecha de creación</errorMessage>
+</ValidationRule>

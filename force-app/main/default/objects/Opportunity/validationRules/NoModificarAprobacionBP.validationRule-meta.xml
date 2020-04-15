@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NoModificarAprobacionBP</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(RecordType.DeveloperName == &#39;BPfleet&#39;, PRIORVALUE( BPfleetApproval__c )== BPfleetApproval__c,BPfleetApproval__c ,NOT(ISCHANGED( StatusApprovalBPfleet__c)),NOT(ISNEW()), NOT(ISPICKVAL(StatusApprovalBPfleet__c, &#39;Aprobado&#39;)),ISCHANGED(StageName))</errorConditionFormula>
+    <errorMessage>Para poder cambiar de etapa es necesario solicitar la aprobación de la Oportunidad</errorMessage>
+</ValidationRule>

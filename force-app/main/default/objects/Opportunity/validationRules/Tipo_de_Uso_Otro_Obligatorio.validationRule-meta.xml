@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tipo_de_Uso_Otro_Obligatorio</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISPICKVAL(UseType__c, &quot;Otro&quot;) &amp;&amp; (UseType_Other__c = &quot;&quot;)</errorConditionFormula>
+    <errorDisplayField>UseType_Other__c</errorDisplayField>
+    <errorMessage>Debe de ingresar una especificación</errorMessage>
+</ValidationRule>

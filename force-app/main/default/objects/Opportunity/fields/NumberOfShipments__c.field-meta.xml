@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NumberOfShipments__c</fullName>
+    <description>Campo resumen que sumariza los números de envíos de las cotizaciones relacionadas a la oportunidad.</description>
+    <externalId>false</externalId>
+    <label>Número de envíos</label>
+    <summarizedField>Quote.NumberOfShipments__c</summarizedField>
+    <summaryForeignKey>Quote.OpportunityId</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

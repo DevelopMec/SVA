@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Nivel_de_Operacion_Obligatorio</fullName>
+    <active>false</active>
+    <description>Campo Nivel de Operación es Obligatorio cuando la familia es Viáticos</description>
+    <errorConditionFormula>ISPICKVAL(Familia__c, &quot;Viáticos&quot;) &amp;&amp; ISPICKVAL(OperationLevel__c, &quot;&quot;) &amp;&amp; NOT(ISNEW())</errorConditionFormula>
+    <errorDisplayField>OperationLevel__c</errorDisplayField>
+    <errorMessage>Campo Obligatorio cuando la familia sea Viáticos</errorMessage>
+</ValidationRule>

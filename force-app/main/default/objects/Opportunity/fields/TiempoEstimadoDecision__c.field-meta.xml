@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TiempoEstimadoDecision__c</fullName>
+    <externalId>false</externalId>
+    <label>Tiempo estimado decisión</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Inmediato</fullName>
+                <default>false</default>
+                <label>Inmediato</label>
+            </value>
+            <value>
+                <fullName>1-2 meses</fullName>
+                <default>false</default>
+                <label>1-2 meses</label>
+            </value>
+            <value>
+                <fullName>2-6 meses</fullName>
+                <default>false</default>
+                <label>2-6 meses</label>
+            </value>
+            <value>
+                <fullName>6-12 meses</fullName>
+                <default>false</default>
+                <label>6-12 meses</label>
+            </value>
+            <value>
+                <fullName>Próximo año</fullName>
+                <default>false</default>
+                <label>Próximo año</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

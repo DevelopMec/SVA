@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TipoVenta__c</fullName>
+    <externalId>false</externalId>
+    <label>Tipo de Venta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Navideños</fullName>
+                <default>false</default>
+                <label>Navideños</label>
+            </value>
+            <value>
+                <fullName>Trademarketing</fullName>
+                <default>false</default>
+                <label>Trademarketing</label>
+            </value>
+            <value>
+                <fullName>Pedido Unico</fullName>
+                <default>false</default>
+                <label>Pedido Unico</label>
+            </value>
+            <value>
+                <fullName>Simple</fullName>
+                <default>false</default>
+                <label>Simple</label>
+            </value>
+            <value>
+                <fullName>Cruzada</fullName>
+                <default>false</default>
+                <label>Cruzada</label>
+            </value>
+            <value>
+                <fullName>Upselling</fullName>
+                <default>false</default>
+                <label>Upselling</label>
+            </value>
+            <value>
+                <fullName>Indefinido</fullName>
+                <default>false</default>
+                <label>Indefinido</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

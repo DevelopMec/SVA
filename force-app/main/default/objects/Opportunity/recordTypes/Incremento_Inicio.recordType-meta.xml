@@ -1,0 +1,1231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Incremento_Inicio</fullName>
+    <active>true</active>
+    <businessProcess>Posventa</businessProcess>
+    <label>Incremento Inicio</label>
+    <picklistValues>
+        <picklist>Competidor__c</picklist>
+        <values>
+            <fullName>Amex</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aseguradoras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Autochilango</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banamex</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bancomer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banorte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banregio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Broxel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Convenio con Gasolinera</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Easyvale %2F Toka</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Efectivale</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Element</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Finutil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GasnGo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HSBC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hidrosina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inburgas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inbursa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lease Plan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mega Vale %2F Suven</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No había la prestación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No proporcionó información</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No tenía proveedor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nómina%2FEfectivo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OCSI %2F One Card</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>One Card</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Orsan</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otro banco</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otro competidor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otro grupo gasolinero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oxxo Gas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pagaflex</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Previvale</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recargas Energex</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Santander</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Scotiabank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si Vale</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sodexo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Talleres %2F Agencias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tiendas de autoservicio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Todito Pagos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valemex</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>DB_Competitor__c</picklist>
+        <values>
+            <fullName>Competitor A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Competitor B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Competitor C</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>EstatusImplementacion__c</picklist>
+        <values>
+            <fullName>Cancelada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Capacitación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Concluida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pausada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pedido de fondos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pedido de tarjetas</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Estatus_Aprobacion__c</picklist>
+        <values>
+            <fullName>Aprobado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En proceso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin solicitud de aprobacion</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Estatus__c</picklist>
+        <values>
+            <fullName>Cancelada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cerrada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Iniciada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pausada</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Familia__c</picklist>
+        <values>
+            <fullName>Ayuda Social</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Combustible</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Despensa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresarial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mantenimiento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Regalo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ticket Restaurante</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vestimenta</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ForecastCategoryName</picklist>
+        <values>
+            <fullName>Best Case</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Closed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Commit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omitted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pipeline</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>IsApprovedCreditEval__c</picklist>
+        <values>
+            <fullName>En Proceso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Si</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>LeadSource</picklist>
+        <values>
+            <fullName>Alianzas Comerciales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CPL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Email Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Eventos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Expos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Migracion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recomendado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Redes sociales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Referenciadores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Referidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEO</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Maquilador__c</picklist>
+        <values>
+            <fullName>Chedraui</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>G500 FLEET</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hidrosina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Walmart</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Metodo_Pago__c</picklist>
+        <values>
+            <fullName>Cheque nominativo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dinero electrónico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Efectivo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Monedero electrónico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de Crédito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de débito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de servicios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Transferencia electrónica de fondos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vales de despensa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Motivo__c</picklist>
+        <values>
+            <fullName>Abandono proceso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cobertura</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cobertura no satisfactoria</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comisión %2F Precio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Condiciones Comerciales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contacto no quiso atender</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Continuara con proveedor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conveniencia Fiscal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Eligio otro proveedor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Experiencias anteriores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Financiamiento AMEX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Financiamiento con Amex</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidad de Apps</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidad y Controles de Plataforma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidad-Control</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidad-Plataformas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidad-Seguridad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidades del Producto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidades y Controles de Plataforma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Funcionalidades y diferenciales del producto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inconsistencia en Plataforma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mal servicio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No pidio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No se pudo contactar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otro motivo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Plazo para pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Precio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recomendación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Red de afiliados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicio de implementación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicio de logistica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicio de venta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin operaciones de Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valores agregados-SAC 24%2F7</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vencida por falta de seguimiento</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Motivo_incremento__c</picklist>
+        <values>
+            <fullName>Ampliación de operación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aumento de número de empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aumento del consumo de combustible</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aumento del valor facial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Estacionalidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fusión y adquisición</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Navideños</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tomada de la competencia</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OperationLevel__c</picklist>
+        <values>
+            <fullName>Integración con API%E2%80%99s</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Medio de pago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Medio de pago %2B Comprobación de gastos</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Producto_PL__c</picklist>
+        <values>
+            <fullName>1-Ticket Restaurante</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>12-Ticket Despensa Red Premium Banda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>14-Ticket Vestimenta %28HT%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>18-Regalo Edenred</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>29-Empresarial Edenred</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3-Ticket Vale Gasolina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>30-Ticket Car 3%2E0</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>31-Mantenimiento de flota</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>32-Vale Despensas Red Premium chip</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>34-Vestimenta chip %28HT%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>39 C-Plus Edenred Chip</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>39-Plus Edenred Banda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>41- Ticket Restaurante LAAT %28HT%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>48-Regalo con chip %28HT%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>52-Ecovale Despensas Red Vital chip</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>58-Regalo con chip Red Máxima MasterCard %28PS%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>60 D-Ecovale Combustible Edenred - Diesel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>60 M-Ecovale Combustible Edenred - Magna</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>60 P-Ecovale Combustible Edenred - Premium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>61-Ticket Restaurante %28PS%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>62-Ecovale Despensas Red Esencial chip</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>69-Ecovale Despensas Red Esencial Plus chip</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>71-Ticket Restaurante Red Máxima CHIP CARNET %28HT%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>81-Ticket Restaurante Red Máxima CHIP CARNET %28PS%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>9-Vale Despensas Edenred - SP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>91-Ticket Restaurante Red Máxima CHIP MasterCard %28HT%29</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>RejectionReasons__c</picklist>
+        <values>
+            <fullName>Adjuntos no legibles</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Administrador No especificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Condiciones comerciales del contrato diferentes de la oportunidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrato diferente del producto de la oportunidad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Diferencias entre datos capturados y documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Documentación Incompleta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Falta de información en documentos comprobatorios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inconsistencia en Firmas de contrato</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazado a pedido del ejecutivo</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>StatusApprovalBPfleet__c</picklist>
+        <values>
+            <fullName>Aprobado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En espera de aprobación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SubOrigen__c</picklist>
+        <values>
+            <fullName>ABC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Adwords</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>American Express</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aspel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aura Digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>BING</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banners</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Blog</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Calls</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Carlos Kiviat</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cartera ejecutivo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente de grupo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>El financiero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Email Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Enconta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Facebook</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fernando Granados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Finanzas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Firma corporativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Framework</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Francisco Salgado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Global Data Base</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google%2B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hector Sanchez</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Hyperion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instagram</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kickads</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kwanko</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LDM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Link Factor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Linkedin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Logística</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lummark</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MVF</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mundo Ejecutivo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not Only Media</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OATH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OCC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pedro Borda</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Point Capital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ramon Aguilar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Relaciones públicas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Retención</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SBI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sitio Web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Starnet</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Thomas Urrutia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Twitter</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Uber</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Visor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WhatsApp</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>YouTube</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zebras</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Sub_estatus__c</picklist>
+        <values>
+            <fullName>Cotización en análisis de aprobación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Impacto - COVID19</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Submotivo_PL__c</picklist>
+        <values>
+            <fullName>Atencion a clientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comercial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Implementacion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Logistica</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SubtipoNegocio__c</picklist>
+        <values>
+            <fullName>Cruzada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Grupo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mercado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Migración</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pedido único</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Renegociación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trade Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Virgen</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>TiempoEstimadoDecision__c</picklist>
+        <values>
+            <fullName>1-2 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2-6 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>6-12 meses</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inmediato</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Próximo año</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>TipoSolucion__c</picklist>
+        <values>
+            <fullName>Avanzado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Básico</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>TipoVenta__c</picklist>
+        <values>
+            <fullName>Cruzada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Indefinido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Navideños</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pedido Unico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Simple</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trademarketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Upselling</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type</picklist>
+        <values>
+            <fullName>Incremento</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>UseType__c</picklist>
+        <values>
+            <fullName>Caja chica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gastos de operación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Viáticos</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>VentaCruzadaMKT__c</picklist>
+        <values>
+            <fullName>Ayuda Social</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Combustible</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Despensa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mantenimiento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vestimenta</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>VentaTradeMarketing_PL__c</picklist>
+        <values>
+            <fullName>NO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SI</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

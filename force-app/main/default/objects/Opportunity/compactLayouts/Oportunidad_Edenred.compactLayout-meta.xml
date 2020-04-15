@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Oportunidad_Edenred</fullName>
+    <fields>Name</fields>
+    <fields>AccountId</fields>
+    <fields>Contacto__c</fields>
+    <fields>VolumenEmision2__c</fields>
+    <fields>CloseDate</fields>
+    <fields>Solution__c</fields>
+    <fields>Elapsed_days__c</fields>
+    <label>Oportunidad Edenred</label>
+</CompactLayout>

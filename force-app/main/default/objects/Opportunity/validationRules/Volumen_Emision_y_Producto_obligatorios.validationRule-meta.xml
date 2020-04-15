@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Volumen_Emision_y_Producto_obligatorios</fullName>
+    <active>false</active>
+    <description>Es necesario capturar el volumen de emisión y el producto para pasar a la etapa de Contrato</description>
+    <errorConditionFormula>AND( ISBLANK(  Amount)  ||  ( ISBLANK( Producto__c)), ISPICKVAL(StageName,&#39;Contrato&#39;) ||  (ISPICKVAL( StageName, &#39;Implementación&#39;)||  (ISPICKVAL(StageName, &#39;Pedido&#39;)||  (ISPICKVAL(StageName,&#39;Piloto&#39;)||  (ISPICKVAL(StageName,&#39;Ganada&#39;)||  (ISPICKVAL(StageName,&#39;Perdida&#39;)))))))</errorConditionFormula>
+    <errorMessage>Los campos de Volumen de Emisión y Producto son obligatorios</errorMessage>
+</ValidationRule>

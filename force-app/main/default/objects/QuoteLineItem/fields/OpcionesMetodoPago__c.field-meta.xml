@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OpcionesMetodoPago__c</fullName>
+    <externalId>false</externalId>
+    <label>Opciones de método de pago</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>FormaPago__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Banamex</fullName>
+                <default>false</default>
+                <label>Banamex</label>
+            </value>
+            <value>
+                <fullName>Banorte</fullName>
+                <default>false</default>
+                <label>Banorte</label>
+            </value>
+            <value>
+                <fullName>BBVA Bancomer</fullName>
+                <default>false</default>
+                <label>BBVA Bancomer</label>
+            </value>
+            <value>
+                <fullName>HSBC</fullName>
+                <default>false</default>
+                <label>HSBC</label>
+            </value>
+            <value>
+                <fullName>Multiva</fullName>
+                <default>false</default>
+                <label>Multiva</label>
+            </value>
+            <value>
+                <fullName>Santander</fullName>
+                <default>false</default>
+                <label>Santander</label>
+            </value>
+            <value>
+                <fullName>Scotiabank</fullName>
+                <default>false</default>
+                <label>Scotiabank</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>Banamex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>Banorte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>BBVA Bancomer</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>HSBC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>Multiva</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>Santander</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>TransferenciaElectronica</controllingFieldValue>
+            <valueName>Scotiabank</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

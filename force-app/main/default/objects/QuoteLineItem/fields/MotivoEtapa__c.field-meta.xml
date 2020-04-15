@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MotivoEtapa__c</fullName>
+    <description>Motivo de la etapa del producto cuando es Ganada o Perdida</description>
+    <externalId>false</externalId>
+    <label>Motivo de la etapa</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Etapa__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Asesoria Fiscal</fullName>
+                <default>false</default>
+                <label>Asesoria Fiscal</label>
+            </value>
+            <value>
+                <fullName>Comision</fullName>
+                <default>false</default>
+                <label>Comision</label>
+            </value>
+            <value>
+                <fullName>Comision mas baja</fullName>
+                <default>false</default>
+                <label>Comision mas baja</label>
+            </value>
+            <value>
+                <fullName>Contacto no quiso atender</fullName>
+                <default>false</default>
+                <label>Contacto no quiso atender</label>
+            </value>
+            <value>
+                <fullName>Conveniencia Fiscal</fullName>
+                <default>false</default>
+                <label>Conveniencia Fiscal</label>
+            </value>
+            <value>
+                <fullName>Crédito</fullName>
+                <default>false</default>
+                <label>Crédito</label>
+            </value>
+            <value>
+                <fullName>Duplicada por Error</fullName>
+                <default>false</default>
+                <label>Duplicada por Error</label>
+            </value>
+            <value>
+                <fullName>Financiamiento AMEX</fullName>
+                <default>false</default>
+                <label>Financiamiento AMEX</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Cobertura</fullName>
+                <default>false</default>
+                <label>Funcionalidad-Cobertura</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Control</fullName>
+                <default>false</default>
+                <label>Funcionalidad-Control</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Plataformas</fullName>
+                <default>false</default>
+                <label>Funcionalidad-Plataformas</label>
+            </value>
+            <value>
+                <fullName>Funcionalidad-Seguridad</fullName>
+                <default>false</default>
+                <label>Funcionalidad-Seguridad</label>
+            </value>
+            <value>
+                <fullName>Mal Servicio</fullName>
+                <default>false</default>
+                <label>Mal Servicio</label>
+            </value>
+            <value>
+                <fullName>No acepta migracion</fullName>
+                <default>false</default>
+                <label>No acepta migracion</label>
+            </value>
+            <value>
+                <fullName>No quiso pagar comisión</fullName>
+                <default>false</default>
+                <label>No quiso pagar comisión</label>
+            </value>
+            <value>
+                <fullName>Recomendación</fullName>
+                <default>false</default>
+                <label>Recomendación</label>
+            </value>
+            <value>
+                <fullName>Recomendación BBVA</fullName>
+                <default>false</default>
+                <label>Recomendación BBVA</label>
+            </value>
+            <value>
+                <fullName>Recomendación Chedraui</fullName>
+                <default>false</default>
+                <label>Recomendación Chedraui</label>
+            </value>
+            <value>
+                <fullName>Valores Agregados-Apps</fullName>
+                <default>false</default>
+                <label>Valores Agregados-Apps</label>
+            </value>
+            <value>
+                <fullName>Valores Agregados-Beneficio Club</fullName>
+                <default>false</default>
+                <label>Valores Agregados-Beneficio Club</label>
+            </value>
+            <value>
+                <fullName>Valores Agregados-SAC 24/7</fullName>
+                <default>false</default>
+                <label>Valores Agregados-SAC 24/7</label>
+            </value>
+            <value>
+                <fullName>Valores Agregados-Servicio Postventa</fullName>
+                <default>false</default>
+                <label>Valores Agregados-Servicio Postventa</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Asesoria Fiscal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Comision</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Financiamiento AMEX</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Funcionalidad-Cobertura</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Funcionalidad-Control</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Funcionalidad-Plataformas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Funcionalidad-Seguridad</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Recomendación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Recomendación BBVA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Recomendación Chedraui</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Valores Agregados-Apps</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Valores Agregados-Beneficio Club</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Valores Agregados-SAC 24/7</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ganada</controllingFieldValue>
+            <valueName>Valores Agregados-Servicio Postventa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Comision mas baja</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Contacto no quiso atender</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Conveniencia Fiscal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Crédito</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Duplicada por Error</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>Mal Servicio</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>No acepta migracion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdida</controllingFieldValue>
+            <valueName>No quiso pagar comisión</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

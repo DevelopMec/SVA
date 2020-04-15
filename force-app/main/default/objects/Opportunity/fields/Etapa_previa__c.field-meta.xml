@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Etapa_previa__c</fullName>
+    <description>Etapa de la oportunidad previo a que se declare como PERDIDA</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Etapa de la oportunidad previo a que se declare como PERDIDA</inlineHelpText>
+    <label>Etapa previa</label>
+    <length>25</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

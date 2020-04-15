@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Valida_Aprobacion_en_etapa</fullName>
+    <active>false</active>
+    <errorConditionFormula>OR(
+   AND(
+       Solicitar_validaci_n_descuentos__c=TRUE,
+       NOT(ISPICKVAL(StageName, &#39;Perdida&#39;)),
+       ISCHANGED(StageName)
+   ), 
+   AND(
+       Rechazo_validaci_n_descuentos__c=TRUE,
+       NOT(ISPICKVAL(StageName, &#39;Perdida&#39;)),
+       ISCHANGED(StageName)
+   )
+)</errorConditionFormula>
+    <errorDisplayField>StageName</errorDisplayField>
+    <errorMessage>Para pasar de etapa debe haber sido Aprobada la Oportunidad.</errorMessage>
+</ValidationRule>

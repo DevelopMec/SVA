@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FormaPago__c</fullName>
+    <externalId>false</externalId>
+    <label>Método de Pago</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>TransferenciaElectronica</fullName>
+                <default>false</default>
+                <label>Transferencia electrónica</label>
+            </value>
+            <value>
+                <fullName>American Express</fullName>
+                <default>false</default>
+                <label>American Express</label>
+            </value>
+            <value>
+                <fullName>Deposito</fullName>
+                <default>false</default>
+                <label>Depósito bancario</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

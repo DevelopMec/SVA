@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>QuoteCreatedDate__c</fullName>
+    <description>Campo creado para ser utilizado en las vistas de lista de cotización.</description>
+    <externalId>false</externalId>
+    <formula>CreatedDate</formula>
+    <label>Fecha de creación de la cotización</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

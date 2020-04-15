@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sub_estatus__c</fullName>
+    <externalId>false</externalId>
+    <label>Sub-estatus</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Cotización en análisis de aprobación</fullName>
+                <default>false</default>
+                <label>Cotización en análisis de aprobación</label>
+            </value>
+            <value>
+                <fullName>Impacto - COVID19</fullName>
+                <default>false</default>
+                <label>Impacto - COVID19</label>
+            </value>
+            <value>
+                <fullName>Esperando corrección del comercial</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Esperando corrección del comercial</label>
+            </value>
+            <value>
+                <fullName>No se ha  tomado capacitación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No se ha  tomado capacitación</label>
+            </value>
+            <value>
+                <fullName>No se ha alcanzado  el VE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No se ha alcanzado  el VE</label>
+            </value>
+            <value>
+                <fullName>No tiene fecha de inicio de operación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No tiene fecha de inicio de operación</label>
+            </value>
+            <value>
+                <fullName>Otro Motivo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Otro Motivo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cantidad_Descuento__c</fullName>
+    <description>Cantidad de conceptos producto con un descuento definido.</description>
+    <externalId>false</externalId>
+    <label>Cantidad % Descuento</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

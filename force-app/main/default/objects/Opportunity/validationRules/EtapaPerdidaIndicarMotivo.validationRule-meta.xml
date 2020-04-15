@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EtapaPerdidaIndicarMotivo</fullName>
+    <active>true</active>
+    <description>Debe indicar en el campo Motivo, el motivo de la pérdida.</description>
+    <errorConditionFormula>AND ( 
+ISPICKVAL( StageName , &quot;Perdida&quot;), 
+ISBLANK(Text( Motivo__c)), 
+RecordType.DeveloperName &lt;&gt; &quot;Incremento&quot; 
+)</errorConditionFormula>
+    <errorMessage>Debe indicar en el campo Motivo, el motivo de la pérdida.</errorMessage>
+</ValidationRule>

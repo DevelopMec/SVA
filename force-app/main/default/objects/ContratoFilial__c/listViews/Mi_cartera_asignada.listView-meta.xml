@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mi_cartera_asignada</fullName>
+    <columns>GroupAS400F__c</columns>
+    <columns>AccountF__c</columns>
+    <columns>AccountBusinessUnit__c</columns>
+    <columns>SegmentoF__c</columns>
+    <columns>Entidad_Cuenta__c</columns>
+    <columns>NAME</columns>
+    <columns>AccountSolutions__c</columns>
+    <columns>Last_order_date__c</columns>
+    <columns>Amount_last_order__c</columns>
+    <columns>Solution__c</columns>
+    <columns>OWNER.FIRST_NAME</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CodigoAS400__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <filters>
+        <field>Entidad_Cuenta__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Activo</value>
+    </filters>
+    <filters>
+        <field>Last_order_date__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <label>Mi cartera asignada</label>
+</ListView>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Solution__c</fullName>
+    <description>Fórmula que obtiene la solución seleccionada en la oportunidad y la convierte en un ícono respectivamente.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+	ISBLANK(TEXT(Familia__c)),
+	&#39;Sin Solución&#39; ,
+	IMAGE(&quot;/resource/Soluciones/&quot;&amp;SUBSTITUTE(TEXT(Familia__c),&quot; &quot;,&quot;&quot;)&amp;&quot;.PNG&quot;,TEXT(Familia__c), 45, -1)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Solución</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

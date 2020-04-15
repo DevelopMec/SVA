@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Competidor__c</fullName>
+    <description>Competidor por familia</description>
+    <externalId>false</externalId>
+    <label>Competidor</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Familia__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>Competidor</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Amex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Banamex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Bancomer</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Banorte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>Broxel</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Easyvale / Toka</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Efectivale</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>HSBC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Inbursa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Mega Vale / Suven</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Nómina/Efectivo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>No proporcionó información</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>No tenía proveedor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>One Card</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>Otro banco</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Otro competidor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>Santander</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>Si Vale</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>Sodexo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <valueName>Tiendas de autoservicio</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Car</controllingFieldValue>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>Aseguradoras</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Car</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Otro grupo gasolinero</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <valueName>Autochilango</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Banregio</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <valueName>Element</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Lease Plan</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <valueName>Talleres / Agencias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Convenio con Gasolinera</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Finutil</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>GasnGo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Hidrosina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Inburgas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>OCSI / One Card</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Orsan</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Oxxo Gas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Pagaflex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Previvale</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Recargas Energex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Scotiabank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Todito Pagos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Valemex</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

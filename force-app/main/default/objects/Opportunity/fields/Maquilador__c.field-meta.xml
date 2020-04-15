@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Maquilador__c</fullName>
+    <externalId>false</externalId>
+    <label>Soluciones White Label</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Familia__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>BP Fleet</fullName>
+                <default>false</default>
+                <label>BP Fleet</label>
+            </value>
+            <value>
+                <fullName>BP Migrados</fullName>
+                <default>false</default>
+                <label>BP Migrados</label>
+            </value>
+            <value>
+                <fullName>Chedraui</fullName>
+                <default>false</default>
+                <label>Chedraui</label>
+            </value>
+            <value>
+                <fullName>Element</fullName>
+                <default>false</default>
+                <label>Element</label>
+            </value>
+            <value>
+                <fullName>G500 FLEET</fullName>
+                <default>false</default>
+                <label>G500 FLEET</label>
+            </value>
+            <value>
+                <fullName>Hidrosina</fullName>
+                <default>false</default>
+                <label>Hidrosina</label>
+            </value>
+            <value>
+                <fullName>Servifacil</fullName>
+                <default>false</default>
+                <label>Servifacil</label>
+            </value>
+            <value>
+                <fullName>Walmart</fullName>
+                <default>false</default>
+                <label>Walmart</label>
+            </value>
+            <value>
+                <fullName>Walmart Migracion</fullName>
+                <default>false</default>
+                <label>Walmart Migracion</label>
+            </value>
+            <value>
+                <fullName>Walmart Referidos</fullName>
+                <default>false</default>
+                <label>Walmart Referidos</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>Chedraui</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>Walmart</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>Walmart Migracion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>Walmart Referidos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>BP Fleet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>BP Migrados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Element</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>G500 FLEET</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Hidrosina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>Servifacil</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

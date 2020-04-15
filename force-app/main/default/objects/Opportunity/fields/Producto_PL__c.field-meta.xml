@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Producto_PL__c</fullName>
+    <externalId>false</externalId>
+    <label>Producto</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Familia__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>Productos</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <valueName>1-Ticket Restaurante</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <valueName>41- Ticket Restaurante LAAT (HT)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <valueName>61-Ticket Restaurante (PS)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <valueName>71-Ticket Restaurante Red Máxima CHIP CARNET (HT)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <valueName>81-Ticket Restaurante Red Máxima CHIP CARNET (PS)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <valueName>91-Ticket Restaurante Red Máxima CHIP MasterCard (HT)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <valueName>12-Ticket Despensa Red Premium Banda</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <valueName>32-Vale Despensas Red Premium chip</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <valueName>52-Ecovale Despensas Red Vital chip</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <valueName>62-Ecovale Despensas Red Esencial chip</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <valueName>69-Ecovale Despensas Red Esencial Plus chip</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <valueName>9-Vale Despensas Edenred - SP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <valueName>31-Mantenimiento de flota</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <valueName>14-Ticket Vestimenta (HT)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <valueName>34-Vestimenta chip (HT)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>18-Regalo Edenred</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>48-Regalo con chip (HT)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <valueName>58-Regalo con chip Red Máxima MasterCard (PS)</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>30-Ticket Car 3.0</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>3-Ticket Vale Gasolina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>60 D-Ecovale Combustible Edenred - Diesel</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>60 M-Ecovale Combustible Edenred - Magna</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <valueName>60 P-Ecovale Combustible Edenred - Premium</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <valueName>39 C-Plus Edenred Chip</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <valueName>39-Plus Edenred Banda</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <valueName>29-Empresarial Edenred</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

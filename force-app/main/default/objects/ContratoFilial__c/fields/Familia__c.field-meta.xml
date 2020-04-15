@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Familia__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(TEXT(Producto__r.Family)=&#39;Combustible&#39;, &#39;Ticket Car&#39;,
+IF(TEXT(Producto__r.Family)=&#39;Empresarial&#39;, &#39;Ticket Empresarial&#39;,
+IF(OR(TEXT(Producto__r.Family)=&#39;Ticket Restaurante&#39;,TEXT(Producto__r.Family)=&#39;Despensa&#39;,TEXT(Producto__r.Family)=&#39;Vestimenta&#39;,TEXT(Producto__r.Family)=&#39;Regalo&#39;,TEXT(Producto__r.Family)=&#39;Ayuda social&#39;), &#39;Benefits&#39;,
+&#39;&#39;) 
+)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Solución</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

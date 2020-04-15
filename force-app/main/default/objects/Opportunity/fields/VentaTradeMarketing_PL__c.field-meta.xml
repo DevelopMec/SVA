@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VentaTradeMarketing_PL__c</fullName>
+    <externalId>false</externalId>
+    <label>Venta Trade Marketing</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Familia__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SI</fullName>
+                <default>false</default>
+                <label>SI</label>
+            </value>
+            <value>
+                <fullName>NO</fullName>
+                <default>false</default>
+                <label>NO</label>
+            </value>
+            <value>
+                <fullName>NO APLICA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>NO APLICA</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Ticket Car</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>SI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Ticket Restaurante</controllingFieldValue>
+            <controllingFieldValue>Ticket Car</controllingFieldValue>
+            <controllingFieldValue>Despensa</controllingFieldValue>
+            <controllingFieldValue>Mantenimiento</controllingFieldValue>
+            <controllingFieldValue>Vestimenta</controllingFieldValue>
+            <controllingFieldValue>Regalo</controllingFieldValue>
+            <controllingFieldValue>Combustible</controllingFieldValue>
+            <controllingFieldValue>Ayuda Social</controllingFieldValue>
+            <controllingFieldValue>Empresarial</controllingFieldValue>
+            <controllingFieldValue>Benefits</controllingFieldValue>
+            <valueName>NO</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

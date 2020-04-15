@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>QuotesInApprovalProcess__c</fullName>
+    <description>Número de cotizaciones en un proceso de aprobación pendiente.</description>
+    <externalId>false</externalId>
+    <label>Cotizaciones en proceso de aprobación</label>
+    <summaryFilterItems>
+        <field>Quote.ApprovalStatus__c</field>
+        <operation>equals</operation>
+        <value>Pendiente</value>
+    </summaryFilterItems>
+    <summaryForeignKey>Quote.OpportunityId</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

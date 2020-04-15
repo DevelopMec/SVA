@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Escalonamiento1__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si se trata de un escalonamiento o no</description>
+    <externalId>false</externalId>
+    <label>Escalonamiento1</label>
+    <type>Checkbox</type>
+</CustomField>
