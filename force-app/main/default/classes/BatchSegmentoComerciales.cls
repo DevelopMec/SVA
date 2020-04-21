@@ -6,10 +6,10 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
     global Database.QueryLocator start(Database.BatchableContext BC) {
         String query; 
         if (test.isRunningTest()){
-            query = 'SELECT Id,Funcion__c, business__c,Owner.Name,OwnerId,type, NumeroEmpleados__c, Segmento3__c,Frozen_Segment__c, CodigoClienteAS400__c,Type FROM Account WHERE CodigoClienteAS400__c= \'1627\'';
+            query = 'SELECT Id,Funcion__c, business__c,Owner.Name,OwnerId, NumeroEmpleados__c, Text_Segment__c,Segmento3__c,Frozen_Segment__c, CodigoClienteAS400__c,Type FROM Account WHERE CodigoClienteAS400__c= \'1627\'';
         }
         else{
-            query = 'SELECT Id,Funcion__c, business__c,Owner.Name,OwnerId,type, NumeroEmpleados__c, Segmento3__c, CodigoClienteAS400__c,Frozen_Segment__c,Type FROM Account WHERE CodigoClienteAS400__c != null ORDER BY CodigoClienteAS400__c DESC';
+            query = 'SELECT Id,Funcion__c, business__c,Owner.Name,OwnerId,Text_Segment__c, NumeroEmpleados__c, Segmento3__c, CodigoClienteAS400__c,Frozen_Segment__c,Type FROM Account WHERE CodigoClienteAS400__c != null ORDER BY CodigoClienteAS400__c DESC';
         }
         Database.QueryLocator resultados=  Database.getQueryLocator(query);
         return resultados;

@@ -1,6 +1,6 @@
 public with sharing class Vista_EjecutivosAsignadosBatchProcess {
     
-    Map<Id,Account> lupdateCuentas = new Map<Id,Account>;
+    Map<Id,Account> lupdateCuentas = new Map<Id,Account>();
     List<ContratoFilial__c> contratoF = new List<ContratoFilial__c>();
 
     Public Vista_EjecutivosAsignadosBatchProcess(List<Account> cuentas, List<ContratoFilial__c> contratoF) {
@@ -10,7 +10,7 @@ public with sharing class Vista_EjecutivosAsignadosBatchProcess {
 
     public  List<Account> updateAccountView() {
         List<Account> listToUpdateAcc = new List<Account>();
-        for(Accout cuenta : this.lupdateCuentas.values()) {
+        for(Account cuenta : this.lupdateCuentas.values()) {
             if(allContractsInnactive(cuenta)){
                 cuenta.Frozen_Segment__c = cuenta.Text_Segment__c;
                 cuenta.business__c = '';
@@ -18,7 +18,7 @@ public with sharing class Vista_EjecutivosAsignadosBatchProcess {
                 cuenta.type =  System.Label.exclient;
             } else {
                 cuenta.Frozen_Segment__c = '';
-                cuentas.type = 'cliente';
+                cuenta.type = 'cliente';
             }
             listToUpdateAcc.add(cuenta);
         }

@@ -479,7 +479,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 				Opportunity_status__c	= newOpp.Estatus__c,
 				Rejection_reason__c = newOpp.RejectionReasons__c,
 				ADV_End_Date__c	= newOpp.FechaFinADV__c != null ?  newOpp.FechaFinADV__c : null,
-				ADV_Start_Date__c = newOpp.FechaInicioADV__c,
+				ADV_Start_Date__c = system.now(),
 				Name = newOpp.NumeroAltaCliente__c + ': Rechazo- ' + String.valueOf(rejections),
 				Assignment_folio__c = newOpp.NumeroAltaCliente__c,
 				Opportunity__c	 = newOpp.Id
