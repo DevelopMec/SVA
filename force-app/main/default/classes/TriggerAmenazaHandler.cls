@@ -3,6 +3,7 @@
 * @change	28/02/2020 Add threat validaction activation or deactivation with OpportunityAndThreatValidation__mdt.
 * @change	13/03/2020 Add validateRFCSolcionAssignment method [Freeway 2900].
 * @change	24/03/2020 Add validateBU method [Freeway 2901].
+* @change	15/04/2020 validateBU method modified to include the beforeUpdate actions [Freeway 2901].
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 public without sharing class TriggerAmenazaHandler extends TriggerHandler{
@@ -10,6 +11,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
     private List<Amenaza__c> newList;
     private List<Amenaza__c> oldList;
     private Map<Id, Amenaza__c> oldMap;
+    private static String currentUserRole = null;
 
     public TriggerAmenazaHandler(){
         this.newList = (List<Amenaza__c>) trigger.new;
@@ -18,7 +20,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
     }
     
     public override void beforeInsert(){
-        validateBU(newList);
+        validateBU(newList, null);
         validateRFCSolcionAssignment(newList, null);
         List<OpportunityAndThreatValidation__mdt> threatValidation = [SELECT isActive__c FROM OpportunityAndThreatValidation__mdt WHERE DeveloperName = 'Threat'];
         if ((!threatValidation.isEmpty() && threatValidation[0].isActive__c == true) || Test.isRunningTest()) {
@@ -59,6 +61,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
     
     public override void beforeUpdate(){
         validateRFCSolcionAssignment(newList, oldMap);
+        validateBU(newList, oldMap);
     }
     
     //Validate if the RFC-Solution has already an executive assigned. 
@@ -83,27 +86,43 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
             }
         }
         if (!threatsToValidate.isEmpty()) {
-            List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__c, Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, Owner.Name, OwnerId FROM ContratoFilial__c
-                                                        WHERE Entidad_Cuenta__r.Cuenta__c IN: threatsAccIds AND Producto__r.Family != null
-                                                        AND RFC__c != null AND isActive__c = true AND Owner.UserRole.DeveloperName != 'Ejecutivo_Trademarketing'
-                                                        AND Producto__r.ProductCode != '30-B' AND OwnerId !=: UserInfo.getUserId()];
-            Map<String, ContratoFilial__c> contratosMap = new Map<String, ContratoFilial__c>();
-            for(ContratoFilial__c contrato: contratosActivos){
-                String solucion = contrato.Producto__r.Family;
-                if(solucion == 'Despensa' || solucion == 'Ticket Restaurante' || solucion == 'Regalo' || solucion == 'Vestimenta' || solucion == 'Ayuda social') {
-                    solucion = 'Benefits';
-                }
-                contratosMap.put(contrato.Entidad_Cuenta__r.Cuenta__c + '-' + contrato.Entidad_Cuenta__c + '-' + solucion , contrato);
+            if (currentUserRole == null) {
+                currentUserRole = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()].UserRole.Name; 
             }
-            for (Amenaza__c amenazaToValidate: threatsToValidate) {
-                String solucionAmenaza = amenazaToValidate.Familia__c;
-                if(solucionAmenaza == 'Despensa' || solucionAmenaza == 'Ticket Restaurante' || solucionAmenaza == 'Regalo' || solucionAmenaza == 'Vestimenta' || solucionAmenaza == 'Ayuda Social') {
-                    solucionAmenaza = 'Benefits';
+            List<Roles_BusinessUnits_Solutions__mdt> fieldSalesRoles = [Select MasterLabel, DoNotApplyLocks__c FROM Roles_BusinessUnits_Solutions__mdt];
+            List<String> fieldSalesRolesList = new List<String>();
+            List<String> rolesWithoutLocks = new List<String>();
+            
+            for (Roles_BusinessUnits_Solutions__mdt fieldSalesRole : fieldSalesRoles) {
+                if (fieldSalesRole.DoNotApplyLocks__c) {
+                    rolesWithoutLocks.add(fieldSalesRole.MasterLabel);
+                } else {
+                    fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
                 }
-                if (contratosMap.containsKey(amenazaToValidate.Cuenta__c + '-' + amenazaToValidate.EntidadCuenta_RB__c + '-' + solucionAmenaza)) {
-                    amenazaToValidate.addError('Ya existe un ejecutivo asignado para ese RFC en esa solución.');
+            }
+            if (!rolesWithoutLocks.contains(currentUserRole) && fieldSalesRolesList.contains(currentUserRole)) {
+                List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__c, Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, Owner.Name, OwnerId FROM ContratoFilial__c
+                                                            WHERE Entidad_Cuenta__r.Cuenta__c IN: threatsAccIds AND Producto__r.Family != null
+                                                            AND RFC__c != null AND isActive__c = true AND Owner.UserRole.DeveloperName != 'Ejecutivo_Trademarketing'
+                                                            AND Producto__r.ProductCode != '30-B' AND OwnerId !=: UserInfo.getUserId()];
+                Map<String, ContratoFilial__c> contratosMap = new Map<String, ContratoFilial__c>();
+                for(ContratoFilial__c contrato: contratosActivos){
+                    String solucion = contrato.Producto__r.Family;
+                    if(solucion == 'Despensa' || solucion == 'Ticket Restaurante' || solucion == 'Regalo' || solucion == 'Vestimenta' || solucion == 'Ayuda social') {
+                        solucion = 'Benefits';
+                    }
+                    contratosMap.put(contrato.Entidad_Cuenta__r.Cuenta__c + '-' + contrato.Entidad_Cuenta__c + '-' + solucion , contrato);
                 }
-            }                
+                for (Amenaza__c amenazaToValidate: threatsToValidate) {
+                    String solucionAmenaza = amenazaToValidate.Familia__c;
+                    if(solucionAmenaza == 'Despensa' || solucionAmenaza == 'Ticket Restaurante' || solucionAmenaza == 'Regalo' || solucionAmenaza == 'Vestimenta' || solucionAmenaza == 'Ayuda Social') {
+                        solucionAmenaza = 'Benefits';
+                    }
+                    if (contratosMap.containsKey(amenazaToValidate.Cuenta__c + '-' + amenazaToValidate.EntidadCuenta_RB__c + '-' + solucionAmenaza)) {
+                        amenazaToValidate.addError('Ya existe un ejecutivo asignado para ese RFC en esa solución.');
+                    }
+                }                
+            }
         }
     }
     
@@ -114,12 +133,125 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
 						creation.
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-    public static void validateBU(List<Amenaza__c> newList){
+    public static void validateBU(List<Amenaza__c> newList, Map<Id, Amenaza__c> oldMap){
+        List<Amenaza__c> threatsToValidate = new List<Amenaza__c> ();
+        Set<Id> threatsAccIds = new Set<Id>();
+        Set<String> threatsSolutions = new Set<String>();
+        if (oldMap == null) {
+            //Is insert.
+            for(Amenaza__c threat: newList){
+                if (threat.Familia__c != null && threat.Cuenta__c != null) {
+                    threatsToValidate.add(threat);
+                    threatsAccIds.add(threat.Cuenta__c);
+                    String solution = threat.Familia__c;
+                    if (solution == 'Ayuda Social') {
+                        solution = 'Ayuda social';
+                    }
+                    threatsSolutions.add(solution);
+                }
+            }
+        } else {
+            //Is update.
+            for(Amenaza__c threat: newList){
+                if (threat.Familia__c != null && threat.Cuenta__c != null && threat.Familia__c != oldMap.get(threat.Id).Familia__c) {
+                    threatsToValidate.add(threat);
+                    threatsAccIds.add(threat.Cuenta__c);
+                    String solution = threat.Familia__c;
+                    if (solution == 'Ayuda Social') {
+                        solution = 'Ayuda social';
+                    }
+                    threatsSolutions.add(solution);
+                }
+            }
+        }
+        System.debug('La lista de soluciones entrantes es :' + threatsSolutions);
+        //If there are threats to validate
+        if (!threatsToValidate.isEmpty()) {
+            if (currentUserRole == null) {
+                currentUserRole = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()].UserRole.Name; 
+            }
+            List<Roles_BusinessUnits_Solutions__mdt> fieldSalesRoles = [Select MasterLabel, DoNotApplyLocks__c FROM Roles_BusinessUnits_Solutions__mdt];
+            List<String> fieldSalesRolesList = new List<String>();
+            List<String> rolesWithoutLocks = new List<String>();
+
+            for (Roles_BusinessUnits_Solutions__mdt fieldSalesRole : fieldSalesRoles) {
+                if (fieldSalesRole.DoNotApplyLocks__c) {
+                    rolesWithoutLocks.add(fieldSalesRole.MasterLabel);
+                } else {
+                 	fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
+                }
+            }
+            if (!rolesWithoutLocks.contains(currentUserRole) && fieldSalesRolesList.contains(currentUserRole)) {
+                Map<String, String> solutionAndBUSolutions = new Map<String,String>();
+                List<String> allAllowedSolutions = new List<String>();
+                for (String solution : threatsSolutions) {
+                    List<Roles_BusinessUnits_Solutions__mdt> bUSolutions = [Select AllowedSolutions__c
+                                                                            FROM Roles_BusinessUnits_Solutions__mdt
+                                                                            WHERE BusinessUnit__c != 'Multiproducto' AND AllowedSolutions__c LIKE : '%'+solution+'%' LIMIT 1];
+                    if (!bUSolutions.isEmpty()) {
+                        for (String allowedSolution : bUSolutions[0].AllowedSolutions__c.split(',')) {
+                            //Filling a map with the threat solution as the key and the string containing all allowed solutions for the business unit for that solution.
+                            solutionAndBUSolutions.put(allowedSolution,bUSolutions[0].AllowedSolutions__c);
+                            //Get in a list all allowed solutions for the business units related to the incoming threats solutions.
+                            allAllowedSolutions.add(allowedSolution);
+                        }
+                    }
+                }
+                System.debug('Mapa de familia y soluciones permitidas: ' + solutionAndBUSolutions);
+                System.debug('Lista de soluciones permitidas: ' + allAllowedSolutions);
+                
+                //Select contratos filiales related to the accs in the incoming threats and with a solution containing in the business unit solutions related to the threat solution.
+                List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__r.Cuenta__c, Producto__r.Family FROM ContratoFilial__c
+                                                            WHERE Entidad_Cuenta__r.Cuenta__c IN: threatsAccIds
+                                                            AND Producto__r.Family != null
+                                                            AND Producto__r.Family IN: allAllowedSolutions
+                                                            AND isActive__c = true AND OwnerId !=: UserInfo.getUserId()
+                                                            AND Owner.UserRole.Name NOT IN: rolesWithoutLocks];
+                if (!contratosActivos.isEmpty()) {
+                    System.debug('Contratos activos de esa BU: ' + contratosActivos);
+                    Map<String, List<ContratoFilial__c>> allSolutionsWhithContracts = new Map<String, List<ContratoFilial__c>>();
+                    for (ContratoFilial__c contrato : contratosActivos) {
+                        //Filling a map with a string with the acc and all allowed solutions for a BU and as value, the list of contratos filiales with a solution containing in the key.
+                        if (allSolutionsWhithContracts.containsKey(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family))) {
+                            //If the allSolutionsWhithContracts contains the key(acc-allAllowedSolutions) that contains the comtrato filial solution, only add the contrato to the existing value list. 
+                            List<ContratoFilial__c> accContracts = allSolutionsWhithContracts.get(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family));
+                            accContracts.add(contrato);
+                            allSolutionsWhithContracts.put(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family), accContracts);
+                        } else {
+                            //If the allSolutionsWhithContracts does not contain the key(acc-allAllowedSolutions) that contains the comtrato filial solution, add the key and initialize the value list with the contrato. 
+                            allSolutionsWhithContracts.put(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family), new List<ContratoFilial__c> { contrato });
+                        }                                      
+                    }
+                    System.debug('Mapa de cuenta, familia - Contratos activos: ' + allSolutionsWhithContracts);
+                    for (Amenaza__c newAmenaza : threatsToValidate) {
+                        String solution = newAmenaza.Familia__c;
+                        if (solution == 'Ayuda Social') {
+                            solution = 'Ayuda social';
+                        }
+                        //If acc Id and allowed solutions for that business unit is already a key in the map, add the error.
+                        if(allSolutionsWhithContracts.containsKey(newAmenaza.Cuenta__c+'-'+solutionAndBUSolutions.get(solution))) {
+                            newAmenaza.addError('Este grupo ya tiene asignado un ejecutivo para la Unidad de negocio seleccionada.');
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+/**
+* ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+* @Created	15/04/2020 	Description: Check if there is an excecutive already assigned to the business unit related
+						to the solution added to the thread record, if so, show a message and avoid the record
+						update.
+* ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+*/
+    /*public static void validateBUBeforeUpdate(List<Amenaza__c> newList, Map<Id, Amenaza__c> oldMap){
         List<Amenaza__c> threatsToValidate = new List<Amenaza__c> ();
         Set<Id> threatsAccIds = new Set<Id>();
         Set<String> threatsSolutions = new Set<String>();
         for(Amenaza__c threat: newList){
-            if (threat.Familia__c != null && threat.Cuenta__c != null) {
+            //If the threat solution changes, the threat needs to be validated.
+            if (threat.Familia__c != null && threat.Cuenta__c != null && threat.Familia__c != oldMap.get(threat.Id).Familia__c) {
                 threatsToValidate.add(threat);
                 threatsAccIds.add(threat.Cuenta__c);
                 String solution = threat.Familia__c;
@@ -129,6 +261,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
                 threatsSolutions.add(solution);
             }
         }
+        
         System.debug('La lista de soluciones entrantes es :' + threatsSolutions);
         //If there are threats to validate
         if (!threatsToValidate.isEmpty()) {
@@ -151,11 +284,11 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
             System.debug('Lista de soluciones permitidas: ' + allAllowedSolutions);
 
             //Select contratos filiales related to the accs in the incoming threats and with a solution containing in the business unit solutions related to the threat solution.
-            List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__r.Cuenta__c, Producto__r.Family FROM ContratoFilial__c
+            List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, OwnerId FROM ContratoFilial__c
                                                         WHERE Entidad_Cuenta__r.Cuenta__c IN: threatsAccIds
                                                         AND Producto__r.Family != null
                                                         AND Producto__r.Family IN: allAllowedSolutions
-                                                        AND isActive__c = true AND OwnerId !=: UserInfo.getUserId()];
+                                                        AND isActive__c = true];
             if (!contratosActivos.isEmpty()) {
                 System.debug('Contratos activos de esa BU: ' + contratosActivos);
                 Map<String, List<ContratoFilial__c>> allSolutionsWhithContracts = new Map<String, List<ContratoFilial__c>>();
@@ -177,13 +310,18 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
                     if (solution == 'Ayuda Social') {
                         solution = 'Ayuda social';
                     }
-                    //If acc Id and allowed solutions for that business unit is already a key in the map, add the error.
+                    //If acc Id and allowed solutions for that business unit is already a key in the map, check if there is a diferent owner.
                     if(allSolutionsWhithContracts.containsKey(newAmenaza.Cuenta__c+'-'+solutionAndBUSolutions.get(solution))) {
-                        newAmenaza.addError('Este grupo ya tiene asignado un ejecutivo para la Unidad de negocio seleccionada.');
+                        for (ContratoFilial__c contrato : allSolutionsWhithContracts.get(newAmenaza.Cuenta__c+'-'+solutionAndBUSolutions.get(solution))) {
+                            if (newAmenaza.OwnerId !=){
+                       			newAmenaza.addError('Este grupo ya tiene asignado un ejecutivo para la Unidad de negocio seleccionada.');
+                                break;
+                            }    
+                        }
                     }
                 }
             }
         }
-    }
-
+    }*/
+    
 }

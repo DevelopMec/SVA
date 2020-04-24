@@ -241,15 +241,15 @@ public without sharing class AltaContrato_CONT {
 	@AuraEnabled
     public static infoWP getInfoQli(String idQli){
         infoWP res=new infoWP();
-        res.headerData=[Select Id,Quote.Opportunity.StageName,Product2.Name,Product2.ProductLogo__c,Quote.Opportunity.Entidad_Cuenta__c,Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c,Quote.OpportunityId,Quote.Opportunity.Familia__c,Quote.Opportunity.Name,Quote.Opportunity.Id,Quote.Opportunity.Account.Id,Quote.Opportunity.Account.Name from QuoteLineItem where Id=:idQli];
+        res.headerData=[Select Id,Quote.Opportunity.Owner.Segmento__c,Quote.Opportunity.StageName,Product2.Name,Product2.ProductLogo__c,Quote.Opportunity.Entidad_Cuenta__c,Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c,Quote.OpportunityId,Quote.Opportunity.Familia__c,Quote.Opportunity.Name,Quote.Opportunity.Id,Quote.Opportunity.Account.Id,Quote.Opportunity.Account.Name from QuoteLineItem where Id=:idQli];
         res.etapa=res.headerData.Quote.Opportunity.StageName;
-        List<Contrato2__c> lisADV=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where PartidaPresupuesto__c=:idQli order by CreatedDate DESC limit 1];
+        List<Contrato2__c> lisADV=[Select Id,RejectedContract__c,PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where PartidaPresupuesto__c=:idQli order by CreatedDate DESC limit 1];
         if(lisADV!=null&&lisADV.size()==1){
             res.contrato=lisADV[0];        
         }else{
             Contrato2__c contrato=new Contrato2__c(PartidaPresupuesto__c=res.headerData.Id,Entidad_Cuenta__c=res.headerData.Quote.Opportunity.Entidad_Cuenta__c,Entidad_Legal__c=res.headerData.Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c);
             insert contrato;
-            Contrato2__c contratoTem=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where Id=:contrato.Id];
+            Contrato2__c contratoTem=[Select Id,PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,RejectedContract__c ,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where Id=:contrato.Id];
             res.contrato=contratoTem;
         }
         res.filiales=getEntidadesCuenta(res.contrato.Id);

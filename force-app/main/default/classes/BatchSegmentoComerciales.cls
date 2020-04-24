@@ -18,7 +18,7 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
     global void execute(Database.BatchableContext BC, List<sObject> cuentas){ 
         List<Account> listCuentas=(List<Account>) cuentas;
         List<Account> lupdateCuentas=new List<Account>();
-
+		system.debug(listCuentas);
         List<Account> channelBUAccounts = new List<Account>();
         Boolean hasAllContractsInactive = false;
 
@@ -67,7 +67,7 @@ global class BatchSegmentoComerciales implements Database.Batchable<sObject>, Da
             }
         }
         
-        contratoF = [SELECT Id, Name, average_turnover_volume__c, Entidad_Cuenta__c,Entidad_Cuenta__r.Cuenta__c, CodigoAS400__c,Last_order_date__c from ContratoFilial__c WHERE Entidad_Cuenta__r.Cuenta__r.ID IN: listCuentasUsar];
+        contratoF = [SELECT Id, Name, average_turnover_volume__c, Entidad_Cuenta__c,Entidad_Cuenta__r.Cuenta__c,Entidad_Cuenta__r.Cuenta__r.Text_Segment__c, CodigoAS400__c,Last_order_date__c from ContratoFilial__c WHERE Entidad_Cuenta__r.Cuenta__r.ID IN: listCuentasUsar];
         for (ContratoFilial__c ent: contratoF ){
             listSubcuentas.add(ent.Name);
             contratosFiliales.add(ent.Id);

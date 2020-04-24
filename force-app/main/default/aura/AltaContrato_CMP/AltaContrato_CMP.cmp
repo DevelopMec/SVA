@@ -13,6 +13,8 @@
     <aura:attribute name="showSpinnerPrime" type="Boolean" default="false"/>
     <aura:attribute name="personalizacionDeTarjetas" type="Boolean" default="false"/>
     
+    <aura:attribute name="esPospago" type="Boolean" default="false"/>
+    
     <aura:attribute name="recordId" type="String" default=""/>
     
     <aura:attribute name="advInfo" type="Map"/>
@@ -223,7 +225,6 @@
                         </div>                                                
                     </div>
                 </div>
-                                
                 
                 <div>
                     <lightning:buttonGroup class="button-group-container">
@@ -238,13 +239,13 @@
                         <lightning:button disabled="{!v.data.etapa!='Contrato'}" class="slds-m-around_small" variant="bare" name="En proceso" onclick="{!c.guardar}" >
                             <lightning:icon iconName="utility:save" title="Guardar" class="save-button"/>
                         </lightning:button>
-                        <lightning:button class="slds-m-around_small" variant="bare" onclick="{!c.sendEmail}" >
+                        <lightning:button disabled="{!and(v.data.headerData.Quote.Opportunity.Owner.Segmento__c=='Small',and(!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,!v.esPospago))}" class="slds-m-around_small" variant="bare" onclick="{!c.sendEmail}" >
                             <lightning:icon iconName="utility:email" title="Enviar" class="send-button"/>
                             <aura:if isTrue="{!v.isSending}">
                                 <lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
                             </aura:if>
                         </lightning:button>
-                        <lightning:button class="slds-m-around_small" variant="bare" onclick="{!c.generarPDF}" >
+                        <lightning:button disabled="{!and(v.data.headerData.Quote.Opportunity.Owner.Segmento__c=='Small',and(!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,!v.esPospago))}" class="slds-m-around_small" variant="bare" onclick="{!c.generarPDF}" >
                             <lightning:icon iconName="utility:page" title="Descargar PDF" class="pdf-button"/>
                             <aura:if isTrue="{!v.isPDFGenerated}">
                                 <lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>

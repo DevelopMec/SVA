@@ -12,7 +12,7 @@
             console.log("return");
             var state=response.getState();
             if(state=='SUCCESS'){
-                console.log(JSON.stringify(response.getReturnValue()));
+                //console.log(JSON.stringify(response.getReturnValue()));
                 var result=response.getReturnValue();
                 component.set("v.data",result);
                 if(true){

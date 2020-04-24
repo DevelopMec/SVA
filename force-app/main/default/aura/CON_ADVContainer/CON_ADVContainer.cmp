@@ -798,7 +798,10 @@
 								<lightning:input  disabled="true"    type="text" label="Comentarios del comercial para ADC" name="comentariosComercial" value="{!rechazo.Comercial_comments__c}" />
 							</lightning:layoutItem>
 							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input type="datetime" name="fechaInicio" label="Fecha inicio ADV" disabled="true" value="{!rechazo.ADV_Start_Date__c}" />
+								<div class="row">
+									<p class="header">Fecha inicio ADV</p>
+									<lightning:input variant="label-hidden" type="datetime" disabled="true" name="fechaInicio" value="{!rechazo.ADV_Start_Date__c}" />
+								</div>
 							</lightning:layoutItem>
 						</lightning:layout>
 					</aura:iteration>

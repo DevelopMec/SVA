@@ -174,8 +174,10 @@ public without sharing class TriggerAmenazaHandler_Test {
     @isTest
     static void validateBUTest(){
         Profile prof = [SELECT Id FROM Profile WHERE Name = 'Administrador del sistema' OR Name = 'System Administrator' LIMIT 1];
+        UserRole roleMantenimiento = [SELECT Id FROM UserRole WHERE Name = 'Ejecutivo EB Metro' LIMIT 1];
+
         List<User> testUsers = new List<User>();
-        User user1 = new User(LastName = 'last', Email = 'usertestadmin@amamama.com', Username = 'usertestadmin@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
+        User user1 = new User(UserRoleId = roleMantenimiento.Id , LastName = 'last', Email = 'usertestadmin@amamama.com', Username = 'usertestadmin@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
         User user2 = new User(LastName = 'last2', Email = 'usertestadmin2@amamama.com', Username = 'usertestadmin2@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias2', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
         testUsers.add(user1);
         testUsers.add(user2);

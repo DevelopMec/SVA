@@ -10,7 +10,7 @@
         l.LeadSource='Cambaceo';	
         l.CategoriaSolucion__c='Despensa';
         l.NumEmpleados__c='1-25';	
-        l.N_mero_de_veh_culos__c='1-5';	
+        l.N_mero_de_veh_culos__c='1';	
         l.MobilePhone='1234567890';	
         l.Email='afd@test.com';
         insert l;

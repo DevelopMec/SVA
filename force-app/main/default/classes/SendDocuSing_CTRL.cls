@@ -2,16 +2,22 @@ public without sharing class SendDocuSing_CTRL {
 	@AuraEnabled
     public static Map<String,String> generarInformacion(String recordId){
         Map<String,String> resp=new Map<String,String>();
+        Integer cant=[Select count() from dsfs__DocuSign_Status__c where dsfs__Opportunity__c=:recordId and dsfs__Envelope_Status__c IN ('Enviado','Delivered')];
+        if(cant>100){
+            resp.put('status','error');
+            resp.put('msj','No se puede envíar el contrato debido a que hay un proceso pendiente');
+            return resp;
+        }        
         String idDocuSingEnvelope=createDocuSingEnvelope(recordId);
         Quote q;
         try{
-            q=[Select Id,IdPDFPropuestaComercial__c,ContactId,Contact.Email,Contact.Name,Opportunity.OwnerId from Quote where IsSyncing=true and OpportunityId=:recordId];
+            q=[Select Id,IdPDFPropuestaComercial__c,ContactId,Contact.Email,Contact.Name,Opportunity.RecordType.DeveloperName,Opportunity.OwnerId from Quote where IsSyncing=true and OpportunityId=:recordId];
         }catch(Exception e){
             resp.put('status','error');
             resp.put('msj','No existe una cotización generada');
             return resp;
         }
-        if(q.Opportunity.OwnerId!=UserInfo.getUserId()){
+        if(q.Opportunity.OwnerId!=UserInfo.getUserId()&&false){
             resp.put('status','error');
             resp.put('msj','El envío del contrato solo lo puede realizar el propietario de la oportunidad');
             return resp;
@@ -20,6 +26,11 @@ public without sharing class SendDocuSing_CTRL {
             Negocio__c config=Negocio__c.getInstance();
             String idDocuSingEnvelopeDocument=createDocuSingEnvelopeDocument(idDocuSingEnvelope,q.IdPDFPropuestaComercial__c,'Contrato o Propuesta firmados');        
             String idDocuSingEnvelopeRecipient=createDocuSingEnvelopeRecipient(idDocuSingEnvelope,q.Contact.Email,q.Contact.Name,q.ContactId);
+            if(q.Opportunity.RecordType.DeveloperName=='BPfleet'){
+                resp.put('templateId',config.TemplateIdBPfleet__c);
+            }else{
+                resp.put('templateId',config.TemplateIdEdenred__c);
+            }
             resp.put('idDoc',idDocuSingEnvelope);
             resp.put('urlDocuSign',config.UrlDocuSign__c);
             resp.put('status','success');

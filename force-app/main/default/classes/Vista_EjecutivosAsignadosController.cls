@@ -1,122 +1,142 @@
 public class Vista_EjecutivosAsignadosController {
-    private static String[] DistantSales{get;set;}
-    private static String[] Corporate{get;set;}
-    private static String[] Key{get;set;}
-    private static String[] EMPLOYEEBENEFITS{get;set;}
-    private static String[] familiafuncion{get;set;}
-    private static String[] FLEETMOBILITY{get;set;}
-    private static String[] DistantBusines{get;set;}
-    private static String[] FLEETMOBILITYfamilia{get;set;}
-    private static String[] EMPLOYEEBENEFITSfamilia{get;set;}
+    private static String[] DistantSales {get;set;}
+    private static String[] Corporate {get;set;}
+    private static String[] Key {get;set;}
+    private static String[] EmployeeBenefits {get;set;}
+    private static String[] FamiliaFuncion {get;set;}
+    private static String[] FleetMobility {get;set;}
+    private static String[] DistantBusiness {get;set;}
+    private static String[] FleetMobilityFamilia {get;set;}
+    private static String[] EmployeeBenefitsfamilia {get;set;}
     
     static{
         DistantSales = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'DistantSales'].Funciones__c.split(',');
         Corporate = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'Corporate'].Funciones__c.split(','); 
         Key = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'Key'].Funciones__c.split(',');
-        EMPLOYEEBENEFITS = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'EmployeeBenefits'].Funciones__c.split(',');
-        FLEETMOBILITY = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'FleetMobility'].Funciones__c.split(',');
-        DistantBusines = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'DistantBusiness'].Funciones__c.split(',');           
-        familiafuncion = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'FamiliaFuncion'].Funciones__c.split(',');
-        FLEETMOBILITYfamilia = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'FleetMobilityFamilia'].Funciones__c.split(',');
-        EMPLOYEEBENEFITSfamilia = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'EmployeeBenefitsFamilia'].Funciones__c.split(',');
+        EmployeeBenefits = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'EmployeeBenefits'].Funciones__c.split(',');
+        FleetMobility = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'FleetMobility'].Funciones__c.split(',');
+        DistantBusiness = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'DistantBusiness'].Funciones__c.split(',');           
+        FamiliaFuncion = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'FamiliaFuncion'].Funciones__c.split(',');
+        FleetMobilityFamilia = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'FleetMobilityFamilia'].Funciones__c.split(',');
+        EmployeeBenefitsfamilia = [SELECT Funciones__c FROM Funciones_por_BU__mdt where QualifiedApiName = 'EmployeeBenefitsfamilia'].Funciones__c.split(',');
     }
     
     @AuraEnabled
     public static List<ListBU> getListEjecutivos(Id recordId){
-        List<ListBU> lBU = new List<ListBU>();
-        List<ContratoFilial__c> contratoFilialList = new List<ContratoFilial__c>();
-        List<EntidadCuenta__c> entidadCuentaList = New List<EntidadCuenta__c>(); 
-        List<Account> ListCuenta = New List<Account>(); 
+        Map<String, List<Ejecutivo>> mapaData = new Map<String, List<Ejecutivo>>();
         
-        Map<String,List<String>> mapaFamiliaBU = new Map<String,List<String>>();
-        Map<String,List<Ejecutivo>> mapaData = new Map<String,List<Ejecutivo>>();
-        Map<String,List<String>> mapaUsuarios = new Map<String,List<String>>();
-        Map<String,Boolean> mapBusinessChannel = new Map<String,Boolean>();
-
-        Boolean hasAllContractsInactive = false;
-		Boolean accountToClient = false;
-        //Change - Req. 2329 Freeway. In data list change UserRole.Name for UserRole.RollupDescription and add TerritorioPosventa__c.
-        for(User user : [select Id, Name, UserRole.Name, UserRole.RollupDescription, TerritorioPosventa__c, Manager.Name from User]){
-            List<String> data = new List<String>();
-            data.add(user.UserRole.RollupDescription);
-            data.add(user.Manager.Name);
-            data.add(user.TerritorioPosventa__c);
-            data.add(user.UserRole.Name);
-            mapaUsuarios.put(user.Id, data);    
-        }
-        
+        Map<String, List<String>> mapaFamiliaBU = new Map<String, List<String>>();
         for(GeneralCatalog__c familia : [SELECT Id, Family_Icon__c, Family_Name__c, Family_BU__c FROM GeneralCatalog__c WHERE Name = 'Familia']){
             List<String> data = new List<String>();
             data.add(familia.Family_Icon__c);
             data.add(familia.Family_BU__c);
             data.add(familia.Family_Name__c);
-            mapaFamiliaBU.put(familia.Family_Name__c,data); 
+            mapaFamiliaBU.put(familia.Family_Name__c, data);
         }
         
-        entidadCuentaList = [Select Id, Name, NombreEL__c, Status__c From EntidadCuenta__c Where Cuenta__c = :recordId];
-        Account cuenta = [Select Funcion__c, business__c,Owner.Name,OwnerId,type From Account where id =: recordId];
+        Account cuenta = [
+            Select Id, Funcion__c, business__c, Owner.Name, OwnerId, type,
+                   Owner.UserRole.RollupDescription, Owner.Manager.Name, Owner.TerritorioPosventa__c, Owner.UserRole.Name
+              From Account
+             where Id =: recordId
+        ];
         string priorRole = cuenta.Funcion__c;
         string priorBU = cuenta.business__c;
-        System.debug('Entidad cuenta list: ' + entidadCuentaList);
-        if(entidadCuentaList.size() > 0){               
-            contratoFilialList = [Select Producto__r.Family, Owner.Name, Owner.UserRoleId, OwnerId  From ContratoFilial__c  Where isActive__c = true and Entidad_Cuenta__c IN: entidadCuentaList];
-            hasAllContractsInactive = accountHasActiveContracts(entidadCuentaList);
+        
+        List<EntidadCuenta__c> entidadCuentaList = [Select Id, Name, NombreEL__c, Status__c From EntidadCuenta__c Where Cuenta__c =: recordId];
+        if(!entidadCuentaList.isEmpty()){
+            List<ContratoFilial__c> contratoFilialList = [
+                Select Id, Producto__r.Family, Owner.UserRoleId, OwnerId, Owner.UserRole.Name,
+                       Owner.Name, Owner.UserRole.RollupDescription, ManagerName__c, Territory__c
+                  From ContratoFilial__c
+                 Where isActive__c = true
+                   and Entidad_Cuenta__c IN: entidadCuentaList
+                   and Producto__r.Family in: mapaFamiliaBU.KeySet()
+            ];
+            
+            Boolean DistantSalesCanal = false;
+            Boolean CorporateCanal = false;
+            Boolean KeyCanal = false;
+
+            Boolean DistantSalesBusiness = false;
+            Boolean EmployeeBenefitsBusiness = false;
+            Boolean FleetMobilityBusiness = false;
+            
             for(ContratoFilial__c c : contratoFilialList){
-                if(cuenta.Type == System.Label.exclient){
-                    cuenta.Type = 'cliente';
-                    accountToClient = true;
+                List<String> datafamilia = mapaFamiliaBU.get(c.Producto__r.Family);
+                
+                Ejecutivo ejec = new Ejecutivo();
+                ejec.Icono = '/servlet/servlet.FileDownload?file=' + datafamilia[0];
+                ejec.Nombre = c.Owner.Name;
+                ejec.Cargo = c.Owner.UserRole.RollupDescription;
+                ejec.Gestor = c.ManagerName__c;
+                ejec.TerritorioPostventa = c.Territory__c;
+                
+                List<Ejecutivo> listEject = new List<Ejecutivo>();
+                if(mapaData.containsKey(datafamilia[1])){
+                    listEject = mapaData.get(datafamilia[1]);
                 }
-                if(mapaFamiliaBU.containsKey(c.Producto__r.Family)){
-                    List<String> datafamilia = mapaFamiliaBU.get(c.Producto__r.Family);                                              
-                    List<String> datauser = mapaUsuarios.get(c.OwnerId);  
-                    Ejecutivo ejec = new Ejecutivo();
-                    ejec.Icono = '/servlet/servlet.FileDownload?file=' + datafamilia[0];
-                    ejec.Nombre = c.Owner.Name;
-                    ejec.Cargo = datauser[0];
-                    ejec.Gestor = datauser[1];
-                    ejec.TerritorioPostventa = dataUser[2];
-                    mapBusinessChannel = getBusinessAndChannel(datauser,datafamilia);
                     
-                    List<Ejecutivo> listEject = new List<Ejecutivo>();
-                    if(mapaData.containsKey(datafamilia[1])){
-                        listEject = mapaData.get(datafamilia[1]);
-                    }
-                    
-                    boolean existe = false;
-                    for(Ejecutivo lej : listEject){
-                        if(lej.Nombre == ejec.Nombre){
-                            existe = true;
-                            break;
-                        }
-                    }
-                    
-                    if(!existe){
-                        listEject.add(ejec);
-                        mapaData.put(datafamilia[1], listEject);
+                boolean existe = false;
+                for(Ejecutivo lej : listEject){
+                    if(lej.Nombre == ejec.Nombre){
+                        existe = true;
+                        break;
                     }
                 }
-                validateFields(mapBusinessChannel,cuenta);
+                    
+                if(!existe){
+                    listEject.add(ejec);
+                    mapaData.put(datafamilia[1], listEject);
+                }
+                
+                // Canal
+                if(DistantSales.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                    DistantSalesCanal = true;
+                }
+                if(Corporate.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                    CorporateCanal = true; 
+                }
+                if(Key.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                    KeyCanal = true; 
+                }
+                // Business
+                if(EmployeeBenefits.contains(c.Owner.UserRole.Name) || (familiafuncion.contains(c.Owner.UserRole.Name) && EmployeeBenefitsfamilia.contains(c.Producto__r.Family))){
+                    EmployeeBenefitsBusiness = true;
+                }
+                if(FleetMobility.contains(c.Owner.UserRole.Name) || (familiafuncion.contains(c.Owner.UserRole.Name) && FleetMobilityFamilia.contains(c.Producto__r.Family))){
+                    FleetMobilityBusiness = true;
+                }
+                if(DistantBusiness.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                    DistantSalesBusiness = true;
+                }
             }
+            Map<String,Boolean> mapBusinessChannel = new Map<String,Boolean>();
+            // Canal
+            mapBusinessChannel.put('DistantSalesCanal', DistantSalesCanal);
+            mapBusinessChannel.put('CorporateCanal', CorporateCanal);
+            mapBusinessChannel.put('KeyCanal', KeyCanal);
+            // Business
+            mapBusinessChannel.put('EmployeeBenefitsBusiness', EmployeeBenefitsBusiness);
+            mapBusinessChannel.put('FleetMobilityBusiness', FleetMobilityBusiness);
+            mapBusinessChannel.put('DistantSalesBusiness', DistantSalesBusiness);
+            validateFields(mapBusinessChannel, cuenta);
         } 
         else {
-            List<String> datauser = mapaUsuarios.get(cuenta.OwnerId); 
-            List<String> datafamilia = new List<String>();
             Ejecutivo ejec = new Ejecutivo();
             ejec.Nombre = cuenta.Owner.Name;
-            ejec.Cargo = datauser[0];
-            ejec.Gestor = datauser[1];
-            ejec.TerritorioPostventa = dataUser[2];
+            ejec.Cargo = cuenta.Owner.UserRole.RollupDescription;
+            ejec.Gestor = cuenta.Owner.Manager.Name;
+            ejec.TerritorioPostventa = cuenta.Owner.TerritorioPosventa__c;
             mapaData.put('Sin contrato', new List<Ejecutivo>{ejec});
-            mapBusinessChannel = getBusinessAndChannel(datauser,datafamilia);
-            validateFields(mapBusinessChannel,cuenta);
-         }
-        //actualizacion de la cuenta para el campo de la funcion.
-        if(hasAllContractsInactive) {
-            cuenta.Type = System.Label.exclient;
+            Map<String, Boolean> mapBusinessChannel = getBusinessAndChannel(cuenta.Owner.UserRole.Name, '');
+            validateFields(mapBusinessChannel, cuenta);
         }
-        if(priorRole != cuenta.Funcion__c || priorBU != cuenta.business__c ||  hasAllContractsInactive || accountToClient){
+        if(priorRole != cuenta.Funcion__c || priorBU != cuenta.business__c){
             update cuenta;
         }
+        
+        List<ListBU> lBU = new List<ListBU>();
         for(String familia : mapaData.keySet()){
             ListBU vlist = new ListBU();
             vlist.BU = familia;
@@ -126,75 +146,76 @@ public class Vista_EjecutivosAsignadosController {
         if(TEST.ISRUNNINGTEST()){
             ProcessAccounts(new List<Id>{recordId});
         }
-        system.debug('LBU: ' + lBU);
         return lBU;
     }
     
-    private static Map<String,Boolean> getBusinessAndChannel(List<String> datauser,List<String> datafamilia){
+    private static Map<String, Boolean> getBusinessAndChannel(string UserRoleName, string ProductoFamily){
         Map<String,Boolean> mapBusinessChannel = new Map<String,Boolean>();
-        Boolean DistantSalescanal = false;
-        Boolean Corporatecanal = false;
-        Boolean keycanal = false;
-        //variables para referenciar campo business
-        Boolean DistantSalesbusiness = false;
-        Boolean EMPLOYEEBENEFITSbusiness = false;
-        Boolean FLEETMOBILITYbusiness = false;
-        //if para el campo de canal                                             
-        if(DistantSales.contains(dataUser[3]) || TEST.ISRUNNINGTEST()){
-            DistantSalescanal = true;
+        
+        // Canal
+        Boolean DistantSalesCanal = false;
+        Boolean CorporateCanal = false;
+        Boolean KeyCanal = false;
+        // Business
+        Boolean DistantSalesBusiness = false;
+        Boolean EmployeeBenefitsBusiness = false;
+        Boolean FleetMobilityBusiness = false;
+        
+        // Canal
+        if(DistantSales.contains(UserRoleName) || TEST.ISRUNNINGTEST()){
+            DistantSalesCanal = true;
+        }
+        if(Corporate.contains(UserRoleName) || TEST.ISRUNNINGTEST()){
+            CorporateCanal = true; 
+        }
+        if(Key.contains(UserRoleName) || TEST.ISRUNNINGTEST()){
+            KeyCanal = true; 
+        }
+        // Business
+        if(EmployeeBenefits.contains(UserRoleName) || (familiafuncion.contains(UserRoleName) && EmployeeBenefitsfamilia.contains(ProductoFamily))){
+            EmployeeBenefitsBusiness = true;
+        }
+        if(FleetMobility.contains(UserRoleName) || (familiafuncion.contains(UserRoleName) && FleetMobilityFamilia.contains(ProductoFamily))){
+            FleetMobilityBusiness = true;
+        }
+        if(DistantBusiness.contains(UserRoleName) || TEST.ISRUNNINGTEST()){
+            DistantSalesBusiness = true;
         }
         
-        if(Corporate.contains(dataUser[3]) || TEST.ISRUNNINGTEST()){
-            Corporatecanal = true; 
-        }
+        // Canal
+        mapBusinessChannel.put('DistantSalesCanal', DistantSalesCanal);
+        mapBusinessChannel.put('CorporateCanal', CorporateCanal);
+        mapBusinessChannel.put('KeyCanal', KeyCanal);
+        // Business
+        mapBusinessChannel.put('EmployeeBenefitsBusiness', EmployeeBenefitsBusiness);
+        mapBusinessChannel.put('FleetMobilityBusiness', FleetMobilityBusiness);
+        mapBusinessChannel.put('DistantSalesBusiness', DistantSalesBusiness);
         
-        if(Key.contains(dataUser[3]) || TEST.ISRUNNINGTEST()){
-            keycanal = true; 
-        }
-        
-        //if para el campo de business
-        if(EMPLOYEEBENEFITS.contains(dataUser[3])||(familiafuncion.contains(dataUser[3])&&EMPLOYEEBENEFITSfamilia.contains(datafamilia[2]))){
-            EMPLOYEEBENEFITSbusiness = true;
-        }
-        
-        if(FLEETMOBILITY.contains(dataUser[3])||(familiafuncion.contains(dataUser[3])&&FLEETMOBILITYfamilia.contains(datafamilia[2]))){
-            FLEETMOBILITYbusiness = true;
-        }
-        
-        if(DistantBusines.contains(dataUser[3]) || TEST.ISRUNNINGTEST()){
-            DistantSalesbusiness = true;
-        }
-        mapBusinessChannel.put('DistantSalescanal',DistantSalescanal);
-        mapBusinessChannel.put('DistantSalesbusiness',DistantSalesbusiness);
-        mapBusinessChannel.put('FLEETMOBILITYbusiness',FLEETMOBILITYbusiness);
-        mapBusinessChannel.put('EMPLOYEEBENEFITSbusiness',EMPLOYEEBENEFITSbusiness);
-        mapBusinessChannel.put('keycanal',keycanal);
-        mapBusinessChannel.put('Corporatecanal',Corporatecanal);
         return mapBusinessChannel;
     }
 
-    private static void validateFields(Map<String,Boolean> mapBusinessChannel,Account cuenta){
-        //Validaciones para el campo de canal
-        if(mapBusinessChannel.get('DistantSalescanal') && !mapBusinessChannel.get('Corporatecanal') && !mapBusinessChannel.get('keycanal')){
-            cuenta.Funcion__c = 'DistalSales';
+    private static void validateFields(Map<String, Boolean> mapBusinessChannel, Account cuenta){
+        // Canal
+        if(mapBusinessChannel.get('DistantSalesCanal') && !mapBusinessChannel.get('CorporateCanal') && !mapBusinessChannel.get('KeyCanal')){
+            cuenta.Funcion__c = 'DS';
         }else{
-            if( !mapBusinessChannel.get('DistantSalescanal') && mapBusinessChannel.get('Corporatecanal') && !mapBusinessChannel.get('keycanal') ){
-               cuenta.Funcion__c = 'Corporate'; 
+            if(!mapBusinessChannel.get('DistantSalesCanal') && mapBusinessChannel.get('CorporateCanal') && !mapBusinessChannel.get('KeyCanal') ){
+               cuenta.Funcion__c = 'C';
             }else{
-                if(!mapBusinessChannel.get('DistantSalescanal') && !mapBusinessChannel.get('Corporatecanal') && mapBusinessChannel.get('keycanal') ){
-                   cuenta.Funcion__c = 'Key';  
+                if(!mapBusinessChannel.get('DistantSalesCanal') && !mapBusinessChannel.get('CorporateCanal') && mapBusinessChannel.get('KeyCanal') ){
+                   cuenta.Funcion__c = 'K';  
                 }else{
-                    if(mapBusinessChannel.get('DistantSalescanal') && mapBusinessChannel.get('Corporatecanal') && !mapBusinessChannel.get('keycanal') ){
-                       cuenta.Funcion__c = 'DistalSales y Corporate'; 
+                    if(mapBusinessChannel.get('DistantSalesCanal') && mapBusinessChannel.get('CorporateCanal') && !mapBusinessChannel.get('KeyCanal') ){
+                       cuenta.Funcion__c = 'DS&C'; 
                     }else{
-                        if(mapBusinessChannel.get('DistantSalescanal') && !mapBusinessChannel.get('Corporatecanal') && mapBusinessChannel.get('keycanal') ){
-                            cuenta.Funcion__c = 'DistalSales y Key';
+                        if(mapBusinessChannel.get('DistantSalesCanal') && !mapBusinessChannel.get('CorporateCanal') && mapBusinessChannel.get('KeyCanal') ){
+                            cuenta.Funcion__c = 'DS&K';
                         }else{
-                            if( !mapBusinessChannel.get('DistantSalescanal') && mapBusinessChannel.get('Corporatecanal') && mapBusinessChannel.get('keycanal') ){
-                                cuenta.Funcion__c = 'Corporate y Key';
+                            if( !mapBusinessChannel.get('DistantSalesCanal') && mapBusinessChannel.get('CorporateCanal') && mapBusinessChannel.get('KeyCanal') ){
+                                cuenta.Funcion__c = 'C&K';
                             }else{
-                                if(mapBusinessChannel.get('DistantSalescanal') && mapBusinessChannel.get('Corporatecanal') && mapBusinessChannel.get('keycanal') ){
-                                    cuenta.Funcion__c = 'Todos';
+                                if(mapBusinessChannel.get('DistantSalesCanal') && mapBusinessChannel.get('CorporateCanal') && mapBusinessChannel.get('KeyCanal') ){
+                                    cuenta.Funcion__c = 'All';
                                 }else{
                                     cuenta.Funcion__c = '';
                                 }                                
@@ -205,27 +226,27 @@ public class Vista_EjecutivosAsignadosController {
             }
         }
             
-        //Validaciones para el campo de business
-        if(!mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && !mapBusinessChannel.get('FLEETMOBILITYbusiness') && mapBusinessChannel.get('DistantSalesbusiness')){
-            cuenta.business__c = 'distantb';
+        // Business
+        if(!mapBusinessChannel.get('EmployeeBenefitsBusiness') && !mapBusinessChannel.get('FleetMobilityBusiness') && mapBusinessChannel.get('DistantSalesBusiness')){
+            cuenta.business__c = 'DS';
         }else{
-            if(mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && !mapBusinessChannel.get('FLEETMOBILITYbusiness') && !mapBusinessChannel.get('DistantSalesbusiness')){
-                cuenta.business__c = 'employee benefist';
+            if(mapBusinessChannel.get('EmployeeBenefitsBusiness') && !mapBusinessChannel.get('FleetMobilityBusiness') && !mapBusinessChannel.get('DistantSalesBusiness')){
+                cuenta.business__c = 'EB';
             }else{
-                if(!mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && mapBusinessChannel.get('FLEETMOBILITYbusiness') && !mapBusinessChannel.get('DistantSalesbusiness')){
-                   cuenta.business__c = 'fleet y mobility'; 
+                if(!mapBusinessChannel.get('EmployeeBenefitsBusiness') && mapBusinessChannel.get('FleetMobilityBusiness') && !mapBusinessChannel.get('DistantSalesBusiness')){
+                   cuenta.business__c = 'FM';
                  }else{
-                    if(mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && !mapBusinessChannel.get('FLEETMOBILITYbusiness') && mapBusinessChannel.get('DistantSalesbusiness')){
-                        cuenta.business__c = 'distant y employee'; 
+                    if(mapBusinessChannel.get('EmployeeBenefitsBusiness') && !mapBusinessChannel.get('FleetMobilityBusiness') && mapBusinessChannel.get('DistantSalesBusiness')){
+                        cuenta.business__c = 'DS&EB';
                     }else{
-                        if(!mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && mapBusinessChannel.get('FLEETMOBILITYbusiness') && mapBusinessChannel.get('DistantSalesbusiness')){
-                            cuenta.business__c = 'distant y fleet'; 
+                        if(!mapBusinessChannel.get('EmployeeBenefitsBusiness') && mapBusinessChannel.get('FleetMobilityBusiness') && mapBusinessChannel.get('DistantSalesBusiness')){
+                            cuenta.business__c = 'DS&FM'; 
                         }else{
-                            if(mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && mapBusinessChannel.get('FLEETMOBILITYbusiness') && !mapBusinessChannel.get('DistantSalesbusiness')){
-                               cuenta.business__c = 'employee y fleet';  
+                            if(mapBusinessChannel.get('EmployeeBenefitsBusiness') && mapBusinessChannel.get('FleetMobilityBusiness') && !mapBusinessChannel.get('DistantSalesBusiness')){
+                               cuenta.business__c = 'EB&FM';  
                             }else{
-                                if(mapBusinessChannel.get('EMPLOYEEBENEFITSbusiness') && mapBusinessChannel.get('FLEETMOBILITYbusiness') && mapBusinessChannel.get('DistantSalesbusiness')){
-                                    cuenta.business__c = 'Todo';  
+                                if(mapBusinessChannel.get('EmployeeBenefitsBusiness') && mapBusinessChannel.get('FleetMobilityBusiness') && mapBusinessChannel.get('DistantSalesBusiness')){
+                                    cuenta.business__c = 'All';  
                                 }else{
                                     cuenta.business__c = ''; 
                                 }
@@ -236,18 +257,6 @@ public class Vista_EjecutivosAsignadosController {
             }
         }
     }
-    private static boolean accountHasActiveContracts(List<EntidadCuenta__c> entidadCuentaList) {
-        Boolean activeContracts = false;
-        List<ContratoFilial__c> contratos = [Select Producto__r.Family, Owner.Name, Owner.UserRoleId, OwnerId,isActive__c  From ContratoFilial__c  Where  Entidad_Cuenta__c IN: entidadCuentaList];
-        Integer nonActiveContracts = 0;
-        for(ContratoFilial__c contrato : contratos){
-                if(contrato.isActive__c == false) {
-                    nonActiveContracts += 1;
-                }
-        }
-        activeContracts = contratos.size() == nonActiveContracts;
-        return activeContracts;
-    }
     
     @InvocableMethod
     public static void ProcessAccounts(List<Id> accountIds)
@@ -257,8 +266,13 @@ public class Vista_EjecutivosAsignadosController {
             families.add(cat.Family_Name__c);
         }
 
-        Map<Id, Account> mas = new Map<Id, Account>([Select Id, Funcion__c, business__c From Account where Id in: accountIds]);
-        
+        Map<Id, Account> mas = new Map<Id, Account>([
+            Select Id, Name, Funcion__c, business__c, Owner.UserRole.Name
+              From Account
+             where Id in: accountIds
+             order by Name
+        ]);
+
         List<ContratoFilial__c> lcfs = [
             Select Id, Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, Owner.UserRole.Name
                   From ContratoFilial__c 
@@ -275,10 +289,11 @@ public class Vista_EjecutivosAsignadosController {
             ccfs.add(cf);
             macfs.put(cf.Entidad_Cuenta__r.Cuenta__c, ccfs);
         }
-        
+
         List<Account> luas = new List<Account>();
-        for(Id aId : macfs.keySet()){
+        for(Id aId : mas.keySet()){
             Account cuenta = mas.get(aId);
+            system.debug('Cuenta: ' + cuenta.Name);
             string priorRole = cuenta.Funcion__c;
             string priorBU = cuenta.business__c;
             
@@ -290,56 +305,77 @@ public class Vista_EjecutivosAsignadosController {
             Boolean EmployeeBenefitsBusiness = false;
             Boolean FleetMobilityBusiness = false;
                 
-            List<ContratoFilial__c> ccfs = macfs.get(aId);
-            for(ContratoFilial__c c : ccfs){
-                //if para el campo de canal                                             
-                if(DistantSales.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+            if(macfs.containsKey(aId)){
+                List<ContratoFilial__c> ccfs = macfs.get(aId);
+                for(ContratoFilial__c c : ccfs){
+                    // Canal
+                    if(DistantSales.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                        DistantSalesCanal = true;
+                    }
+                    if(Corporate.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                        CorporateCanal = true; 
+                    }
+                    if(Key.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                        KeyCanal = true; 
+                    }
+                        
+                    // Business
+                    if(EmployeeBenefits.contains(c.Owner.UserRole.Name) || (familiafuncion.contains(c.Owner.UserRole.Name) && EmployeeBenefitsfamilia.contains(c.Producto__r.Family))){
+                        EmployeeBenefitsBusiness = true;
+                    }
+                    if(FleetMobility.contains(c.Owner.UserRole.Name) || (familiafuncion.contains(c.Owner.UserRole.Name) && FleetMobilityFamilia.contains(c.Producto__r.Family))){
+                        FleetMobilityBusiness = true;
+                    }
+                    if(DistantBusiness.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                        DistantSalesBusiness = true;
+                    }
+                }
+            }
+            else{
+                // Canal
+                if(DistantSales.contains(cuenta.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
                     DistantSalesCanal = true;
                 }
-                                           
-                if(Corporate.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                if(Corporate.contains(cuenta.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
                     CorporateCanal = true; 
                 }
-                                           
-                if(Key.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                if(Key.contains(cuenta.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
                     KeyCanal = true; 
                 }
-                    
-                //if para el campo de business
-                if(EMPLOYEEBENEFITS.contains(c.Owner.UserRole.Name) || (familiafuncion.contains(c.Owner.UserRole.Name) && EMPLOYEEBENEFITSfamilia.contains(c.Producto__r.Family))){
+
+                // Business
+                if(EmployeeBenefits.contains(cuenta.Owner.UserRole.Name) || (familiafuncion.contains(cuenta.Owner.UserRole.Name) && EmployeeBenefitsfamilia.contains(''))){
                     EmployeeBenefitsBusiness = true;
                 }
-                                       
-                if(FLEETMOBILITY.contains(c.Owner.UserRole.Name) || (familiafuncion.contains(c.Owner.UserRole.Name) && FLEETMOBILITYfamilia.contains(c.Producto__r.Family))){
+                if(FleetMobility.contains(cuenta.Owner.UserRole.Name) || (familiafuncion.contains(cuenta.Owner.UserRole.Name) && FleetMobilityFamilia.contains(''))){
                     FleetMobilityBusiness = true;
                 }
-                                          
-                if(DistantBusines.contains(c.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
+                if(DistantBusiness.contains(cuenta.Owner.UserRole.Name) || TEST.ISRUNNINGTEST()){
                     DistantSalesBusiness = true;
                 }
             }
             
             //Validaciones para el campo de canal
             if(DistantSalesCanal && !CorporateCanal && !KeyCanal){
-                cuenta.Funcion__c = 'DistalSales';
+                cuenta.Funcion__c = 'DS';
             }else{
                 if(!DistantSalesCanal && CorporateCanal && !KeyCanal){
-                   cuenta.Funcion__c = 'Corporate';
+                   cuenta.Funcion__c = 'C';
                 }else{
                     if(!DistantSalesCanal && !CorporateCanal && KeyCanal){
-                       cuenta.Funcion__c = 'Key';
+                       cuenta.Funcion__c = 'K';
                     }else{
                         if(DistantSalesCanal && CorporateCanal && !KeyCanal){
-                           cuenta.Funcion__c = 'DistalSales y Corporate';
+                           cuenta.Funcion__c = 'DS&C';
                         }else{
                             if(DistantSalesCanal && !CorporateCanal && KeyCanal){
-                                cuenta.Funcion__c = 'DistalSales y Key';
+                                cuenta.Funcion__c = 'DS&K';
                             }else{
                                 if(!DistantSalesCanal && CorporateCanal && KeyCanal){
-                                    cuenta.Funcion__c = 'Corporate y Key';
+                                    cuenta.Funcion__c = 'C&K';
                                 }else{
                                     if(DistantSalesCanal && CorporateCanal && KeyCanal){
-                                        cuenta.Funcion__c = 'Todos';
+                                        cuenta.Funcion__c = 'All';
                                     }else{
                                         cuenta.Funcion__c = '';
                                     }                                
@@ -352,25 +388,25 @@ public class Vista_EjecutivosAsignadosController {
             
             //Validaciones para el campo de business
             if(!EmployeeBenefitsBusiness && !FleetMobilityBusiness && DistantSalesBusiness){
-                cuenta.business__c = 'distantb';
+                cuenta.business__c = 'DS';
             }else{
                 if(EmployeeBenefitsBusiness && !FleetMobilityBusiness && !DistantSalesBusiness){
-                    cuenta.business__c = 'employee benefist';
+                    cuenta.business__c = 'EB';
                 }else{
                     if(!EmployeeBenefitsBusiness && FleetMobilityBusiness && !DistantSalesBusiness){
-                       cuenta.business__c = 'fleet y mobility';
+                       cuenta.business__c = 'FM';
                     }else{
                         if(EmployeeBenefitsBusiness && !FleetMobilityBusiness && DistantSalesBusiness){
-                            cuenta.business__c = 'distant y employee';
+                            cuenta.business__c = 'DS&EB';
                         }else{
                             if(!EmployeeBenefitsBusiness && FleetMobilityBusiness && DistantSalesBusiness){
-                                cuenta.business__c = 'distant y fleet';
+                                cuenta.business__c = 'DS&FM';
                             }else{
                                 if(EmployeeBenefitsBusiness && FleetMobilityBusiness && !DistantSalesBusiness){
-                                   cuenta.business__c = 'employee y fleet';
+                                   cuenta.business__c = 'EB&FM';
                                 }else{
                                     if(EmployeeBenefitsBusiness && FleetMobilityBusiness && DistantSalesBusiness){
-                                        cuenta.business__c = 'Todo';
+                                        cuenta.business__c = 'All';
                                     }else{
                                         cuenta.business__c = '';
                                     }
@@ -380,14 +416,17 @@ public class Vista_EjecutivosAsignadosController {
                     }
                 }
             }
-            
+            system.debug('priorRole: ' + priorRole);
+            system.debug('cuenta.Funcion__c: ' + cuenta.Funcion__c);
+            system.debug('priorBU: ' + priorBU);
+            system.debug('cuenta.business__c: ' + cuenta.business__c);
             //actualizacion de la cuenta para el campo de la funcion.
             if(priorRole != cuenta.Funcion__c || priorBU != cuenta.business__c){
                 luas.add(cuenta);
             }
         }
-        
-        database.update(luas, false);
+        system.debug('luas: ' + luas.size());
+        database.update(luas, true);
     }
     
     public class ListBU{

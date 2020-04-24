@@ -7,11 +7,10 @@ public without sharing class TriggerOpportunityHandler_Test {
     */
     
     /**
-        * @changes 
+        * @changes
         * @12/03/2020 Desarrollo Freeway: Add method modificarOpotunidadTest to improve coverage.
         * @12/03/2020 Desarrollo Freeway: Add method validateRFCSolcionAssignmentTest to improve coverage.
         * @30/03/2020 Improve coverage. Add setup and ownerBUValidationTest methods.
-
     */
 
     @testSetup
@@ -173,11 +172,11 @@ public without sharing class TriggerOpportunityHandler_Test {
 
         System.debug('LIMITEEE:::'+Limits.getQueries());
         //qli.Id = (Id) result.get('Upsert_QuoteLineItem').get(0).get('id');
-        Test.startTest();
+        
         List<QuoteLineItem> listQlis = [SELECT Id FROM QuoteLineItem WHERE Quote.OpportunityId =: opp.Id];
         Contrato2__c contrato2 = new Contrato2__c(EtapaContrato__c='Finalizado',PartidaPresupuesto__c = listQlis[0].Id, CodigoAS400__c = '11-11-12345-122', Personalizacion_de_Tarjetas__c = true);
         insert contrato2;
-        
+        Test.startTest();
         CatalogoDirecciones__c direccion = new CatalogoDirecciones__c();
         direccion.Calle_Tt__c = 'Lago Alberto';
         direccion.Ciudad_Tt__c = 'CDMX';
@@ -679,7 +678,7 @@ public without sharing class TriggerOpportunityHandler_Test {
         User u= new User(UserRoleId=role.Id,LastName = 'last', Email = 'puser000@amamama.com', Username = 'puser000@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
         insert u;
         Profile profBP = [SELECT Id FROM Profile WHERE Name = 'BPfleet Sales' LIMIT 1];
-        UserRole roleBP = [SELECT Id FROM UserRole WHERE Name = 'Ejecutivo BP' LIMIT 1];
+        UserRole roleBP = [SELECT Id FROM UserRole WHERE Name = 'Ejecutivo BP FS' LIMIT 1];
         User uBP= new User(UserRoleId=roleBP.Id,LastName = 'lastt', Email = 'puser0t00@amamama.com', Username = 'puser0t00@amamama.com' + System.currentTimeMillis(), CompanyName = 'TESTw', Title = 'titlee', Alias = 'aliasTes', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = profBP.Id);
         insert uBP;
         Account acc;EntidadLegal__c el;EntidadCuenta__c ec;
@@ -1034,8 +1033,10 @@ public without sharing class TriggerOpportunityHandler_Test {
     @isTest
     static void validateRFCSolcionAssignmentTest(){
         Profile prof = [SELECT Id FROM Profile WHERE Name = 'Administrador del sistema' LIMIT 1];
+        UserRole uRol = [SELECT Id FROM UserRole WHERE Name = 'Ejecutivo EB Metro' LIMIT 1];
+
         List<User> testUsers = new List<User>();
-        User u = new User(LastName = 'last', Email = 'usertestadmin@amamama.com', Username = 'usertestadmin@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
+        User u = new User(UserRoleId = uRol.Id, LastName = 'last', Email = 'usertestadmin@amamama.com', Username = 'usertestadmin@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
         User u2 = new User(LastName = 'last2', Email = 'usertestadmin2@amamama.com', Username = 'usertestadmin2@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias2', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
 		testUsers.add(u);
         testUsers.add(u2);
@@ -1079,17 +1080,17 @@ public without sharing class TriggerOpportunityHandler_Test {
             System.assert(errorMessage.contains('Ya existe un ejecutivo asignado para ese RFC en esa solución.'));
         }
     }
-    
+
     //Coverage to ownerBUValidation method.
     @isTest
     static void ownerBUValidationTest(){
         Profile prof = [SELECT Id FROM Profile WHERE Name = 'Administrador del sistema' OR Name = 'System Administrator' LIMIT 1];
-        UserRole roleFleetAndMobility = [SELECT Id FROM UserRole WHERE Name = 'KAMs Fleet&Mobililty' LIMIT 1];
-        UserRole roleMantenimiento = [SELECT Id FROM UserRole WHERE Name = 'Ejecutivo de Mantenimiento' LIMIT 1];
+        UserRole roleFleetAndMobility = [SELECT Id FROM UserRole WHERE Name = 'KAMs Fleet&Mobility' LIMIT 1];
+        UserRole roleEBMetro = [SELECT Id FROM UserRole WHERE Name = 'Ejecutivo EB Metro' LIMIT 1];
         
         List<User> testUsers = new List<User>();
         User userFleet = new User(LastName = 'last', Email = 'usertestadmin@amamama.com', Username = 'usertestadmin@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id, UserRoleId = roleFleetAndMobility.Id );
-        User userMantenimiento = new User(LastName = 'last2', Email = 'usertestadmin2@amamama.com', Username = 'usertestadmin2@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias2', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id, UserRoleId = roleMantenimiento.Id);
+        User userMantenimiento = new User(LastName = 'last2', Email = 'usertestadmin2@amamama.com', Username = 'usertestadmin2@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias2', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id, UserRoleId = roleEBMetro.Id);
         testUsers.add(userFleet);
         testUsers.add(userMantenimiento);
         insert testUsers;
@@ -1124,5 +1125,5 @@ public without sharing class TriggerOpportunityHandler_Test {
             System.assert(errorMessage.contains('El ejecutivo asignado no corresponde a la business unit relacionada a la solución asociada a la oportunidad.'));
         }
     }
-        
+
 }

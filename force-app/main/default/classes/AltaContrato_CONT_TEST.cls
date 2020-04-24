@@ -2,7 +2,6 @@
 public class AltaContrato_CONT_TEST {
     @testSetup
     public static void setup(){
-        Test.startTest();
         insert new GeneralCatalog__c(Key__c='POS-AC',value__c='12');
         PlantillaContrato__c pc=new PlantillaContrato__c(Name='Contrato Ticket Car 4.0');
         insert pc;
@@ -48,7 +47,6 @@ public class AltaContrato_CONT_TEST {
         ProductoConcepto__c pcon = new ProductoConcepto__c(Concepto__c = c.Id, PartidaPresupuesto__c = qli.Id,PrecioFinal__c=1);
         objs.add(pcon);
         insert objs;
-        Test.stopTest();
     }
     
     @isTest

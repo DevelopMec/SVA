@@ -256,7 +256,6 @@ public class CON_ContractsContainer_TEST {
 		Map<String, String> mapUcadv = CON_ContractsContainer_CTRL.updateContratoADV2(jsonContrato, jsonOportunidad, extras);
         Map<String, String> mapUcadv2 = CON_ContractsContainer_CTRL.updateContratoAfiliadoADV2(jsonContrato, jsonOportunidad, extras);
 	}
-	
 	// Calling updateContratoADV with a created instance of contract
 	/*@isTest
 	static void updateContratoAD2VTest2() {

@@ -9,7 +9,7 @@
             if(state=='SUCCESS'){
                 var result=response.getReturnValue();
                 if(result.status){
-                    console.log(JSON.stringify(result));
+                    //console.log(JSON.stringify(result));
                     component.set("v.secciones",result.seccionesList);
                     component.set("v.advInfo",result.adv);
                     component.set("v.dependencias",result.dependencias);
@@ -199,17 +199,18 @@
                 //component.set("v.showSpinner",false);
             }            
             
-            //Credito comentado, no se libera.
-            /*if (campo == "TipoPago__c"){
+            if (campo == "TipoPago__c"){
                 if (val == "Pospago"){
-                    component.set("v.isCreditEvaluationButtonVisible", true);
-                    this.VerificaEstatusEvaluacionCredito(component,false);
+                    component.set("v.esPospago",true);
+                    //component.set("v.isCreditEvaluationButtonVisible", true);
+                    //this.VerificaEstatusEvaluacionCredito(component,false);
                 }
                 else{
-                    component.set("v.isFinishButtonDisabled", false);
-                    component.set("v.isCreditEvaluationButtonVisible", false);
+                    component.set("v.esPospago",false);
+                    //component.set("v.isFinishButtonDisabled", false);
+                    //component.set("v.isCreditEvaluationButtonVisible", false);
                 }
-            }*/
+            }
         }else{
             component.set("v.showSpinner",false);
         } 

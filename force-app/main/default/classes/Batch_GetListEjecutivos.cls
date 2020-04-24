@@ -1,6 +1,9 @@
 global class Batch_GetListEjecutivos implements Database.Batchable<sObject>{
+    global final boolean FilterBlanks;
     
-    global Batch_GetListEjecutivos(){
+    global Batch_GetListEjecutivos(boolean fb){
+        this.FilterBlanks = fb;
+        
         if(Test.isRunningTest()){
             integer c = 0;
             c++;
@@ -20,19 +23,30 @@ global class Batch_GetListEjecutivos implements Database.Batchable<sObject>{
     }
     
     global Database.QueryLocator start(Database.BatchableContext BC){
-        return Database.getQueryLocator([
-            Select Id, Name, business__c, Busines__c
-              From Account
-             where business__c = null
-               and Id in (Select Cuenta__c from EntidadCuenta__c)
-             order by lastModifiedDate
+        if(this.FilterBlanks){
+            return Database.getQueryLocator([
+                Select Id, Name
+                  From Account
+                 where Funcion__c = null
+                    or business__c = null
+                 order by lastModifiedDate
             ]);
+        }
+        else{
+            return Database.getQueryLocator([
+                Select Id, Name
+                  From Account
+                 order by lastModifiedDate
+            ]);
+        }
     }
 
-    global void execute(Database.BatchableContext BC, List<Account> scope){
-        for(Account r : scope){
-            Vista_EjecutivosAsignadosController.getListEjecutivos(r.Id);
+    global void execute(Database.BatchableContext BC, List<Account> rs){
+        List<Id> ids = new List<Id>();
+        for(Account a : rs){
+            ids.add(a.Id);
         }
+        Vista_EjecutivosAsignadosController.ProcessAccounts(ids);
     }
     
     global void finish(Database.BatchableContext BC){

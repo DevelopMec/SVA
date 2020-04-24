@@ -6,9 +6,8 @@
             var state=response.getState();
             if(state=='SUCCESS'){
                 var result=response.getReturnValue();
-                console.log("res::"+JSON.stringify(result));
                 if(result.status=='success'){
-                    window.open(result.urlDocuSign+"?eId="+result.idDoc+"&nw=1&sId="+component.get("v.recordId"),"_blank");
+                    window.open(result.urlDocuSign+"?DST="+encodeURI(result.templateId)+"&eId="+encodeURI(result.idDoc)+"&nw=1&sId="+encodeURI(component.get("v.recordId")),"_blank");
                 }else{
                     var toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams({

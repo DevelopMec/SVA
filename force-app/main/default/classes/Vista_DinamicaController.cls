@@ -315,37 +315,41 @@ public class Vista_DinamicaController {
     @InvocableMethod(label='Update account solutions' description='Update account solutions.')    
     public static void updateAccountSolutions(List <EntidadCuenta__c> entidadesList) {
         Set<Id> entidadesIds = new Set<Id>();
-        for(EntidadCuenta__c entidad : entidadesList) {
-            entidadesIds.add(entidad.Id);
-        }
-        //Get active contratos filiales
-        List<EntidadCuenta__c> entidades = [SELECT Cuenta__c, Cuenta__r.SolutionsText__c, 
-                                            (SELECT Producto__r.Family, isActive__c FROM Contratos_Filial__r 
-                                             WHERE Producto__r.Family != null AND RFC__c != null AND isActive__c = true)
-                                            FROM EntidadCuenta__c WHERE Id IN: entidadesIds];
-        List<Account> accsToUpdate = new List<Account>();
-        for(EntidadCuenta__c entidad : entidades){
-            Set<String> familySet = new Set<String>();
-            for (ContratoFilial__c contrato : entidad.Contratos_Filial__r){
-                familySet.add(contrato.Producto__r.Family);                    
+        if (entidadesList != null && !entidadesList.isEmpty() && entidadesList.size() > 0) {
+            for(EntidadCuenta__c entidad : entidadesList) {
+                entidadesIds.add(entidad.Id);
             }
-            List<String> familyList = new List<String>(familySet);
-            String familyListString = '';
-            if(!familyList.isEmpty()){
-                //Get the solutions combination in a string in alphabetical order.
-                familyList.sort();
-                familyListString = string.join(familyList,',');
+            //Get active contratos filiales
+            List<EntidadCuenta__c> entidades = [SELECT Cuenta__c, Cuenta__r.SolutionsText__c, 
+                                                (SELECT Producto__r.Family, isActive__c FROM Contratos_Filial__r 
+                                                 WHERE Producto__r.Family != null AND RFC__c != null AND isActive__c = true)
+                                                FROM EntidadCuenta__c WHERE Id IN: entidadesIds];
+            Map<Id, Account> accsToUpdateMap = new Map<Id, Account>();
+            for(EntidadCuenta__c entidad : entidades){
+                Set<String> familySet = new Set<String>();
+                if (entidad.Contratos_Filial__r != null && !entidad.Contratos_Filial__r.isEmpty() && entidad.Contratos_Filial__r.size() > 0) {
+                    for (ContratoFilial__c contrato : entidad.Contratos_Filial__r){
+                        familySet.add(contrato.Producto__r.Family);                    
+                    }
+                }
+                List<String> familyList = new List<String>(familySet);
+                String familyListString = '';
+                if(!familyList.isEmpty()){
+                    //Get the solutions combination in a string in alphabetical order.
+                    familyList.sort();
+                    familyListString = string.join(familyList,',');
+                }
+                //If the account has a new solutions combination, it´s updated.
+                if (entidad.Cuenta__r.SolutionsText__c != familyListString) {
+                    Account accToUpdate = new Account();
+                    accToUpdate.Id = entidad.Cuenta__c;
+                    accToUpdate.SolutionsText__c = familyListString;
+                    accsToUpdateMap.put(accToUpdate.Id, accToUpdate);
+                }
             }
-            //If the account has a new solutions combination, it´s updated.
-            if (entidad.Cuenta__r.SolutionsText__c != familyListString) {
-                Account accToUpdate = new Account();
-                accToUpdate.Id = entidad.Cuenta__c;
-                accToUpdate.SolutionsText__c = familyListString;
-                accsToUpdate.add(accToUpdate);
+            if (!accsToUpdateMap.isEmpty()) {
+                database.update(accsToUpdateMap.values(), false);
             }
-        }
-        if (!accsToUpdate.isEmpty()) {
-        	database.update(accsToUpdate, false);
         }
     }
 }

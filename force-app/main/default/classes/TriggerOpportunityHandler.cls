@@ -14,14 +14,22 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     private List<Opportunity> oldList;
     public Boolean hasCreatedOT = false;
     
+    public String newAffiliateRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('RT_NuevaAfiliacion').getRecordTypeId();
+    public String newSolutionRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('RT_NuevaSolucion').getRecordTypeId();
+    public Set<String> affiliateRecordTypes = new Set<String>{newAffiliateRecordType,newSolutionRecordType};
+        public Map<String,ServiceGroups__c> mapGruposGlob;
+    public Map<String,User> mapUserGlob;    
+    
     private List<Opportunity> lisFECGlob;
     private List<QuoteLineItem> lisQliGlob;
     
+    private static String currentUserRole = null;
+
     public TriggerOpportunityHandler() {
         this.newMap = (Map<Id, Opportunity>) trigger.newMap;
         this.oldMap = (Map<Id, Opportunity>) trigger.oldMap;
         this.newList = (List<Opportunity>) trigger.new;
-        this.oldList = (List<Opportunity>) trigger.old; 
+        this.oldList = (List<Opportunity>) trigger.old;
         
         lisFECGlob=new List<Opportunity>();
         if(trigger.isUpdate){
@@ -56,13 +64,14 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         	ValidateOpportunityWithRFC(this.newList, this.oldMap); //req 2331 FRWY
         }
         validateRFCSolcionAssignment(newList, oldMap);
+        validateBU(newList, oldMap);
     }
     
     public override void beforeInsert(){
         asignarCamposIniciales(newList);
         //validarSemaforos(newList);
         validacionesBP();
-        validateBU(newList);
+        validateBU(newList, null);
         List<OpportunityAndThreatValidation__mdt> threatValidation = [SELECT isActive__c FROM OpportunityAndThreatValidation__mdt WHERE DeveloperName = 'Opportunity'];
         if ((!threatValidation.isEmpty() && threatValidation[0].isActive__c == true) || Test.isRunningTest()) {
             ValidatepadlockOpportunity(newList); //Valida duplicados de op solo incrementos- cambio FWY 2331 HU
@@ -229,7 +238,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     opp.TipoVenta__c='Trademarketing';
                 }else if(mapaPedido.containsKey(opp.Id)&&mapaPedido.get(opp.Id)=='Unico'){
                     opp.TipoVenta__c='Pedido Unico';
-                }else if(opp.Entidad_Cuenta__c!=null&&((mapaFilial.containsKey(opp.Entidad_Cuenta__c)&&mapaFilial.get(opp.Entidad_Cuenta__c).size()==0)||!mapaFilial.containsKey(opp.Entidad_Cuenta__c))){
+                }else if(opp.Entidad_Cuenta__c!=null&&mapaFilial.containsKey(opp.Entidad_Cuenta__c)&&mapaFilial.get(opp.Entidad_Cuenta__c).size()==1){
                     opp.TipoVenta__c='Simple';
                 }else if(opp.Entidad_Cuenta__c!=null&&mapaFilial.containsKey(opp.Entidad_Cuenta__c)&&esCruzada(mapaFilial.get(opp.Entidad_Cuenta__c),opp.Familia__c,opp.Id)){
                     opp.TipoVenta__c='Cruzada';
@@ -560,7 +569,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             
             if(oppsAltaCliente.size() > 0){
                 //Arma un Mapa de contratos identificados por el ID de OPP
-                List<Contrato2__c> contratosRel = new List<Contrato2__c>([SELECT Id,EtapaContrato__c, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.OpportunityId FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId = :oppsAltaCliente.keySet()]);
+                List<Contrato2__c> contratosRel = new List<Contrato2__c>([SELECT Id,EtapaContrato__c, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.OpportunityId FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId = :oppsAltaCliente.keySet() order by CreatedDate ASC]);
                 Map<Id,Contrato2__c> mapContratos = new Map<Id,Contrato2__c>();
                 for(Contrato2__c contrato : contratosRel){ mapContratos.put(contrato.PartidaPresupuesto__r.Quote.OpportunityId, contrato); }
                 
@@ -576,7 +585,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     if(mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).EtapaContrato__c != 'Finalizado'){
                         oppADV.addError('Necesita Finalizar el contrato para poder pasar a ADV');
                     }
-                    if(!mapDirEntrega.containsKey(oppADV.Id) && mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).DireccionesAuxiliares__c == false ){
+                    if(!mapDirEntrega.containsKey(oppADV.Id) && !affiliateRecordTypes.contains(oppADV.recordTypeId) && mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).DireccionesAuxiliares__c == false ){
                         oppADV.addError('Necesita agregar una Dirección de Entrega para poder pasar a ADV');
                     }
                 }
@@ -663,7 +672,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     opp.addError('No puede cambiar la etapa de la oportunidad debido a que debe adjuntar los documentos correspondientes');
                 }
            }else if(opp.StageName == 'Contrato'){// && !subsidiaryUsersMap.containsKey(opp.OwnerId) 
-               if(oppSinMetodoPago.contains(opp.Id)){
+               if(oppSinMetodoPago.contains(opp.Id)&&!affiliateRecordTypes.contains(opp.recordTypeId)){
                    opp.addError('Debe agregar un metodo de pago en la cotización para poder pasar a Contrato');
                }
            }
@@ -681,7 +690,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
 
             System.debug('oppFilterList:'+oppFilterList);
             //Se buscan los contratos asociados a Las Oportunidades con Attachments
-            List<Contrato2__c> lstContrato = [SELECT Id, AsignacionContrato__c,PartidaPresupuesto__c,PartidaPresupuesto__r.Product2.Name, PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Id from Contrato2__c WHERE PartidaPresupuesto__r.Quote.Opportunity.Id IN: mapOppAttch.keySet() ];
+            List<Contrato2__c> lstContrato = [SELECT Id, AsignacionContrato__c,PartidaPresupuesto__c,PartidaPresupuesto__r.Product2.Solution__c,PartidaPresupuesto__r.Product2.IsAffiliate__c,PartidaPresupuesto__r.Product2.Name, PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Id from Contrato2__c WHERE PartidaPresupuesto__r.Quote.Opportunity.Id IN: mapOppAttch.keySet() ];
             Map<String,List<Contrato2__c>> mapOppContract = new Map<String,List<Contrato2__c>>();
 
             //Se filtran los contrantos que pertenezcan a dichas oportunidades
@@ -743,6 +752,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             //User usuarioFalse = 
             //Se recorren las Oportunidades Filtradas
             List<Contrato2__c> listaContratos = new List<Contrato2__c>();
+            getDatosGrupo();
 			//List<ConnectApi.BatchInput> batchInputs = new List<ConnectApi.BatchInput>();
             for( Opportunity opp : oppFilterList ) {
                 try {
@@ -776,6 +786,9 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                 } else if( att.ContentDocument.Title.indexOf('Registro Patronal') != -1 ) {
                                     isRegistroPatronal = true;                                    
                                 }
+                                if(opp.RecordTypeId==newAffiliateRecordType){
+                                    isIdDelCliente = true;
+                                }
                             }
                         }
 
@@ -792,7 +805,9 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                         if( String.isNotEmpty(contrato.AsignacionContrato__c) ) {
                                             //falta validar productos OPAM
                                             User usuarioADV;
-                                            if( contrato.PartidaPresupuesto__r.Product2.ProductCode == '60-M' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '60-P' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '60-D' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '52-C' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '62-C' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '69-C' ) {
+                                            if(contrato.PartidaPresupuesto__r.Product2.IsAffiliate__c){
+                                                usuarioADV = getUserAsignar('ADV', contrato.PartidaPresupuesto__r.Product2.Solution__c);
+                                            }else if( contrato.PartidaPresupuesto__r.Product2.ProductCode == '60-M' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '60-P' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '60-D' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '52-C' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '62-C' || contrato.PartidaPresupuesto__r.Product2.ProductCode == '69-C' ) {
                                                 //System.debug('usuarioTrue:'+usuarioTrue);
                                                 usuarioADV = getEjecutioADVTRUE('Ejecutivo_de_Administracion_de_Ventas', 'Clientes OPAM', 'ADV_OPAM');
                                             } else {
@@ -877,9 +892,81 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                 System.debug('CHATTERPOSTS:'+batchInputs.size());
 				ConnectApi.ChatterFeeds.postFeedElementBatch(Network.getNetworkId(), batchInputs);
             }*/
+            actualizarGrupos();
         }
                            
     }  
+    
+    public void getDatosGrupo(){
+        Map<String,ServiceGroups__c> mapTem=new Map<String,ServiceGroups__c>();
+        Map<String,User> mapTemUser=new Map<String,User>();
+        for(ServiceGroups__c sg:[Select Id,Name,AssignmentByFamily__c,Users__c,(Select Id,User__c,User__r.Name,User__r.Id,Family__c from UsersInServiceGroup__r where User__r.IsActive=true) from ServiceGroups__c]){
+            mapTem.put(sg.Name.toLowerCase(), sg);
+            for(ServiceGroupsUser__c  usg : sg.UsersInServiceGroup__r){
+                mapTemUser.put(sg.AssignmentByFamily__c ? (sg.Name+'-'+usg.Family__c+'-'+usg.User__c).toLowerCase() : (sg.Name+'-'+usg.User__c).toLowerCase() , usg.User__r);
+            }
+        }
+        mapUserGlob=mapTemUser;
+        mapGruposGlob=mapTem;
+    }
+    
+    public User getUserAsignar(String grupoAtencion,String familia){
+        System.debug('::getUserAsignar::');
+        grupoAtencion=grupoAtencion.toLowerCase();
+        User usr;
+        ServiceGroups__c sg=mapGruposGlob.containsKey(grupoAtencion) ? mapGruposGlob.get(grupoAtencion) : new ServiceGroups__c() ;
+        List<String> usuariosColaActual=sg.Users__c!=null ? sg.Users__c.split(';') : new List<String>();
+        if(usuariosColaActual!=null){
+            Integer index=0;
+            if(sg.AssignmentByFamily__c){
+                for(String us : usuariosColaActual){
+                    String llave=grupoAtencion+'-'+familia+'-'+us;
+                    if(mapUserGlob.containsKey(llave.toLowerCase())){
+                        usr=mapUserGlob.get(llave.toLowerCase());
+                        break;
+                    }
+                    index++;
+                }
+            }else{
+                for(String us : usuariosColaActual){
+                    String llave=grupoAtencion+'-'+us;
+                    if(mapUserGlob.containsKey(llave.toLowerCase())){
+                        usr=mapUserGlob.get(llave.toLowerCase());
+                        break;
+                    }
+                    index++;
+                }
+            }
+            if(index<usuariosColaActual.size()){
+                restructureQueue(grupoAtencion,index,usuariosColaActual);
+            } 
+        }
+        return usr;
+    }
+    private void restructureQueue(String grupoAtencion,Integer index,List<String> usuariosColaActual){
+        System.debug('::restructureQueue::');
+        System.debug('INI::'+usuariosColaActual);
+        String tem=usuariosColaActual[index];
+        usuariosColaActual.remove(index);
+        usuariosColaActual.add(tem);
+        System.debug('FIN::'+usuariosColaActual);
+        mapGruposGlob.get(grupoAtencion).Users__c=String.join(usuariosColaActual, ';');
+    }
+    private void actualizarGrupos(){
+        System.debug('::actualizarGrupos::');
+        List<ServiceGroups__c> listUp = new List<ServiceGroups__c>();
+        for(ServiceGroups__c sg:[Select Id,Users__c,Name from ServiceGroups__c where Name IN:mapGruposGlob.keySet()]){
+            if(mapGruposGlob.containsKey(sg.Name.toLowerCase())){
+                if(sg.Users__c!=mapGruposGlob.get(sg.Name.toLowerCase()).Users__c){
+                    sg.Users__c=mapGruposGlob.get(sg.Name.toLowerCase()).Users__c;
+                    listUp.add(sg);
+                }
+            }
+        }
+        if(listUp!=null&&listUp.size()>0){
+            update listUp;
+        }
+    }
     
     public User getEjecutioADVTRUE( String role, String filtroAsignacion, String contador){
         List<User> asignarAlEjecutivo = [SELECT ID, Name FROM User WHERE UserRole.DeveloperName = :role AND FiltroAsignacion_MSPL__c INCLUDES (:filtroAsignacion) AND IsActive = true ORDER BY CreatedDate ASC];
@@ -1392,7 +1479,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
 		WhatId=contrato.Id,Description='Esta tarea esta relacionada a la oportunidad que se le ha asignado, favor de revisarla para el proceso de Alta de cliente',
 		Priority='Normal',Status='No iniciada',ActivityDate= system.today());*/
     //}
-    
+
     //Validate if the RFC-Solution has already an executive assigned. 
     public static void validateRFCSolcionAssignment(List<Opportunity> newList, Map<Id, Opportunity> oldMap){
         List<Opportunity> oppsToValidate = new List<Opportunity> ();
@@ -1415,29 +1502,45 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             }
         }
         if (!oppsToValidate.isEmpty()) {
-            List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__c, Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, Owner.Name, OwnerId FROM ContratoFilial__c
-                                                        WHERE Entidad_Cuenta__r.Cuenta__c IN: oppsAccIds AND Producto__r.Family != null
-                                                        AND RFC__c != null AND isActive__c = true AND Owner.UserRole.DeveloperName != 'Ejecutivo_Trademarketing'
-                                                        AND Producto__r.ProductCode != '30-B' AND OwnerId !=: UserInfo.getUserId()];
-            Map<String, ContratoFilial__c> contratosMap = new Map<String, ContratoFilial__c>();
-            for(ContratoFilial__c contrato: contratosActivos){
-                String solucion = contrato.Producto__r.Family;
-                if(solucion == 'Despensa' || solucion == 'Ticket Restaurante' || solucion == 'Regalo' || solucion == 'Vestimenta' || solucion == 'Ayuda social') {
-                    solucion = 'Benefits';
-                }
-                contratosMap.put(contrato.Entidad_Cuenta__r.Cuenta__c + '-' + contrato.Entidad_Cuenta__c + '-' + solucion , contrato);
+            if (currentUserRole == null) {
+                currentUserRole = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()].UserRole.Name; 
             }
-            for (Opportunity oppToValidate: oppsToValidate) {
-                String solucionAmenaza = oppToValidate.Familia__c;
-                if(solucionAmenaza == 'Despensa' || solucionAmenaza == 'Ticket Restaurante' || solucionAmenaza == 'Regalo' || solucionAmenaza == 'Vestimenta' || solucionAmenaza == 'Ayuda Social') {
-                    solucionAmenaza = 'Benefits';
+            List<Roles_BusinessUnits_Solutions__mdt> fieldSalesRoles = [Select MasterLabel, DoNotApplyLocks__c FROM Roles_BusinessUnits_Solutions__mdt];
+            List<String> fieldSalesRolesList = new List<String>();
+            List<String> rolesWithoutLocks = new List<String>();
+            for (Roles_BusinessUnits_Solutions__mdt fieldSalesRole : fieldSalesRoles) {
+                if (fieldSalesRole.DoNotApplyLocks__c) {
+                    rolesWithoutLocks.add(fieldSalesRole.MasterLabel);
+                } else {
+                    fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
                 }
-                if (contratosMap.containsKey(oppToValidate.AccountId + '-' + oppToValidate.Entidad_Cuenta__c + '-' + solucionAmenaza)) {
-                    oppToValidate.addError('Ya existe un ejecutivo asignado para ese RFC en esa solución.');
+            }
+            if (!rolesWithoutLocks.contains(currentUserRole) && fieldSalesRolesList.contains(currentUserRole)) {
+                List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__c, Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, Owner.Name, OwnerId FROM ContratoFilial__c
+                                                            WHERE Entidad_Cuenta__r.Cuenta__c IN: oppsAccIds AND Producto__r.Family != null
+                                                            AND RFC__c != null AND isActive__c = true AND Owner.UserRole.DeveloperName != 'Ejecutivo_Trademarketing'
+                                                            AND Producto__r.ProductCode != '30-B' AND OwnerId !=: UserInfo.getUserId()];
+                Map<String, ContratoFilial__c> contratosMap = new Map<String, ContratoFilial__c>();
+                for(ContratoFilial__c contrato: contratosActivos){
+                    String solucion = contrato.Producto__r.Family;
+                    if(solucion == 'Despensa' || solucion == 'Ticket Restaurante' || solucion == 'Regalo' || solucion == 'Vestimenta' || solucion == 'Ayuda social') {
+                        solucion = 'Benefits';
+                    }
+                    contratosMap.put(contrato.Entidad_Cuenta__r.Cuenta__c + '-' + contrato.Entidad_Cuenta__c + '-' + solucion , contrato);
                 }
-            }                
+                for (Opportunity oppToValidate: oppsToValidate) {
+                    String solucionAmenaza = oppToValidate.Familia__c;
+                    if(solucionAmenaza == 'Despensa' || solucionAmenaza == 'Ticket Restaurante' || solucionAmenaza == 'Regalo' || solucionAmenaza == 'Vestimenta' || solucionAmenaza == 'Ayuda Social') {
+                        solucionAmenaza = 'Benefits';
+                    }
+                    if (contratosMap.containsKey(oppToValidate.AccountId + '-' + oppToValidate.Entidad_Cuenta__c + '-' + solucionAmenaza)) {
+                        oppToValidate.addError('Ya existe un ejecutivo asignado para ese RFC en esa solución.');
+                    }
+                }    
+            }
         }
-    }    
+    }
+
     /* 
     public void getContacto(List<Opportunity> newList){
         set<Id> cuentas = new set<Id>();
@@ -1456,7 +1559,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
     }*/
     
-/**
+    /**
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 * @Created	27/03/2020 	Description: Check if there is an excecutive already assigned to the business unit related
 						to the solution added to the opp record, if so, show a message and avoid the record
@@ -1464,91 +1567,126 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
 						related to the 'Apadrinados' campaign.
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-    public static void validateBU(List<Opportunity> newList){
+    public static void validateBU(List<Opportunity> newList, Map<Id, Opportunity> oldMap){
         List<Opportunity> oppsToValidate = new List<Opportunity> ();
         Set<Id> threatsAccIds = new Set<Id>();
         Set<String> oppsSolutions = new Set<String>();
-        for(Opportunity opp: newList){
-            if (opp.Familia__c != null && opp.AccountId != null) {
-                oppsToValidate.add(opp);
-                threatsAccIds.add(opp.AccountId);
-                String solution = opp.Familia__c;
-                if (solution == 'Ayuda Social') {
-                    solution = 'Ayuda social';
+        if (oldMap == null) {
+            //Is insert.
+            for(Opportunity opp: newList){
+                if (opp.Familia__c != null && opp.AccountId != null) {
+                    oppsToValidate.add(opp);
+                    threatsAccIds.add(opp.AccountId);
+                    String solution = opp.Familia__c;
+                    if (solution == 'Ayuda Social') {
+                        solution = 'Ayuda social';
+                    }
+                    oppsSolutions.add(solution);
                 }
-                oppsSolutions.add(solution);
+            }
+        } else {
+            //Is update.
+            for(Opportunity opp: newList){
+                if (opp.Familia__c != null && opp.AccountId != null && opp.Familia__c != oldMap.get(opp.Id).Familia__c) {
+                    oppsToValidate.add(opp);
+                    threatsAccIds.add(opp.AccountId);
+                    String solution = opp.Familia__c;
+                    if (solution == 'Ayuda Social') {
+                        solution = 'Ayuda social';
+                    }
+                    oppsSolutions.add(solution);
+                }
             }
         }
         //If there are threats to validate
         if (!oppsToValidate.isEmpty()) {
-            Map<String, String> solutionAndBUSolutions = new Map<String,String>();
-            List<Opportunity> oppsToBeInserted = oppsToValidate;
-            List<String> allAllowedSolutions = new List<String>();
-            for (String solution : oppsSolutions) {
-                List<Roles_BusinessUnits_Solutions__mdt> bUSolutions = [Select AllowedSolutions__c
-                                                                        FROM Roles_BusinessUnits_Solutions__mdt
-                                                                        WHERE BusinessUnit__c != 'Multiproducto' AND AllowedSolutions__c LIKE : '%'+solution+'%' LIMIT 1];
-                if (!bUSolutions.isEmpty()) {
-                    for (String allowedSolution : bUSolutions[0].AllowedSolutions__c.split(',')) {
-                    	//Filling a map with the threat solution as the key and the string containing all allowed solutions for the business unit for that solution.
-                        solutionAndBUSolutions.put(allowedSolution,bUSolutions[0].AllowedSolutions__c);
-                        //Get in a list all allowed solutions for the business units related to the incoming threats solutions.
-                        allAllowedSolutions.add(allowedSolution);
-                    }
+            if (currentUserRole == null) {
+                currentUserRole = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()].UserRole.Name; 
+            }
+            List<Roles_BusinessUnits_Solutions__mdt> fieldSalesRoles = [Select MasterLabel, DoNotApplyLocks__c FROM Roles_BusinessUnits_Solutions__mdt];
+            List<String> fieldSalesRolesList = new List<String>();
+            List<String> rolesWithoutLocks = new List<String>();
+            for (Roles_BusinessUnits_Solutions__mdt fieldSalesRole : fieldSalesRoles) {
+                if (fieldSalesRole.DoNotApplyLocks__c) {
+                    rolesWithoutLocks.add(fieldSalesRole.MasterLabel);
+                } else {
+                 	fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
                 }
             }
-
-            //Select contratos filiales related to the accs in the incoming threats and with a solution containing in the business unit solutions related to the threat solution.
-            List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__r.Cuenta__c, Producto__r.Family FROM ContratoFilial__c
-                                                        WHERE Entidad_Cuenta__r.Cuenta__c IN: threatsAccIds
-                                                        AND Producto__r.Family != null
-                                                        AND Producto__r.Family IN: allAllowedSolutions
-                                                        AND isActive__c = true AND OwnerId !=: UserInfo.getUserId()];
-            if (!contratosActivos.isEmpty()) {
-                Map<String, List<ContratoFilial__c>> allSolutionsWhithContracts = new Map<String, List<ContratoFilial__c>>();
-                for (ContratoFilial__c contrato : contratosActivos) {
-                    //Filling a map with a string with the acc and all allowed solutions for a BU and as value, the list of contratos filiales with a solution containing in the key.
-                    if (allSolutionsWhithContracts.containsKey(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family))) {
-                        //If the allSolutionsWhithContracts contains the key(acc-allAllowedSolutions) that contains the comtrato filial solution, only add the contrato to the existing value list. 
-                        List<ContratoFilial__c> accContracts = allSolutionsWhithContracts.get(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family));
-                        accContracts.add(contrato);
-                        allSolutionsWhithContracts.put(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family), accContracts);
-                    } else {
-                        //If the allSolutionsWhithContracts does not contain the key(acc-allAllowedSolutions) that contains the comtrato filial solution, add the key and initialize the value list with the contrato. 
-                        allSolutionsWhithContracts.put(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family), new List<ContratoFilial__c> { contrato });
-                    }                                      
-                }
-                for (Opportunity newOpp : oppsToValidate) {
-                    String solution = newOpp.Familia__c;
-                    if (solution == 'Ayuda Social') {
-                        solution = 'Ayuda social';
-                    }
-                    //If acc Id and allowed solutions for that business unit is already a key in the map, add the error.
-                    if(allSolutionsWhithContracts.containsKey(newOpp.AccountId+'-'+solutionAndBUSolutions.get(solution))) {
-                        newOpp.addError('Este grupo ya tiene asignado un ejecutivo para la Unidad de negocio seleccionada.');
-                    } else {
-                        //If the opp has an error, is removed from the opps to be inserted.
-                    	oppsToBeInserted.remove(oppsToBeInserted.indexOf(newOpp));
-                    }
-                }
-            }
-            if (!oppsToBeInserted.isEmpty()) {
-                List<User> userRoleName = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()];
-                if (!userRoleName.IsEmpty() && userRoleName[0].UserRole.Name != 'Ejecutivo Multiproducto Region Noroeste' && userRoleName[0].UserRole.Name != 'Ejecutivo Multiproducto Region Sureste' && userRoleName[0].UserRole.Name != 'Ejecutivo Ventas Gobierno' && userRoleName[0].UserRole.Name != 'Ejecutivo Region Gobierno' ) {
+            if (!rolesWithoutLocks.contains(currentUserRole) && fieldSalesRolesList.contains(currentUserRole)) {
+                Map<String, String> solutionAndBUSolutions = new Map<String,String>();
+                List<Opportunity> oppsToBeInserted = oppsToValidate;
+                List<String> allAllowedSolutions = new List<String>();
+                for (String solution : oppsSolutions) {
                     List<Roles_BusinessUnits_Solutions__mdt> bUSolutions = [Select AllowedSolutions__c
                                                                             FROM Roles_BusinessUnits_Solutions__mdt
-                                                                            WHERE MasterLabel =: userRoleName[0].UserRole.Name];
+                                                                            WHERE BusinessUnit__c != 'Multiproducto' AND AllowedSolutions__c LIKE : '%'+solution+'%' LIMIT 1];
                     if (!bUSolutions.isEmpty()) {
-                        List<String> solutionsList = bUSolutions[0].AllowedSolutions__c.split(',');
-                        for (Opportunity oppToBeInserted : oppsToBeInserted) {
-                            String solution = oppToBeInserted.Familia__c;
-                            if (solution == 'Ayuda Social') {
-                                solution = 'Ayuda social';
-                            }
-                            //Determine if the opp will be added to the 'Apadrinados' campaign.
-                            if (!solutionsList.contains(solution)) {
-                                oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
-                                oppToBeInserted.OwnerChangeRequired__c = true;   
+                        for (String allowedSolution : bUSolutions[0].AllowedSolutions__c.split(',')) {
+                            //Filling a map with the threat solution as the key and the string containing all allowed solutions for the business unit for that solution.
+                            solutionAndBUSolutions.put(allowedSolution,bUSolutions[0].AllowedSolutions__c);
+                            //Get in a list all allowed solutions for the business units related to the incoming threats solutions.
+                            allAllowedSolutions.add(allowedSolution);
+                        }
+                    }
+                }
+                
+                //Select contratos filiales related to the accs in the incoming threats and with a solution containing in the business unit solutions related to the threat solution.
+                List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__r.Cuenta__c, Producto__r.Family FROM ContratoFilial__c
+                                                            WHERE Entidad_Cuenta__r.Cuenta__c IN: threatsAccIds
+                                                            AND Producto__r.Family != null
+                                                            AND Producto__r.Family IN: allAllowedSolutions
+                                                            AND isActive__c = true AND OwnerId !=: UserInfo.getUserId()
+                                                            AND Owner.UserRole.Name NOT IN: rolesWithoutLocks];
+                if (!contratosActivos.isEmpty()) {
+                    Map<String, List<ContratoFilial__c>> allSolutionsWhithContracts = new Map<String, List<ContratoFilial__c>>();
+                    for (ContratoFilial__c contrato : contratosActivos) {
+                        //Filling a map with a string with the acc and all allowed solutions for a BU and as value, the list of contratos filiales with a solution containing in the key.
+                        if (allSolutionsWhithContracts.containsKey(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family))) {
+                            //If the allSolutionsWhithContracts contains the key(acc-allAllowedSolutions) that contains the comtrato filial solution, only add the contrato to the existing value list. 
+                            List<ContratoFilial__c> accContracts = allSolutionsWhithContracts.get(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family));
+                            accContracts.add(contrato);
+                            allSolutionsWhithContracts.put(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family), accContracts);
+                        } else {
+                            //If the allSolutionsWhithContracts does not contain the key(acc-allAllowedSolutions) that contains the comtrato filial solution, add the key and initialize the value list with the contrato. 
+                            allSolutionsWhithContracts.put(contrato.Entidad_Cuenta__r.Cuenta__c+'-'+solutionAndBUSolutions.get(contrato.Producto__r.Family), new List<ContratoFilial__c> { contrato });
+                        }                                      
+                    }
+                    for (Opportunity newOpp : oppsToValidate) {
+                        String solution = newOpp.Familia__c;
+                        if (solution == 'Ayuda Social') {
+                            solution = 'Ayuda social';
+                        }
+                        //If acc Id and allowed solutions for that business unit is already a key in the map, add the error.
+                        if(allSolutionsWhithContracts.containsKey(newOpp.AccountId+'-'+solutionAndBUSolutions.get(solution))) {
+                            newOpp.addError('Este grupo ya tiene asignado un ejecutivo para la Unidad de negocio seleccionada.');
+                        } else {
+                            //If the opp has an error, is removed from the opps to be inserted.
+                            oppsToBeInserted.remove(oppsToBeInserted.indexOf(newOpp));
+                        }
+                    }
+                }
+                if (!oppsToBeInserted.isEmpty()) {
+                    List<User> userRoleName = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()];
+                    if (!userRoleName.IsEmpty()) {
+                        List<Roles_BusinessUnits_Solutions__mdt> bUSolutions = [Select AllowedSolutions__c
+                                                                                FROM Roles_BusinessUnits_Solutions__mdt
+                                                                                WHERE MasterLabel =: userRoleName[0].UserRole.Name
+                                                                                AND BusinessUnit__c != 'Multiproducto'];
+                        if (!bUSolutions.isEmpty()) {
+                            List<String> solutionsList = bUSolutions[0].AllowedSolutions__c.split(',');
+                            for (Opportunity oppToBeInserted : oppsToBeInserted) {
+                                String solution = oppToBeInserted.Familia__c;
+                                if (solution == 'Ayuda Social') {
+                                    solution = 'Ayuda social';
+                                }
+                                //Determine if the opp will be added to the 'Apadrinados' campaign.
+                                if (!solutionsList.contains(solution)) {
+                                    if(!Test.isRunningTest()) {
+                                        oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
+                                    }
+                                    oppToBeInserted.OwnerChangeRequired__c = true;   
+                                }
                             }
                         }
                     }
@@ -1557,7 +1695,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
     }
     
-    /**
+/**
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 * @Created	30/03/2020 	Description: If the opp needs an owner change, validate if the new owner is from the correct
 						business unit based on the opp solution. 
@@ -1612,5 +1750,4 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             }
         }
     }
-    
 }
