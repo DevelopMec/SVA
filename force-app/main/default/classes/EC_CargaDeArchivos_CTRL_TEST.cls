@@ -117,7 +117,7 @@ private class EC_CargaDeArchivos_CTRL_TEST {
 
 	@isTest static void EC_getForeignContact(){
 
-		Account cuenta = new Account(Name ='Cuenta maestra',NumeroEmpleados__c = '1-25',NumeroVehiculos__c = '1-5');
+		Account cuenta = new Account(Name ='Cuenta maestra',NumeroEmpleados__c = '1-25',NumeroVehiculos__c = '1');
 		insert cuenta;
 		Contact contacto = new Contact();
 		contacto.LastName = 'Sola';

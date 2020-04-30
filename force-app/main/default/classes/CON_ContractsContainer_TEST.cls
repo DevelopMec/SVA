@@ -252,10 +252,13 @@ public class CON_ContractsContainer_TEST {
 	static void updateContratoADV2Test1() {
 		String jsonContrato = '{}';
 		String jsonOportunidad = '{}';
-		String extras = '{}';
+        String extras = '{}';
 		Map<String, String> mapUcadv = CON_ContractsContainer_CTRL.updateContratoADV2(jsonContrato, jsonOportunidad, extras);
+        system.debug('MAPUCADV:' + mapUcadv);
         Map<String, String> mapUcadv2 = CON_ContractsContainer_CTRL.updateContratoAfiliadoADV2(jsonContrato, jsonOportunidad, extras);
+        system.debug('MAPUCADV2:' + mapUcadv2);
 	}
+	
 	// Calling updateContratoADV with a created instance of contract
 	/*@isTest
 	static void updateContratoAD2VTest2() {

@@ -14,7 +14,7 @@ private class TriggerEntidadLegal_Test {
 		Id recordTypeFisica = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByName().get('Persona Física').getRecordTypeId();
 		Id recordTypeMoral = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByName().get('Persona Moral').getRecordTypeId();
 
-		Account acc = new Account( Name = 'testAccount', NumeroEmpleados__c = '1-25', NumeroVehiculos__c  = '1-5' );
+		Account acc = new Account( Name = 'testAccount', NumeroEmpleados__c = '1-25', NumeroVehiculos__c  = '1' );
         insert acc;
 
 		EntidadLegal__c el = new EntidadLegal__c( Name = 'CUPU800825559', Nombre__c = 'EL Prueba', RecordTypeId = recordTypeFisica );

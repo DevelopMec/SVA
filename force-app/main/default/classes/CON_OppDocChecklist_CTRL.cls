@@ -134,7 +134,7 @@ public virtual class CON_OppDocChecklist_CTRL {
 		try {
 			Map<String, Object> mapERD = new Map<String, Object>();
 			Negocio__c n = [SELECT Id, CodigosRegistroPatronal__c FROM Negocio__c LIMIT 1];
-			Opportunity opp = [SELECT Id, Codigo_Producto_cotizacion__c FROM Opportunity WHERE Id = :oppId LIMIT 1];
+			Opportunity opp = [SELECT Id, Codigo_Producto_cotizacion__c,RecordType.DeveloperName FROM Opportunity WHERE Id = :oppId LIMIT 1];
 			mapERD.put('employerRegistrationCodes', n);
 			mapERD.put('opportunity', opp);
 			return mapERD;

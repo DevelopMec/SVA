@@ -3,9 +3,9 @@ public class DireccionesEntrega_CR {
     public static Contrato2__c getOportunidadContrato(String recordID){
         Contrato2__c opp_contrato;  
         if(recordID.startsWith('006'))
-          opp_contrato = [SELECT Id, PartidaPresupuesto__r.Quote.Opportunity.NumberOfShipments__c, Name, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c, PartidaPresupuesto__r.Quote.Opportunity.AccountId, PartidaPresupuesto__r.Quote.Opportunity.StageName FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId = :recordID and PartidaPresupuesto__r.Quote.IsSyncing=true];
+          opp_contrato = [SELECT Id, PartidaPresupuesto__r.Quote.Opportunity.NumberOfShipments__c, Name, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c, PartidaPresupuesto__r.Quote.Opportunity.AccountId, PartidaPresupuesto__r.Quote.Opportunity.StageName,PartidaPresupuesto__r.Quote.Opportunity.RecordType.DeveloperName FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId = :recordID and PartidaPresupuesto__r.Quote.IsSyncing=true];
         else
-          opp_contrato = [SELECT Id, PartidaPresupuesto__r.Quote.Opportunity.NumberOfShipments__c, Name, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c, PartidaPresupuesto__r.Quote.Opportunity.AccountId, PartidaPresupuesto__r.Quote.Opportunity.StageName FROM Contrato2__c WHERE Id = :recordID];
+          opp_contrato = [SELECT Id, PartidaPresupuesto__r.Quote.Opportunity.NumberOfShipments__c, Name, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c, PartidaPresupuesto__r.Quote.Opportunity.AccountId, PartidaPresupuesto__r.Quote.Opportunity.StageName,PartidaPresupuesto__r.Quote.Opportunity.RecordType.DeveloperName FROM Contrato2__c WHERE Id = :recordID];
 
         return opp_contrato;
     }

@@ -1,0 +1,314 @@
+<apex:page controller="PLAN_AltaAfiliados_Ctrl" renderAs="pdf">
+    <div  style = "display:{! If(establishments.size == 0 ,'none','') }; position: absolute; top: 0;">
+        <apex:repeat value="{!establishments}" var="Establecimiento" id="theRepeat">
+            <div style="page-break">
+                <!-------------->
+                <!--ENCABEZADO-->
+                <!-------------->
+                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td align="left">
+                                <apex:image style="width: 40%; height: auto;" url="{!URLFOR($Resource.imagesAfiliados,'images/LogoEdenred.jpg')}"/>
+                            </td>
+                            <td align="center" style="color: darkblue;">
+                                ALTA DE AFILIADO {!NombreProducto}
+                                
+                            </td>
+                            <!--<td align="right">
+                                <apex:image style="width: 50%; height: auto;" url="{!URLFOR($Resource.imagesAfiliados,'images/LogoEdenred.jpg')}"/>
+                            </td>-->
+                        </tr>
+                        <tr>
+                            <td>
+                                <p style="font-size: .6em;">
+                                    Edenred México, S.A. de C.V <br/>
+                                    Lago Rodolfo 29, Col. Granada,<br/>
+                                    11520, México D.F.<br/>
+                                </p>
+                            </td>
+                            <td>&nbsp;</td>
+                            <td align="right">
+                                <p style="font-size: .6em;">
+                                    DTCOMBE-002-2
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!--<td colspan="100%">
+                                <hr color="darkblue" size="3"/>
+                            </td>-->
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="right" style="font-size: .8em;">{!Establecimiento.Contract__r.Entidad_Legal__r.RecordType.Name}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!------------------>
+                <!--DATOS FISCALES-->
+                <!------------------>
+                <table width="100%" border="0" cellpadding="2" cellspacing="1">
+                    <tbody>
+                        <tr>
+                            <td align="center" colspan="4"
+                                style="font-size: .8em;border: 1px solid black;background-color: white;color: black;">Datos
+                                Fiscales
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="font-size: .8em;">Razón Social/Nombre:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.RazonSocial__c}</u></td>
+                            <td colspan="1" style="font-size: .8em;">Sucursales:
+                                <u>{!Establecimiento.Contract__r.Sucursal_facturacion_global__c}</u></td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Dirección Fiscal:</td>
+                            <td colspan="2" style="font-size: .8em;">Calle y N° Ext.:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.Calle__c}</u>
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.NumeroExterior__c}</u></td>
+                            <td style="font-size: .8em;">N° Interior:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.NumeroInterior__c}</u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Colonia:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.Colonia__c}</u>
+                            </td>
+                            <td colspan="2" style="font-size: .8em;">C.P.:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.CodigoPostal__c}</u>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Ciudad/Mpio.:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.DelegacionMunicipioFiscal__c}</u></td>
+                            <td colspan="4" style="font-size: .8em;">R.F.C.:
+                                <u>{!Establecimiento.Contract__r.Entidad_Legal__r.Name}</u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Estado: <u>{!Establecimiento.Contract__r.Entidad_Legal__r.Estado__c}</u>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" style="font-size: .8em;">Representante Legal:
+                                <u>{!Establecimiento.Contract__r.Contacto__r.Name}</u>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">E-mail:
+                                <u>{!Establecimiento.Contract__r.CorreoRecibeFactura__c} </u></td>
+                            <td colspan="2" style="font-size: .8em;">E-mail 2:
+                                <u>{!Establecimiento.Contract__r.Contacto__r.Email}</u></td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Lada: <u></u></td>
+                            <td style="font-size: .8em;">Tel.: <u>{!Establecimiento.Contract__r.Contacto__r.Phone}</u></td>
+                            <td style="font-size: .8em;">Cel.: <u>{!Establecimiento.Contract__r.Contacto__r.MobilePhone}</u></td>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--------------------->
+                <!--DATOS COMERCIALES-->
+                <!--------------------->
+                <table width="100%" border="0" cellpadding="2" cellspacing="1">
+                    <tbody>
+                        <tr>
+                            <td align="center" colspan="4"
+                                style="font-size: .8em;border: 1px solid black;background-color: white;color: black;">Datos
+                                Comerciales</td>
+                        </tr>
+                        <tr>
+                            <td colspan="100%" style="font-size: .8em;">Nombre comercial:
+                                <u>{!Establecimiento.Name}</u></td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Dirección del Establecimiento: </td>
+                            <td style="font-size: .8em;">Calle: <u>{!Establecimiento.Street__c}</u></td>
+                            <td style="font-size: .8em;">N° Exterior <u>{!Establecimiento.ExternalNumber__c}</u></td>
+                            <td style="font-size: .8em;">N° Interior <u>{!Establecimiento.InternalNumber__c}</u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Colonia: <u>{!Establecimiento.Settlement__c}</u></td>
+                            <td colspan="2" style="font-size: .8em;">Ciudad/Mpio: <u>{!Establecimiento.City__c}</u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Estado: <u>{!Establecimiento.State__c}</u></td>
+                            <td colspan="2" style="font-size: .8em;">C.P.: <u>{!Establecimiento.PostalCode__c}</u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">E-mail: <u>{!Establecimiento.Email__c}</u></td>
+                            <td colspan="2" style="font-size: .8em;">E-mail 2: <u></u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" style="font-size: .8em;">Persona Responsable:
+                                <u>{!Establecimiento.Contract__r.Contacto__r.Name}</u></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="font-size: .8em;">Página Web: <u>{!Establecimiento.Web__c}</u></td>
+                            <td colspan="1" style="font-size: .8em;">E-Commerce: <img src="{!eCommerce}"/></td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Lada: <u></u></td>
+                            <td style="font-size: .8em;">Tel.: <u>{!Establecimiento.Contract__r.Contacto__r.Phone}</u></td>
+                            <td style="font-size: .8em;">Cel.: <u>{!Establecimiento.Contract__r.Contacto__r.MobilePhone}</u>
+                            </td>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-------------------------------------------->
+                <!--CAMPOS LLENADOS POR EL EJECUTIVO EDENRED-->
+                <!-------------------------------------------->
+                <table width="100%" border="0" cellpadding="2" cellspacing="1">
+                    <tbody>
+                        <tr>
+                            <td align="center" colspan="4"
+                                style="font-size: .8em;border: 1px solid black;background-color: white;color: black;">Campos
+                                Llenados por el Ejecutivo Edenred</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Sucursal: {!Establecimiento.Contract__r.Branch__c}</td>
+                            <td style="font-size: .8em;">Afiliado: {!Establecimiento.Contract__r.Affiliate__c}</td>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                            <!--<td style="font-size: .5em;">Solicitud: {!Establecimiento.Contract__r.Request__c}</td>-->
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Nombre Ejecutivo:
+                                {!Establecimiento.Contract__r.PartidaPresupuesto__r.Quote.Opportunity.Owner.Name}</td>
+                            <td style="font-size: .8em;">Territorio: {!Establecimiento.Contract__r.PartidaPresupuesto__r.Quote.Opportunity.Owner.NumeroTerritorio__c}</td>
+                        </tr>
+                        <tr>
+                            <!--<td style="font-size: .8em;">Productos Afiliados:</td>-->
+                            <td style="font-size: .8em;">&nbsp;</td>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                            <!--td style="font-size: .8em;">Papel    Tarjeta</td>-->
+                            <td style="font-size: .8em;">Giro: {!Establecimiento.Contract__r.Cuenta__r.Giro__c}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">&nbsp;</td>
+                            <!--<td style="font-size: .8em;">Papel Tarjeta</td>-->
+                            <!--<td style="font-size: .8em;"><img src="{!isPaper}"/>&nbsp;&nbsp;&nbsp;&nbsp;<img src="{!isCard}"/></td>-->  
+                            <td style="font-size: .8em;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Tipo de Terminal:</td>
+                            <td style="font-size: .8em;">Convencional: <img src="{!ConventionalTerminal}"/>
+                            </td>
+                            <td style="font-size: .8em;">{!Despensa}</td>
+                            <!--<td style="font-size: .8em;">Sistema Despensa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Papel      Tarjeta</td>
+                            <td style="font-size: .8em;">&nbsp;</td>-->
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                            <td style="font-size: .8em;">Agregador: <img src="{!AggregatorTerminal}"/>
+                            </td>
+                            <td style="font-size: .8em;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="{!isPaper}"/>&nbsp;&nbsp;&nbsp;&nbsp;<img src="{!isCard}"/></td>
+                            <!--<td style="font-size: .8em;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="{!isPaper}"/>&nbsp;&nbsp;&nbsp;&nbsp;<img src="{!isCard}"/></td>-->
+                            <td style="font-size: .8em;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                            <td style="font-size: .8em;">Bancaria: <img src="{!BankingTerminal}"/>
+                            </td>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                            <td style="font-size: .8em;">&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!------------------>
+                <!--FORMAS DE PAGO-->
+                <!------------------>
+                <table width="100%" border="0" cellpadding="2" cellspacing="1">
+                    <tbody>
+                        <tr>
+                           <td style="font-size: .8em;">&nbsp;</td> 
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="font-size: .8em;">Productos Afiliados Papel: {!Establecimiento.Contract__r.affiliateProduct__c}</td>
+                        </tr>
+                       <tr>
+                           <td style="font-size: .8em;">&nbsp;</td> 
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Productos Afiliados Electrónico: {!Establecimiento.Contract__r.electronicAffiliatesProduct__c}</td>
+                        </tr>
+                        <tr>
+                           <td style="font-size: .8em;">&nbsp;</td> 
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="font-size: .8em;">Cuenta Bancaria:</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: .8em;">Banco: <u>{!Establecimiento.Contract__r.Bank_Account__r.Bank__c}</u></td>
+                            <td style="font-size: .8em;">Sucursal: <u>{!Establecimiento.Contract__r.Bank_Account__r.Branch__c}</u>
+                            </td>
+                            <td style="font-size: .8em;">No. de Cuenta:
+                                {!Establecimiento.Contract__r.Bank_Account__r.StandardiziedBankKey__c}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size: .8em;">Cuenta CLABE:
+                                <u>{!Establecimiento.Contract__r.Bank_Account__r.CLABE__c}</u></td>
+                            <td style="font-size: .8em;">Referencia:
+                                <u>{!Establecimiento.Contract__r.Bank_Account__r.Reference__c}</u></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!---------->
+                <!--FIRMAS-->
+                <!---------->
+                <table width="100%" border="0" cellpadding="2" cellspacing="1">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" style="font-size: .8em;">Firma del Afiliado</td>
+                            <td align="center" style="font-size: .8em;">Firma del Ejecutivo</td>
+                            <td align="center" style="font-size: .8em;">Autorización EDENRED</td>
+                            <td align="center" style="font-size: .8em;">Administración de Ventas</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                            <td>
+                                <hr color="black" size="1" width="150px" style="margin-top: 30px;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" style="font-size: .8em;">Fecha</td>
+                            <td align="center" style="font-size: .8em;">Fecha</td>
+                            <td align="center" style="font-size: .8em;">Fecha</td>
+                            <td align="center" style="font-size: .8em;">Fecha</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </apex:repeat>
+    </div>
+    <!--<div  style = "display:{! If(establishments.size == 0 ,'none','') }">
+        <p style="text-align:center; font-size:20px;">
+            No hay establecimientos relacionados al contrato.
+        </p>
+    </div>-->
+</apex:page>

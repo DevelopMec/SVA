@@ -1,4 +1,4 @@
-trigger Account on Account (before insert, after insert, after update,before update) {
+trigger Account on Account (before insert, after insert, after update) {
     if(Trigger.isInsert && Trigger.isBefore){
         Profile perfil = [SELECT Name FROM Profile WHERE Id =: UserInfo.getProfileId()];
         for(Account cuenta : Trigger.new){
@@ -7,11 +7,7 @@ trigger Account on Account (before insert, after insert, after update,before upd
             }
         }
     }
-    
-    if(Trigger.isUpdate && Trigger.isBefore){
-    	Account_Handler.populateFrozenSegment(Trigger.newMap,Trigger.oldMap);
-    }
-    
+
     if(Trigger.isInsert && Trigger.isAfter){
     	//List<Account> listaCuentas = new List<Account>();
     	//set<id> setCuentas = new set<id>();

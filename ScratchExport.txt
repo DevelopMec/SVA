@@ -1,0 +1,26 @@
+#!/bin/bash -x
+
+if [[ $# -eq 0 ]] ; then
+ echo ‘you need to pass in a string name for your scratch org’
+ exit 1
+fi
+
+echo "* Exporting Dynamic Form data -> Templates..."
+sfdx force:data:soql:query --query \
+"SELECT Name,dyfr__Template_Code__c FROM dyfr__Template__c" \
+-u $1 --resultformat csv &> ./data/templates.csv
+
+echo "* Exporting Dynamic Form data -> Tabs..."
+sfdx force:data:soql:query --query \
+"SELECT Name, dyfr__Order__c,dyfr__Column_Number__c,dyfr__Show_Completion__c,dyfr__Template__r.dyfr__Template_Code__c,dyfr__Tab_Code__c FROM dyfr__Tab__c" \
+-u $1 --resultformat csv &> ./data/tabs.csv
+
+echo "* Exporting Dynamic Form data -> Field Configs..."
+sfdx force:data:soql:query --query \
+"SELECT dyfr__MaxLength__c,dyfr__DeveloperName__c,dyfr__Section_order__c,dyfr__Lower_limit__c,dyfr__Upper_limit__c,dyfr__Mandatory__c,dyfr__Label__c,dyfr__Visibility_condition__c,dyfr__Full_width__c,dyfr__Read_only__c,dyfr__Section_name__c,dyfr__Default_value__c,dyfr__Hidden__c,dyfr__Relationship_Query_Content__c,dyfr__Relationship_Query_Field__c,dyfr__Relationship_Dynamic_Label_Field__c,dyfr__Relationship_Object_Name__c,dyfr__Order__c,dyfr__Type__c,dyfr__Visibility_control_value__c,dyfr__Values_control_field__c,dyfr__Visibility_control_field__c,dyfr__Important__c,dyfr__Map_field__c,dyfr__Lightning_component_attributes__c,dyfr__Lightning_component_api_name__c,dyfr__Tab__r.dyfr__Tab_Code__c,dyfr__Column_Size__c,dyfr__Blank_in_edit_mode__c ,dyfr__Hidden_in_edit_mode__c,dyfr__Subsection_name__c,dyfr__Subsection_order__c FROM dyfr__Field_Config__c ORDER BY dyfr__Section_name__c ASC ,dyfr__Subsection_name__c ASC,dyfr__DeveloperName__c ASC" \
+-u $1 --resultformat csv &> ./data/fieldConfigs.csv
+
+echo "* Exporting Dynamic Form data -> DataValues..."
+sfdx force:data:soql:query --query \
+"SELECT dyfr__LoV_values__c, dyfr__Values_control_value__c, dyfr__Field_Config__r.dyfr__DeveloperName__c, dyfr__LoV_labels__c FROM dyfr__Dependent_value__c" \
+-u $1 --resultformat csv & > ./data/dataValues.csv

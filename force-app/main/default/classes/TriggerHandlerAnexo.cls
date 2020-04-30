@@ -2,6 +2,10 @@ public class TriggerHandlerAnexo {
     public static void metodo(List<Anexo__c> anexos){
         
         for(Anexo__c campo : anexos){
+            if(campo.PercentageElectronicParticipation__c != null){
+                System.debug('PercentageElectronicParticipationText__c	 => ');    
+                campo.PercentageElectronicParticipationText__c = ConversionNumeroTexto.Convertir(campo.PercentageElectronicParticipation__c, 'porcentaje');
+            }
             if(campo.TarjetaAdicional__c != null ){
                 System.debug('Tarjeta Adicional => ' + campo.TarjetaAdicional__c);
                 campo.TarjetaAdicionalTexto__c = ConversionNumeroTexto.Convertir(campo.TarjetaAdicional__c, 'moneda');
@@ -154,6 +158,25 @@ public class TriggerHandlerAnexo {
                 System.debug('AnualidadPyme_Text__c	 => ' + campo.AnualidadPyme_Text__c);    
                 campo.AnualidadPymeLetra_Text__c = 'No Aplica';
             }
+            
+                        
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            	
+            
+            
+            
+            
         }
     }
 }

@@ -6,7 +6,6 @@ public without sharing class TriggerHandlerProductoConcepto extends triggerHandl
     Map<String, Schema.SObjectField> mapaCamposAnexo;
     
     public TriggerHandlerProductoConcepto() {
-        System.debug('::TriggerHandlerProductoConcepto::'+limits.getQueries());
         this.newList = (List<ProductoConcepto__c>) trigger.new;
         this.oldMap = (Map<Id, ProductoConcepto__c>) trigger.oldMap;
         this.newMap = (Map<Id, ProductoConcepto__c>) trigger.newMap;

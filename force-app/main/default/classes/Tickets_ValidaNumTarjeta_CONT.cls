@@ -147,6 +147,7 @@ public class Tickets_ValidaNumTarjeta_CONT {
                     datosT.findCards=false;
                     if(tarjBase){
                         //cuenta = subcuenta.substring(2,7);
+                        subcuenta=subcuenta.length()<10 ? '0'+subcuenta : subcuenta;
                         subcuenta = subcuenta.substring(0,2) + '-' + CProd + '-' + subcuenta.substring(2,7) + '-' + subcuenta.substring(7,10);
                     }
                     try{

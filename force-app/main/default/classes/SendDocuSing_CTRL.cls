@@ -3,7 +3,7 @@ public without sharing class SendDocuSing_CTRL {
     public static Map<String,String> generarInformacion(String recordId){
         Map<String,String> resp=new Map<String,String>();
         Integer cant=[Select count() from dsfs__DocuSign_Status__c where dsfs__Opportunity__c=:recordId and dsfs__Envelope_Status__c IN ('Enviado','Delivered')];
-        if(cant>100){
+        if(cant>0){
             resp.put('status','error');
             resp.put('msj','No se puede envíar el contrato debido a que hay un proceso pendiente');
             return resp;

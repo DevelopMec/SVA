@@ -59,7 +59,7 @@ public class TriggerLeadHandler_TEST{
         
         Lead lea = new Lead(
             RFC__c = 'RFC_Test',
-
+            ProductoInteres__c = 'Combustible',
             LastName = 'CLS_lastNameTest',
             Company = 'CLS_TestCompany',
             Puesto__c='Administrador',
@@ -67,7 +67,7 @@ public class TriggerLeadHandler_TEST{
             Phone='8765434574',
             Email = 'CLS_test@mail.com',
             NumEmpleados__c = '1-25',
-            CategoriaSolucion__c = 'Despensa;combustible',
+            CategoriaSolucion__c = 'Despensa',
             Telefono2__c = '1234567890',
             MobilePhone = '1234567890',
             AreaTrabajo__c = 'Atención a clientes',
@@ -80,13 +80,6 @@ public class TriggerLeadHandler_TEST{
 
         Task t = new Task( Subject = 'Envío de cotización', Status = 'New', Priority = 'Normal', WhoId = lea.Id);
         insert t; 
-        
-        lea.Status = 'Contactado';
-        update lea;
-        lea.Status = 'Sin Segmento Definido';
-        update lea;
-        lea.Status = 'No interesado';
-        update lea;
 
         lea.Status = 'En curso';
         update lea;
@@ -136,51 +129,6 @@ public class TriggerLeadHandler_TEST{
         
         SolicitarAprobacionBPfleet_CONT.getInfo(lead2.Id);
         SolicitarAprobacionBPfleet_CONT.solicitarAprobacion(lead2.Id);
-        Test.stopTest();
-    }
-    
-    @isTest
-    static void metodo2() {
-        Init();
-        insert new GeneralCatalog__c(ApproverBPSmall__c=UserInfo.getUserId(),ApproverBPCorporate__c=UserInfo.getUserId());
-        Profile prof = [SELECT Id FROM Profile WHERE Name = 'Ventas' LIMIT 1];
-        User u= new User(ManagerId=UserInfo.getUserId(),LastName = 'last', Email = 'puser000@amamama.com', Username = 'puser000@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
-        insert u;
-
-        System.runAs(u){
-            Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
-            insert acc;
-
-            EntidadLegal__c el=new EntidadLegal__c(RFC__c='AAHJ343534KG3',Name='AAHJ343534KG3',Estatus__c='Completa');
-            insert el;
-
-            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='AAHJ343534KG3',EntidadLegal__c=el.Id);
-            insert ec;
-
-            Opportunity opp=new Opportunity(Familia__c='Combustible',Name='BP',AccountId=acc.Id,Entidad_Cuenta__c=ec.Id,CloseDate=Date.today().addMonths(1),StageName='Cotización');
-            insert opp;
-        }
-
-        Test.startTest();
-        Lead lead2 = new Lead(RFC__c='AAHJ343534KG3', LastName = 'TestBP', Company = 'BPCompany', LeadSource='Web',Phone='9823657493', Email = 'test@test.com', NumEmpleados__c = '1-25',RecordTypeId=Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('BPfleet').getRecordTypeId());
-        insert lead2;
-        
-        Profile profBP = [SELECT Id FROM Profile WHERE Name = 'BPfleet Sales' LIMIT 1];
-        User uBP= new User(LastName = 'lastt', Email = 'puser0t00@amamama.com', Username = 'puser0t00@amamama.com' + System.currentTimeMillis(), CompanyName = 'TESTw', Title = 'titlee', Alias = 'aliasTes', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = profBP.Id);
-        insert uBP;
-        System.runAs(uBP){
-            BuscadorBPfleet_CONT.crearColaboracion('AAHJ343534KG3');
-            BuscadorBPfleet_CONT.getStatus(new Set<String>{'AAHJ343538KG3'});
-            BuscadorBPfleet_CONT.getStatus(new Set<String>{'AAHJ343534KG3'});
-        }
-        
-        //Lead ltem=[Select Id,Approver__c,IdExecutiveNotification__c from Lead where Id=:lead2.Id];
-        //System.debug('LEASSSSS:'+ltem);
-        //lead2.StatusApprovalBPfleet__c='Aprobado';
-        //update lead2;
-        
-        //SolicitarAprobacionBPfleet_CONT.getInfo(lead2.Id);
-        //SolicitarAprobacionBPfleet_CONT.solicitarAprobacion(lead2.Id);
         Test.stopTest();
     }
 }

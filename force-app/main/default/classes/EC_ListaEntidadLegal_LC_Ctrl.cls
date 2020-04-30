@@ -459,19 +459,30 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
 				
 				Map<String, Object> mapDocsByTypePerson = CON_OppDocChecklist_CTRL.getDocsByTypePerson();
 				TiposDocumento__c td = new TiposDocumento__c();
-				
-				if( entidades[0].EntidadLegal__r.RecordType.Name == 'Persona Moral' ) {
-					td = TiposDocumento__c.getInstance('Persona Moral EL');
-
-				} else if ( entidades[0].EntidadLegal__r.RecordType.Name == 'Persona Física' ) {
-					td = TiposDocumento__c.getInstance('Persona Física EL');
-				}
+				Profile p=[Select Id,Name from Profile where Id=:UserInfo.getProfileId()];
+                String perfil=' ';
+                if(p.Name=='Afiliación'){
+                    perfil=' Afiliación ';
+                }
+				//if( entidades[0].EntidadLegal__r.RecordType.Name == 'Persona Moral' ) {
+                        td = [Select Id,Name from TiposDocumento__c where Name=:entidades[0].EntidadLegal__r.RecordType.Name+perfil+'EL'];//TiposDocumento__c.getInstance('Persona Moral'+perfil+'EL');                  
+				//} else if ( entidades[0].EntidadLegal__r.RecordType.Name == 'Persona Física' ) {
+					//td = TiposDocumento__c.getInstance('Persona Física'+perfil+'EL');
+				///}
 
 				List<Object> listDocs = (List<Object>) mapDocsByTypePerson.get( td.Name );
 				System.debug('Anydatatype_msg '+listDocs);
 				System.debug('Anydatatype_msg '+setDocs);
 				Boolean allDocs = true;
-				
+                List<String> docOpcionales=new List<String>();
+                try{
+                    GeneralCatalog__c gc=[Select Id,Value__c from GeneralCatalog__c where Key__c=:entidades[0].EntidadLegal__r.RecordType.Name+perfil+'EL'];
+                    if(gc.value__c!=null){
+                        docOpcionales=gc.Value__c.split(';');
+                    }
+                }catch(Exception e){
+                    System.debug('Error: '+e.getMessage()+',Linea: '+e.getLineNumber());
+                }
 				for( Object obj: listDocs ) {
 					Map<String, Object> mapDoc = (Map<String, Object>) obj;
 					String name = (String.valueOf(mapDoc.get('name')).replaceAll(' ', '_')) + '.pdf';
@@ -484,7 +495,7 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
 
 					System.debug('name: ' + name);
 
-					if( String.isNotBlank( name ) && !setDocs.contains( name ) && allDocs == true ) {
+					if( String.isNotBlank( name ) && !setDocs.contains( name ) && allDocs == true &&!docOpcionales.contains(name)) {
 						System.debug('name: d ' + name);
 						allDocs = false;
 					}

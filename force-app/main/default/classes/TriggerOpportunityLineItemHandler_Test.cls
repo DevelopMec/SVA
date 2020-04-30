@@ -1,7 +1,7 @@
 @IsTest public class TriggerOpportunityLineItemHandler_Test {
     
     @TestSetup static void SetUpData(){
-        Account a = new Account(Name='testAccount',NumeroEmpleados__c='1-25', NumeroVehiculos__c  = '1-5');
+        Account a = new Account(Name='testAccount',NumeroEmpleados__c='1-25', NumeroVehiculos__c  = '1');
         insert a;
  		
         User u1 = [SELECT Id, Name, Segmento__c FROM User WHERE Segmento__c='MLK' AND IsActive = true LIMIT 1];

@@ -31,7 +31,7 @@ public without sharing class AltaContrato_CONT {
                 camposStr=camposStr.trim();
                 camposObligatorios=camposObligatorios.trim();
                 camposDesh=camposDesh.trim();
-                String query='Select '+camposStr.replaceAll(';', ',')+',PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c from Contrato2__c where PartidaPresupuesto__c=:idQli and PartidaPresupuesto__r.Quote.IsSyncing=true order by CreatedDate DESC limit 1';
+                String query='Select '+camposStr.replaceAll(';', ',')+',Bank_Account__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c from Contrato2__c where PartidaPresupuesto__c=:idQli and PartidaPresupuesto__r.Quote.IsSyncing=true order by CreatedDate DESC limit 1';
                 //System.debug('Q::'+query);
                 res.query=query;
                 Contrato2__c adv=Database.query(query);
@@ -168,7 +168,7 @@ public without sharing class AltaContrato_CONT {
     }
     
     @AuraEnabled
-    public static String guardarInfo(List<OpportunityContactRole__c> datos,Contrato2__c contrato,List<ContratoFilial__c> filiales){
+    public static String guardarInfo(Contrato2__c contrato,String filiales, List<String> establishments,boolean esAfiliado){
         System.debug('INICIO GI');
         system.debug(filiales);
         Savepoint sp = Database.setSavepoint();
@@ -183,11 +183,17 @@ public without sharing class AltaContrato_CONT {
                         an.IdContrato__c=con2.Id;
                     }
                     update qli.Anexos__r;
-                }catch(Exception e){
-                    
-                }
+                }catch(Exception e){}
             }
-            Map<String,ContratoFilial__c> setEC=getEntidadesCuenta(contrato.Id);
+            saveEstablishments(establishments, contrato.Id);
+            if(!esAfiliado){
+                List<ContratoFilial__c> lfil=(List<ContratoFilial__c>)JSON.deserialize(filiales, List<ContratoFilial__c>.class);
+                generarFiliales(con2,lfil);
+            }else{
+                 List<Affiliate__c> lAff=(List<Affiliate__c>)JSON.deserialize(filiales, List<Affiliate__c>.class);
+                generarAfiliados(con2,lAff);
+            }
+            /*Map<String,ContratoFilial__c> setEC=getEntidadesCuenta(contrato.Id);
             String oppOwner=con2.PartidaPresupuesto__r.Quote.Opportunity.OwnerId;//[Select Id,PartidaPresupuesto__r.Quote.Opportunity.OwnerId from Contrato2__c where Id=:contrato.Id].PartidaPresupuesto__r.Quote.Opportunity.OwnerId;
             List<ContratoFilial__c> lisF=new List<ContratoFilial__c>();
             List<ContratoFilial__c> lisDel=new List<ContratoFilial__c>();
@@ -211,6 +217,100 @@ public without sharing class AltaContrato_CONT {
             if(lisF!=null&&lisF.size()>0){
                 System.debug('VERRR:'+lisF);
                 upsert lisF;
+            }*/
+            return 'exito';
+        }catch(Exception e){
+            Database.rollback(sp);
+            return e.getMessage();
+        }
+    }
+    
+    public static void generarFiliales(Contrato2__c contrato,List<ContratoFilial__c> filiales){
+        Map<String,ContratoFilial__c> setEC=getEntidadesCuenta(contrato.Id);
+        String oppOwner=contrato.PartidaPresupuesto__r.Quote.Opportunity.OwnerId;//[Select Id,PartidaPresupuesto__r.Quote.Opportunity.OwnerId from Contrato2__c where Id=:contrato.Id].PartidaPresupuesto__r.Quote.Opportunity.OwnerId;
+        List<ContratoFilial__c> lisF=new List<ContratoFilial__c>();
+        List<ContratoFilial__c> lisDel=new List<ContratoFilial__c>();
+        Set<String> idsEC=new Set<String>();
+        for(ContratoFilial__c ec : filiales){
+            idsEC.add(ec.Entidad_Cuenta__c);
+            //if(!setEC.containsKey(ec.Entidad_Cuenta__c)){
+            ec.Contrato_2__c=contrato.Id;
+            ec.OwnerID=oppOwner;
+            lisF.add(ec);
+            //}
+        }
+        for(String ec : setEC.KeySet()){
+            if(!idsEC.contains(ec)){
+                lisDel.add(setEC.get(ec)); 
+            }
+        }
+        if(lisDel!=null&&lisDel.size()>0){
+            delete lisDel;
+        }
+        if(lisF!=null&&lisF.size()>0){
+            System.debug('VERRR:'+lisF);
+            upsert lisF;
+        }
+    }
+    public static void generarAfiliados(Contrato2__c contrato,List<Affiliate__c> afiliados){  
+        System.debug('INFO::'+contrato.PartidaPresupuesto__r.Quote.Opportunity.OwnerId);
+        Map<String,Affiliate__c> setEC=getEntidadesCuentaAfiliados(contrato.Id);
+        String oppOwner=contrato.PartidaPresupuesto__r.Quote.Opportunity.OwnerId;
+        List<Affiliate__c> lisF=new List<Affiliate__c>();
+        List<Affiliate__c> lisDel=new List<Affiliate__c>();
+        Set<String> idsEC=new Set<String>();
+        for(Affiliate__c ec : afiliados){
+            idsEC.add(ec.AccountEntity__c);
+            ec.Contract_2__c=contrato.Id;
+            ec.OwnerID=oppOwner;
+            lisF.add(ec);
+        }
+        for(String ec : setEC.KeySet()){
+            if(!idsEC.contains(ec)){
+                lisDel.add(setEC.get(ec)); 
+            }
+        }
+        if(lisDel!=null&&lisDel.size()>0){
+            delete lisDel;
+        }
+        if(lisF!=null&&lisF.size()>0){
+            upsert lisF;
+        }
+    }
+    
+    @AuraEnabled
+    public static String guardarInfoAfiliado(Contrato2__c contrato,List<Affiliate__c> filiales, List<String> establishments){
+        System.debug('INICIO GI');
+        system.debug(filiales);
+        Savepoint sp = Database.setSavepoint();
+        try{
+            //Database.upsert(datos,false);
+            update contrato;
+            saveEstablishments(establishments, contrato.Id);
+            Map<String,Affiliate__c> setEC=getEntidadesCuentaAfiliados(contrato.Id);
+            String oppOwner=[Select Id,PartidaPresupuesto__r.Quote.Opportunity.OwnerId from Contrato2__c where Id=:contrato.Id].PartidaPresupuesto__r.Quote.Opportunity.OwnerId;
+            List<Affiliate__c> lisF=new List<Affiliate__c>();
+            List<Affiliate__c> lisDel=new List<Affiliate__c>();
+            Set<String> idsEC=new Set<String>();
+            for(Affiliate__c ec : filiales){
+                idsEC.add(ec.AccountEntity__c);
+                //if(!setEC.containsKey(ec.Entidad_Cuenta__c)){
+                ec.Contract_2__c=contrato.Id;
+                ec.OwnerID=oppOwner;
+                    lisF.add(ec);
+                //}
+            }
+            for(String ec : setEC.KeySet()){
+                if(!idsEC.contains(ec)){
+                   lisDel.add(setEC.get(ec)); 
+                }
+            }
+            if(lisDel!=null&&lisDel.size()>0){
+                delete lisDel;
+            }
+            if(lisF!=null&&lisF.size()>0){
+                System.debug('VERRR:'+lisF);
+                upsert lisF;
             }
             return 'exito';
         }catch(Exception e){
@@ -218,6 +318,28 @@ public without sharing class AltaContrato_CONT {
             return e.getMessage();
         }
     }
+    
+    public static Map<String,Affiliate__c> getEntidadesCuentaAfiliados(String idContrato){
+        Map<String,Affiliate__c> res=new Map<String,Affiliate__c>();
+        for(Affiliate__c cf : [Select Id,AccountEntity__c,AccountEntity__r.Name,AccountEntity__r.EntidadLegal__r.RazonSocial__c,AccountEntity__r.EntidadLegal__r.RecordType.Name,PlatformAdministrator__c from Affiliate__c where Contract_2__c=:IdContrato]){
+            res.put(cf.AccountEntity__c,cf);
+        }
+        return res;
+    }
+    
+    private static void saveEstablishments(List<String> establishmentsIds,String  IdContrato) {
+        Map<String,Establishment__C> relatedEstablishments = new Map<String,Establishment__C> ([SELECT Id,Name,Contract__c FROM Establishment__c WHERE Contract__c =: IdContrato OR Id in: establishmentsIds]);
+        For(String currentId : relatedEstablishments.keySet()) {
+            if(establishmentsIds.contains(currentId)) {
+                relatedEstablishments.get(currentId).Contract__c = IdContrato;
+            } else {
+                relatedEstablishments.get(currentId).Contract__c = null;
+            }
+        }
+        update relatedEstablishments.values();
+    }
+    
+    
     public static Map<String,ContratoFilial__c> getEntidadesCuenta(String idContrato){
         Map<String,ContratoFilial__c> res=new Map<String,ContratoFilial__c>();
         for(ContratoFilial__c cf : [Select Id,Entidad_Cuenta__c,Entidad_Cuenta__r.Name,Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c,Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name,PlatformAdministrator__c from ContratoFilial__c where Contrato_2__c=:IdContrato]){
@@ -241,23 +363,31 @@ public without sharing class AltaContrato_CONT {
 	@AuraEnabled
     public static infoWP getInfoQli(String idQli){
         infoWP res=new infoWP();
-        res.headerData=[Select Id,Quote.Opportunity.Owner.Segmento__c,Quote.Opportunity.StageName,Product2.Name,Product2.ProductLogo__c,Quote.Opportunity.Entidad_Cuenta__c,Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c,Quote.OpportunityId,Quote.Opportunity.Familia__c,Quote.Opportunity.Name,Quote.Opportunity.Id,Quote.Opportunity.Account.Id,Quote.Opportunity.Account.Name from QuoteLineItem where Id=:idQli];
+        res.headerData=[Select Id,Product2.IsAffiliate__c,Product2.Family,Quote.Opportunity.StageName,Product2.Name,Product2.ProductLogo__c,Quote.Opportunity.Entidad_Cuenta__c,Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c,Quote.OpportunityId,Quote.Opportunity.Familia__c,Quote.Opportunity.Name,Quote.Opportunity.Id,Quote.Opportunity.Account.Id,Quote.Opportunity.Account.Name from QuoteLineItem where Id=:idQli];
         res.etapa=res.headerData.Quote.Opportunity.StageName;
-        List<Contrato2__c> lisADV=[Select Id,RejectedContract__c,PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where PartidaPresupuesto__c=:idQli order by CreatedDate DESC limit 1];
+        List<Contrato2__c> lisADV=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,ContractDate__c,DireccionFiscal__c,Domiciliation__c,bill__c,paymentTermPaper__c,electronicPaymentTerm__c,billingEmail__c,stationId__c,Entidad_Cuenta__c,IsPaper__c,CuttingDayMon__c,CuttingDayTue__c,CuttingDayWed__c,CuttingDayThu__c,CuttingDayFri__c,CuttingDays__c,webAccessEmail__c,Producto__c,Observaciones__c,IntraseBranch__c,Chain__c from Contrato2__c where PartidaPresupuesto__c=:idQli order by CreatedDate DESC limit 1];
         if(lisADV!=null&&lisADV.size()==1){
             res.contrato=lisADV[0];        
         }else{
             Contrato2__c contrato=new Contrato2__c(PartidaPresupuesto__c=res.headerData.Id,Entidad_Cuenta__c=res.headerData.Quote.Opportunity.Entidad_Cuenta__c,Entidad_Legal__c=res.headerData.Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c);
             insert contrato;
-            Contrato2__c contratoTem=[Select Id,PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,RejectedContract__c ,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where Id=:contrato.Id];
+            Contrato2__c contratoTem=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,ContractDate__c,Domiciliation__c,bill__c,paymentTermPaper__c,electronicPaymentTerm__c,DireccionFiscal__c,billingEmail__c,stationId__c,Entidad_Cuenta__c,IsPaper__c,CuttingDayMon__c,CuttingDayTue__c,CuttingDayWed__c,CuttingDayThu__c,CuttingDayFri__c,CuttingDays__c,webAccessEmail__c,Producto__c,Observaciones__c,IntraseBranch__c,Chain__c from Contrato2__c where Id=:contrato.Id];
             res.contrato=contratoTem;
         }
-        res.filiales=getEntidadesCuenta(res.contrato.Id);
+        if(res.headerData.Product2.IsAffiliate__c){
+            res.filiales=getEntidadesCuentaAfiliados(res.contrato.Id);
+        }else{
+            res.filiales=getEntidadesCuenta(res.contrato.Id);
+        }         
         //res.contrato=[Select Id,Name,Contacto__c,DireccionFiscal__c,Entidad_Cuenta__c from Contrato2__c where PartidaPresupuesto__c=:idQli];        
         List<comboWP> lisVal=new List<comboWP>();
         Set<String> idsEC=new Set<String>();
         String idCuenta=res.headerData.Quote.Opportunity.Account.Id;
         String idOpp=res.headerData.Quote.OpportunityId;
+        
+        res.metodosPago = [SELECT Id, CLABE__c, Name, AccountHolder__c,StandardiziedBankKey__c, Reference__c, Bank__c, RegistrationStatus__c, Cuenta__c FROM BankAccount__c Where Cuenta__c =: idCuenta];
+        res.establecimientos = [SELECT Account__c,Name, Gas_Station_Quantity__c , PetrolPumpQuantity__c,idCRE__c,PostalCode__c,Street__c,City__c,Settlement__c,State__c,Population__c,InternalNumber__c,ExternalNumber__c,Bank__r.Name, Id FROM Establishment__c Where Account__c =: idCuenta and EstablishmentStatus__c!='Generado'];
+        res.establecimientosGuardados = new Map<Id,Establishment__c>([SELECT Id,Account__c,Name, Gas_Station_Quantity__c,idCRE__c , PetrolPumpQuantity__c,Contract__c,PostalCode__c,Street__c,City__c,Settlement__c,State__c,Population__c,InternalNumber__c,ExternalNumber__c,Bank__r.Name  FROM Establishment__c Where EstablishmentStatus__c!='Generado' and Contract__c =: res.contrato.id AND Account__c =: idCuenta]).keySet();        
         
         res.contactosCuenta=new List<comboWP>();
         for(Contact cont : [Select Id,Name,Funcion__c from Contact where AccountId=:idCuenta]){
@@ -295,6 +425,28 @@ public without sharing class AltaContrato_CONT {
         res.IdOpp = IdOpp;
         return res;
     }
+    @AuraEnabled
+    public static infoWP getMetodosPago(String idCuenta){
+        infoWP res=new infoWP();
+        res.metodosPago = [SELECT Id, CLABE__c, Name, AccountHolder__c,StandardiziedBankKey__c, Reference__c, Bank__c, RegistrationStatus__c, Cuenta__c FROM BankAccount__c Where Cuenta__c =: idCuenta];
+        return res;
+    }
+    @AuraEnabled
+    public static estabRefresWP getEstablecimientosRefresh(String idCuenta,String contratoId){
+        estabRefresWP res=new estabRefresWP();
+        try{
+            res.establecimientos =[SELECT Account__c,Bank__r.Name,Name, Gas_Station_Quantity__c ,PetrolPumpQuantity__c,idCRE__c,PostalCode__c,Street__c,City__c,Settlement__c,State__c,Population__c,InternalNumber__c,ExternalNumber__c,Id FROM Establishment__c Where Account__c =: idCuenta and EstablishmentStatus__c!='Generado'];
+            res.establecimientosGuardados = new Map<String,Establishment__c>([SELECT Id,Account__c,Name,Bank__r.Name, Gas_Station_Quantity__c,idCRE__c , PetrolPumpQuantity__c,Contract__c FROM Establishment__c Where Contract__c =: contratoId and EstablishmentStatus__c!='Generado' AND Account__c =: idCuenta]).keySet();            
+        }catch(Exception e){
+            System.debug('Error:'+e.getMessage()+', Linea:'+e.getLineNumber());
+            return res;
+        }
+        return res;
+    }
+    public without sharing class estabRefresWP{
+        @AuraEnabled public Set<String> establecimientosGuardados{get;set;}
+        @AuraEnabled public List<Establishment__c> establecimientos{get;set;}
+    }
     public without sharing class infoWP{
         @AuraEnabled public Map<String,EntidadCuenta__c> mapaEC{get;set;}
         @AuraEnabled public List<CatalogoDirecciones__c> direcciones{get;set;}
@@ -305,7 +457,13 @@ public without sharing class AltaContrato_CONT {
         @AuraEnabled public List<comboWP> contactosCuenta{get;set;}
         @AuraEnabled public Map<String,OpportunityContactRole__c> contactosGuardados{get;set;}
         @AuraEnabled public Set<String> funcionesContactos{get;set;}
-        @AuraEnabled public Map<String,ContratoFilial__c> filiales{get;set;}
+        @AuraEnabled public Map<String,sObject> filiales{get;set;}
+        
+        @AuraEnabled public List<BankAccount__c> metodosPago{get;set;}
+        @AuraEnabled public List<Establishment__c> establecimientos{get;set;}
+        @AuraEnabled public Set<Id> establecimientosGuardados{get;set;}
+        
+        
         @AuraEnabled public String IdOpp{get;set;}
         @AuraEnabled public String etapa{get;set;}
     }
@@ -359,8 +517,8 @@ public without sharing class AltaContrato_CONT {
         }
          
         GetGruposPrime_WS.responseWP grupos=GetGruposPrime_WS.getGrupos(gcG.EndPoint__c, gcG.ClientId__c, gcG.ClientSecret__c,token, grupoNum, codigoProducto);
-        //System.debug('RES::'+grupos);
-        //System.debug('RES2::'+JSON.serialize(grupos));
+        System.debug('RES::'+grupos);
+        System.debug('RES2::'+JSON.serialize(grupos));
         if(grupos.Status){
             for(PrimeGroupResponse_WP.primeGroupWP pg: grupos.response.data.group_prime_list){
                 res.add(new comboWP(String.valueOf(pg.prime_identifier)+'-'+String.valueOf(pg.client_identifier),pg.prime_name));

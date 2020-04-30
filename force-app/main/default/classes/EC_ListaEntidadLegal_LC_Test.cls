@@ -60,7 +60,7 @@ private class EC_ListaEntidadLegal_LC_Test {
 		insert tipos;
 
 
-		Account cuenta = new Account(Name ='Cuenta maestra',NumeroEmpleados__c = '1-25',NumeroVehiculos__c = '1-5');
+		Account cuenta = new Account(Name ='Cuenta maestra',NumeroEmpleados__c = '1-25',NumeroVehiculos__c = '1');
 		insert cuenta;
 		Contact contacto = new Contact();
 		contacto.LastName = 'Sola';
@@ -100,7 +100,7 @@ private class EC_ListaEntidadLegal_LC_Test {
 
 		Id recordTypeFisica = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByName().get('Persona Física').getRecordTypeId();
 
-		Account acc = new Account( Name = 'testAccount', NumeroEmpleados__c = '1-25', NumeroVehiculos__c  = '1-5' );
+		Account acc = new Account( Name = 'testAccount', NumeroEmpleados__c = '1-25', NumeroVehiculos__c  = '1' );
         insert acc;
 
 		Contact cont = new Contact(LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Funcion__c = 'Representante Legal',Curp__c='VAVR950616MVZZZB09',isCurp__c=TRUE);

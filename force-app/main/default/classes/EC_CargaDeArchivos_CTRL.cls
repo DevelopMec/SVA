@@ -400,9 +400,14 @@ public class EC_CargaDeArchivos_CTRL {
 		* @return SObject Objeto de tipo Entidad Legal con los campos especificados.
 	*/
 	@AuraEnabled
-	public static SObject EC_getRelatedAccountInformation(Id elId) {
-		List<EntidadLegal__c> listRelatedAccount = [SELECT Id,RecordType.Name FROM EntidadLegal__c WHERE Id = :elId LIMIT 1];
-		return listRelatedAccount[0];
+	public static String EC_getRelatedAccountInformation(Id elId) {
+		EntidadLegal__c listRelatedAccount = [SELECT Id,RecordType.Name FROM EntidadLegal__c WHERE Id = :elId];
+        Profile prof=[Select Id,Name from Profile where Id=:UserInfo.getProfileId()];
+        if(prof.Name=='Afiliación'){
+            return listRelatedAccount.RecordType.Name+' Afiliación';
+        }else{
+            return listRelatedAccount.RecordType.Name;
+        }
 	}
 	
 	@AuraEnabled

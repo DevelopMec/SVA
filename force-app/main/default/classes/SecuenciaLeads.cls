@@ -24,14 +24,14 @@ public class SecuenciaLeads {
                 if(lead.SubOrigen__c != 'MVF' && lead.ProductoInteres__c == 'Combustible' && ( lead.N_mero_de_veh_culos__c == '1-50' || lead.NumEmpleados__c == '1-125' ) )
                     leadsFamiliaCombustibleOA.add(lead);
                 
-                if(lead.SubOrigen__c == 'MVF' && lead.ProductoInteres__c == 'Empresarial' && lead.NumEmpleados__c == '1-125')
+                if(lead.SubOrigen__c == 'MVF' && lead.ProductoInteres__c == 'Viáticos' && lead.NumEmpleados__c == '1-125')
                     leadsFamiliaViaticosMVF.add(lead);
                 
-                if(lead.SubOrigen__c != 'MVF' && lead.ProductoInteres__c == 'Empresarial' && lead.NumEmpleados__c == '1-125')
+                if(lead.SubOrigen__c != 'MVF' && lead.ProductoInteres__c == 'Viáticos' && lead.NumEmpleados__c == '1-125')
                     leadsFamiliaViaticosOA.add(lead);
             }
             
-            if(!String.isBlank(lead.ProductoInteres__c) && lead.ProductoInteres__c != 'Despensa' && lead.ProductoInteres__c != 'Empresarial' &&  lead.ProductoInteres__c != 'Combustible' && lead.CountryCode != 'CO' && lead.CountryCode != 'PE' && (lead.NumEmpleados__c == '1-125' || lead.N_mero_de_veh_culos__c == '1-50'))
+            if(!String.isBlank(lead.ProductoInteres__c) && lead.ProductoInteres__c != 'Despensa' && lead.ProductoInteres__c != 'Viáticos' &&  lead.ProductoInteres__c != 'Combustible' && lead.CountryCode != 'CO' && lead.CountryCode != 'PE' && (lead.NumEmpleados__c == '1-125' || lead.N_mero_de_veh_culos__c == '1-50'))
                 leadsFamiliasRestantes.add(lead);
         }
         
@@ -110,7 +110,7 @@ public class SecuenciaLeads {
     }
     
     private static void contadorMVFLeadsFamiliaViaticos(List<Lead> leadsFamiliaViaticosMVF){
-        AggregateResult UltimoLeadMVFFamiliaViaticos =  [SELECT MAX(ContadorFamiliaViaticosMVF_Num__c) FROM Lead WHERE SubOrigen__c = 'MVF' AND ProductoInteres__c = 'Empresarial'];
+        AggregateResult UltimoLeadMVFFamiliaViaticos =  [SELECT MAX(ContadorFamiliaViaticosMVF_Num__c) FROM Lead WHERE SubOrigen__c = 'MVF' AND ProductoInteres__c = 'Viáticos'];
         
         if(UltimoLeadMVFFamiliaViaticos.get('expr0') != null){
             Decimal contadorAuxiliar = (Decimal)UltimoLeadMVFFamiliaViaticos.get('expr0');
@@ -122,7 +122,7 @@ public class SecuenciaLeads {
     }
     
     private static void contadorOALeadsFamiliaViaticos(List<Lead> leadsFamiliaViaticosOA){
-        AggregateResult  UltimoLeadOAFamiliaViaticos =  [SELECT MAX(ContadorFamiliaViaticosOA_Num__c) FROM Lead WHERE SubOrigen__c != 'MVF' AND ProductoInteres__c = 'Empresarial'];
+        AggregateResult  UltimoLeadOAFamiliaViaticos =  [SELECT MAX(ContadorFamiliaViaticosOA_Num__c) FROM Lead WHERE SubOrigen__c != 'MVF' AND ProductoInteres__c = 'Viáticos'];
         
         if(UltimoLeadOAFamiliaViaticos.get('expr0') != null){
             Decimal contadorAuxiliar = (Decimal)UltimoLeadOAFamiliaViaticos.get('expr0');
@@ -135,7 +135,7 @@ public class SecuenciaLeads {
     
     
     private static void contadorLeadsOtrasFamilias(List<Lead> leadsFamiliasRestantes){
-        AggregateResult  UltimoLeadOtrasFamilias =  [SELECT MAX(ContadorFamiliasRestantes_Num__c) FROM Lead WHERE ProductoInteres__c != null AND ProductoInteres__c != 'Despensa' AND ProductoInteres__c != 'Empresarial' AND ProductoInteres__c != 'Combustible'];
+        AggregateResult  UltimoLeadOtrasFamilias =  [SELECT MAX(ContadorFamiliasRestantes_Num__c) FROM Lead WHERE ProductoInteres__c != null AND ProductoInteres__c != 'Despensa' AND ProductoInteres__c != 'Viáticos' AND ProductoInteres__c != 'Combustible'];
         
         if(UltimoLeadOtrasFamilias.get('expr0') != null){
             Decimal contadorAuxiliar = (Decimal)UltimoLeadOtrasFamilias.get('expr0');

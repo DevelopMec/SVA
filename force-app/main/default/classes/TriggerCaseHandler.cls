@@ -135,10 +135,10 @@ public without sharing class TriggerCaseHandler extends TriggerHandler {
                     }else{
                         caso.addError('Ingrese todos los campos de la sección de Información del ticket');
                     }
-                }/*else if(caso.OwnerId!=oldMap.get(caso.Id).OwnerId){
+                }else if(caso.OwnerId!=oldMap.get(caso.Id).OwnerId){
                     caso.Grupo_atencion_anterior__c = caso.Grupo_de_Atencion__c;
                     caso.Grupo_de_Atencion__c=mapaUsOwn.containsKey(caso.OwnerId)&&mapaUsOwn.get(caso.OwnerId)!=null ? mapaUsOwn.get(caso.OwnerId).Grupo_de_Atencion__c : null;
-                }*/else if(!mapaSubMotivos.containsKey(strLlave)){
+                }else if(!mapaSubMotivos.containsKey(strLlave)){
                     System.debug('::La combinación no se encuentra en el catalogo::'+strLlave);
                     //caso.addError('La combinación no se encuentra en el catalogo');
                 }

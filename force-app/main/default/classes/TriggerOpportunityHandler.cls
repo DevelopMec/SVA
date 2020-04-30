@@ -24,6 +24,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     private List<QuoteLineItem> lisQliGlob;
     
     private static String currentUserRole = null;
+    private static Boolean sendMail = true;
 
     public TriggerOpportunityHandler() {
         this.newMap = (Map<Id, Opportunity>) trigger.newMap;
@@ -83,6 +84,9 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         crearOTImplementacion(this.newList, this.oldMap );
         oppPerdidaOTCancelada(this.newList, this.oldMap );
         validarActualizacionFechaEC();
+        if (sendMail) {
+        	sendPartnersAndAliancesMail(newList, oldMap);
+        }
     }
     
     public void asignarCamposIniciales(List<Opportunity> listOpps){
@@ -1750,4 +1754,73 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             }
         }
     }
+    
+    public static void sendPartnersAndAliancesMail(List<Opportunity> newList, Map<Id, Opportunity> oldMap){ 
+        List<Opportunity> oppsToValidate = new List<Opportunity>(); 
+        Set<String> partnersAndAaliances = new Set<String>(); 
+        for(Opportunity opp: newList){
+            if (opp.StageName != oldMap.get(opp.Id).StageName && oldMap.get(opp.Id).StageName == 'Alta de cliente' && opp.StageName == 'Implementación' && String.isNotEmpty(opp.PartnersAliances__c)) {
+                oppsToValidate.add(opp);
+                partnersAndAaliances.addAll(opp.PartnersAliances__c.split(';'));
+            }
+        }
+        if (!oppsToValidate.isEmpty()) {
+            List<PartnersAliancesContacts__mdt> contacts = [SELECT PartnerOrAliance__c, ContactEmail__c FROM PartnersAliancesContacts__mdt
+                                                            WHERE PartnerOrAliance__c IN: partnersAndAaliances AND ContactEmail__c != NULL
+                                                            AND ContactEmail__c != '' AND isActive__c = TRUE];
+            Map<String, Set<String>> contactsMap = new Map<String, Set<String>>();
+            if (!contacts.isEmpty()) {
+                for (PartnersAliancesContacts__mdt contact: contacts) {
+                    if (contactsMap.containsKey(contact.PartnerOrAliance__c)) {
+                        Set<String> contactEmails = contactsMap.get(contact.PartnerOrAliance__c);
+                        contactEmails.add(contact.ContactEmail__c);
+                        contactsMap.put(contact.PartnerOrAliance__c, contactEmails);
+                    } else {
+                        contactsMap.put(contact.PartnerOrAliance__c, new Set<String> { contact.ContactEmail__c });
+                    }
+                }
+            }
+            if (!contactsMap.isEmpty()) {
+                List<EmailTemplate> emailTemplates = [Select Id, Name from EmailTemplate where name IN: partnersAndAaliances];
+                Map<String, Id> emailTemplatesMap = new Map<String, Id>();
+                if (!emailTemplates.isEmpty()) {
+                    for (EmailTemplate template : emailTemplates) {
+                        emailTemplatesMap.put(template.Name, template.Id);
+                    }
+                }
+                if (!emailTemplatesMap.isEmpty()) {
+                    List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
+                    for(Opportunity oppToMail : oppsToValidate) {
+                        for (String alianzaOrPartner : oppToMail.PartnersAliances__c.split(';')) {
+                            //If there are active contacts for a the partner or aliance.
+                            if (contactsMap.containsKey(alianzaOrPartner) && emailTemplatesMap.containsKey(alianzaOrPartner)) {
+                                sendMail = false;
+                                // Create a new single email message object
+                                Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                                List<String> emailAdresses = new List<String>();
+                                emailAdresses.addAll(contactsMap.get(alianzaOrPartner));
+                                mail.setToAddresses(emailAdresses);
+                                
+                                mail.setTemplateID(emailTemplatesMap.get(alianzaOrPartner)); 
+                                
+                                // Set to True if you want to BCC yourself on the email.
+                                mail.setBccSender(false);
+                                
+                                // Optionally append the salesforce.com email signature to the email.
+                                mail.setUseSignature(false);
+                                
+                                mail.setWhatId(oppToMail.Id);
+                                
+                                mail.setTargetObjectId(oppToMail.Contacto__c);
+                                mail.setTreatTargetObjectAsRecipient(false);
+                                mails.add(mail);
+                            }
+                        }
+                    }
+                    Messaging.sendEmail(mails);
+                }
+            }
+        }
+    }
+
 }

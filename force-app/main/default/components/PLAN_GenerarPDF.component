@@ -600,7 +600,9 @@
                                     producto.owner = vm.owner
                                     producto.Segmento__c = 'MLK'
                                 }
-                                
+                                if(tipoPromesa == '30-TC4'){
+                                    producto.tipo = '4.0';
+                                }
                                 //Se crea un documento para que las tablas se corten de acuerdo al tamaño de la hoja
                                 vm.paginaPdfTicketCard(producto); //vm.codigos[tipoPromesa]
                             }

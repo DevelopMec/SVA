@@ -224,6 +224,7 @@
                 console.log("dataSource 1: ", dataSource)
 
                 if( contrato.Tipo_de_Facturacion__c == 'Consumo' && contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Avanzado' && (dataSource.Product2.ProductCode == "30" || dataSource.Product2.ProductCode == "30-TC4") ) {
+                    
                     nombreProducto = 'Contrato Ticket Car 3.0 Pospago'; 
                     leyendaHeader = `<div class="leyendaHeader">
                                     <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />

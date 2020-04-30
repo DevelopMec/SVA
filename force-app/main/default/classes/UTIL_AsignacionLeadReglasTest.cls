@@ -13,13 +13,13 @@ private class UTIL_AsignacionLeadReglasTest {
         
         //calvarez: Inserción de nuevos Leads, se disparará método UTIL_AsignacionLeadReglas.doProcess desde TriggerLeadHandler.doProcess
         List<Lead> leads = new List<Lead>();
-        leads.add(new Lead(CategoriaSolucion__c='Combustible',Phone='1234565434',LeadSource='Cambaceo',LastName = 'Prueba 3', Company = 'Company 3', NumEmpleados__c = '1-25', N_mero_de_veh_culos__c = '1-5', EstadoHubSpot__c = 'Durango', Email = 'prueba@mail.com'));
+        leads.add(new Lead(CategoriaSolucion__c='Combustible',Phone='1234565434',LeadSource='Cambaceo',LastName = 'Prueba 3', Company = 'Company 3', NumEmpleados__c = '1-25', N_mero_de_veh_culos__c = '1', EstadoHubSpot__c = 'Durango', Email = 'prueba@mail.com'));
 
-        leads.add(new Lead(CategoriaSolucion__c='Combustible',Phone='1234565435',LeadSource='Cambaceo',LastName = 'Prueba 5', Company = 'Company 5', N_mero_de_veh_culos__c = '1-5', EstadoHubSpot__c = 'Durango', Email = 'prueba@mail.com'));
+        leads.add(new Lead(CategoriaSolucion__c='Combustible',Phone='1234565435',LeadSource='Cambaceo',LastName = 'Prueba 5', Company = 'Company 5', N_mero_de_veh_culos__c = '1', EstadoHubSpot__c = 'Durango', Email = 'prueba@mail.com'));
 
-        leads.add(new Lead(CategoriaSolucion__c='Combustible',LeadSource='Cambaceo',LastName= 'Prueba CAS', Company= 'Prueba CAS', Country= 'United States', CountryCode= 'US', Phone= '4423118378',  Email= 'mailcas@mail.com', DoNotCall= false, NumEmpleados__c= '1-25', N_mero_de_veh_culos__c= '1-5', ProductoInteres2__c= 'Ticket Car 3.0'));
+        leads.add(new Lead(CategoriaSolucion__c='Combustible',LeadSource='Cambaceo',LastName= 'Prueba CAS', Company= 'Prueba CAS', Country= 'United States', CountryCode= 'US', Phone= '4423118378',  Email= 'mailcas@mail.com', DoNotCall= false, NumEmpleados__c= '1-25', N_mero_de_veh_culos__c= '1', ProductoInteres2__c= 'Ticket Car 3.0'));
 
-        leads.add(new Lead(CategoriaSolucion__c='Combustible',LeadSource='Cambaceo',LastName= 'Prueba CAS2', Company= 'Prueba CAS 2', Country= 'United States', CountryCode= 'US', Phone= '4423118378',  Email= 'mailcas@mail.com', DoNotCall= false, NumEmpleados__c= '1-25', N_mero_de_veh_culos__c= '1-5',  ProductoInteres2__c= 'Ticket Car 3.0'));
+        leads.add(new Lead(CategoriaSolucion__c='Combustible',LeadSource='Cambaceo',LastName= 'Prueba CAS2', Company= 'Prueba CAS 2', Country= 'United States', CountryCode= 'US', Phone= '4423118378',  Email= 'mailcas@mail.com', DoNotCall= false, NumEmpleados__c= '1-25', N_mero_de_veh_culos__c= '1',  ProductoInteres2__c= 'Ticket Car 3.0'));
         insert leads;
 
         //calvarez: Obtener Reglas de duplicados, este objeto es visible desde pruebas

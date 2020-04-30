@@ -9,7 +9,6 @@ public class SendMailWorkOrderCreation {
     //Method to build the mail.
     @InvocableMethod(label='SendWOImplementationMail' description='Send WO implementation mail.')  
     public static void alert(List<WorkOrder> ots){ 
-        System.debug('::SendMailWorkOrderCreation::');
         if(!ots.isEmpty()) {  
             List<Id> OTIds = new List<Id>();
             for(WorkOrder ot:ots) {

@@ -2,6 +2,7 @@
 public class AltaContrato_CONT_TEST {
     @testSetup
     public static void setup(){
+        Test.startTest();
         insert new GeneralCatalog__c(Key__c='POS-AC',value__c='12');
         PlantillaContrato__c pc=new PlantillaContrato__c(Name='Contrato Ticket Car 4.0');
         insert pc;
@@ -17,7 +18,7 @@ public class AltaContrato_CONT_TEST {
         objs.add(acc);        
         insert objs;        
         objs.clear();        
-        Opportunity opp = new Opportunity(IsApprovedCreditEval__c='No',AccountId = acc.Id, Name = 'Prueba', StageName = 'Prospecting', CloseDate = System.today());                
+        Opportunity opp = new Opportunity(OwnerId=UserInfo.getUserId(),IsApprovedCreditEval__c='No',AccountId = acc.Id, Name = 'Prueba', StageName = 'Prospecting', CloseDate = System.today());                
         Contact cont = new Contact(Phone='6354737654',LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Funcion__c = 'Quien administra Plataforma');   
         PricebookEntry pbe = new PricebookEntry(Pricebook2Id = pricebookId, Product2Id = p.Id, UnitPrice = 10000, IsActive = true);        
         Concepto__c c = new Concepto__c(TipoCargo__c = 'Anualidad - Grande', Producto__c = p.Id, Importe__c = 1.1,FieldText__c='CargoRefactura__c');
@@ -47,6 +48,7 @@ public class AltaContrato_CONT_TEST {
         ProductoConcepto__c pcon = new ProductoConcepto__c(Concepto__c = c.Id, PartidaPresupuesto__c = qli.Id,PrecioFinal__c=1);
         objs.add(pcon);
         insert objs;
+        Test.stopTest();
     }
     
     @isTest
@@ -86,19 +88,28 @@ public class AltaContrato_CONT_TEST {
         QuoteLineItem qli=[Select Id from QuoteLineItem limit 1];
         Test.startTest();
         Contrato2__c c2 = new Contrato2__c(PartidaPresupuesto__c = qli.Id,ManejaAutoconsumo_Checkbox__c=true,CuotaMensual_Currency__c=1,CuotaLitros_Currency__c=2);
-        insert c2;   
+        insert c2; 
+                        
         System.debug('LIMIT6::'+Limits.getQueries());
         ContratoFilial__c cf=new ContratoFilial__c(Contrato_2__c=c2.Id,Name='01-30-42424-323',CodigoAS400__c='01-30-42424-323');
+        Affiliate__c  af=new Affiliate__c (Contract_2__c=c2.Id,Name='01-30-42424-323',codeAS400__c ='01-30-42424-323');
         insert cf;
         System.debug('LIMIT7::'+Limits.getQueries());
         List<OpportunityContactRole__c> lop=[Select Id from OpportunityContactRole__c];
         
+        
+        
+        
         AltaContrato_CONT.getInfoPlantilla(qli.Id);
         AltaContrato_CONT.getInfoQli(qli.Id);
-        AltaContrato_CONT.guardarInfo(lop, c2, new List<ContratoFilial__c>{cf});
-        AltaContrato_CONT.guardarInfo(lop, c2, new List<ContratoFilial__c>());
+        AltaContrato_CONT.guardarInfo( c2, '', new list<String>() , false);
+        Contrato2__c c2Te=[Select Id,PartidaPresupuesto__r.Quote.OpportunityId,PartidaPresupuesto__r.Quote.Opportunity.OwnerId from Contrato2__c where Id=:c2.Id];        
+        AltaContrato_CONT.generarAfiliados(c2Te, new List<Affiliate__c>{af});
+        AltaContrato_CONT.getEstablecimientosRefresh(ac.Id,c2Te.Id);
+        AltaContrato_CONT.getMetodosPago(ac.Id);
+        //AltaContrato_CONT.guardarInfo(lop, c2, new List<ContratoFilial__c>());
         c2.Id=null;
-        AltaContrato_CONT.guardarInfo(new List<OpportunityContactRole__c>(), c2, new List<ContratoFilial__c>());
+        //AltaContrato_CONT.guardarInfo(new List<OpportunityContactRole__c>(), c2, new List<ContratoFilial__c>());
         Test.stopTest();
     }
     @isTest
@@ -233,5 +244,36 @@ public class AltaContrato_CONT_TEST {
         insert c3;
         c3.CodigoAS400__c='01-30-16474-001';
         CON_ContractsContainer_CTRL.updateContratoADV2(JSON.serialize(c3), JSON.serialize(opp), JSON.serialize(li));
+    }
+    @isTest
+    public static void CON_ContractContainer_CTRL_Tes(){
+        Account ac=[Select Id from Account where Name = 'Cuenta prueba' limit 1];
+        CON_ContractsContainer_CTRL.getEntidadCuenta(ac.Id);
+        QuoteLineItem qli=[Select Id ,Quote.OpportunityId from QuoteLineItem limit 1];
+        Opportunity opp=[Select Id from Opportunity where Id=:qli.Quote.OpportunityId];
+        Test.startTest();
+                        
+        EntidadLegal__c el=new EntidadLegal__c(Estado__c='test',Ciudad__c='test',Colonia__c='test',NumeroInterior__c='7',Estatus__c='Completa',Cuenta__c=ac.Id,RazonSocial__c='test',Name='JFHD635463KJ8',RFC__c='JFHD635463KJ8',RecordTypeId=Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId());
+        insert el;
+        System.debug('LIMIT2::'+Limits.getQueries());
+        EntidadCuenta__c ec=[Select Id from EntidadCuenta__c where Cuenta__c=:ac.Id and EntidadLegal__c=:el.Id];
+        Contrato2__c c2 = new Contrato2__c(Entidad_Legal__c=el.Id,Entidad_Cuenta__c=ec.Id,PartidaPresupuesto__c = qli.Id,ManejaAutoconsumo_Checkbox__c=true,CuotaMensual_Currency__c=1,CuotaLitros_Currency__c=2);
+        insert c2;  
+        ContratoFilial__c cf=new ContratoFilial__c(Entidad_Cuenta__c=ec.id,Contrato_2__c=c2.Id,Name='01-30-42424-323',CodigoAS400__c='01-30-42424-323');
+        Affiliate__c  af=new Affiliate__c (Contract_2__c=c2.Id,Name='01-30-42424-323',codeAS400__c ='01-30-42424-323');
+        insert cf;
+        insert af;
+        ContratoFilial__c cf2=[Select Id,Entidad_Cuenta__r.EntidadLegal__r.Estado__c,Entidad_Cuenta__r.EntidadLegal__r.Ciudad__c,Entidad_Cuenta__r.EntidadLegal__r.Colonia__c,Entidad_Cuenta__r.EntidadLegal__r.CodigoPostal__c,Entidad_Cuenta__r.EntidadLegal__r.NumeroInterior__c,Entidad_Cuenta__r.EntidadLegal__r.NumeroExterior__c,Entidad_Cuenta__r.EntidadLegal__r.Calle__c,Entidad_Cuenta__r.EntidadLegal__r.Name,Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c,CodigoAS400__c from ContratoFilial__c where Id=:cf.Id];
+        CON_ContractsContainer_CTRL.Sub st=new CON_ContractsContainer_CTRL.Sub();
+        st.Name='test';
+        st.CodigoAS400='01-30-42424-324';
+        List<CON_ContractsContainer_CTRL.Sub> lt=new List<CON_ContractsContainer_CTRL.Sub>{st};        
+        CON_ContractsContainer_CTRL.generaXMLExtras(qli.Quote.OpportunityId, c2.Id, new List<ContratoFilial__c>{cf2},JSON.serialize(lt));
+        CON_ContractsContainer_CTRL.updateContratoAfiliadoADV2(JSON.serialize(c2), JSON.serialize(new Opportunity(Id=qli.Quote.OpportunityId)), JSON.serialize(lt));
+        sObject ob=cf;
+        ob.put('Id',af.Id);
+        String idFil=JSON.serialize(new List<sObject>{ob});
+        
+        CON_ContractsContainer_CTRL.saveS400FilialesAfiliados(idFil);
     }
 }

@@ -492,7 +492,9 @@
 
                         <br/>
                         
-			            <p>• <strong>Entrega de tarjetas: </strong>6 días hábiles después del pedido.</p>
+						<p ng-if="solucion.tipo != '4.0' ">• <strong>Entrega de tarjetas: </strong>6 días hábiles después del pedido.</p>
+						<p ng-if="solucion.tipo == '4.0' ">• <strong>Entrega de TAGS: </strong>7 días hábiles después del pedido.</p>
+						
 			            <p>• <strong>Pedido de fondos: </strong>recibirá una proforma electrónica de forma inmediata al realizar su pedido.</p>
 			            <p>• <strong>Liberación de saldo: </strong>desde el momento y máximo el mismo día, con pago del mismo banco o SPEI referenciado.</p>
 		            </div>
