@@ -235,7 +235,7 @@
                     nombreProducto = 'Contrato Ticket Car 4.0 Pospago'; 
                     leyendaHeader = `<div class="leyendaHeader">
                                     <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />
-                                    <p>DTCOM-001-04</p>
+                                    <p>DTCOMTC-001-1</p>
                                     <p>FECHA DE ACTUALIZACIÓN 11/03/2020</p>
                                     <p>CONTRATO <strong>CLIENTES EDENRED</strong> TC PAGO POR CONSUMO JUR</p>
                                     </div>`
@@ -249,7 +249,7 @@
                                     </div>`
                     top = '3cm'
 
-                } else if( contrato.Tipo_de_Facturacion__c == 'Pedido' && contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Avanzado' && (dataSource.Product2.ProductCode == "30" || dataSource.Product2.ProductCode == "30-TC4") ){
+                } else if( contrato.Tipo_de_Facturacion__c == 'Pedido' && contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Avanzado' && dataSource.Product2.ProductCode == "30" ){
                     nombreProducto = 'Contrato Ticket Car 3.0 Prepago';// Ok
                     leyendaHeader = `<div class="leyendaHeader">
                                     <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />
@@ -260,10 +260,10 @@
                     top = '3cm'
                  
                    } else if( contrato.Tipo_de_Facturacion__c == 'Pedido' && contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Avanzado' && dataSource.Product2.ProductCode == "30-TC4" ){
-                    nombreProducto = 'Contrato Ticket Car 3.0 Prepago';// Ok
+                    nombreProducto = 'Contrato Ticket Car 4.0 Prepago';// Ok
                     leyendaHeader = `<div class="leyendaHeader">
                                     <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/LogoTicketCar.png")}" />
-                                    <p>DTCOM-001-03</p>
+                                    <p>DTCOMTC-001-2</p>
                                     <p>FECHA DE ACTUALIZACIÓN 11/03/2020</p>
                                     <p>CONTRATO <strong>CLIENTES EDENRED</strong> TC PAGO POR PEDIDO JUR</p>
                                     </div>`
