@@ -108,10 +108,10 @@ public class TriggerLeadHandler_TEST{
             Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
             insert acc;
 
-            EntidadLegal__c el=new EntidadLegal__c(RFC__c='AAHJ343534KG3',Name='AAHJ343534KG3',Estatus__c='Completa');
+            EntidadLegal__c el=new EntidadLegal__c(RFC__c='HIJD93061278A',Name='HIJD93061278A',Estatus__c='Completa');
             insert el;
 
-            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='AAHJ343534KG3',EntidadLegal__c=el.Id);
+            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='HIJD93061278A',EntidadLegal__c=el.Id);
             insert ec;
 
             Opportunity opp=new Opportunity(Familia__c='Combustible',Name='BP',AccountId=acc.Id,Entidad_Cuenta__c=ec.Id,CloseDate=Date.today().addMonths(1),StageName='Cotización');
@@ -119,7 +119,7 @@ public class TriggerLeadHandler_TEST{
         }
 
         Test.startTest();
-        Lead lead2 = new Lead(StatusApprovalBPfleet__c='En espera de aprobación',RFC__c='AAHJ343534KG3', LastName = 'TestBP', Company = 'BPCompany', LeadSource='Web',Phone='9823657493', Email = 'test@test.com', NumEmpleados__c = '1-25',RecordTypeId=Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('BPfleet').getRecordTypeId());
+        Lead lead2 = new Lead(StatusApprovalBPfleet__c='En espera de aprobación',RFC__c='HIJD93061278A', LastName = 'TestBP', Company = 'BPCompany', LeadSource='Web',Phone='9823657493', Email = 'test@test.com', NumEmpleados__c = '1-25',RecordTypeId=Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('BPfleet').getRecordTypeId());
         insert lead2;
         
         //Lead ltem=[Select Id,Approver__c,IdExecutiveNotification__c from Lead where Id=:lead2.Id];

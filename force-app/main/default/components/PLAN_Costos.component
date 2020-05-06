@@ -45,7 +45,7 @@
                                         <span ng-if="concepto.Obligatorio__c" ng-bind="concepto.TipoCargo__c"></span>
                                         <span uib-tooltip="Libre" class="fa fa-pencil fa-fw lbl-libre" ng-if="(concepto.Obligatorio__c || concepto.SinEdicion__c) && concepto.Libre__c"></span>
                                     </span>
-                                    <a ng-if="concepto.TipoCargo__c == 'Comisión por el servicio'" class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" ng-click="cos.mostrarComisiones(producto)" uib-tooltip="Tabulador de comisiones" tooltip-placement="left">
+                                    <a ng-if="concepto.TipoCargo__c == 'Comisión por el servicio' || concepto.SuggestedPricePerSegment__c" class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" ng-click="cos.mostrarComisiones(producto)" uib-tooltip="Tabulador de comisiones" tooltip-placement="left">
                                         <span class="fa fa-percent fa-fw" />
                                     </a>
                                     <a ng-if="concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' " class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" ng-click="cos.mostrarTablaAprobaciones(producto,concepto)" uib-tooltip="Tabulador de aprobaciones" tooltip-placement="left">

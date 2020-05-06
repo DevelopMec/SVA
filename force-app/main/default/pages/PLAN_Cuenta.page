@@ -283,9 +283,9 @@
 
                                 if(ctcUtils.app.opportunity.Familia__c == 'Combustible' && accountGiro == 'Transportes, correos y almacenamiento' && (accountSubgiro == 'Servicios de mensajeria y paqueteria' || accountSubgiro == 'Autotransporte de carga')) {
                                     //console.log('Está entrando a la excepción de transportista');
-                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Segmento__c=\'' + accountSegment +  '\' AND (CodigoProducto__c = \'' + transportistaString + '\' OR CodigoProducto__c = \'30-B\') ORDER BY PaymentAccelerator__c DESC')
+                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, ComissionInCurrency__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Segmento__c=\'' + accountSegment +  '\' AND (CodigoProducto__c = \'' + transportistaString + '\' OR CodigoProducto__c = \'30-B\') ORDER BY PaymentAccelerator__c DESC')
                                 } else {
-                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Familia__c=\'' + ctcUtils.app.opportunity.Familia__c +  '\' AND Segmento__c=\'' + accountSegment + '\' ORDER BY  PaymentAccelerator__c DESC')
+                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, ComissionInCurrency__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Familia__c=\'' + ctcUtils.app.opportunity.Familia__c +  '\' AND Segmento__c=\'' + accountSegment + '\' ORDER BY  PaymentAccelerator__c DESC')
                                 }                                
                                 //return ctcUtils.query('SELECT Id, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, Segmento__c FROM ComisionServicio__c WHERE Familia__c=\'' + ctcUtils.app.opportunity.Familia__c + '\' AND Segmento__c=\'' + segmento + '\' ORDER BY MontoInicial__c ASC')
                                 //return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c FROM ComisionServicio__c WHERE Familia__c=\'' + ctcUtils.app.opportunity.Familia__c + '\' ORDER BY MontoInicial__c ASC')
@@ -550,14 +550,14 @@
                             }
                             if(ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
                                 //console.log('Está entrando a la excepción de transportista');
-                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c, Carrier__c FROM Concepto__c WHERE ((Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR  ((Carrier__c = true OR Producto__r.ProductCode = \'30-B\') AND Segment__c=\'' + accountSegment +  '\'))) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\')) AND Activo__c=true ORDER BY Orden__c ASC'
+                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, SuggestedPricePerSegment__c, CantidadTarjetas__c, VigenciaDescuento__c, Carrier__c FROM Concepto__c WHERE ((Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR  ((Carrier__c = true OR Producto__r.ProductCode = \'30-B\') AND Segment__c=\'' + accountSegment +  '\'))) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\')) AND Activo__c=true ORDER BY Orden__c ASC'
                             } else {
-                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE (Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR Segment__c=\'' + accountSegment +  '\')) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true AND Carrier__c = false ORDER BY Orden__c ASC'
+                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, SuggestedPricePerSegment__c, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE (Producto__c IN(' + idsProduct2 +') AND ((TipoCargo__c != \'Comisión por el servicio\' AND SuggestedPricePerSegment__c = FALSE) OR Segment__c=\'' + accountSegment +  '\')) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true AND Carrier__c = false ORDER BY Orden__c ASC'
                             }
                             ctcUtils.query(stringToQuery)
                             //ctcUtils.query('SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE Producto__c IN(' + idsProduct2 +') AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true ORDER BY Obligatorio__c DESC')
                             .then( function( res ) {
-                                //console.log('Los conceptos son: ' + JSON.stringify(res));
+                                console.log('Los conceptos son: ' + JSON.stringify(res));
                                 var tipoCargoConcepto = {}
                                 angular.forEach( res, function( concepto, index ) {
                                     if( concepto.Producto__c || concepto.Carrier__c == true ) {
@@ -620,7 +620,7 @@
                                 if( !reRender ) {
                                     concepto.Bonificacion__c = 0
                                     concepto.TieneBonificacion = true
-                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' || concepto.SuggestedPricePerSegment__c) {
                                         concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
                                         setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(concepto.Importe__c)))}, 500);
                                     } else if (concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' ) {
@@ -1040,7 +1040,7 @@
                             
                             let filteredValues = [];
                             let comisionesMap = ctcUtils.app.comisiones.map(function (comision) {
-                                //console.log('NEW MAP: '+comision.FinalPercentage__c)
+                                console.log('NEW MAP: '+comision.FinalPercentage__c)
                                 if(comision.FinalPercentage__c != undefined) {
                                     filteredValues.push(comision.FinalPercentage__c);
                                 }
@@ -1052,8 +1052,11 @@
                             let maxInicial = Math.max(...ctcUtils.app.comisiones.map(val => ctcUtils.number(val.InitialPercentage__c) ) );
                             let hasFinalPercentage = ctcUtils.app.comisiones.map(comision => comision.FinalPercentage__c)[0] ? true : false;
                             let hasInitialPercentage = ctcUtils.app.comisiones.map(comision => comision.InitialPercentage__c)[ctcUtils.app.comisiones.length - 1] ? true : false;
+                                console.log('CIN FINAL: ' + instance.PrecioFinal__c__approvalLevel);
 
                             for(i = 0; i <= ctcUtils.app.comisiones.length -1 ; i++) {
+                                                                console.log('CIN FINAL: ' + instance.PrecioFinal__c__approvalLevel);
+
                                 if('{!OppRecordType}' != 'Migracion'){
                                     if(ctcUtils.valueIsInRange(i,precioFinal, hasFinalPercentage, hasInitialPercentage,minFinal,maxInicial) ){
                                         switch(ctcUtils.app.comisiones[i].ApprovalLevel__c) {
@@ -1078,6 +1081,7 @@
                                 else{
                                     instance.PrecioFinal__c__approvalLevel = 0;
                                 }
+                                console.log('CIN FINAL: ' + instance.PrecioFinal__c__approvalLevel);
                             }
                         }
                         

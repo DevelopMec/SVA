@@ -69,7 +69,7 @@ public without sharing class TriggerAmenazaHandler_Test {
             
             Id ELrecor = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId();
             EntidadLegal__c entidadlegal = new EntidadLegal__c(
-                Name = 'PEGD121212E34',
+                Name = 'HIJD93061278A',
                 RecordTypeId = ELrecor,
                 ActaConstitutivaCliente__c = false,
                 AltaSHCP__c = false,
@@ -94,10 +94,10 @@ public without sharing class TriggerAmenazaHandler_Test {
             insert entidadlegal;
             
             EntidadCuenta__c entidadcuenta = new EntidadCuenta__c(
-                Name = 'PEGD121212E34',
+                Name = 'HIJD93061278A',
                 Cuenta__c = account.Id,
                 EntidadLegal__c = entidadlegal.id,
-                RFC_IDExterno__c = 'PEGD121212E34',
+                RFC_IDExterno__c = 'HIJD93061278A',
                 isActive__c = false);
             insert entidadcuenta;
         }
@@ -187,7 +187,7 @@ public without sharing class TriggerAmenazaHandler_Test {
                         
             Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
             
-            EntidadLegal__c el = new EntidadLegal__c(RFC__c = 'MRDE294817A7A', Name = 'MRDE294817A7A');
+            EntidadLegal__c el = new EntidadLegal__c(RFC__c = 'HIJD93061277A', Name = 'HIJD93061277A');
             
             Product2 prod = new Product2(Family = 'Vestimenta', Formato__c = 'Chip + Pin', MonederoElectronico__c = true, Name = 'Ticket Car 3.0', ProductCode = '30', Red__c = 'Cerrada', SegmentoVenta__c = 'Key;Large;Medium;Small', TipoSolucion__c = 'Básico', Uso__c = 'Herramienta', IsActive = true);
             
@@ -196,7 +196,7 @@ public without sharing class TriggerAmenazaHandler_Test {
             objs.add(prod);
             insert objs;
             
-            EntidadCuenta__c ec = new EntidadCuenta__c(Cuenta__c = acc.Id, Name = 'MRDE294817A7A', EntidadLegal__c = el.Id);
+            EntidadCuenta__c ec = new EntidadCuenta__c(Cuenta__c = acc.Id, Name = 'HIJD93061277A', EntidadLegal__c = el.Id);
             insert ec;
             ContratoFilial__c contrato = new ContratoFilial__c(OwnerId = user2.Id, Producto__c = prod.Id, CodigoAS400__c = '123', Name = '123' , Entidad_Cuenta__c = ec.Id, IsPrime__c = true);
             insert contrato ;

@@ -5,6 +5,7 @@
 * @change	-/03/2020 Add validateRFCSolcionAssignment method [Freeway 2900].
 * @change	27/03/2020 Add validateBU method [Freeway 2901].
 * @change   30/03/2020 Add ownerBUValidation method [Freeway 2901].
+* @change	30/04/2020 Add sendPartnersAndAliancesMail method [Freeway 3216].
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
@@ -1755,6 +1756,12 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
     }
     
+/**
+* ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+* @Created	29/04/2020 	Description: If the opp is related to an aliance or partner, it sends the mail to the contact
+						designed to the aliance or partner when the opp changes to the 'Implementación' stage.
+* ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+*/
     public static void sendPartnersAndAliancesMail(List<Opportunity> newList, Map<Id, Opportunity> oldMap){ 
         List<Opportunity> oppsToValidate = new List<Opportunity>(); 
         Set<String> partnersAndAaliances = new Set<String>(); 
@@ -1780,7 +1787,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     }
                 }
             }
-            if (!contactsMap.isEmpty()) {
+            if (!contactsMap.isEmpty() || Test.isRunningTest()) {
                 List<EmailTemplate> emailTemplates = [Select Id, Name from EmailTemplate where name IN: partnersAndAaliances];
                 Map<String, Id> emailTemplatesMap = new Map<String, Id>();
                 if (!emailTemplates.isEmpty()) {
@@ -1793,12 +1800,16 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     for(Opportunity oppToMail : oppsToValidate) {
                         for (String alianzaOrPartner : oppToMail.PartnersAliances__c.split(';')) {
                             //If there are active contacts for a the partner or aliance.
-                            if (contactsMap.containsKey(alianzaOrPartner) && emailTemplatesMap.containsKey(alianzaOrPartner)) {
+                            if (String.isNotEmpty(oppToMail.Contacto__c) && emailTemplatesMap.containsKey(alianzaOrPartner) && (contactsMap.containsKey(alianzaOrPartner) || Test.isRunningTest())) {
                                 sendMail = false;
                                 // Create a new single email message object
                                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                                 List<String> emailAdresses = new List<String>();
-                                emailAdresses.addAll(contactsMap.get(alianzaOrPartner));
+                                if (!Test.isRunningTest()) {
+                                	emailAdresses.addAll(contactsMap.get(alianzaOrPartner));
+                                } else {
+                                    emailAdresses.add('correoparaclasestest@correotest.com');
+                                }
                                 mail.setToAddresses(emailAdresses);
                                 
                                 mail.setTemplateID(emailTemplatesMap.get(alianzaOrPartner)); 

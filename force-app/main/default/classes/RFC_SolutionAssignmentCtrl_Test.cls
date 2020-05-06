@@ -22,7 +22,7 @@ public class RFC_SolutionAssignmentCtrl_Test {
             
             Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
             
-            EntidadLegal__c el = new EntidadLegal__c(RFC__c = 'MRDE294817A7A', Name = 'MRDE294817A7A');
+            EntidadLegal__c el = new EntidadLegal__c(RFC__c = 'HIJD93061278A', Name = 'HIJD93061278A', RecordTypeId=Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId());
             
             Product2 prod = new Product2(Family = 'Vestimenta', Formato__c = 'Chip + Pin', MonederoElectronico__c = true, Name = 'Ticket Car 3.0', ProductCode = '30', Red__c = 'Cerrada', SegmentoVenta__c = 'Key;Large;Medium;Small', TipoSolucion__c = 'Básico', Uso__c = 'Herramienta', IsActive = true);
             
@@ -33,7 +33,7 @@ public class RFC_SolutionAssignmentCtrl_Test {
             insert objs;
             
             Id pricebookId = pr.Id;
-            EntidadCuenta__c ec = new EntidadCuenta__c(Cuenta__c = acc.Id, Name = 'MRDE294817A7A', EntidadLegal__c = el.Id);
+            EntidadCuenta__c ec = new EntidadCuenta__c(Cuenta__c = acc.Id, Name = 'HIJD93061278A', EntidadLegal__c = el.Id);
             insert ec;
             ContratoFilial__c contrato = new ContratoFilial__c(Producto__c = prod.Id, CodigoAS400__c = '123', Name = '123' , Entidad_Cuenta__c = ec.Id, IsPrime__c = true);
             insert contrato ;

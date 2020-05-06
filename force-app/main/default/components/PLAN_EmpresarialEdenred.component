@@ -530,7 +530,6 @@
 
                 <div class="row">
                     <div class="col-sm-5-5 text-center">
-                        <div class="fontwhite">\s1\</div>
                         <center>{{solucion.Quote.Opportunity.Owner.Manager.Name}}</center>
                         <div class="promiseLine"></div>
                         <center><strong>Nombre y Firma del Apoderado </strong></center>

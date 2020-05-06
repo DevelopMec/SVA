@@ -18,9 +18,13 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="tab in com.comisiones" ng-class="{'success': (com.producto.UnitPrice >= tab.MontoInicial__c && com.producto.UnitPrice <= tab.MontoFinal__c) || (!tab.MontoFinal__c && com.producto.UnitPrice >= tab.MontoInicial__c)}">
-                        <td ng-if="tab.InitialPercentage__c" ng-bind="(tab.InitialPercentage__c | number : 2)  + ' %'" class="text-center"></td>
+                        <td ng-if="tab.InitialPercentage__c && !tab.ComissionInCurrency__c" ng-bind="(tab.InitialPercentage__c | number : 2)  + ' %'" class="text-center"></td>
+                        
+                        <td ng-if="tab.InitialPercentage__c && tab.ComissionInCurrency__c" ng-bind="'$ ' + (tab.InitialPercentage__c | number : 2)" class="text-center"></td>
                         <td ng-if="!tab.InitialPercentage__c" ng-bind="tab.InitialPercentage__c" class="text-center"></td>
-                        <td ng-if="tab.FinalPercentage__c" ng-bind="(tab.FinalPercentage__c | number : 2)  + ' %'" class="text-center"></td>
+                        <td ng-if="tab.FinalPercentage__c && !tab.ComissionInCurrency__c" ng-bind="(tab.FinalPercentage__c | number : 2)  + ' %'" class="text-center"></td>
+                        
+                        <td ng-if="tab.FinalPercentage__c && tab.ComissionInCurrency__c" ng-bind="'$ ' + (tab.FinalPercentage__c | number : 2)" class="text-center"></td>
                         <td ng-if="!tab.FinalPercentage__c" ng-bind="tab.FinalPercentage__c" class="text-center"></td>
                         <td ng-if="tab.ApprovalLevel__c == 1" class="text-center">
                                 <span class="fa fa-circle greenCircle"></span>

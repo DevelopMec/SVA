@@ -55,7 +55,7 @@ public class TriggerEstablishmentHandler_TEST {
         Account ac=[Select Id from Account where Name = 'Cuenta prueba' limit 1];
         Contact con = new Contact(Phone='6354737654',CURP__c='AAPD940930HGRMNY09',LastName = 'Contacto prueba', AccountId = ac.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Funcion__c = 'Representante Legal');   
         insert con;
-        EntidadLegal__c el=new EntidadLegal__c(Estatus__c='Completa',Cuenta__c=ac.Id,RazonSocial__c='test',Name='JFHD635463KJ8',RFC__c='JFHD635463KJ8',RecordTypeId=Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId());
+        EntidadLegal__c el=new EntidadLegal__c(Estatus__c='Completa',Cuenta__c=ac.Id,RazonSocial__c='test',Name='HIJD93061278A',RFC__c='HIJD93061278A',RecordTypeId=Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId());
         insert el;
         EntidadCuenta__c ec=[Select Id from EntidadCuenta__c where Cuenta__c=:ac.Id and EntidadLegal__c=:el.Id];
         ContactoEntidad__c ce=new ContactoEntidad__c(Entidad_Cuenta__c=ec.Id,Contacto__c=con.Id);

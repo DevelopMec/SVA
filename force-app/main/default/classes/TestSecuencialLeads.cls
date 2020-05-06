@@ -175,7 +175,7 @@ Private class TestSecuencialLeads {
             LeadCombustibleMVF2.LeadSource='CPL';
             LeadCombustibleMVF2.SubOrigen__c = 'MVF';
             LeadCombustibleMVF2.RecordTypeId=Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('Edenred').getRecordTypeId();
-            LeadCombustibleMVF2.N_mero_de_veh_culos__c = '1-5';
+            LeadCombustibleMVF2.N_mero_de_veh_culos__c = '1';
             
             
             insert LeadCombustibleMVF2;
@@ -203,7 +203,7 @@ Private class TestSecuencialLeads {
             LeadCombustibleNOMVF2.LeadSource='CPL';
             LeadCombustibleNOMVF2.SubOrigen__c = 'OCC';
             LeadCombustibleNOMVF2.RecordTypeId=Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('Edenred').getRecordTypeId();
-            LeadCombustibleNOMVF2.N_mero_de_veh_culos__c = '1-5';
+            LeadCombustibleNOMVF2.N_mero_de_veh_culos__c = '1';
             
             
             insert LeadCombustibleNOMVF2;

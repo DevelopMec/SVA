@@ -1510,7 +1510,11 @@
                             finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
                         }
                     }
-                    ctcUtils.app.finalApprovalLevel = Math.max(...finalApprovalLevels);
+					if (finalApprovalLevels != '' && finalApprovalLevels != null) {
+                    	ctcUtils.app.finalApprovalLevel = Math.max(...finalApprovalLevels);
+                    } else {
+                    	ctcUtils.app.finalApprovalLevel = 0;
+                    }
                     //console.log('El nivel de aprobación final es: ' + ctcUtils.app.finalApprovalLevel);
                     let approvalLevel = ctcUtils.app.finalApprovalLevel;
                     if(approvalLevel == 0 || approvalLevel == 1) {

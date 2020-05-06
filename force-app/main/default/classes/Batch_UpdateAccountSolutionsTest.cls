@@ -20,7 +20,7 @@ public class Batch_UpdateAccountSolutionsTest {
         insert accountList;
         
         EntidadLegal__c entidadLegal = new EntidadLegal__c();
-        entidadLegal.Name = 'ABCD112233XYZ';
+        entidadLegal.Name = 'HIJD93061278A';
         entidadLegal.Cuenta__c = acc.Id;
         insert entidadLegal;
         

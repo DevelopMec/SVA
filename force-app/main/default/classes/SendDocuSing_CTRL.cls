@@ -41,9 +41,10 @@ public without sharing class SendDocuSing_CTRL {
         return resp;
     }
     public static String createDocuSingEnvelope(String idOpp){
-        dsfs__DocuSign_Envelope__c de=new dsfs__DocuSign_Envelope__c(dsfs__DocuSign_Email_Subject__c='Documentos pendientes de firma',
-                                                                     dsfs__DocuSign_Email_Message__c='Le envió esa solicitud de su firma electrónica, revise el documento y fírmelo electrónicamente',
-                                                                     dsfs__Source_Object__c=idOpp);
+        dsfs__DocuSign_Envelope__c de=new dsfs__DocuSign_Envelope__c(
+            dsfs__DocuSign_Email_Subject__c='Documentos pendientes de firma',
+            dsfs__DocuSign_Email_Message__c='Le envió esa solicitud de su firma electrónica, revise el documento y fírmelo electrónicamente',
+            dsfs__Source_Object__c=idOpp);
         insert de;
         return de.Id;
     }

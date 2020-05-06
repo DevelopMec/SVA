@@ -12,13 +12,13 @@ public class BuscadorBPfleet_CONT_TEST {
     public static void metodo1(){
         Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
         insert acc;
-        EntidadLegal__c el=new EntidadLegal__c(RFC__c='AAHJ343534KG3',Name='AAHJ343534KG3');
+        EntidadLegal__c el=new EntidadLegal__c(RFC__c='HIJD93061278A',Name='HIJD93061278A');
         insert el;
-        EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='AAHJ343534KG3',EntidadLegal__c=el.Id);
+        EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='HIJD93061278A',EntidadLegal__c=el.Id);
         insert ec;
         BuscadorBPfleet_CONT.getRecordTypeBP('Lead', 'BPfleet');
-        BuscadorBPfleet_CONT.getDatosBuscar('AAHJ343534KG3', 'test');
-        BuscadorBPfleet_CONT.crearColaboracion('AAHJ343534KG3');
+        BuscadorBPfleet_CONT.getDatosBuscar('HIJD93061278A', 'test');
+        BuscadorBPfleet_CONT.crearColaboracion('HIJD93061278A');
     }
     @isTest
     public static void metodo2(){
@@ -28,9 +28,9 @@ public class BuscadorBPfleet_CONT_TEST {
         System.runAs(u){
             Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
             insert acc;
-            EntidadLegal__c el=new EntidadLegal__c(RFC__c='AAHJ343534KG3',Name='AAHJ343534KG3',Estatus__c='Completa');
+            EntidadLegal__c el=new EntidadLegal__c(RFC__c='HIJD93061278A',Name='HIJD93061278A',Estatus__c='Completa');
             insert el;
-            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='AAHJ343534KG3',EntidadLegal__c=el.Id);
+            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='HIJD93061278A',EntidadLegal__c=el.Id);
             insert ec;
             Opportunity opp=new Opportunity(Familia__c='Combustible',Name='BP',AccountId=acc.Id,Entidad_Cuenta__c=ec.Id,CloseDate=Date.today().addMonths(1),StageName='Cotización');
             insert opp;
@@ -39,9 +39,9 @@ public class BuscadorBPfleet_CONT_TEST {
         User uBP= new User(LastName = 'lastt', Email = 'puser0t00@amamama.com', Username = 'puser0t00@amamama.com' + System.currentTimeMillis(), CompanyName = 'TESTw', Title = 'titlee', Alias = 'aliasTes', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = profBP.Id);
         insert uBP;
         System.runAs(uBP){
-            BuscadorBPfleet_CONT.crearColaboracion('AAHJ343534KG3');
+            BuscadorBPfleet_CONT.crearColaboracion('HIJD93061278A');
             BuscadorBPfleet_CONT.getStatus(new Set<String>{'AAHJ343538KG3'});
-            BuscadorBPfleet_CONT.getStatus(new Set<String>{'AAHJ343534KG3'});
+            BuscadorBPfleet_CONT.getStatus(new Set<String>{'HIJD93061278A'});
         }
     }
 }

@@ -9,9 +9,9 @@ private  class SearchDuplicatesTest {
         System.runAs(u){
             Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25',CodigoClienteAS400__c='3');
             insert acc;
-            EntidadLegal__c el=new EntidadLegal__c(RFC__c='AAHJ343534KG3',Name='AAHJ343534KG3',Estatus__c='Completa');
+            EntidadLegal__c el=new EntidadLegal__c(RFC__c='HIJD93061278A',Name='HIJD93061278A',Estatus__c='Completa');
             insert el;
-            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='AAHJ343534KG3',EntidadLegal__c=el.Id);
+            EntidadCuenta__c ec=new EntidadCuenta__c(Cuenta__c=Acc.Id,Name='HIJD93061278A',EntidadLegal__c=el.Id);
             insert ec;
             Opportunity opp=new Opportunity(Familia__c='Combustible',Name='BP',FechaUltimaActividad__c=Date.today(),AccountId=acc.Id,Entidad_Cuenta__c=ec.Id,CloseDate=Date.today().addMonths(1),StageName='Cotización');
             insert opp;

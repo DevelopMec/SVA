@@ -21,7 +21,7 @@ private class EC_ListaEntidadLegal_LC_Test {
 	@isTest
 	static void guardaEntidadLegal() {
 		Id recordTypeFisica = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByName().get('Persona Física').getRecordTypeId();
-        EntidadLegal__c el = new EntidadLegal__c( Name = 'BBDF880303L23', RecordTypeId = recordTypeFisica );
+        EntidadLegal__c el = new EntidadLegal__c( Name = 'HIJD93061278A', RecordTypeId = recordTypeFisica );
 		el.Estatus__c = 'Completa';
 		el.RazonSocial__c = 'Completa';
 		el.Calle__c = 'Completa';
@@ -106,7 +106,7 @@ private class EC_ListaEntidadLegal_LC_Test {
 		Contact cont = new Contact(LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Funcion__c = 'Representante Legal',Curp__c='VAVR950616MVZZZB09',isCurp__c=TRUE);
 		insert cont;
 		
-		EntidadLegal__c el = new EntidadLegal__c( Name = 'BBDF880303L23', RecordTypeId = recordTypeFisica );
+		EntidadLegal__c el = new EntidadLegal__c( Name = 'HIJD93061278A', RecordTypeId = recordTypeFisica );
 		insert el;
 
 		el.Estatus__c = 'Completa';

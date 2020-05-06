@@ -22,7 +22,7 @@ public class PLAN_AltaAfiliados_Test {
         Opportunity opp = new Opportunity(IsApprovedCreditEval__c='No',AccountId = acc.Id, Name = 'Prueba Afiliados', StageName = '	Pre Análisis', CloseDate = System.today());                
         Contact cont = new Contact(Phone='6354737654',LastName = 'Contacto Afiliados', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Funcion__c = 'Quien administra Plataforma'); 
         Contact con = new Contact(Phone='6354737854',CURP__c='AAPD940930HGRMNY09',LastName = 'Contacto Afiliate', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Funcion__c = 'Representante Legal');
-        EntidadLegal__c el=new EntidadLegal__c(Estatus__c='Completa',Cuenta__c=acc.Id,RazonSocial__c='test',Name='JFHD635463KJ8',RFC__c='JFHD635463KJ8',RecordTypeId=Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId());
+        EntidadLegal__c el=new EntidadLegal__c(Estatus__c='Completa',Cuenta__c=acc.Id,RazonSocial__c='test',Name='HIJD93061278A',RFC__c='HIJD93061278A',RecordTypeId=Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByDeveloperName().get('Persona_Fisica').getRecordTypeId());
         insert el;
         PricebookEntry pbe = new PricebookEntry(Pricebook2Id = pricebookId, Product2Id = p.Id, UnitPrice = 10000, IsActive = true);        
         Concepto__c c = new Concepto__c(TipoCargo__c = '% Participación Papel', Producto__c = p.Id, Importe__c = 4.0,FieldText__c='PercentagePaperParticipation__c',RecordTypeId=Schema.SObjectType.Concepto__c.getRecordTypeInfosByDeveloperName().get('Conceptos').getRecordTypeId());
