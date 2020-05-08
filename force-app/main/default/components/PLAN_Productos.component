@@ -22,7 +22,7 @@
                     <div class="col-sm-12">
                         
                         <div class="table-responsive table-container">
-                            <table class="table table-striped table-condensed table-hover">
+                            <table class="table table-striped table-condensed table-hover" style="width:100%">
                                 <thead>
                                     <tr>
 
@@ -34,6 +34,12 @@
                                         <th ng-bind="cot.schema.QuoteLineItem.CantidadTarjetas__c.label"></th>
                                         <th ng-bind="cot.schema.QuoteLineItem.UnitPrice.label" class="precioProducto text-center"></th>
                                         <th ng-bind="cot.schema.QuoteLineItem.ServiceDate.label" class="fechaProducto text-center"></th>
+                                        
+                                        <!-- TICKET 3219 
+                                        <th ng-bind="cot.schema.Quote.EstimatedNumberTransactions__c.label"/>
+                                        <th ng-bind="cot.schema.Quote.PerformDollarOperations__c.label"/>
+                                      Endregion -->
+                                        
                                         <th ng-bind="cot.schema.QuoteLineItem.NumberOfShipments__c.label" class="th-envios text-center"></th>
                                         <th ng-bind="cot.schema.Opportunity.Competidor__c.label" class="th-producto competidorProducto"></th>
                                         <th class="th-acciones text-right"></th>
@@ -77,6 +83,16 @@
 
                                             <span ng-if="!producto.escalonamientos.Escalonamiento__c" ng-bind="producto.ServiceDate | date: 'dd/MM/yyyy': 'UTC'"></span>
                                         </td>
+                                        
+                                        <!-- TICKET 3219
+                                        <td>
+                                         
+                                        </td>
+                                        
+                                        <td>
+                                        </td>
+                                      Endregion -->
+                                        
                                         <td>
                                             <div ng-class="{'has-error': cotizacion.formCotiza['NumberOfShipments__c' + producto.IdElement].$invalid}" class="ctc-input-base">
                                                 

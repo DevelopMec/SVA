@@ -1,22 +1,16 @@
 <apex:component >
-    <!--hello-world></hello-world-->
     <div ng-controller="cotizacionCtrl as cot" id="cotizacionCtrl" ng-init="cot.leerParams(sc.opportunity, sc.idCot)">
-
         <!-- Performance calvarez -->
         <uib-tabset active="cot.selectedTab" mng-if="sc.opportunity.Performance">
             <uib-tab ng-repeat="cotizacion in cot.quotes track by $index" select="cot.seleccionaCotizacion(cotizacion)">
-                
                 <uib-tab-heading>
                     <i class="fa fa-sitemap"></i> 
                     <span ng-bind="cotizacion.Name"></span>
                     <i class="fa fa-check-circle cot-actual animated fadeInUp ng-animate-disabled" ng-if="cotizacion.IsSyncing" uib-tooltip="Cotización vigente"></i>
-
                     <a ng-dblclick="cot.seleccionaCotizacion(cotizacion, true)" uib-tooltip="Actualizar cotización" tooltip-placement="left" ng-if="cotizacion.Render && cotizacion.Id && !cotizacion.IsClone" ng-show="cot.selectedTab == $index">
                         <i class="fa fa-spinner fa-fw" ng-class="{'fa-pulse': cotizacion.loading}"></i>
                     </a>
-
                 </uib-tab-heading>
-
                 <div class="container" ng-if="cotizacion.Render">
                     <form name="cotizacion.formCotiza" class="form-horizontal">
                         <div class="row text-center" style="margin-bottom: 15px; color: #D86344;">
@@ -33,7 +27,6 @@
                                     ctc-params="{segmento: sc.user.Segmento__c,perfil: sc.user.profile}"
                                     ctc-on-change="cot.getProductsByFamily"></ctc-form-group>
                             </div>
-
                             <div class="col-sm-4">
                                 <div class="row">
                                     <div class="col-sm-9 text-right">
@@ -48,7 +41,6 @@
                                             ng-mouseup="cot.activateSaveButton()"
                                             ></ctc-form-group>
                                     </div>
-
                                     <div class="col-sm-3 text-left">
                                        <!-- <div class="btnb-group">
                                             <button type="button" ng-disabled="cotizacion.disabled.BotonAgregarContacto" class="btnb btnb-primary btnb-sm" ng-click="cot.agregarContacto(sc.opportunity.Account, cot.schema, cotizacion, sc.opportunity)" uib-tooltip="Crear contacto">
@@ -61,18 +53,14 @@
                                             </button>
                                         </div>-->
                                     </div>
-
-
                                 </div>
                             </div>
-
                             <div class="col-sm-3">
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <strong ng-bind="cot.schema.Quote.VigenciaCotizacion__c.label" ng-class="{'text-danger': cotizacion.formCotiza.VigenciaCotizacion__c.$invalid}"></strong>
                                         <ul class="list-inline" ng-class="{'has-error': cotizacion.formCotiza.VigenciaCotizacion__c.$invalid}">
                                             <i class="label label-danger  animated rubberBand ng-animate-disabled  msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza.VigenciaCotizacion__c.$invalid">Requerido</i>
-
                                             <li ng-repeat="vigencia in cot.schema.Quote.VigenciaCotizacion__c.values">
                                                 <div class="radio">
                                                     <label>
@@ -84,7 +72,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-sm-2 text-right">
                                 <div class="btnb-group">
                                     <a ng-if="sc.opportunity.StageName == 'Cotización' && !cotizacion.IsClone && !cotizacion._otraFamilia" class="btnb btnb-info" uib-tooltip="Duplicar cotización" ng-click="cot.duplicarCotizacion(cotizacion, sc.productos)"> 
@@ -99,15 +86,12 @@
                                 </div>
                             </div>
                         </div>
-
                         <c:PLAN_Productos ></c:PLAN_Productos>
-
                         <div class="row" ng-if="!cotizacion.productos || cotizacion.productos.length <= 0">
                             <div class="col-sm-4 col-sm-offset-4 text-center">
                                 <div class="alert alert-danger">Debe agregar al menos un producto a la cotización.</div>
                             </div>
                         </div>
-
                         <div class="btnSaveCot" ng-if="sc.opportunity.StageName == 'Cotización'">
                             <div class="row">
                                 <div class="col-sm-8">
@@ -122,36 +106,20 @@
                                 </div>
                             </div>
                         </div>
-
                     </form>
                 </div>
-
             </uib-tab>
-
             <uib-tab-heading class="btn-add-cot" ng-if="sc.opportunity.StageName == 'Cotización'">
                 <a class="btnb btnb-success" uib-tooltip="Agregar cotización" ng-click="cot.agregarCotizacion({}, sc.opportunity.Account.contacts)">
                     <span class="fa fa-plus" />
                 </a>
             </uib-tab-heading>
-
         </uib-tabset>
         <c:PLAN_GenerarPDF ></c:PLAN_GenerarPDF>
         <c:PLAN_SendApproval ></c:PLAN_SendApproval>
         <c:PLAN_SincronizarCotizacion ></c:PLAN_SincronizarCotizacion>
     </div>
     <script type="text/javascript">
-
-
-            /*class HelloWorld extends HTMLElement {
-                constructor() {
-                  super()
-                }
-
-                connectedCallback() {
-                    this.innerHTML = '<h1>Hey, Hello World</h1>'
-                }
-            }
-            window.customElements.define('hello-world', HelloWorld)*/
         (function() {
             'use strict'
             angular.module('appEdenred')
@@ -244,9 +212,7 @@
                 }
 
                 vm.visualizarPDF = function( cotizacion, owner ) {
-
                     console.log('visualizarPDF: ', arguments)
-
 
                     var soluciones = []
                     var idsQli = ''
@@ -262,7 +228,6 @@
                     var idUndefined = 0
 
                     angular.forEach( cotizacion.productos, function( producto, index) {
-
                         if( !producto.Product2Id__o || !producto.Id ) {
                             idUndefined += 1
                         }
@@ -278,7 +243,6 @@
                         }  
                         idsQli += '\'' + producto.Id + '\''
 
-
                         if( !idsProductsUnico.hasOwnProperty(producto.Product2Id) ) {
                             idsProductsUnico[producto.Product2Id] = true
                             if( idsProducts.length > 0 ) {
@@ -291,7 +255,6 @@
                         }
                     })
 
-
                     if( idUndefined > 0 ) {
                         ctcUtils.showError('Guardar la cotización para ver propuesta comercial')
                     } else {
@@ -303,9 +266,6 @@
                         var totalSoluciones = 0
                         var totalNoEncontrado = 0
                         var contratos = {}
-
-                        
-                        
                         
                         ctcUtils.queryMod('SELECT Id,Quote.Opportunity.Contacto__r.Name, ComentariosCotizacion__c, Product2.Name,Product2.Family, Product2.ProductCode, Quote.Name, Quote.VigenciaCotizacion__c, Quote.Contact.Name, Quote.Contact.Puesto__c,Quote.Opportunity.Razon_social__c, Quote.Contact.Account.Name,Quote.Opportunity.Owner.Manager.Name, CantidadTarjetas__c, UnitPrice, FormaPago__c, OpcionesMetodoPago__c, TarjetaAsociada__c, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, OtroMetodoPago__c, (SELECT Id, ProductoCotizado__c, ProductoComparado__c, ProductoComparado__r.Name FROM Productos_Comparados__r) FROM QuoteLineItem WHERE Id IN(' + idsQli + ')')
                         .then( function( res ) {
@@ -319,7 +279,6 @@
                             angular.forEach( soluciones, function( solucion, index ) {
                                 if( solucion.Productos_Comparados__r ) {
                                     angular.forEach( solucion.Productos_Comparados__r, function( comparado, index_comparado ) {
-
                                         if( !idsProductsUnico.hasOwnProperty(comparado.ProductoComparado__c) ) {
                                             idsProductsUnico[comparado.ProductoComparado__c] = true
                                             if( idsProducts.length > 0 ) {
@@ -332,7 +291,6 @@
                                             idsQli += ', '
                                         }  
                                         idsQli += '\'' + comparado.Id + '\''
-                                        
                                     })
                                 }  
                             })
@@ -348,7 +306,6 @@
                             return ctcUtils.query('SELECT Id, Concepto__c, PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, PartidaPresupuesto__c, ProductoComparadoID__c, EsProductoComparado__c,Concepto_Tipo_Cargo__c FROM ProductoConcepto__c WHERE  Concepto__c != null AND (PartidaPresupuesto__c IN(' + idsQli + ') OR ProductoComparadoID__c IN(' + idsQli + '))')
                         })
                         .then( function( res ) {
-
                             //console.log('ProductoConcepto__c:',res)
 
                             angular.forEach( res, function( productoCon, index ) {
@@ -402,12 +359,9 @@
                                 })
                             })
 
-
                             // console.log('\n\n soluciones: ', soluciones)
-
                             
                             return ctcUtils.query('SELECT Id, Name, Codigos__c, ColorPrincipal__c,TextoPresentacion__c, ColorLetra__c, NombreLogotipo__c, Titulo__c, Subtitulo__c FROM PropuestaComercial__c')
-
                         })
                         .then( function( res ) {
                             angular.forEach(res, function( propuesta, index ) {
@@ -445,7 +399,7 @@
                                 }
                             })
 
-                                console.log("VERRRTYC::"+JSON.stringify(codigosTYC));
+                            console.log("VERRRTYC::"+JSON.stringify(codigosTYC));
                             if( Object.keys(codigosTYC).length > 0 ) {
                                 var idsTYC = ''
                                 angular.forEach( Object.keys(codigosTYC), function( id, index ) {
@@ -457,11 +411,10 @@
                                 })
                                 return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c, AnexoA__c FROM PlantillaContrato__c WHERE Id IN(' + idsTYC + ')')
                             }
-
                         })
                         .then( function( res ) {
-
                             console.log('result términos: ', res)
+
                             var codigosTerminos = {}
                             var codigosAnexoA = {}
                             angular.forEach( res , function( tyc, index ) {
@@ -478,21 +431,15 @@
                                 if( solucion.Product2 && solucion.Product2.ProductCode && !codigos.hasOwnProperty(solucion.Product2.ProductCode) ) {
                                     totalNoEncontrado += 1
                                 }
-
                             })
 
                             window.localStorage['soluciones'] = soluciones
-
-
-
-                           
 
                             ctcUtils.showProcess(false, 'Comprobando datos')
 
                             console.log('\n\n soluciones: ', soluciones, '\n codigos: ', codigos, '\n codigosTYC: ', codigosTYC, '\n codigosTerminos: ', codigosTerminos)
 
                             $timeout( function() {
-
                                 if ( totalSoluciones == totalNoEncontrado ) {
                                     ctcUtils.showError('Productos sin propuesta comercial', 'Propuesta comercial')
                                 } else {
@@ -502,10 +449,7 @@
                                         console.log('cierra modal: ', res)
                                     })
                                 }
-
-
                             }, 600)
-
                         })
                         .catch( function ( err ) {
                             ctcUtils.showProcess(false, 'Comprobando datos')
@@ -513,15 +457,8 @@
                         })
                     }
 
-
-
-
-
-
-
                     /*ctcUtils.query('SELECT Id, Product2.Name, Product2.ProductCode, Quote.Name, Quote.VigenciaCotizacion__c, Quote.Contact.Name, Quote.Contact.Puesto__c, Quote.Contact.Account.Name, CantidadTarjetas__c, UnitPrice, FormaPago__c, OpcionesMetodoPago__c, TarjetaAsociada__c, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, OtroMetodoPago__c, (SELECT PrecioLista__c, PrecioLista2__c, PrecioFinal__c, Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, Concepto__r.Name, Concepto__r.Importe__c, Concepto__r.TipoCargo__c, Concepto__r.NombreSistemas__c, Concepto__r.Orden__c FROM Productos_Concepto__r) FROM QuoteLineItem WHERE Id IN(' + idsQli + ')')
                     .then( function( res ) {
-
                         soluciones = res || []
 
                         return ctcUtils.query('SELECT Id, CaracteristicasSolucion__c, Producto__c FROM Concepto__c WHERE Producto__c IN(' + idsProducts + ') AND RecordType.DeveloperName=\'CaracteristicasSolucion\' AND Activo__c=true')
@@ -538,14 +475,9 @@
                             solucion.diferenciales = keyProducto.hasOwnProperty(solucion.Product2Id) ? keyProducto[solucion.Product2Id] : []
                         })
 
-
                         return ctcUtils.query('SELECT Name, Codigos__c FROM PropuestaComercial__c')
-
-
-
                     })
                     .then( function( res ) {
-
                         angular.forEach(res, function( propuesta, index ) {
                             if( propuesta.Codigos__c && propuesta.Codigos__c.length > 0 ) {
                                 var codesTemp = propuesta.Codigos__c.split('\,')
@@ -573,7 +505,6 @@
                             }
                         })
 
-
                         if( Object.keys(codigosTYC).length > 0 ) {
                             var idsTYC = ''
                             angular.forEach( Object.keys(codigosTYC), function( id, index ) {
@@ -585,11 +516,10 @@
                             })
                             return ctcUtils.query('SELECT Id, Name, CodigosTYC__c, Contenido_del__c FROM PlantillaContrato__c WHERE Id IN(' + idsTYC + ')')
                         }
-
                     })
                     .then( function( res ) {
-
                         console.log('result: ', res)
+
                         var codigosTerminos = {}
                         angular.forEach( res , function( tyc, index ) {
                             codigosTerminos[tyc.Id] = ctcUtils.html(tyc.Contenido_del__c)
@@ -600,8 +530,6 @@
                                 solucion.terminos = codigosTerminos[codigosTYC[solucion.Product2.ProductCode]]
                             }
                         })
-
-
 
                         ctcUtils.showProcess(false, 'Comprobando datos')
 
@@ -614,9 +542,7 @@
                                 console.log('cierra modal: ', res)
                             })
                         }, 600)
-
                     }).catch( function( err ) {
-
                         ctcUtils.showProcess(false, 'Comprobando datos')
 
                         ctcUtils.removeConfig = {icon: 'fa fa-exclamation-circle fa-fw', confirm: 'Eliminar', cancel: 'Cerrar', showRemove: false, headerClass: 'modal-header-danger'}
@@ -701,11 +627,8 @@
                         })
                     })
 
-
                     return pc
                 }
-
-                
 
                 vm.sincronizaCotizacion = function(cotizacion) {
                     var modal = $uibModal.open({
@@ -734,7 +657,6 @@
                         }
                         // console.log('sincronizada: ', cotizacion, '\n quotes: ', vm.quotes)
                     }, function () {
-                        
                     })
                 }
 
@@ -753,7 +675,6 @@
                                 if(vm.cotizaciones && vm.cotizaciones.length > 0) {
                                     angular.forEach(vm.cotizaciones, function(v, k) {
                                         v.IsSyncing = v.Id === cotizacion.Id
-
                                     })
                                 }
                                 
@@ -807,7 +728,6 @@
                                             v1.productoConceptoInstancias[v2][v3].disabled['PrecioFinal2__c'] = disabled
                                             v1.productoConceptoInstancias[v2][v3].disabled['VigenciaDescuento__c'] = disabled
                                             v1.productoConceptoInstancias[v2][v3].disabled['CantidadTarjetas__c'] = disabled
-
                                         })
                                     })
                                 }
@@ -863,7 +783,11 @@
                         if(params.perfil=='BPfleet Sales'){
                             querySoql='SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c,AplicaSegmento__c FROM Product2 WHERE Family= \'' + model.value + '\' AND IsActive=true AND ProductCode=\'30-B\' AND SegmentoVenta__c includes(' + segmento + ') ORDER BY Name ASC';
                         }else{
-                            querySoql='SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c,AplicaSegmento__c FROM Product2 WHERE Family= \'' + model.value + '\' AND IsActive=true AND ProductCode!=\'30-B\' AND SegmentoVenta__c includes(' + segmento + ') ORDER BY Name ASC';
+                            if(params.segmento=='Small' && ctcUtils.app.opportunity.Maquilador__c=='Hidrosina'){
+                                querySoql='SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c,AplicaSegmento__c FROM Product2 WHERE Family= \'' + model.value + '\' AND IsActive=true AND ProductCode=\'30H\' AND SegmentoVenta__c includes(' + segmento + ') ORDER BY Name ASC';
+                            }else{
+                                querySoql='SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c,AplicaSegmento__c FROM Product2 WHERE Family= \'' + model.value + '\' AND IsActive=true AND ProductCode!=\'30-B\' AND ProductCode!=\'30H\' AND SegmentoVenta__c includes(' + segmento + ') ORDER BY Name ASC';
+                            }
                         }
                         ctcUtils.query(querySoql)
                         .then(function( res ) {
@@ -897,7 +821,6 @@
                             }
                         })
                     }
-                    
                 }
 
                 vm.guardaEscalonamientos = function( productos, idsQliClone ) {
@@ -957,8 +880,6 @@
                         console.log('error: ', error)
                     })
 
-
-
                     // escToSave.Escalonamiento__c = esc.Escalonamiento__c
                     // escToSave.QuoteId = vm.producto.QuoteId
                     // escToSave.PricebookEntryId = vm.producto.PricebookEntryId
@@ -969,20 +890,13 @@
                     //     escToSave.ServiceDate = fecha[2] + '-' + fecha[1] + '-' + fecha[0]
                     // }
 
-
                     // escToSave.Quantity = esc.Quantity
                     // escToSave.CantidadTarjetas__c = vm.producto.CantidadTarjetas__c,
                     // escToSave.UnitPrice = esc.UnitPrice
                     // escToSave.QuoteId = vm.producto.QuoteId
                     // escToSave.PricebookEntryId = vm.producto.PricebookEntryId
                     // escToSave.Product2Id = vm.producto.Product2Id
-
                 }
-
-
-
-
-
 
                 /**
                     * @author calvarez@ctconsulting.com.mx
@@ -1022,22 +936,15 @@
                             cotizacion.ContactId = quote.ContactId
                             vm.contacts = contacts
 
-
-                            // cotizacion._readOnly = {
-                            //     ContactId: true
-                            // }
-
-
-
-                        // Obtener QuoteLinetItem - Partidas de presupuesto - asociadas a la oportunidad
-                        return ctcUtils.query('SELECT Id, CantidadTarjetas__c, NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
+                            // Obtener QuoteLinetItem - Partidas de presupuesto - asociadas a la oportunidad
+                            return ctcUtils.query('SELECT Id, CantidadTarjetas__c, NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
                         })
                         .then( function( res ) {
                             // Recibe y asigna a productos los QuoteLineItems encontrados
                             // console.log('QuoteLineItems asociados: ', res)
                             if (res != null) {
                                 //Keep the already saved number of shipment addresses.
-                            	ctcUtils.app.dirEntregaOriginal = res[0].NumberOfShipments__c;
+                                ctcUtils.app.dirEntregaOriginal = res[0].NumberOfShipments__c;
                             }
                             cotizacion.productos = res || []
                             cotizacion.soluciones = ctcUtils.app.soluciones
@@ -1045,10 +952,8 @@
                             cotizacion.tab = 0
                             cotizacion._otraFamilia = false
 
-
                             //Obtener ProductoComparado__c
                             angular.forEach(cotizacion.productos, function( producto, index ) {
-
                                 if( producto.Product2 && producto.Product2.Family && producto.Product2.Family.toLowerCase() != ctcUtils.app.opportunity.Familia__c.toLowerCase() ) {
                                     if( !cotizacion._otraFamilia ) {
                                         cotizacion.soluciones = []
@@ -1143,6 +1048,7 @@
                             //Values to compare if an approved quote changes.
                             ctcUtils.app.checkSecondApproval = false;
                             ctcUtils.app.ComisionOriginal = 0;
+                            ctcUtils.app.ComisionOriginalMant = 0;
                             ctcUtils.app.EnvioRecurrenteOriginal = 0;
                             ctcUtils.app.PrimerEnvioOriginal = 0;
                             ctcUtils.app.StockOriginal = 0;
@@ -1162,6 +1068,9 @@
                                     if (productoCon.Concepto_Tipo_Cargo__c == 'Comisión por el servicio') {
                                         ctcUtils.app.ComisionOriginal = productoCon.PrecioFinal__c;
                                         ctcUtils.app.checkSecondApproval = true;
+                                    } else if (productoCon.Concepto_Tipo_Cargo__c == 'Cobro por gestion de vehiculos') {
+                                        ctcUtils.app.ComisionOriginalMant = productoCon.PrecioFinal__c;
+                                        ctcUtils.app.checkSecondApproval = true;                                    
                                     } else if (productoCon.Concepto_Tipo_Cargo__c == 'Cargo por envío - Recurrente') {
                                         ctcUtils.app.EnvioRecurrenteOriginal = productoCon.Bonificacion__c;
                                         ctcUtils.app.checkSecondApproval = true;
@@ -1184,7 +1093,6 @@
                             }
                         })
                         .then( function( res ) {
-
                             // console.log('obtenerConceptosCaracteristicasPorProducto: ', res)
 
                             var conceptos = res && res.conceptos ? res.conceptos : {}
@@ -1192,7 +1100,6 @@
 
                             // Asignar ProductoConcepto__c, ProductoComparado__c y Concepto__c a QuoteLineItem(Producto Cotizado)
                             angular.forEach( cotizacion.productos, function( producto, index ) {
-
                                 var todosConceptos = []
                                 producto.comparados = productosComparados[producto.Id] || [{}]
                                 producto.conceptos = conceptos[producto.Product2Id] || []
@@ -1214,7 +1121,6 @@
 
                                 // Asignar Concepto__c y ProductoConcepto__c a ProductoComparado__c
                                 angular.forEach( producto.comparados, function( comparado, comparado_index ) {
-
                                     if( cotizacion._otraFamilia ) {
                                         producto.soluciones.push(comparado.ProductoComparado__r)
                                     }
@@ -1324,7 +1230,6 @@
                         vm.loadingContacts = true
                         ctcUtils.query('SELECT Id, FirstName, LastName, Name, Puesto__c, Funcion__c FROM Contact WHERE Id in (select ContactId from AccountContactRelation where AccountId=\'' + accountId + '\') ORDER BY Name ASC')
                         .then(function( res ) {
-
                             vm.contacts = res || []
                             vm.loadingContacts = false
 
@@ -1333,8 +1238,6 @@
                             var representante = ctcUtils.filter(ctcUtils.app.contacts, {Funcion__c: 'Representante Legal'}) 
                             representante = representante.length > 0 ? representante[0] : {}
                             ctcUtils.app.representante = representante
-                            
-
                         }).catch(function( err ) {
                             ctcUtils.showError(err)
                             vm.loadingContacts = false
@@ -1422,7 +1325,6 @@
                             })
                         })
 
-
                         console.log('\n\n clone: ', clone, '\n\n')
                         ctcUtils.bloquearCotizacion(clone, false)
 
@@ -1434,9 +1336,7 @@
                                 ctcUtils.showProcess(false, 'Duplicando cotización')
                             }, 300)
                         }, 300)
-
                     })
-
 
                     /*var modal = $uibModal.open({
                         animation: true,
@@ -1457,10 +1357,8 @@
                         console.log('finish clone: ', angular.copy(instance), '\n ctcUtils.app.selectedTab: ', ctcUtils.app.selectedTab, '\n vm.selectedTab: ', vm.selectedTab)
                         vm.selectedTab = ctcUtils.app.selectedTab
                         ctcUtils.bloquearCotizacion(instance, false)
-
                         
                     }, function () {
-                        
                     })*/
                 }
 
@@ -1475,27 +1373,29 @@
                     if (ctcUtils.app.checkSecondApproval == true && ctcUtils.app.quoteRejected == false) {
                         //If the quote has already been approved, it compares original values versus changed values.
                         finalApprovalLevels.push(1);
-                    		angular.forEach( cotizacion.productos, function( producto, index ) {
+                            angular.forEach( cotizacion.productos, function( producto, index ) {
                                 angular.forEach( producto.conceptosUnicos, function( productoCon, index ) {
                                     if(productoCon.TipoCargo__c == 'Comisión por el servicio' && productoCon.PrecioFinal2__c < ctcUtils.app.ComisionOriginal && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
-                                    	finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
-                                    } else if (productoCon.TipoCargo__c == 'Cargo por envío - Recurrente' && (productoCon.Bonificacion__c > ctcUtils.app.EnvioRecurrenteOriginal || producto.NumberOfShipments__c > ctcUtils.app.dirEntregaOriginal && ctcUtils.app.approvalEnvioRecurrente != undefined)) {
+                                        finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                                    } else if (productoCon.SuggestedPricePerSegment__c && productoCon.PrecioFinal__c < ctcUtils.app.ComisionOriginalMant && ctcUtils.app.conceptoAprobacionMant != undefined && ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel != undefined) {
+                                        finalApprovalLevels.push(ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel);
+                                    }else if (productoCon.TipoCargo__c == 'Cargo por envío - Recurrente' && (productoCon.Bonificacion__c > ctcUtils.app.EnvioRecurrenteOriginal || producto.NumberOfShipments__c > ctcUtils.app.dirEntregaOriginal && ctcUtils.app.approvalEnvioRecurrente != undefined)) {
                                         finalApprovalLevels.push(ctcUtils.app.approvalEnvioRecurrente);
                                     } else if (productoCon.TipoCargo__c == 'Cargo del primer envío' && productoCon.Bonificacion__c > ctcUtils.app.PrimerEnvioOriginal && ctcUtils.app.approvalPrimerEnvio != undefined) {
-                                       	finalApprovalLevels.push(ctcUtils.app.approvalPrimerEnvio);
+                                        finalApprovalLevels.push(ctcUtils.app.approvalPrimerEnvio);
                                     } else if (productoCon.TipoCargo__c == 'Tarjeta titular / Stock' && productoCon.Bonificacion__c > ctcUtils.app.StockOriginal && ctcUtils.app.approvalStock != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.approvalStock);
                                     } else if (productoCon.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' && productoCon.Bonificacion__c > ctcUtils.app.StockPrimerEnvioOriginal && ctcUtils.app.approvalStockPrimerEnvio != undefined) {
-                                       	finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
+                                        finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
                                     }
-                                    
                                 })                            
                             })
-                        
                     } else {
                         //If the quote is not approved, it follows the normal path without compare values.
                         if(ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
-                        	finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                            finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                        } else if (ctcUtils.app.conceptoAprobacionMant != undefined && ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel != undefined) {
+                            finalApprovalLevels.push(ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel);
                         }
                         if(ctcUtils.app.approvalEnvioRecurrente != undefined) {
                             finalApprovalLevels.push(ctcUtils.app.approvalEnvioRecurrente);
@@ -1510,10 +1410,10 @@
                             finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
                         }
                     }
-					if (finalApprovalLevels != '' && finalApprovalLevels != null) {
-                    	ctcUtils.app.finalApprovalLevel = Math.max(...finalApprovalLevels);
+                    if (finalApprovalLevels != '' && finalApprovalLevels != null) {
+                        ctcUtils.app.finalApprovalLevel = Math.max(...finalApprovalLevels);
                     } else {
-                    	ctcUtils.app.finalApprovalLevel = 0;
+                        ctcUtils.app.finalApprovalLevel = 0;
                     }
                     //console.log('El nivel de aprobación final es: ' + ctcUtils.app.finalApprovalLevel);
                     let approvalLevel = ctcUtils.app.finalApprovalLevel;
@@ -1593,9 +1493,6 @@
                             }
                         })
                     })
-
-
-
 
                     // Arma Ids a eliminar
                     if( cotizacion.Ids2Delete ) {
@@ -1695,8 +1592,6 @@
                                 indexComparado++
                             }
                         })
-
-
                     })
 
                     delete payloadIds2Delete.unique
@@ -1730,27 +1625,19 @@
                         return
                     }*/
 
-
-
-                    
-
                     console.log('\n\n ya no estoy: ', payload, '\n\n')
 
                     ctcUtils.remote('PLAN_CuentaService.guardaCotizacion')(JSON.stringify(payload),JSON.stringify(aprobacion))
                     .then( function( res ) {
-                        
                         var opportunity_update = res.SOQL_Opportunity
                         if( res.error ) {
                             vm.class = 'slds-theme--error'
                             vm.errors = [res.error]
 
                             if( opportunity_update ) {
-
                                 cotizacion.Editable = false
                                 ctcUtils.bloquearCotizacion(cotizacion, true)
-
                             }
-
                         } else {
                             var isCreated = res.Upsert_Quote.created
 
@@ -1758,9 +1645,7 @@
                             cotizacion.Name = angular.isArray(res.Instance_Quote) ? res.Instance_Quote[0].Name : res.Instance_Quote.Name
                             cotizacion.IsSyncing = angular.isArray(res.Instance_Quote) ? res.Instance_Quote[0].IsSyncing : res.Instance_Quote.IsSyncing
 
-                            
-
-                             if( opportunity_update ) {
+                            if( opportunity_update ) {
                                 ctcUtils.app.opportunity.Solicitar_validaci_n_descuentos__c = "true"
                                 
                                 vm.class = 'slds-theme--error'
@@ -1768,7 +1653,6 @@
 
                                 cotizacion.Editable = false
                                 ctcUtils.bloquearCotizacion(cotizacion, true)
-
                             } else {
                                 //Deloperfreeeay 
                                 //mensajes de error para cuando se actualiza o se crea isCreated
@@ -1796,7 +1680,6 @@
                                         ctcUtils.bloquearCotizacion(cotizacion_existente, !cotizacion_existente.Editable)
                                     })
                                 }
-
                             }
 
                             var indexProductoComparado_sf = 0
@@ -1846,13 +1729,7 @@
                                         })
                                     }
                                 })
-
-
-
-
                             })
-
-
                         }
                         cotizacion.Ids2Delete = {}
                         delete cotizacion.IsClone
@@ -1864,7 +1741,6 @@
 
                         ctcUtils.showProcess(false, 'Guardando cotización')
                         cotizacion.guardando = false
-
                     }).catch( function( err ) {
                         ctcUtils.showProcess(false, 'Guardando cotización')
                         ctcUtils.showError( err )
@@ -1944,13 +1820,11 @@
                         ret.Id = productoConcepto.IdProductoConcepto__c
                     }
 
-
                     // ret.PartidaPresupuesto__c = idCotizado
                     // ret.ProductoComparadoID__c = idComparado
                     
                     return ret
                 }
-
             }
         })()
     </script>

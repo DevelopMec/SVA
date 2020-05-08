@@ -58,7 +58,12 @@
                         quoteData.owner= cotizacion.OwnerId;
                         //quoteData.ownerRole= cotizacion.Owner.UserRole.Name;
                         quoteData.approvalLevel = ctcUtils.app.finalApprovalLevel;
-                        quoteData.approvalComision = ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel;
+                        if (ctcUtils.app.conceptoAprobacion != undefined) {
+                        	quoteData.approvalComision = ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel;
+                        }
+                        if (ctcUtils.app.conceptoAprobacionMant != undefined) {
+                        	quoteData.approvalComisionMant = ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel;
+						}
                         quoteData.approvalEnvioRecurrente = ctcUtils.app.approvalEnvioRecurrente;
                         quoteData.approvalPrimerEnvio = ctcUtils.app.approvalPrimerEnvio;
                         quoteData.approvalTarjetaStock = ctcUtils.app.approvalStock;

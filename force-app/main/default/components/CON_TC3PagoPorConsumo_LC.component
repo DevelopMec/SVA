@@ -76,6 +76,10 @@
             var contactos = []
             var templateFiliales = ''
             var templateConceptos = ''
+            var conceptsListTC4 = {'Comisión por el servicio' : {},'Cargo por envío - Recurrente' : {} , 'Cargo por refacturacion' : {}, 'Anualidad - Grande' : {} ,
+                                'Anualidad - Pyme' : {}, 'Cuota por impresión de logo a color' : {} , 'Cuota por renta mensual TAG' : {}, 'Cuota por transacción con TAG' : {},
+                                'TAG Ticket Car' : {},'Cargo por tarjeta activa' : {}, 'Reposición de tarjetas' : {}, 'Tarjeta titular' : {} };
+            var conceptList = {}; 
             var logoHeader = 'LogoEdenred.png'
             var leyendaHeader = '<strong style="color: red">!Por definir!</strong>'
             var top = '2cm'
@@ -158,10 +162,10 @@
                 dataSource.FormaPago__c = '{!FormaPago}'
                 /***DYAMPI***/
                 if(dataSource.Product2!=null&&dataSource.Product2.Id!=null){
-                    
-                    ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Concepto_Tipo_Cargo__c,PrecioLista__c,Bonificacion__c,CantidadTarjetas__c,VigenciaDescuento__c,PrecioFinal__c FROM ProductoConcepto__c where Concepto_Tipo_Cargo__c!=\'Comisión por el servicio\' and PartidaPresupuesto__c=\'"+productoQLI+"\'")
+                    ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Concepto_Tipo_Cargo__c,PrecioLista__c,Bonificacion__c,VigenciaDescuento__c,PrecioFinal__c FROM ProductoConcepto__c where  PartidaPresupuesto__c=\'"+productoQLI+"\'")
                     .then( function( result ) {
                         var conceptos=result;
+                        conceptList = result;
                         templateConceptos='<table class="tableFilial">';
                         templateConceptos=templateConceptos+'<thead>';                        
                         templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th><th>Cantidad de Tarjetas</th><th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
@@ -478,7 +482,6 @@
                     nombreProducto = 'Contrato '+'{!QuoteLineItem.Product2.Name}';
                     return Promise.reject(new Error('Los criterios definidos no son adecuados para la generación del contrato, favor de revisar'))
                 }
-                console.log('NOMBRE PROD: '+nombreProducto);
                 query = "select Activo__c, AnexoA__c, AnexoB__c, AnexoC__c, AnexoD__c, AnexoE__c,  CamposAnexoA__c, CamposAnexoB__c, CamposAnexoC__c, CamposAnexoD__c, CodigosTYC__c, Contenido_del__c, Contratos_Ticket_Despensa__c, CreatedById, CreatedDate, Dias_habiles_para_entrega_de_tarjetas__c, Horas_de_anticipacion_para_dispersion_de__c, Horas_de_dispersion_de_saldos__c, Id, IsDeleted, LastModifiedById, LastModifiedDate, LastReferencedDate, LastViewedDate, Name, OwnerId, RecordTypeId, Seccion1__c, Seccion2__c, Seccion3__c, Seccion4__c, Seccion5__c, Seccion6__c, SystemModstamp, Tipo_Contrato__c, UsoMarcaLogotipo__c, UsoProgramaOrganismoGubernamental__c,Logocontrato__c from PlantillaContrato__c WHERE Name = '" + nombreProducto + "' ";
                 return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")(query)
             })
@@ -541,7 +544,8 @@
                 dataSource.Anexo__c = anexos;
                 plantilla.Contenido_del__c = replaceStr(plantilla.Contenido_del__c, dataSource);
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!filiales\)/g, templateFiliales);
-                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                //plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                replaceConceptValues(plantilla, conceptList, conceptsListTC4);
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
 
                 $('#contentPdf').html('');
@@ -576,7 +580,7 @@
                 if(plantilla.AnexoD__c != undefined && dataSource.FormaPago__c == 'American Express' ){
                     plantilla.AnexoD__c = html(plantilla.AnexoD__c,dataSource);
                     plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/\(\!filiales\)/g, templateFiliales);
-                    plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                    //plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
                     plantilla.AnexoD__c = plantilla.AnexoD__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
                     $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoD__c);
 
@@ -667,6 +671,34 @@
             }
         })
         return ret;
+    }
+
+    function replaceConceptValues(plantilla, concepts, conceptsListTC4) {
+        concepts.forEach( function(concepto) {
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ;
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ;
+            let vig = '';
+            if( concepto.VigenciaDescuento__c) {
+                let dateV = new Date(concepto.VigenciaDescuento__c);
+                let dia=dateV.getUTCDate().toString().length>1 ? dateV.getUTCDate()+'' : '0'+dateV.getUTCDate();
+                let mes=(dateV.getUTCMonth() + 1).toString().length>1 ? (dateV.getUTCMonth() + 1)+'' : '0'+(dateV.getUTCMonth() + 1);
+                vig=dia+'-'+mes+'-'+dateV.getUTCFullYear();
+            }
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].VigenciaDescuento__c = vig;
+        });
+        replaceConceptsInHtml(plantilla,conceptsListTC4);
+    }
+    function replaceConceptsInHtml(plantilla,data){
+        let conceptoAnualidadSelected = false;
+        for(let concepto in data){
+            conceptoAnualidadSelected = ( !conceptoAnualidadSelected &&  (concepto == 'Anualidad - Grande'  || concepto == 'Anualidad - Pyme') );
+            data[concepto].precioFinalReemplazo  = `(!PrecioFinal.${concepto})`;
+            data[concepto].bonificacionReemplazo =  `(!Bonificacion.${concepto})`;
+            data[concepto].vigenciaReemplazo  = `(!vigencia.${concepto})`;
+            plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp( data[concepto].bonificacionReemplazo, 'gi' ), data[concepto].Bonificacion__c ? data[concepto].Bonificacion__c : conceptoAnualidadSelected ? '' : '0');
+            plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp( data[concepto].precioFinalReemplazo, 'gi' ), data[concepto].PrecioFinal__c ? `$ ${data[concepto].PrecioFinal__c}` :  conceptoAnualidadSelected ? '' : '');
+            plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp( data[concepto].vigenciaReemplazo, 'gi' ), data[concepto].VigenciaDescuento__c ? data[concepto].VigenciaDescuento__c : conceptoAnualidadSelected ? '' : ' ( N/A ) ');
+        }
     }
 
     function replaceStr( textHml, datasource ) {

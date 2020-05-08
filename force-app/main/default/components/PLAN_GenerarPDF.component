@@ -1119,7 +1119,6 @@
                 	documento.addPagina(pagina);
                 	console.log('#######Documento:');
                 	console.log(documento);
-                	
                 	vm.documento = documento;
                 }
 
