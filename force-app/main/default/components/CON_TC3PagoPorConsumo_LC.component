@@ -545,8 +545,9 @@
                 plantilla.Contenido_del__c = replaceStr(plantilla.Contenido_del__c, dataSource);
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!filiales\)/g, templateFiliales);
                 //plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
-                replaceConceptValues(plantilla, conceptList, conceptsListTC4);
+                replaceConceptValues(plantilla, conceptList, conceptsListTC4,'Contenido_del__c');
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp('!check', 'gi' ), '<input type="checkbox" kendoCheckBox checked="true" [(ngModel)]="model.foo" />');
 
                 $('#contentPdf').html('');
                 $('#contentPdf').append(plantilla.Contenido_del__c);
@@ -554,12 +555,12 @@
                 if(plantilla.AnexoA__c != undefined) {
                     console.log("ANEXOA!::");
                     plantilla.AnexoA__c = html(plantilla.AnexoA__c, dataSource);
+                    plantilla.AnexoA__c = plantilla.AnexoA__c.replace(new RegExp('!check', 'gi' ), '<input type="checkbox" kendoCheckBox checked="true" [(ngModel)]="model.foo" />');
                     plantilla.AnexoA__c = plantilla.AnexoA__c.replace(/\(\!filiales\)/g, templateFiliales);
                     plantilla.AnexoA__c = plantilla.AnexoA__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
                     //plantilla.AnexoA__c = plantilla.AnexoA__c.replace('<table class="ql-table-blob">', '<table class="tableFilial">');
                     plantilla.AnexoA__c = plantilla.AnexoA__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
                     $('#contentPdf').append('<div class="page-break"></div>' + plantilla.AnexoA__c);
-
                 }
                 if(plantilla.AnexoB__c != undefined) {
                     plantilla.AnexoB__c = html(plantilla.AnexoB__c,dataSource);
@@ -612,6 +613,7 @@
                 //'   <div class="headerText"><p>FECHA DE ACTUALIZACIÓN 19/08/16</p>CONTRATO CLIENTES EDENRED TC PAGO POR CONSUMO JUR<p></p></div>'+
                 //          '   <div class="headerText2"><p>DTCOM-001-04</p></div> ' +
                             '</div>';
+                
                 var waterMark = false
                 if( contrato.EtapaContrato__c != undefined && contrato.EtapaContrato__c == 'Finalizado' ) {
                     waterMark = false;
@@ -673,7 +675,7 @@
         return ret;
     }
 
-    function replaceConceptValues(plantilla, concepts, conceptsListTC4) {
+    function replaceConceptValues(plantilla, concepts, conceptsListTC4,field) {
         concepts.forEach( function(concepto) {
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ;
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ;
@@ -686,18 +688,18 @@
             }
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].VigenciaDescuento__c = vig;
         });
-        replaceConceptsInHtml(plantilla,conceptsListTC4);
+        replaceConceptsInHtml(plantilla,conceptsListTC4,field);
     }
-    function replaceConceptsInHtml(plantilla,data){
+    function replaceConceptsInHtml(plantilla,data,field){
         let conceptoAnualidadSelected = false;
         for(let concepto in data){
             conceptoAnualidadSelected = ( !conceptoAnualidadSelected &&  (concepto == 'Anualidad - Grande'  || concepto == 'Anualidad - Pyme') );
             data[concepto].precioFinalReemplazo  = `(!PrecioFinal.${concepto})`;
             data[concepto].bonificacionReemplazo =  `(!Bonificacion.${concepto})`;
             data[concepto].vigenciaReemplazo  = `(!vigencia.${concepto})`;
-            plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp( data[concepto].bonificacionReemplazo, 'gi' ), data[concepto].Bonificacion__c ? data[concepto].Bonificacion__c : conceptoAnualidadSelected ? '' : '0');
-            plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp( data[concepto].precioFinalReemplazo, 'gi' ), data[concepto].PrecioFinal__c ? `$ ${data[concepto].PrecioFinal__c}` :  conceptoAnualidadSelected ? '' : '');
-            plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp( data[concepto].vigenciaReemplazo, 'gi' ), data[concepto].VigenciaDescuento__c ? data[concepto].VigenciaDescuento__c : conceptoAnualidadSelected ? '' : ' ( N/A ) ');
+            plantilla[field] = plantilla[field].replace(new RegExp( data[concepto].bonificacionReemplazo, 'gi' ), data[concepto].Bonificacion__c ? data[concepto].Bonificacion__c : conceptoAnualidadSelected ? '' : '0');
+            plantilla[field] = plantilla[field].replace(new RegExp( data[concepto].precioFinalReemplazo, 'gi' ), data[concepto].PrecioFinal__c ? `$ ${data[concepto].PrecioFinal__c}` :  conceptoAnualidadSelected ? '' : '');
+            plantilla[field] = plantilla[field].replace(new RegExp( data[concepto].vigenciaReemplazo, 'gi' ), data[concepto].VigenciaDescuento__c ? data[concepto].VigenciaDescuento__c : conceptoAnualidadSelected ? '' : ' ( N/A ) ');
         }
     }
 
@@ -883,6 +885,7 @@
             top: 0px;
             height: 20px;
             line-height: 70%;
+            margin-bottom: 0;
         }
         .headerContratos {
             border-style: solid;
@@ -899,7 +902,6 @@
     .imgInternaEcovale {
         height: 80px;
     }
-    
 </style>
     <apex:attribute name="QuoteLineItem" type="QuoteLineItem" required="true" description="QuoteLineItem" id="QuoteLineItem" />
     <apex:attribute name="QuoteLineItemId" type="String" required="true" description="Id de QuoteLineItem" id="QuoteLineItemId" />
@@ -918,7 +920,6 @@
                 </div>
             </div>
         </div>
-    
         <button id="generaPDFButton" type="submit" class="btn btn-primary buscar" onclick="generaPDF()" >Muestra PDF</button>
     <!-- </div> -->
     
