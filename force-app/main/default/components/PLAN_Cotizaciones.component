@@ -1377,7 +1377,7 @@
                                 angular.forEach( producto.conceptosUnicos, function( productoCon, index ) {
                                     if(productoCon.TipoCargo__c == 'Comisión por el servicio' && productoCon.PrecioFinal2__c < ctcUtils.app.ComisionOriginal && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
-                                    } else if (productoCon.SuggestedPricePerSegment__c && productoCon.PrecioFinal__c < ctcUtils.app.ComisionOriginalMant && ctcUtils.app.conceptoAprobacionMant != undefined && ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel != undefined) {
+                                    } else if (productoCon.TipoCargo__c == 'Cobro por gestion de vehiculos' && productoCon.PrecioFinal__c < ctcUtils.app.ComisionOriginalMant && ctcUtils.app.conceptoAprobacionMant != undefined && ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel);
                                     }else if (productoCon.TipoCargo__c == 'Cargo por envío - Recurrente' && (productoCon.Bonificacion__c > ctcUtils.app.EnvioRecurrenteOriginal || producto.NumberOfShipments__c > ctcUtils.app.dirEntregaOriginal && ctcUtils.app.approvalEnvioRecurrente != undefined)) {
                                         finalApprovalLevels.push(ctcUtils.app.approvalEnvioRecurrente);
