@@ -351,14 +351,20 @@
                                     </div>`
                     logoHeader =  'LogoEcoValeDespensas.png'
                                     
-                } else if(((dataSource.Product2.ProductCode == "1") || (dataSource.Product2.ProductCode == "9")) && ((dataSource.Opportunity.Familia__c == "Ticket Restaurante") || (dataSource.Opportunity.Familia__c == "Despensa"))){
+                } else if( dataSource.Product2.ProductCode == "9" && dataSource.Opportunity.Familia__c == "Despensa"){
                     nombreProducto= "Contrato Clientes TVBE Papel";
                     leyendaHeader = `<div class="leyendaHeader"><p><strong>Fecha de actualización: 03/05/2019</strong></p>
                                     <p>DTCOMBE-001-02</p><br>
                                     </div>`
 
-                } else if((dataSource.Product2.ProductCode == "3") && (dataSource.Opportunity.Familia__c == "Combustible")){
-                    nombreProducto = "Contrato Clientes TV Combustible Papel";
+                } else if(  dataSource.Product2.ProductCode == "1" && dataSource.Opportunity.Familia__c == "Ticket Restaurante" ) {
+                    nombreProducto= "Contrato Clientes TVBE Papel";
+                    leyendaHeader = `<div class="leyendaHeader"><p>FECHA DE ACTUALIZACIÓN 27/02/2020</p>
+                                    <p>DTCOMTR-001-1</p><br>
+                                    </div>`
+                }
+                 else if((dataSource.Product2.ProductCode == "3") && (dataSource.Opportunity.Familia__c == "Combustible")){
+                    nombreProducto = "Contrato clientes papel TRestaurante";
                     leyendaHeader = `<div class="leyendaHeader">
                                     <p><strong>TVGV-01012017</strong></p>
                                     <p>DTCOM-002/ 6 </p>
@@ -677,8 +683,9 @@
 
     function replaceConceptValues(plantilla, concepts, conceptsListTC4,field) {
         concepts.forEach( function(concepto) {
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ;
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ;
+            if(conceptsListTC4[concepto.Concepto_Tipo_Cargo__c]){
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ?  concepto.PrecioFinal__c : '' ;
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ? concepto.Bonificacion__c : '';
             let vig = '';
             if( concepto.VigenciaDescuento__c) {
                 let dateV = new Date(concepto.VigenciaDescuento__c);
@@ -687,6 +694,7 @@
                 vig=dia+'-'+mes+'-'+dateV.getUTCFullYear();
             }
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].VigenciaDescuento__c = vig;
+            }
         });
         replaceConceptsInHtml(plantilla,conceptsListTC4,field);
     }
