@@ -282,7 +282,7 @@
     </tr>
   </tbody>
 </table>
-<p>Datos de la Persona Física o Datos del Representante lega</p>
+<p>Datos de la Persona Física o Datos del Representante legal</p>
 <table
   class="ql-table-blob"
   border="2"
@@ -296,10 +296,10 @@
   <tbody>
     <tr>
       <td align="left" colspan="4" rowspan="1">
-        Apellido paterno:
+        <p>Apellido paterno: {!Contact.LastName}</p>
         <p>Apellido materno:</p>
-        <p>Nombre(s): {!Contact.Name}</p>
-        Actividad, giro o negocio: {!Contact.AreaTrabajo__c}
+        <p>Nombre(s): {!Contact.FirstName}</p>
+        Actividad, giro o negocio: 
       </td>
     </tr>
     <tr>
@@ -324,7 +324,6 @@
       <td colspan="1" rowspan="1">
         RFC (con homoclave)
         <ul></ul>
-        {!EntidadLegal__c.Name}
       </td>
       <td colspan="1" rowspan="1">
         Condición de estancia
@@ -333,7 +332,7 @@
       <td colspan="1" rowspan="1">
         Ocupación
         <ul></ul>
-        {!Contact.Puesto__c}
+        
       </td>
       <td colspan="1" rowspan="1">
         Nacionalidad
@@ -344,7 +343,7 @@
       <td colspan="1" rowspan="1">
         CURP
         <ul></ul>
-        {!Contact.Curp__c}
+        
       </td>
       <td colspan="1" rowspan="1">
         Teléfono de negocio
@@ -385,22 +384,22 @@
         Domicilio particular (residencia) del representante legal y/o persona
         física:
         <ul></ul>
-        Calle: {!EntidadLegal__c.Calle__c}
+        Calle: 
         <ul></ul>
-        Colonia: {!EntidadLegal__c.Colonia__c}
+        Colonia: 
         <ul></ul>
-        Municipio: {!EntidadLegal__c.DelegacionMunicipioFiscal__c}
+        Municipio: 
         <ul></ul>
-        Entidad federativa: {!EntidadLegal__c.Estado__c}
+        Entidad federativa: 
       </td>
       <td align="left" colspan="2" rowspan="1">
         <ul></ul>
         No. Ext y/o Int:
-        {!EntidadLegal__c.NumeroExterior__c}/{!EntidadLegal__c.NumeroInterior__c}
+        
         <ul></ul>
-        Código postal: {!EntidadLegal__c.CodigoPostal__c}
+        Código postal: 
         <ul></ul>
-        Ciudad o población: {!EntidadLegal__c.Ciudad__c}
+        Ciudad o población: 
         <ul></ul>
         País:
       </td>
