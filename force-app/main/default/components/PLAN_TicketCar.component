@@ -604,8 +604,7 @@
 						<p class="dataLabelPDF">Por Edenred México, S. A. de C.V. </p>
 					</div>
 					<div class="col-sm-6">
-						<p class="leftLabel">Por: {{solucion.Quote.Opportunity.Razon_social__c}}</p>
-						<div class="promiseLine"></div>
+						<p class="dataLabelPDF">Por: {{solucion.Quote.Opportunity.Razon_social__c}}</p>
 					</div>
 				</div>
 

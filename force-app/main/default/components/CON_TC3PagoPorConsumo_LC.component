@@ -79,7 +79,7 @@
             var conceptsListTC4 = {'Comisión por el servicio' : {},'Cargo por envío - Recurrente' : {} , 'Cargo por refacturacion' : {}, 'Anualidad - Grande' : {} ,
                                 'Anualidad - Pyme' : {}, 'Cuota por impresión de logo a color' : {} , 'Cuota por renta mensual TAG' : {}, 'Cuota por transacción con TAG' : {},
                                 'TAG Ticket Car' : {},'Cargo por tarjeta activa' : {}, 'Reposición de tarjetas' : {}, 'Tarjeta titular' : {} };
-            var conceptList = {}; 
+                                var conceptList = {}; 
             var logoHeader = 'LogoEdenred.png'
             var leyendaHeader = '<strong style="color: red">!Por definir!</strong>'
             var top = '2cm'
@@ -150,7 +150,7 @@
                 
                 console.log("filiales: ", filiales)
 
-                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Product2.ProductCode,Quote.Opportunity.Name,Quote.Opportunity.StageName,Quote.Opportunity.Owner.Name,Quote.OpportunityId,Quote.Opportunity.ActaConstitutivaCliente__c, Quote.Opportunity.CURP__c,Quote.Opportunity.CedulaRFC__c,Quote.Opportunity.ComprobanteDomicilioCliente__c,Quote.Opportunity.ComprobanteDomicilioFiscal__c, Quote.Opportunity.ConstanciaRFC__c, Quote.Opportunity.ConstanciaRFCCliente__c,Quote.Opportunity.IdentificacionOficialCliente__c,Quote.Opportunity.IdentificacionOficialVigente__c, Quote.Opportunity.PoderNotarial__c,Quote.Opportunity.RegistroPatronal__c, Quote.Opportunity.RegistroPatronalOPAM__c,Quote.Opportunity.Familia__c, Quote.Opportunity.Owner.Manager.Name,Quote.Owner.Name,Quote.AccountId,Quote.Account.RazonSocial__c,Quote.Account.Direccion__c,Quote.Account.RFC__c,Quote.Account.Owner.Name,Quote.Account.BillingAddress, Quote.Account.Sector__c,Quote.Account.TipoPersona__c,Quote.Contact.Email,Quote.Contact.CorreoAP__c,Quote.Contact.Name,Quote.Contact.FirstName,Quote.Contact.LastName,Quote.Contact.Puesto__c,Quote.Contact.MobilePhone,Quote.Contact.Phone,Quote.Contact.AreaTrabajo__c,Quote.Account.Ciudad__c,Quote.Account.Calle__c,Quote.Account.NumeroExterior__c,Quote.Account.Colonia__c,Quote.Account.ColMpoCpEdo__c,Quote.Account.CodigoPostal__c FROM QuoteLineItem WHERE Id ='{!QuoteLineItem.Id}'")
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Product2.ProductCode,Quote.Opportunity.Name,Quote.Opportunity.StageName,Quote.Opportunity.Owner.Name,Quote.Opportunity.Contacto__r.Name,Quote.Opportunity.Contacto__r.Email,Quote.OpportunityId,Quote.Opportunity.ActaConstitutivaCliente__c, Quote.Opportunity.CURP__c,Quote.Opportunity.CedulaRFC__c,Quote.Opportunity.ComprobanteDomicilioCliente__c,Quote.Opportunity.ComprobanteDomicilioFiscal__c, Quote.Opportunity.ConstanciaRFC__c, Quote.Opportunity.ConstanciaRFCCliente__c,Quote.Opportunity.IdentificacionOficialCliente__c,Quote.Opportunity.IdentificacionOficialVigente__c, Quote.Opportunity.PoderNotarial__c,Quote.Opportunity.RegistroPatronal__c, Quote.Opportunity.RegistroPatronalOPAM__c,Quote.Opportunity.Familia__c, Quote.Opportunity.Owner.Manager.Name,Quote.Owner.Name,Quote.AccountId,Quote.Account.RazonSocial__c,Quote.Account.Direccion__c,Quote.Account.RFC__c,Quote.Account.Owner.Name,Quote.Account.BillingAddress, Quote.Account.Sector__c,Quote.Account.TipoPersona__c,Quote.Contact.Email,Quote.Contact.CorreoAP__c,Quote.Contact.Name,Quote.Contact.FirstName,Quote.Contact.LastName,Quote.Contact.Puesto__c,Quote.Contact.MobilePhone,Quote.Contact.Phone,Quote.Contact.AreaTrabajo__c,Quote.Account.Ciudad__c,Quote.Account.Calle__c,Quote.Account.NumeroExterior__c,Quote.Account.Colonia__c,Quote.Account.ColMpoCpEdo__c,Quote.Account.CodigoPostal__c FROM QuoteLineItem WHERE Id ='{!QuoteLineItem.Id}'")
             })
             .then( function( res ) {
                 console.log("res qli: ", res)
@@ -682,7 +682,7 @@
         return ret;
     }
 
-    function replaceConceptValues(plantilla, concepts, conceptsListTC4,field) {
+    function replaceConceptValues(plantilla, concepts, conceptsListTC4,field,meses) {
         concepts.forEach( function(concepto) {
             if(conceptsListTC4[concepto.Concepto_Tipo_Cargo__c]){
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ?  concepto.PrecioFinal__c : '' ;
@@ -701,6 +701,8 @@
     }
     function replaceConceptsInHtml(plantilla,data,field){
         let conceptoAnualidadSelected = false;
+        var meses = {'1' : 'Enero','2' : 'Febrero','3' : 'Marzo','4' : 'Abril','5' : 'Mayo','6' : 'Junio','7' : 'Julio','8' : 'Agosto','9' : 'Septiembre','10' : 'Octubre','11' : 'Noviembre','12' : 'Diciembre'};
+        let fecha = new Date();
         for(let concepto in data){
             let includesAnualidad = concepto.includes('Anualidad');
             conceptoAnualidadSelected = ( !conceptoAnualidadSelected &&  concepto.includes('Anualidad') )  ? true : conceptoAnualidadSelected;
@@ -710,6 +712,9 @@
             plantilla[field] = plantilla[field].replace(new RegExp( data[concepto].bonificacionReemplazo, 'gi' ), data[concepto].Bonificacion__c ? data[concepto].Bonificacion__c : conceptoAnualidadSelected && includesAnualidad ? '' : '0');
             plantilla[field] = plantilla[field].replace(new RegExp( data[concepto].precioFinalReemplazo, 'gi' ), data[concepto].PrecioFinal__c ? concepto == 'Comisión por el servicio' ? ` ${data[concepto].PrecioFinal__c}` : `$ ${data[concepto].PrecioFinal__c}` :  conceptoAnualidadSelected && includesAnualidad ? '' : '');
             plantilla[field] = plantilla[field].replace(new RegExp( data[concepto].vigenciaReemplazo, 'gi' ), data[concepto].VigenciaDescuento__c ? data[concepto].VigenciaDescuento__c : conceptoAnualidadSelected && includesAnualidad ? '' : ' ( N/A ) ');
+            plantilla[field] = plantilla[field].replace(new RegExp('!hoyDia', 'gi' ), fecha.getDate());
+            plantilla[field] = plantilla[field].replace(new RegExp('!hoymes', 'gi' ), meses[fecha.getMonth()+1]);
+            plantilla[field] = plantilla[field].replace(new RegExp('!hoyanio', 'gi' ), fecha.getFullYear());
         }
     }
 
