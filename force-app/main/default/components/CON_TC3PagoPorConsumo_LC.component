@@ -359,8 +359,8 @@
 
                 } else if(  dataSource.Product2.ProductCode == "1" && dataSource.Opportunity.Familia__c == "Ticket Restaurante" ) {
                     nombreProducto= "Contrato clientes papel TRestaurante";
-                    leyendaHeader = `<div class="leyendaHeader"><p>FECHA DE ACTUALIZACIÓN 27/02/2020</p>
-                                    <p>DTCOMTR-001-1</p><br>
+                    leyendaHeader = `<div class="leyendaHeader"><p>FECHA DE ACTUALIZACIÓN 12/05/2020/p>
+                                    <p>DTBETR-001-01</p><br>
                                     </div>`
                 }
                  else if((dataSource.Product2.ProductCode == "3") && (dataSource.Opportunity.Familia__c == "Combustible")){
