@@ -403,7 +403,7 @@ public without sharing class CON_ContractsContainer_CTRL extends CON_OppDocCheck
 		String strSql;
 		List<Contrato2__c> listContrato = new List<Contrato2__c>();
 		strSql = getStrCampos(Contrato2__c.SObjectType);
-		strSql = 'SELECT ' + strSql + ',Cuenta__r.Giro__c,Cuenta__r.Telefono2__c,Bank_Account__r.Reference__c,Bank_Account__r.Bank__c,Bank_Account__r.StandardiziedBankKey__c,Bank_Account__r.AccountHolder__c,Cuenta__r.Name,Cuenta__r.Subgiro__c,Cuenta__r.Phone,Cuenta__r.CodigoClienteAS400__c,PartidaPresupuesto__r.FormaPago__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,Contacto__r.Name,Contacto__r.Email, Entidad_Legal__r.RecordType.Name FROM Contrato2__c WHERE PartidaPresupuesto__c = \'' + quoteLineItemId + '\'';
+		strSql = 'SELECT ' + strSql + ',Cuenta__r.Giro__c,Cuenta__r.Telefono2__c,Bank_Account__r.Reference__c,Bank_Account__r.Bank__c,Bank_Account__r.StandardiziedBankKey__c,Bank_Account__r.AccountHolder__c,Cuenta__r.Name,Cuenta__r.Subgiro__c,Cuenta__r.Phone,Cuenta__r.CodigoClienteAS400__c,PartidaPresupuesto__r.FormaPago__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,Contacto__r.Name,Contacto__r.Email,Contacto__r.FirstName,Contacto__r.LastName, Entidad_Legal__r.RecordType.Name FROM Contrato2__c WHERE PartidaPresupuesto__c = \'' + quoteLineItemId + '\'';
 		System.debug('SQLQuery: ' + strSql);
 		listContrato = Database.query(strSql);
 		if(listContrato.size() > 0){
