@@ -4,7 +4,7 @@ public without sharing class DocuSignStatusTriggerHandler extends triggerHandler
     private Map<Id, dsfs__DocuSign_Status__c> newMap;
     Map<String,String> mapStatus;
     public DocuSignStatusTriggerHandler(){
-        mapStatus=new Map<String,String>{'Delivered'=>'Entregado','Completed'=>'Completado','Sent'=>'Enviado', 'Voided'=>'Cancelado'};
+        mapStatus=new Map<String,String>{'Delivered'=>'Entregado','Completed'=>'Completado','Sent'=>'Enviado', 'Voided'=>'Cancelado', 'Declined'=>'Rechazado' };
         this.newList = (List<dsfs__DocuSign_Status__c>) trigger.new;
         this.oldMap = (Map<Id, dsfs__DocuSign_Status__c>) trigger.oldMap;
         this.newMap = (Map<Id, dsfs__DocuSign_Status__c>) trigger.newMap;

@@ -355,12 +355,14 @@
 
                 <div class="row">
                     <div class="col-sm-5-5 text-center">
+                        <!--<div class="fontwhite">\s1\</div>-->
                         <center>{{solucion.Quote.Opportunity.Owner.Manager.Name}}</center>
                         <div class="promiseLine"></div>
                         <center><strong>Nombre y Firma del Apoderado </strong></center>
                     </div>
                     <div class="col-sm-1"></div>
                     <div class="col-sm-5-5 text-center">
+                        <div class="fontwhite">\s1\</div>
                         <center>{{solucion.Quote.Contact.Name}}</center>
                         <div class="promiseLine"></div>
                         <center><strong>Aceptada por la Empresa Cliente: </strong></center>

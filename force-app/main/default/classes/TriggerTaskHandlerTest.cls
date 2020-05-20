@@ -12,7 +12,10 @@ private class TriggerTaskHandlerTest {
 
 			Opportunity opp = TestDataFactory_TEST.createOpportunity();
 
-			List<task> t = new List<task>{ new task( Subject = 'Enviar información', Status = 'New', Priority = 'Normal', WhoId = lea.Id) };
+			List<task> t = new List<task>{ 
+                	new task( Subject = 'Enviar información', Status = 'New', Priority = 'Normal', WhoId = lea.Id),
+                	new task( Subject = 'Enviar información', Status = 'Concluida', Priority = 'Normal', WhoId = lea.Id)
+                  };
 	        insert t;  
 
 	        t[0].Subject = 'Enviar información';

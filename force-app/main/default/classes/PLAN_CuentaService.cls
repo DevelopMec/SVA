@@ -257,6 +257,7 @@ global with sharing class PLAN_CuentaService {
         
                             //Se realiza el envío del proceso de aprobación
                             Integer approvalComision = 1;
+                            Integer approvalComisionMant = 1;
                             Integer approvalEnvioRecurrente = 1;
                             Integer approvalPrimerEnvio = 1;
                             Integer approvalTarjetaStock = 1;
@@ -268,6 +269,7 @@ global with sharing class PLAN_CuentaService {
                                         oportunidad.Solicitar_validaci_n_descuentos__c = true;
                                         Map<String,Object> quoteInfo = (Map<String,Object>)JSON.deserializeUntyped(quoteData);
                                         approvalComision = (Integer)quoteInfo.get('approvalComision');
+                                        approvalComisionMant = (Integer)quoteInfo.get('approvalComisionMant');
                                         approvalEnvioRecurrente = (Integer)quoteInfo.get('approvalEnvioRecurrente');
                                         approvalPrimerEnvio = (Integer)quoteInfo.get('approvalPrimerEnvio');
                                         approvalTarjetaStock = (Integer)quoteInfo.get('approvalTarjetaStock');
@@ -409,6 +411,8 @@ global with sharing class PLAN_CuentaService {
                                 if(quoteData != null && quoteData != 'null') {
                                     if(concepto.Concepto_Tipo_Cargo__c=='Comisión por el servicio'){
                                         concepto.ApprovalLevel__c = approvalComision;    
+                                    } else if(concepto.Concepto_Tipo_Cargo__c=='Cobro por gestion de vehiculos') {
+                                        concepto.ApprovalLevel__c = approvalComisionMant;  
                                     } else if(concepto.Concepto_Tipo_Cargo__c=='Cargo por envío - Recurrente') {
                                         concepto.ApprovalLevel__c = approvalEnvioRecurrente;    
                                     } else if(concepto.Concepto_Tipo_Cargo__c=='Cargo del primer envío') {

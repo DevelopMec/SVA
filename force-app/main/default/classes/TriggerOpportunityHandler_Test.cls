@@ -1175,7 +1175,7 @@ public without sharing class TriggerOpportunityHandler_Test {
 		insert cont;
         
         //insert Opportunity
-        Opportunity opp = new Opportunity(Contacto__c = cont.Id ,PartnersAliances__c = 'Minu', Familia__c = 'Despensa', RecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('VentaNueva').getRecordTypeId(), AccountId = acc.Id, Name = 'Prueba', Pricebook2Id = pricebookId2,StageName = 'Prospecting', CloseDate = System.today().addDays(5),Solicitar_validaci_n_descuentos__c = false, OwnerId = u.Id, IdEjecutivoADV__c = u.Id);
+        Opportunity opp = new Opportunity(Contacto__c = cont.Id ,PartnersAliances__c = 'Acceso a salario ya trabajado - Minu', Familia__c = 'Despensa', RecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('VentaNueva').getRecordTypeId(), AccountId = acc.Id, Name = 'Prueba', Pricebook2Id = pricebookId2,StageName = 'Prospecting', CloseDate = System.today().addDays(5),Solicitar_validaci_n_descuentos__c = false, OwnerId = u.Id, IdEjecutivoADV__c = u.Id);
 
         Contact cont2 = new Contact(LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com');
         Contact cont3 = new Contact(LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com');
@@ -1317,7 +1317,7 @@ public without sharing class TriggerOpportunityHandler_Test {
         opp.CodigoClienteAS400__c = '1234';
         update opp;
         Test.stopTest();
-        List<Task> emailSend = [Select Id, Subject FROM Task WHERE WhatId =: opp.Id AND TaskSubtype = 'Email' AND Subject Like '%Email: Alianza Edenred%'];
+        List<Task> emailSend = [Select Id, Subject FROM Task WHERE WhatId =: opp.Id AND Subject Like '%: Alianza Edenred%'];
 		System.assert(!emailSend.isEmpty(), 'El correo fue enviado');
     }
 

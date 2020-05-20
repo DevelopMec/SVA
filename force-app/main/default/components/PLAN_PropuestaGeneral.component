@@ -21,7 +21,7 @@
        				<br/>
 		        	<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'Datos Cliente'">
 			            <div class="col-sm-12">
-			                <span class="dataLabelPDF" ng-style="solucion.fontColor">Nombre: </span> <span ng-bind="solucion.Quote.Contact.Name"></span><br/>
+			                <span class="dataLabelPDF" ng-style="solucion.fontColor">Nombreeeee: </span> <span ng-bind="solucion.Quote.Contact.Name"></span><br/>
 			                <span class="dataLabelPDF" ng-style="solucion.fontColor">Cliente: </span> <span ng-bind="solucion.Quote.Contact.Account.Name"></span><br/>
                             <span class="dataLabelPDF" ng-style="solucion.fontColor">Razón social: </span> <span ng-bind="solucion.Quote.Opportunity.Razon_social__c"></span><br/>
 			            </div>
@@ -323,7 +323,35 @@
                         <div class="col-sm-12 seccionDiferenciales">
                             <div class="footerPageDiferenciales" ng-style="solucion.fondoSec">Disfrute de estos servicios con una fácil contratación.</div>
                         </div>
+                        <br/><br/><br/><br/><br/>
+                        <div class="row">
+                    <div class="col-sm-6 text-center">
+                        <p class="dataLabelPDF">Por Edenred México, S. A. de C.V. </p>  
                     </div>
+                    <div class="col-sm-6 text-center">
+                        <p class="leftLabel">Por:</p> 
+                        <div class="promiseLine">{{solucion.Quote.Opportunity.Razon_social__c}}</div>
+                    </div>
+                </div>
+
+                <br/><br/><br/><br/><br/>
+                     <div class="row">
+                    <div class="col-sm-5-5 text-center">
+                        <!--<div class="fontwhite">\s1\</div>-->
+                        <center>{{solucion.Quote.Opportunity.Owner.Manager.Name}}</center>
+                        <div class="promiseLine"></div>
+                        <center><strong>Nombre y Firma del Apoderado </strong></center>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-5-5 text-center">
+                        <div class="fontwhite">\s1\</div>
+                        <center>{{solucion.representante}}</center>
+                        <div class="promiseLine"></div>
+                        <center><strong>Aceptada por la Empresa Cliente: </strong></center>
+                    </div>
+                </div>
+                    </div>
+                    
 					<!-- FIN DIFERENCIALES -->
 				</div>
             </div>
@@ -444,13 +472,14 @@
 
                 <div class="row">
                     <div class="col-sm-5-5 text-center">
-                        <div class="fontwhite">\s1\</div>
+                        <!--<div class="fontwhite">\s1\</div>-->
                         <center>{{solucion.Quote.Opportunity.Owner.Manager.Name}}</center>
                         <div class="promiseLine"></div>
                         <center><strong>Nombre y Firma del Apoderado </strong></center>
                     </div>
                     <div class="col-sm-1"></div>
                     <div class="col-sm-5-5 text-center">
+                        <div class="fontwhite">\s1\</div>
                         <center>{{solucion.representante}}</center>
                         <div class="promiseLine"></div>
                         <center><strong>Aceptada por la Empresa Cliente: </strong></center>

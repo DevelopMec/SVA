@@ -6,12 +6,13 @@ public without sharing class AltaContrato_CONT {
                     '31-Tipo_Maquila__c'=>new List<comboWP>{new comboWP('Daimler Mantenimiento','Daimler Mantenimiento')},
                         '31'=>new List<comboWP>{new comboWP('A Demanda','A Demanda'),new comboWP('Semanal','Semanal'),new comboWP('Quincenal','Quincenal'),new comboWP('DIAMES01','DIAMES01'),new comboWP('Especial al 24','Especial al 24')}
     };
+    
     @AuraEnabled
     public static plantillaWP getInfoPlantilla(String idQli){
-        plantillaWP res=new plantillaWP();
+        plantillaWP res = new plantillaWP();
         try{
-            String plQli=[Select Id,Product2.ContractTemplate__c from QuoteLineItem where Id=:idQli].Product2.ContractTemplate__c;
-            PlantillaContrato__c pl=[Select Id,(Select Id,Name,SectionFields__c,Dependencies__c,RequiredFields__c,DisabledFields__c from ContractSections__r order by Order__c ASC) from PlantillaContrato__c where Id=:plQli];
+            string templateId = [Select Id, Product2.ContractTemplate__c from QuoteLineItem where Id =: idQli].Product2.ContractTemplate__c;
+            PlantillaContrato__c pl = [Select Id, (Select Id, Name, SectionFields__c, Dependencies__c, RequiredFields__c, DisabledFields__c from ContractSections__r order by Order__c ASC) from PlantillaContrato__c where Id =: templateId];
             String camposStr='';
             String camposObligatorios='';
             String camposDesh='';
@@ -27,7 +28,7 @@ public without sharing class AltaContrato_CONT {
                         camposStr=camposStr+pl.ContractSections__r[i].SectionFields__c+'';
                     }
                 }
-                 //System.debug('Q::'+camposObligatorios);
+
                 camposStr=camposStr.trim();
                 camposObligatorios=camposObligatorios.trim();
                 camposDesh=camposDesh.trim();
@@ -104,23 +105,25 @@ public without sharing class AltaContrato_CONT {
         return mapaCampos;
     }
     public class plantillaWP{
-        @AuraEnabled public Contrato2__c adv{get;set;}
-        @AuraEnabled public List<SeccionesWP> seccionesList{get;set;}        
-        @AuraEnabled public Map<String,String> dependencias{get;set;}
-        @AuraEnabled public boolean status{get;set;}
-        @AuraEnabled public String msj{get;set;}
-        @AuraEnabled public String query{get;set;}
+        @AuraEnabled public Contrato2__c adv {get;set;}
+        @AuraEnabled public List<SeccionesWP> seccionesList {get;set;}        
+        @AuraEnabled public Map<String,String> dependencias {get;set;}
+        @AuraEnabled public boolean status {get;set;}
+        @AuraEnabled public String msj {get;set;}
+        @AuraEnabled public String query {get;set;}
     }
+    
     public class SeccionesWP{
         @AuraEnabled public String nombreSeccion{get;set;}
         //@AuraEnabled public List<String> camposObligatorios{get;set;}
         @AuraEnabled public List<campoWP> listaCampos{get;set;}
         @AuraEnabled public Integer sizeSecc{get;set;}
-        
     }
+
     public static campoWP getMap(Schema.DescribeFieldResult des,Contrato2__c adv,List<String> lFieldsRequired,List<String> lFieldsDisabled){
         return new campoWP(des,adv,lFieldsRequired,lFieldsDisabled,adv.PartidaPresupuesto__r.Product2.ProductCode,adv.PartidaPresupuesto__r.Product2.IDInterno__c,adv.PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c);
     }
+
     public class campoWP{
         @AuraEnabled public String tipo{get;set;}
         @AuraEnabled public String api{get;set;}
@@ -339,15 +342,15 @@ public without sharing class AltaContrato_CONT {
         update relatedEstablishments.values();
     }
     
-    
     public static Map<String,ContratoFilial__c> getEntidadesCuenta(String idContrato){
         Map<String,ContratoFilial__c> res=new Map<String,ContratoFilial__c>();
-        for(ContratoFilial__c cf : [Select Id,Entidad_Cuenta__c,Entidad_Cuenta__r.Name,Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c,Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name,PlatformAdministrator__c from ContratoFilial__c where Contrato_2__c=:IdContrato]){
+        for(ContratoFilial__c cf : [Select Id,Entidad_Cuenta__c,Entidad_Cuenta__r.Name,Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c,Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name,PlatformAdministrator__c, Entidad_Cuenta__r.EntidadLegal__r.FEA__c, Entidad_Cuenta__r.EntidadLegal__r.DeedDate__c, Entidad_Cuenta__r.EntidadLegal__r.AccountNumber__c, Entidad_Cuenta__r.EntidadLegal__r.KeyNumber__c, Entidad_Cuenta__r.EntidadLegal__r.Geolocation__c, Entidad_Cuenta__r.EntidadLegal__r.DeedNumber__c, Entidad_Cuenta__r.EntidadLegal__r.PersonType__c from ContratoFilial__c where Contrato_2__c=:IdContrato]){
             res.put(cf.Entidad_Cuenta__c,cf);
         }
         return res;
     }
-     @AuraEnabled
+    
+    @AuraEnabled
     public static  boolean  validarDocumento(String idOpp,String prodCod){
         String term='%'+prodCod+'%';
         System.debug('term:'+term);
@@ -360,18 +363,27 @@ public without sharing class AltaContrato_CONT {
             return false;
         }
     }
-	@AuraEnabled
+    
+    @AuraEnabled
     public static infoWP getInfoQli(String idQli){
-        infoWP res=new infoWP();
-        res.headerData=[Select Id,Product2.IsAffiliate__c,Product2.Family,Quote.Opportunity.StageName,Product2.Name,Product2.ProductLogo__c,Quote.Opportunity.Entidad_Cuenta__c,Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c,Quote.OpportunityId,Quote.Opportunity.Familia__c,Quote.Opportunity.Name,Quote.Opportunity.Id,Quote.Opportunity.Account.Id,Quote.Opportunity.Account.Name from QuoteLineItem where Id=:idQli];
+        infoWP res = new infoWP();
+        res.headerData = [
+            Select Id, Product2.IsAffiliate__c, Product2.Family, Quote.Opportunity.StageName, Product2.Name,
+                   Product2.ProductLogo__c, Product2.No_genera_contrato__c, Quote.Opportunity.Entidad_Cuenta__c,
+                   Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c, Quote.OpportunityId,Quote.Opportunity.Familia__c,
+                   Quote.Opportunity.Name, Quote.Opportunity.Id, Quote.Opportunity.Account.Id, Quote.Opportunity.Account.Name,
+            	   Product2.SendToSIGLO__c
+              from QuoteLineItem
+             where Id=:idQli
+        ];
         res.etapa=res.headerData.Quote.Opportunity.StageName;
-        List<Contrato2__c> lisADV=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,ContractDate__c,DireccionFiscal__c,Domiciliation__c,bill__c,paymentTermPaper__c,electronicPaymentTerm__c,billingEmail__c,stationId__c,Entidad_Cuenta__c,IsPaper__c,CuttingDayMon__c,CuttingDayTue__c,CuttingDayWed__c,CuttingDayThu__c,CuttingDayFri__c,CuttingDays__c,webAccessEmail__c,Producto__c,Observaciones__c,IntraseBranch__c,Chain__c from Contrato2__c where PartidaPresupuesto__c=:idQli order by CreatedDate DESC limit 1];
+        List<Contrato2__c> lisADV=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,ContractDate__c,DireccionFiscal__c,Domiciliation__c,bill__c,paymentTermPaper__c,electronicPaymentTerm__c,billingEmail__c,stationId__c,Entidad_Cuenta__c,IsPaper__c,CuttingDayMon__c,CuttingDayTue__c,CuttingDayWed__c,CuttingDayThu__c,CuttingDayFri__c,CuttingDays__c,webAccessEmail__c,Producto__c,Observaciones__c,IntraseBranch__c,Chain__c, Entidad_Legal__r.FEA__c, Entidad_Cuenta__r.EntidadLegal__r.DeedDate__c, Entidad_Cuenta__r.EntidadLegal__r.AccountNumber__c, Entidad_Cuenta__r.EntidadLegal__r.KeyNumber__c, Entidad_Cuenta__r.EntidadLegal__r.Geolocation__c, Entidad_Cuenta__r.EntidadLegal__r.DeedNumber__c from Contrato2__c where PartidaPresupuesto__c=:idQli order by CreatedDate DESC limit 1];
         if(lisADV!=null&&lisADV.size()==1){
             res.contrato=lisADV[0];        
         }else{
             Contrato2__c contrato=new Contrato2__c(PartidaPresupuesto__c=res.headerData.Id,Entidad_Cuenta__c=res.headerData.Quote.Opportunity.Entidad_Cuenta__c,Entidad_Legal__c=res.headerData.Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c);
             insert contrato;
-            Contrato2__c contratoTem=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,ContractDate__c,Domiciliation__c,bill__c,paymentTermPaper__c,electronicPaymentTerm__c,DireccionFiscal__c,billingEmail__c,stationId__c,Entidad_Cuenta__c,IsPaper__c,CuttingDayMon__c,CuttingDayTue__c,CuttingDayWed__c,CuttingDayThu__c,CuttingDayFri__c,CuttingDays__c,webAccessEmail__c,Producto__c,Observaciones__c,IntraseBranch__c,Chain__c from Contrato2__c where Id=:contrato.Id];
+            Contrato2__c contratoTem=[Select Id,Name,PlatformAdministrator__c,PartidaPresupuesto__r.Product2.IDInterno__c,PartidaPresupuesto__r.Product2.ProductCode,PartidaPresupuesto__r.Quote.Comision_por_Servicio__c,PartidaPresupuesto__r.Quote.Opportunity.Account.CodigoClienteAS400__c,PartidaPresupuesto__r.Quote.Opportunity.Contacto__c,Contacto__c,FiscalAddress__c,ContractDate__c,Domiciliation__c,bill__c,paymentTermPaper__c,electronicPaymentTerm__c,DireccionFiscal__c,billingEmail__c,stationId__c,Entidad_Cuenta__c,IsPaper__c,CuttingDayMon__c,CuttingDayTue__c,CuttingDayWed__c,CuttingDayThu__c,CuttingDayFri__c,CuttingDays__c,webAccessEmail__c,Producto__c,Observaciones__c,IntraseBranch__c,Chain__c, Entidad_Legal__r.FEA__c,Entidad_Cuenta__r.EntidadLegal__r.DeedDate__c, Entidad_Cuenta__r.EntidadLegal__r.AccountNumber__c, Entidad_Cuenta__r.EntidadLegal__r.KeyNumber__c, Entidad_Cuenta__r.EntidadLegal__r.Geolocation__c, Entidad_Cuenta__r.EntidadLegal__r.DeedNumber__c from Contrato2__c where Id=:contrato.Id];
             res.contrato=contratoTem;
         }
         if(res.headerData.Product2.IsAffiliate__c){
@@ -400,7 +412,7 @@ public without sharing class AltaContrato_CONT {
         }
             
         Map<String,EntidadCuenta__c> mapEntidades=new Map<String,EntidadCuenta__c>();
-        for(EntidadCuenta__c ec:[Select Id,Name,NombreEL__c,EntidadLegal__r.RecordType.Name,EntidadLegal__r.RazonSocial__c from EntidadCuenta__c where Cuenta__c=:idCuenta and EntidadLegal__r.Estatus__c='Completa']){
+        for(EntidadCuenta__c ec:[Select Id,Name,NombreEL__c,EntidadLegal__r.RecordType.Name,EntidadLegal__r.RazonSocial__c,EntidadLegal__r.PersonType__c from EntidadCuenta__c where Cuenta__c=:idCuenta and EntidadLegal__r.Estatus__c='Completa']){
             System.debug('IDRF::'+ec.NombreEL__c);
             lisVal.add(new comboWP(ec.Id,ec.NombreEL__c));
             mapEntidades.put(ec.Id, ec);
@@ -425,12 +437,14 @@ public without sharing class AltaContrato_CONT {
         res.IdOpp = IdOpp;
         return res;
     }
+    
     @AuraEnabled
     public static infoWP getMetodosPago(String idCuenta){
         infoWP res=new infoWP();
         res.metodosPago = [SELECT Id, CLABE__c, Name, AccountHolder__c,StandardiziedBankKey__c, Reference__c, Bank__c, RegistrationStatus__c, Cuenta__c FROM BankAccount__c Where Cuenta__c =: idCuenta];
         return res;
     }
+    
     @AuraEnabled
     public static estabRefresWP getEstablecimientosRefresh(String idCuenta,String contratoId){
         estabRefresWP res=new estabRefresWP();
@@ -443,30 +457,32 @@ public without sharing class AltaContrato_CONT {
         }
         return res;
     }
+    
     public without sharing class estabRefresWP{
         @AuraEnabled public Set<String> establecimientosGuardados{get;set;}
         @AuraEnabled public List<Establishment__c> establecimientos{get;set;}
     }
+    
     public without sharing class infoWP{
-        @AuraEnabled public Map<String,EntidadCuenta__c> mapaEC{get;set;}
-        @AuraEnabled public List<CatalogoDirecciones__c> direcciones{get;set;}
-        @AuraEnabled public Contrato2__c contrato{get;set;}
-        @AuraEnabled public QuoteLineItem headerData{get;set;}
-        @AuraEnabled public List<comboWP> entidadesCuenta{get;set;}
-        @AuraEnabled public Map<String,List<comboWP>> representantes{get;set;}
-        @AuraEnabled public List<comboWP> contactosCuenta{get;set;}
-        @AuraEnabled public Map<String,OpportunityContactRole__c> contactosGuardados{get;set;}
-        @AuraEnabled public Set<String> funcionesContactos{get;set;}
-        @AuraEnabled public Map<String,sObject> filiales{get;set;}
+        @AuraEnabled public Map<String,EntidadCuenta__c> mapaEC {get;set;}
+        @AuraEnabled public List<CatalogoDirecciones__c> direcciones {get;set;}
+        @AuraEnabled public Contrato2__c contrato {get;set;}
+        @AuraEnabled public QuoteLineItem headerData {get;set;}
+        @AuraEnabled public List<comboWP> entidadesCuenta {get;set;}
+        @AuraEnabled public Map<String,List<comboWP>> representantes {get;set;}
+        @AuraEnabled public List<comboWP> contactosCuenta {get;set;}
+        @AuraEnabled public Map<String,OpportunityContactRole__c> contactosGuardados {get;set;}
+        @AuraEnabled public Set<String> funcionesContactos {get;set;}
+        @AuraEnabled public Map<String,sObject> filiales {get;set;}
         
         @AuraEnabled public List<BankAccount__c> metodosPago{get;set;}
         @AuraEnabled public List<Establishment__c> establecimientos{get;set;}
         @AuraEnabled public Set<Id> establecimientosGuardados{get;set;}
         
-        
         @AuraEnabled public String IdOpp{get;set;}
         @AuraEnabled public String etapa{get;set;}
     }
+    
     public without sharing class comboWP{
         @AuraEnabled public String label{get;set;}
         @AuraEnabled public String value{get;set;}
@@ -475,6 +491,7 @@ public without sharing class AltaContrato_CONT {
             this.value=val;
         }
     }
+    
     public static Set<String> getFuncionesContactos(){
         Set<String> pickListValuesList= new Set<String>();
         Schema.DescribeFieldResult fieldResult = OpportunityContactRole__c.Role__c.getDescribe();
@@ -503,6 +520,7 @@ public without sharing class AltaContrato_CONT {
         }
         return res;
     }
+    
     @AuraEnabled
     public static List<comboWP> getGruposPrime(String codigoProducto,String grupoNum){
         List<comboWP> res=new List<comboWP>();

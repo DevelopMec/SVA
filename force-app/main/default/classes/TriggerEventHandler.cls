@@ -28,17 +28,28 @@ public with sharing class TriggerEventHandler  extends TriggerHandler{
     public override void beforeInsert(){
         validaFechaInicio(newList);
         insertFieldFamily();
+        for(Event e:newList){
+            if(e.EstatusEvento__c != 'Finalizado'){
+                e.ActivityType__c = null;
+                e.EventNumber__c = null; 
+            }
+        }
     }
 
     public override void afterUpdate(){
         validarEventoCompartido(newList,oldMap);
         //actulizarObjetosUltimaTarea();
+        ActivityCounter.generaContadorTipoEvento(newList);
     }
 
     public override void beforeUpdate(){
         for(Event e:newList){
             if(e.EventoRelacionado__c!=''&&e.EventoRelacionado__c!=null&&e.OwnerId==UserInfo.getUserId()){
                 e.addError('No puedes modificar un evento del cual eres acompañante');
+            }
+            if(e.EstatusEvento__c != 'Finalizado'){
+               e.ActivityType__c = null;
+               e.EventNumber__c = null; 
             }
         }
     }
@@ -52,6 +63,7 @@ public with sharing class TriggerEventHandler  extends TriggerHandler{
         validarEventoCompartido(newList,oldMap);
         actulizarObjetosUltimaTarea();
         insertarFechaPrimeraActividad();
+        ActivityCounter.generaContadorTipoEvento(newList);
     }
     
     public void validarEventoCompartido(List<Event> newListEvt,Map<Id,Event> oldMapEvt){

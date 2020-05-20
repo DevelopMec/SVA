@@ -15,7 +15,8 @@
                     <div ng-repeat="solucion in sc.soluciones">
                         <ctc-component-vfc name="PLAN_EcovaleCombustibleEdenred" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_EcovaleCombustibleEdenred'"></ctc-component-vfc>
-                        <ctc-component-vfc name="PLAN_EcovaleDespensasEdenred" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 'PLAN_EcovaleDespensasEdenred'"></ctc-component-vfc>
+                        <ctc-component-vfc name="PLAN_EcovaleDespensasEdenred" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
+                        'PLAN_EcovaleDespensasEdenred'"></ctc-component-vfc>
                         <ctc-component-vfc name="PLAN_ValeDespensasEdenred" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_ValeDespensasEdenred'"></ctc-component-vfc>
                         <ctc-component-vfc name="PLAN_EmpresarialEdenred" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
@@ -24,7 +25,7 @@
                         'PLAN_RegaloEdenred'"></ctc-component-vfc>
                         <ctc-component-vfc name="PLAN_TicketRestaurante" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_TicketRestaurante'"></ctc-component-vfc>
-						<ctc-component-vfc name="PLAN_TicketCar" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
+                        <ctc-component-vfc name="PLAN_TicketCar" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_TicketCar'"></ctc-component-vfc>
                         <ctc-component-vfc name="PLAN_TicketPlus" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_TicketPlus'"></ctc-component-vfc>
@@ -34,6 +35,8 @@
                         'PLAN_Mantenimiento'"></ctc-component-vfc>
                         <ctc-component-vfc name="PLAN_PropuestaGeneral" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_PropuestaGeneral'"></ctc-component-vfc>
+                        <ctc-component-vfc name="PLAN_TicketCarHidrosina" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
+                        'PLAN_TicketCarHidrosina'"></ctc-component-vfc>
                         <span class="page-break" ng-if="!$last && sc.soluciones.length > 1 && sc.codigos[solucion.Product2.ProductCode]"></span>
                     </div>
                 </div>
@@ -55,35 +58,35 @@
         </div>
     </script>
     <script type="text/javascript">
-    	
-		function Marco(width,height){
-			this.width = width;
-			this.height = height;
-		}
-		
-		/** OBJETO DOCUMENTO **/
-		function DocumentoPDF(){
-			this.paginas = [];
-			this.numPaginas = 0;
-			this.currentPage = 0;
-		}
-		DocumentoPDF.prototype.addPagina = function(p){
-			this.numPaginas += 1;
-			p.numPagina = this.numPaginas;
-        	this.currentPage = 1;
-        	this.paginas.push(p);
-		}
-		/** OBJETO PAGINA **/
-		function Pagina(size){
-			this.size = size || T_CARTA;
-			this.sumaHeight = 0;
-			this.secciones = [];
-			this.numPagina = 0;
-		}
-		Pagina.prototype.addSeccion = function(s){
-			console.log("AddSeccion");
-			console.log(s);
-			this.sumaHeight += s.size.height || 1;
+        
+        function Marco(width,height){
+            this.width = width;
+            this.height = height;
+        }
+        
+        /** OBJETO DOCUMENTO **/
+        function DocumentoPDF(){
+            this.paginas = [];
+            this.numPaginas = 0;
+            this.currentPage = 0;
+        }
+        DocumentoPDF.prototype.addPagina = function(p){
+            this.numPaginas += 1;
+            p.numPagina = this.numPaginas;
+            this.currentPage = 1;
+            this.paginas.push(p);
+        }
+        /** OBJETO PAGINA **/
+        function Pagina(size){
+            this.size = size || T_CARTA;
+            this.sumaHeight = 0;
+            this.secciones = [];
+            this.numPagina = 0;
+        }
+        Pagina.prototype.addSeccion = function(s){
+            console.log("AddSeccion");
+            console.log(s);
+            this.sumaHeight += s.size.height || 1;
             if(this.sumaHeight < this.size.height){
                 this.secciones.push(s);
                 return true;
@@ -91,91 +94,91 @@
                 this.sumaHeight -= s.size.height;
                 return false;
             }
-		}
-		Pagina.prototype.getEspacioFaltante = function(){
-			console.log(this.size.height - this.sumaHeight);
-			return this.size.height - this.sumaHeight;
-		}
-		
-		/** OBJETO SECCION **/
-		function Seccion(nombre, titulo, size, arr){
-			this.nombre = nombre;
-			this.titulo = titulo;
-			this.listaContenido = arr;
-			this.size = size;
-		}
-		
-		/** OBJETO SECCION_TABLA **/
-		function SeccionTabla(nombre, titulo, arr){
-			this.nombre = nombre;
-			this.titulo = titulo;
-			this.ST_HEADER = 1.7;
-			this.ST_ROW = 0.55;
-			this.listaContenido = arr;
-			this.size = new Marco(W_CONTENIDO,this.ST_HEADER + this.ST_ROW * this.listaContenido.length);
-			//this.size.height += this.ST_HEADER + this.ST_ROW * this.listaContenido.length;
-		}
-		//SeccionTabla.prototype = Object.create(Seccion.prototype);
-		//SeccionTabla.prototype.constructor = SeccionTabla;
-		SeccionTabla.prototype.getSize = function(){
-			return(new Marco(W_CONTENIDO,this.ST_HEADER + this.ST_ROW * this.listaContenido.length));
-		}
-		SeccionTabla.prototype.getRowsInHeight = function(height){
-			return Math.floor((height-this.ST_HEADER)/this.ST_ROW);
-		}
-		SeccionTabla.prototype.partirSeccion = function(maxNumRows){
-			console.log('####partirSeccion');
-			console.log(this.titulo);
-			console.log(this.nombre);
-			var lsSec = [];
-			var lsRowsSec = [];
-			var contador = 0;
-			var limiteRows = maxNumRows -1;
-			var rows;
-			var total = this.listaContenido.length;
-			this.listaContenido.forEach(function(item){
-				if(contador == 0){
-					rows = [];
-					rows.push(item);
-					if(limiteRows == contador){
-						lsRowsSec.push(rows);
-						rows = [];
-					}
-				}else if(contador > 0 && limiteRows == contador){
-					rows.push(item);
-					lsRowsSec.push(rows);
-					rows = [];
-				}else{
-					rows.push(item);
-					if(contador == (total - 1)){
-						lsRowsSec.push(rows);
-					}
-				}
-				contador++;
-			});
-			
-			contador = 0;
-			
-			var name = this.nombre;
-			var title = this.titulo;
-			var hrow = this.ST_ROW;
-			console.log('####Titulo '+this.titulo);
-			lsRowsSec.forEach(function(ar){
-				var st = new SeccionTabla(name,title,ar);
-				st.ST_ROW = hrow;
-				st.size = st.getSize();
-				lsSec.push(st);
-				contador++;
-			});
-			
-			return lsSec;
-		}
-		
-		//CONSTANTES
-    	var T_A4 	= new Marco(21.00, 29.70);
-		var T_CARTA = new Marco(21.59, 27.94);
-		var W_CONTENIDO = 19.0;
-		
+        }
+        Pagina.prototype.getEspacioFaltante = function(){
+            console.log(this.size.height - this.sumaHeight);
+            return this.size.height - this.sumaHeight;
+        }
+        
+        /** OBJETO SECCION **/
+        function Seccion(nombre, titulo, size, arr){
+            this.nombre = nombre;
+            this.titulo = titulo;
+            this.listaContenido = arr;
+            this.size = size;
+        }
+        
+        /** OBJETO SECCION_TABLA **/
+        function SeccionTabla(nombre, titulo, arr){
+            this.nombre = nombre;
+            this.titulo = titulo;
+            this.ST_HEADER = 1.7;
+            this.ST_ROW = 0.55;
+            this.listaContenido = arr;
+            this.size = new Marco(W_CONTENIDO,this.ST_HEADER + this.ST_ROW * this.listaContenido.length);
+            //this.size.height += this.ST_HEADER + this.ST_ROW * this.listaContenido.length;
+        }
+        //SeccionTabla.prototype = Object.create(Seccion.prototype);
+        //SeccionTabla.prototype.constructor = SeccionTabla;
+        SeccionTabla.prototype.getSize = function(){
+            return(new Marco(W_CONTENIDO,this.ST_HEADER + this.ST_ROW * this.listaContenido.length));
+        }
+        SeccionTabla.prototype.getRowsInHeight = function(height){
+            return Math.floor((height-this.ST_HEADER)/this.ST_ROW);
+        }
+        SeccionTabla.prototype.partirSeccion = function(maxNumRows){
+            console.log('####partirSeccion');
+            console.log(this.titulo);
+            console.log(this.nombre);
+            var lsSec = [];
+            var lsRowsSec = [];
+            var contador = 0;
+            var limiteRows = maxNumRows -1;
+            var rows;
+            var total = this.listaContenido.length;
+            this.listaContenido.forEach(function(item){
+                if(contador == 0){
+                    rows = [];
+                    rows.push(item);
+                    if(limiteRows == contador){
+                        lsRowsSec.push(rows);
+                        rows = [];
+                    }
+                }else if(contador > 0 && limiteRows == contador){
+                    rows.push(item);
+                    lsRowsSec.push(rows);
+                    rows = [];
+                }else{
+                    rows.push(item);
+                    if(contador == (total - 1)){
+                        lsRowsSec.push(rows);
+                    }
+                }
+                contador++;
+            });
+            
+            contador = 0;
+            
+            var name = this.nombre;
+            var title = this.titulo;
+            var hrow = this.ST_ROW;
+            console.log('####Titulo '+this.titulo);
+            lsRowsSec.forEach(function(ar){
+                var st = new SeccionTabla(name,title,ar);
+                st.ST_ROW = hrow;
+                st.size = st.getSize();
+                lsSec.push(st);
+                contador++;
+            });
+            
+            return lsSec;
+        }
+        
+        //CONSTANTES
+        var T_A4    = new Marco(21.00, 29.70);
+        var T_CARTA = new Marco(21.59, 27.94);
+        var W_CONTENIDO = 19.0;
+        
         (function() {
             'use strict'
             angular.module('appEdenred')
@@ -282,9 +285,9 @@
                         if(!vm.codigos[producto.Product2.ProductCode]){
                             solucionesDescartadas.push(soluciones.indexOf(producto));
                         }
-						
-						
-						//Se recorren los conceptos unicos
+                        
+                        
+                        //Se recorren los conceptos unicos
                         angular.forEach(producto.conceptosUnicos,function(producto2,index2){
 
                                 if(producto.conceptosKey[producto2.key]){
@@ -606,6 +609,35 @@
                                 //Se crea un documento para que las tablas se corten de acuerdo al tamaño de la hoja
                                 vm.paginaPdfTicketCard(producto); //vm.codigos[tipoPromesa]
                             }
+                            
+                            if(vm.codigos[tipoPromesa].Name == 'PLAN_TicketCarHidrosina'){
+                                if(vm.owner.Segmento__c == 'Small'){
+                                    producto.fechaHoy = vm.fechaHoy
+                                    producto.header = 'TicketCarCorporate.png'
+                                    producto.urlHeader = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/"+producto.header+"')}"
+                                    producto.titlePipe = { 'background-color': '#ffc72c'}
+                                    producto.fontColor = {'color':'#ffc72c'}
+                                    producto.dateBorder = {'border': '1.5px solid #ffc72c'}
+                                    producto.owner = vm.owner
+                                    producto.Segmento__c = 'Small'
+                                }
+                                if(vm.owner.Segmento__c == 'MLK'){
+                                    producto.fechaHoy = vm.fechaHoy
+                                    producto.header = 'TicketCarCorporate.png'
+                                    producto.urlHeader = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/"+producto.header+"')}"
+                                    producto.titlePipe = { 'background-color': '#ffc72c'}
+                                    producto.fontColor = {'color':'#ffc72c'}
+                                    producto.dateBorder = {'border': '1.5px solid #ffc72c'}
+                                    producto.owner = vm.owner
+                                    producto.Segmento__c = 'MLK'
+                                }
+                                if(tipoPromesa == '30-TC4'){
+                                    producto.tipo = '4.0';
+                                }
+                                //Se crea un documento para que las tablas se corten de acuerdo al tamaño de la hoja
+                                vm.paginaPdfTicketCard(producto); //vm.codigos[tipoPromesa]
+                            }
+                            
                             if(vm.codigos[tipoPromesa].Name == 'PLAN_Mantenimiento'){
                                 producto.fechaHoy = vm.fechaHoy
                                 producto.header = 'Mantenimiento.png'
@@ -619,9 +651,9 @@
                                 producto.DiferencialesMantenimiento = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/Mantenimiento2.png')}"
                                 producto.SolucionesMantenimiento = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/Mantenimiento3.png')}"
                                 producto.SolucionesMantenimiento2 = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/Mantenimiento4.png')}"
-								
-								vm.paginaPdfMantenimiento(producto);
-								
+                                
+                                vm.paginaPdfMantenimiento(producto);
+                                
                                 vm.margin = {left: "0cm", top: "0cm", right: "0cm", bottom: "0.75cm"}
 
                                 var tablaGlobal = [];                                
@@ -755,9 +787,9 @@
                         }
 
                     })
-					
-					
-					//Si se descartan la totalidad de soluciones se muestra un mensaje de error
+                    
+                    
+                    //Si se descartan la totalidad de soluciones se muestra un mensaje de error
                     if(parseInt(solucionesDescartadas.length) == parseInt(soluciones.length)){
                         vm.processing = false
                         vm.dataRender = false
@@ -826,300 +858,300 @@
                 }
                 
                 vm.paginaPdfMantenimiento = function(producto){
-                	var documento = new DocumentoPDF();
-                	var pagina = new Pagina();
-                	
-                	var secciones = [];
-                	var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
-                	secciones.push(header);
-                	var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
-                	secciones.push(cfecha);
-                	var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
-                	secciones.push(tProp);
-                	var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
-                	secciones.push(datosCliente);
-                	
-                	var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,3.5)));
-                	secciones.push(textoPropuesta);
-                	
-                	if(producto.conceptosFiltrados.length > 0){
-                		var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
-                		tablaPrecios.ST_HEADER = 2.2;
-                		tablaPrecios.size = tablaPrecios.getSize();
-                		secciones.push(tablaPrecios);
-                	}
-                	
-                	var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.0)));
-                	secciones.push(vigenciaIva);
-                	var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,1.0)));
-                	secciones.push(comentarios);
-                	var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,1.5)));
-                	secciones.push(formaPago);
-                	var contraprestacion = new Seccion('contraprestacion','contraprestacion',(new Marco(W_CONTENIDO,1.0)));
-                	secciones.push(contraprestacion);
-                	//Se aplica algoritmo de paginación
-              		vm.paginarDocumentoPdf(secciones, pagina, documento);
+                    var documento = new DocumentoPDF();
+                    var pagina = new Pagina();
+                    
+                    var secciones = [];
+                    var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
+                    secciones.push(header);
+                    var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
+                    secciones.push(cfecha);
+                    var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
+                    secciones.push(tProp);
+                    var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(datosCliente);
+                    
+                    var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,3.5)));
+                    secciones.push(textoPropuesta);
+                    
+                    if(producto.conceptosFiltrados.length > 0){
+                        var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
+                        tablaPrecios.ST_HEADER = 2.2;
+                        tablaPrecios.size = tablaPrecios.getSize();
+                        secciones.push(tablaPrecios);
+                    }
+                    
+                    var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.0)));
+                    secciones.push(vigenciaIva);
+                    var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,1.0)));
+                    secciones.push(comentarios);
+                    var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,1.5)));
+                    secciones.push(formaPago);
+                    var contraprestacion = new Seccion('contraprestacion','contraprestacion',(new Marco(W_CONTENIDO,1.0)));
+                    secciones.push(contraprestacion);
+                    //Se aplica algoritmo de paginación
+                    vm.paginarDocumentoPdf(secciones, pagina, documento);
                 }
                 
                 vm.paginaPdfComun = function(producto){
-                	var documento = new DocumentoPDF();
-                	var pagina = new Pagina();
-                	
-                	var secciones = [];
-                	var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
-                	secciones.push(header);
-                	var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
-                	secciones.push(cfecha);
-                	var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
-                	secciones.push(tProp);
-                	var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
-                	secciones.push(datosCliente);
-                	
-                	var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,5)));
-                	secciones.push(textoPropuesta);
-                	
-                	if(producto.conceptosFiltrados.length > 0){
-                		var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
-                		tablaPrecios.ST_HEADER = 2.2;
-                		tablaPrecios.size = tablaPrecios.getSize();
-                		secciones.push(tablaPrecios);
-                	}
-                	
-                	var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.0)));
-                	secciones.push(vigenciaIva);
-                	var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,2)));
-                	secciones.push(comentarios);
-                	var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,3)));
-                	secciones.push(formaPago);
-                	
-                	if(producto.diferenciales.length > 0){
-                		var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
-                		secciones.push(pipeDiferenciales);
-                		var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
-                		tablaDiferenciales.ST_ROW = 0.7;
-                		tablaDiferenciales.size = tablaDiferenciales.getSize();
-                		secciones.push(tablaDiferenciales);
-                		var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.0)));
-                		secciones.push(pipeDiferenciales2);
-                	}
-                	if(producto.header == 'EmpresarialEdenred.png' && producto.owner.Segmento__c == 'Small'){
-                		var tDocumentacion = new Seccion('tituloDocumentacion','tituloDocumentacion',(new Marco(W_CONTENIDO,1)));
-                		secciones.push(tDocumentacion);
-                		var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,6.5)));
-                		secciones.push(tablaDocumentacion);
-             			var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
-                		secciones.push(infoAdicional);
-                	}
-                	//Se aplica algoritmo de paginación
-              		vm.paginarDocumentoPdf(secciones, pagina, documento);
+                    var documento = new DocumentoPDF();
+                    var pagina = new Pagina();
+                    
+                    var secciones = [];
+                    var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
+                    secciones.push(header);
+                    var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
+                    secciones.push(cfecha);
+                    var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
+                    secciones.push(tProp);
+                    var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(datosCliente);
+                    
+                    var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,5)));
+                    secciones.push(textoPropuesta);
+                    
+                    if(producto.conceptosFiltrados.length > 0){
+                        var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
+                        tablaPrecios.ST_HEADER = 2.2;
+                        tablaPrecios.size = tablaPrecios.getSize();
+                        secciones.push(tablaPrecios);
+                    }
+                    
+                    var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.0)));
+                    secciones.push(vigenciaIva);
+                    var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(comentarios);
+                    var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,3)));
+                    secciones.push(formaPago);
+                    
+                    if(producto.diferenciales.length > 0){
+                        var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
+                        secciones.push(pipeDiferenciales);
+                        var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
+                        tablaDiferenciales.ST_ROW = 0.7;
+                        tablaDiferenciales.size = tablaDiferenciales.getSize();
+                        secciones.push(tablaDiferenciales);
+                        var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.0)));
+                        secciones.push(pipeDiferenciales2);
+                    }
+                    if(producto.header == 'EmpresarialEdenred.png' && producto.owner.Segmento__c == 'Small'){
+                        var tDocumentacion = new Seccion('tituloDocumentacion','tituloDocumentacion',(new Marco(W_CONTENIDO,1)));
+                        secciones.push(tDocumentacion);
+                        var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,6.5)));
+                        secciones.push(tablaDocumentacion);
+                        var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
+                        secciones.push(infoAdicional);
+                    }
+                    //Se aplica algoritmo de paginación
+                    vm.paginarDocumentoPdf(secciones, pagina, documento);
                 }
                 
                 vm.paginaPdfTicketCard = function(producto){
-                	var documento = new DocumentoPDF();
-                	var pagina = new Pagina();
-                	
-                	var secciones = [];
-                	var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
-                	secciones.push(header);
-                	var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
-                	secciones.push(cfecha);
+                    var documento = new DocumentoPDF();
+                    var pagina = new Pagina();
                     
-                	var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
-                	secciones.push(tProp);
-                	var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
-                	secciones.push(datosCliente);
-                	
-                	if(producto.owner.Segmento__c == 'Small'){
-                		var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
-                		secciones.push(textoPropuesta);
+                    var secciones = [];
+                    var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
+                    secciones.push(header);
+                    var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
+                    secciones.push(cfecha);
+                    
+                    var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
+                    secciones.push(tProp);
+                    var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(datosCliente);
+                    
+                    if(producto.owner.Segmento__c == 'Small'){
+                        var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
+                        secciones.push(textoPropuesta);
                         
-                	}else{
-                		var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,3)));
-                		secciones.push(textoPropuesta);
-                	}
-                	
-                	
-                	if(producto.owner.Segemento == 'Small'){
-                		var datosPropuesta = new Seccion('datosPropuesta','datosPropuesta',(new Marco(W_CONTENIDO,1.5)));
-                		secciones.push(datosPropuesta);
-                	}
-                	var textoPropuesta2 = new Seccion('textoPropuesta2','textoPropuesta2',(new Marco(W_CONTENIDO,1.5)));
-                	secciones.push(textoPropuesta2);
-                	
-                	if(producto.conceptosFiltrados.length > 0){
-                		var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
-                		tablaPrecios.size = tablaPrecios.getSize();
-                		secciones.push(tablaPrecios);
-                	}
-                	
-                	var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.5)));
-                	secciones.push(vigenciaIva);
-                	
+                    }else{
+                        var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,3)));
+                        secciones.push(textoPropuesta);
+                    }
+                    
+                    
+                    if(producto.owner.Segemento == 'Small'){
+                        var datosPropuesta = new Seccion('datosPropuesta','datosPropuesta',(new Marco(W_CONTENIDO,1.5)));
+                        secciones.push(datosPropuesta);
+                    }
+                    var textoPropuesta2 = new Seccion('textoPropuesta2','textoPropuesta2',(new Marco(W_CONTENIDO,1.5)));
+                    secciones.push(textoPropuesta2);
+                    
+                    if(producto.conceptosFiltrados.length > 0){
+                        var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
+                        tablaPrecios.size = tablaPrecios.getSize();
+                        secciones.push(tablaPrecios);
+                    }
+                    
+                    var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.5)));
+                    secciones.push(vigenciaIva);
+                    
                     /****/
                     var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,2)));
                     secciones.push(comentarios);
                     /****/
                     
-                	if(producto.owner.Segemento != 'Small'){
-                		var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,3)));
-                		secciones.push(formaPago);
-                	}
-                	
-                	if(producto.diferenciales.length > 0){
-                		var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
-                		secciones.push(pipeDiferenciales);
-                		var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
-                		tablaDiferenciales.ST_ROW = 0.7;
-                		tablaDiferenciales.size = tablaDiferenciales.getSize();
-                		secciones.push(tablaDiferenciales);
-                		var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.5)));
-                		secciones.push(pipeDiferenciales2);
-                	}
-                	
-                	if(producto.owner.Segmento__c == 'Small'){
-                		var contraprestacionSmall = new Seccion('contraprestacionSmall','contraprestacionSmall',new Marco(W_CONTENIDO,2));
-                		secciones.push(contraprestacionSmall);
-                		
-                		var formaPagoSmall = new Seccion('formaPagoSmall','formaPagoSmall',(new Marco(W_CONTENIDO,3)));
-                		secciones.push(formaPagoSmall);
-                	}
-                	
-                	var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,7.5)));
-                	secciones.push(tablaDocumentacion);
-                	
-                	var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
-                	secciones.push(infoAdicional);
-                	
-                	//Se aplica algoritmo de paginación
-              		vm.paginarDocumentoPdf(secciones, pagina, documento);
+                    if(producto.owner.Segemento != 'Small'){
+                        var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,3)));
+                        secciones.push(formaPago);
+                    }
+                    
+                    if(producto.diferenciales.length > 0){
+                        var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
+                        secciones.push(pipeDiferenciales);
+                        var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
+                        tablaDiferenciales.ST_ROW = 0.7;
+                        tablaDiferenciales.size = tablaDiferenciales.getSize();
+                        secciones.push(tablaDiferenciales);
+                        var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.5)));
+                        secciones.push(pipeDiferenciales2);
+                    }
+                    
+                    if(producto.owner.Segmento__c == 'Small'){
+                        var contraprestacionSmall = new Seccion('contraprestacionSmall','contraprestacionSmall',new Marco(W_CONTENIDO,2));
+                        secciones.push(contraprestacionSmall);
+                        
+                        var formaPagoSmall = new Seccion('formaPagoSmall','formaPagoSmall',(new Marco(W_CONTENIDO,3)));
+                        secciones.push(formaPagoSmall);
+                    }
+                    
+                    var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,7.5)));
+                    secciones.push(tablaDocumentacion);
+                    
+                    var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
+                    secciones.push(infoAdicional);
+                    
+                    //Se aplica algoritmo de paginación
+                    vm.paginarDocumentoPdf(secciones, pagina, documento);
                 }
                 
                 vm.paginaEcovaleCombustible = function(producto){
-                	var documento = new DocumentoPDF();
-                	var pagina = new Pagina();
-                	
-                	var secciones = [];
-                	var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
-                	secciones.push(header);
-                	var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
-                	secciones.push(cfecha);
-                	var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
-                	secciones.push(tProp);
-                	var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
-                	secciones.push(datosCliente);
-                	
-                	if(producto.owner.Segmento__c == 'Small'){
-                		var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
-                		secciones.push(textoPropuesta);
-                	}else{
-                		var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
-                		secciones.push(textoPropuesta);
-                	}
-                	
-                	
-                	if(producto.conceptosFiltrados.length > 0){
-                		var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
-                		tablaPrecios.size = tablaPrecios.getSize();
-                		secciones.push(tablaPrecios);
-                	}
-                	
-                	if(producto.owner.Segemento != 'Small'){
-                		var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.0)));
-                		secciones.push(vigenciaIva);
-                		var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,1.0)));
-                		secciones.push(comentarios);
-                		var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,3)));
-                		secciones.push(formaPago);
-                	}else{
-                		var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.5)));
-                		secciones.push(vigenciaIva);
-                	}
-                	
-                	if(producto.diferenciales.length > 0){
-                		var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
-                		secciones.push(pipeDiferenciales);
-                		var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
-                		tablaDiferenciales.ST_ROW = 0.9;
-                		tablaDiferenciales.size = tablaDiferenciales.getSize();
-                		secciones.push(tablaDiferenciales);
-                		if(producto.owner.Segmento__c != 'Small'){
-                			var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.5)));
-                			secciones.push(pipeDiferenciales2);
-                		}
-                	}
-                	
-                	if(producto.owner.Segmento__c == 'Small'){
-                		var formaPagoSmall = new Seccion('formaPagoSmall','formaPagoSmall',(new Marco(W_CONTENIDO,3)));
-                		secciones.push(formaPagoSmall);
-                		var tDocumentacion = new Seccion('tituloDocumentacion','tituloDocumentacion',(new Marco(W_CONTENIDO,1)));
-                		secciones.push(tDocumentacion);
-                	
-                		var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,6.5)));
-                		secciones.push(tablaDocumentacion);
-                	
-                		var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
-                		secciones.push(infoAdicional);
-                	}
-                	
-                	
-                	
-                	//Se aplica algoritmo de paginación
-              		vm.paginarDocumentoPdf(secciones, pagina, documento);
+                    var documento = new DocumentoPDF();
+                    var pagina = new Pagina();
+                    
+                    var secciones = [];
+                    var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
+                    secciones.push(header);
+                    var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
+                    secciones.push(cfecha);
+                    var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
+                    secciones.push(tProp);
+                    var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(datosCliente);
+                    
+                    if(producto.owner.Segmento__c == 'Small'){
+                        var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
+                        secciones.push(textoPropuesta);
+                    }else{
+                        var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
+                        secciones.push(textoPropuesta);
+                    }
+                    
+                    
+                    if(producto.conceptosFiltrados.length > 0){
+                        var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
+                        tablaPrecios.size = tablaPrecios.getSize();
+                        secciones.push(tablaPrecios);
+                    }
+                    
+                    if(producto.owner.Segemento != 'Small'){
+                        var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.0)));
+                        secciones.push(vigenciaIva);
+                        var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,1.0)));
+                        secciones.push(comentarios);
+                        var formaPago = new Seccion('formaPago','formaPago',(new Marco(W_CONTENIDO,3)));
+                        secciones.push(formaPago);
+                    }else{
+                        var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.5)));
+                        secciones.push(vigenciaIva);
+                    }
+                    
+                    if(producto.diferenciales.length > 0){
+                        var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
+                        secciones.push(pipeDiferenciales);
+                        var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
+                        tablaDiferenciales.ST_ROW = 0.9;
+                        tablaDiferenciales.size = tablaDiferenciales.getSize();
+                        secciones.push(tablaDiferenciales);
+                        if(producto.owner.Segmento__c != 'Small'){
+                            var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.5)));
+                            secciones.push(pipeDiferenciales2);
+                        }
+                    }
+                    
+                    if(producto.owner.Segmento__c == 'Small'){
+                        var formaPagoSmall = new Seccion('formaPagoSmall','formaPagoSmall',(new Marco(W_CONTENIDO,3)));
+                        secciones.push(formaPagoSmall);
+                        var tDocumentacion = new Seccion('tituloDocumentacion','tituloDocumentacion',(new Marco(W_CONTENIDO,1)));
+                        secciones.push(tDocumentacion);
+                    
+                        var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,6.5)));
+                        secciones.push(tablaDocumentacion);
+                    
+                        var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
+                        secciones.push(infoAdicional);
+                    }
+                    
+                    
+                    
+                    //Se aplica algoritmo de paginación
+                    vm.paginarDocumentoPdf(secciones, pagina, documento);
                 }
                 
                 /**
                 * Algoritmo que se encarga de la paginación de las secciones.
                 */
                 vm.paginarDocumentoPdf = function(secciones, pagina, documento){
-                	console.log(secciones);
-                	for(var i=0; i < secciones.length; i++){
-                		var sectoadd = secciones[i];
-                		console.log("Añadiendo sección");
-                		console.log(sectoadd);
-                		var contador = 0;
-                		while(!pagina.addSeccion(sectoadd) && contador < 10){
-                			console.log("####La seccion no cupo en la pagina. Se creará una nueva paginas");
-                			if(sectoadd instanceof SeccionTabla){
-                				console.log("Partiendo seccion tabla");
-                				console.log(pagina);
-                				var espacioFaltante = pagina.getEspacioFaltante();
-                				var rowsf = sectoadd.getRowsInHeight(espacioFaltante);
-                				console.log('Espacio faltante '+espacioFaltante);
-                				console.log('Numero Rows '+rowsf);
-                				if(rowsf <= 0){
-                					documento.addPagina(pagina);
-                					pagina = null;
-                					pagina = new Pagina();
-                				}else{
-                					var lsta = sectoadd.partirSeccion(rowsf);
-                					console.log("Sección tabla partida")
-                					console.log(lsta);
-                					if(lsta.length == 1){
-                						sectoadd = lsta[0];
-                					}
-                					if(lsta.length == 2){
-                						if(pagina.addSeccion(lsta[0])){
-                							sectoadd = lsta[1];
-                							documento.addPagina(pagina);
-                							pagina = null;
-                							pagina = new Pagina();
-                						}
-                					}
-                				}
-                				 
-                			}else{
-                				documento.addPagina(pagina);
-                				pagina = null;
-                				pagina = new Pagina();
-                			}
-                			contador++;
-                		}
-                	}
-                	
-                	documento.addPagina(pagina);
-                	console.log('#######Documento:');
-                	console.log(documento);
-                	vm.documento = documento;
+                    console.log(secciones);
+                    for(var i=0; i < secciones.length; i++){
+                        var sectoadd = secciones[i];
+                        console.log("Añadiendo sección");
+                        console.log(sectoadd);
+                        var contador = 0;
+                        while(!pagina.addSeccion(sectoadd) && contador < 10){
+                            console.log("####La seccion no cupo en la pagina. Se creará una nueva paginas");
+                            if(sectoadd instanceof SeccionTabla){
+                                console.log("Partiendo seccion tabla");
+                                console.log(pagina);
+                                var espacioFaltante = pagina.getEspacioFaltante();
+                                var rowsf = sectoadd.getRowsInHeight(espacioFaltante);
+                                console.log('Espacio faltante '+espacioFaltante);
+                                console.log('Numero Rows '+rowsf);
+                                if(rowsf <= 0){
+                                    documento.addPagina(pagina);
+                                    pagina = null;
+                                    pagina = new Pagina();
+                                }else{
+                                    var lsta = sectoadd.partirSeccion(rowsf);
+                                    console.log("Sección tabla partida")
+                                    console.log(lsta);
+                                    if(lsta.length == 1){
+                                        sectoadd = lsta[0];
+                                    }
+                                    if(lsta.length == 2){
+                                        if(pagina.addSeccion(lsta[0])){
+                                            sectoadd = lsta[1];
+                                            documento.addPagina(pagina);
+                                            pagina = null;
+                                            pagina = new Pagina();
+                                        }
+                                    }
+                                }
+                                 
+                            }else{
+                                documento.addPagina(pagina);
+                                pagina = null;
+                                pagina = new Pagina();
+                            }
+                            contador++;
+                        }
+                    }
+                    
+                    documento.addPagina(pagina);
+                    console.log('#######Documento:');
+                    console.log(documento);
+                    vm.documento = documento;
                 }
 
                 vm.init(vm.soluciones)
@@ -1323,7 +1355,7 @@
             margin-top: 0cm !important;
         }
         .dateContainer {
-        	margin-top: 2px;
+            margin-top: 2px;
             border-radius: 20px;
             padding-top: 7.8px;
         }
@@ -1348,7 +1380,7 @@
             font-size: 9pt;
         }
         .dateValue{
-        	margin-top: 2px;
+            margin-top: 2px;
         }
 
         
@@ -1521,16 +1553,16 @@
         }
         .fontwhite {
             color: white;
-        	text-align:left;
-        	padding-left: 60px;
+            text-align:left;
+            padding-left: 60px;
         }
         .informacionEjecutivoBP {
-        	width:450px;
+            width:450px;
             color: white;
-       		padding-top: 10px;
+            padding-top: 10px;
             border-radius: 150px;
-        	padding-left:60px;
-        	right:-125px;
+            padding-left:60px;
+            right:-125px;
         }
         .logoFooter {
             height: 20px;
@@ -1552,20 +1584,20 @@
             font-family: "Helvetica" !important;
         }
         .div0pm{
-        	min-height: 0 !important;
-        	padding: 0 !important;
-        	margin: 0 !important;
-        	width: 100% !important;
-        	/*border: 1px solid blue;*/
+            min-height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            /*border: 1px solid blue;*/
         }
         .row{
-        	top-margin: 0 !important;
-        	/*border: 1px solid #efe !important;*/
+            top-margin: 0 !important;
+            /*border: 1px solid #efe !important;*/
         }
         
         img{
-        	/*border: 1px solid #efe !important;*/
-        	/*margin-bottom: 0 !important;*/
+            /*border: 1px solid #efe !important;*/
+            /*margin-bottom: 0 !important;*/
         }
         .separaccionFooterOndulado{
             padding-bottom: 13px;

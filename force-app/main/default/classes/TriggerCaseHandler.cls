@@ -30,7 +30,7 @@ public without sharing class TriggerCaseHandler extends TriggerHandler {
     }
     
     public override void beforeInsert() {
-        system.debug('::beforeInsert::');
+        System.debug('::beforeInsert::');
         asignarGrupoAtencionInicial(this.newList);
         
         this.mapaTiposRegistro = getTiposRegistro(this.newList);
@@ -47,11 +47,36 @@ public without sharing class TriggerCaseHandler extends TriggerHandler {
     
     public override void beforeUpdate() {
         System.debug('::beforeUpdate::');
-        
+        String  strIdTicket = '';
+        Boolean  blnCloseCase = false;
         this.mapaTiposRegistro = getTiposRegistro(this.newList);
         this.mapaUsuariosCreadores = getCreatorUsers(this.newList);
         verificarCambiosCasos();
         asignarPropietarios();
+
+        // SE AÑADE SECCION DE CODIGO PARA EL CAMPO Resolution_time_holidays__c 
+        for(Case caso : newList){
+            if(caso.Status != oldMap.get(caso.Id).Status && caso.Status == 'Concluido'){
+                blnCloseCase  = true;
+                System.debug('******** HMDH ********');
+                System.debug('**CASO ESTATUS ** '+caso.Status);
+                System.debug('**CASO CLOSEDATE**  '+caso.ClosedDate);
+                System.debug('**CASO Datetime **  '+Datetime.now());
+                caso.Resolution_time_holidays__c = WorkDays.getWorkDays(caso.Fecha_Hora_de_Creacion__c, Datetime.now());
+               
+                strIdTicket = caso.Id; 
+                System.debug('TICKET ID : ' + strIdTicket);
+            }         
+        }
+        if(blnCloseCase){
+            for(escalation_History__c objEscalionExist : [SELECT id,name,createdDate,Resolution_time_holidays__c FROM escalation_History__c WHERE ticket__c =: strIdTicket AND (Resolution_time_holidays__c =: '' OR Resolution_time_holidays__c = null) ORDER BY createdDate ASC limit 1]){
+                objEscalionExist.Resolution_time_holidays__c = WorkDays.getWorkDays(objEscalionExist.createdDate, Datetime.now());
+                update objEscalionExist;
+                System.debug('***ULTIMO ACTUALIZADO TICKET CERRADO ');
+                System.debug(objEscalionExist);
+            }
+        }
+         
     }
     
     public override void afterUpdate() {

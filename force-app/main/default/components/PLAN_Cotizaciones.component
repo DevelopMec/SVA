@@ -461,7 +461,7 @@
                     .then( function( res ) {
                         soluciones = res || []
 
-                        return ctcUtils.query('SELECT Id, CaracteristicasSolucion__c, Producto__c FROM Concepto__c WHERE Producto__c IN(' + idsProducts + ') AND RecordType.DeveloperName=\'CaracteristicasSolucion\' AND Activo__c=true')
+                        return ctcUtils.query('SELECT Id, CaracteristicasSolucion__c, Producto__c FROM Concepto__c WHERE Producto__c IN(' + idsProducts + ') AND RecordType.DeveloperName=\'CaracteristicasSolucion\' AND Activo__c = true order by Orden__c')
                     })
                     .then( function( res ) {
                         angular.forEach( res, function( caracteristica, index ) {

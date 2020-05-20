@@ -41,7 +41,6 @@ public class TriggerHandlerContrato2 {
                 if(mapaProductos.get(cont.PartidaPresupuesto__c)=='31'){
                     cont.Item_Contratacion__c='TC Avanzado';
                     cont.Facturacion_Comision__c='Separado del Consumo';
-                    cont.Facturacion_Cargos__c='Junto al Consumo';
                     cont.ComoFactura__c='Empresa';
                     cont.EmpresaPrincipal_PL__c='Prime';
                     cont.ModoOffline__c='Cliente NO opera offline';
@@ -70,6 +69,11 @@ public class TriggerHandlerContrato2 {
                     cont.TipoCliente__c='Facturación';
                 }
             } */
+            if(Trigger.isUpdate&&cont.TipoPago__c!=contratosOld.get(cont.Id).TipoPago__c&&mapaProductos.containsKey(cont.PartidaPresupuesto__c)&&(new List<String>{'31'}.indexOf(mapaProductos.get(cont.PartidaPresupuesto__c))!=-1)){
+                if(cont.TipoPago__c == 'Prepago' && cont.Facturacion_Cargos_Prepago__c != null){
+                    cont.Facturacion_Cargos__c='Separado del Consumo';
+                }
+            }
         }
     }
 }

@@ -32,20 +32,35 @@ public without sharing class TriggerTaskHandler  extends TriggerHandler{
 			if(tarea.Status == 'Completada'){
 				tarea.TimestampCompletada__c = Datetime.now();
 			}
+            if(tarea.Status != 'Concluida'){
+               tarea.ActivityType__c = null;
+               tarea.TaskNumber__c = null; 
+            }
 		}
 	}
 	
-	public override void afterUpdate(){
+	public override void afterUpdate(){        
 		//actulizarObjetosUltimaTarea();
+		ActivityCounter.generaContadorTipoTarea(newList);
 	}
 
 	public override void beforeDelete(){
 		validaBorradoEventos(oldList);
 	}
+    
+    public override void beforeInsert(){
+		for(Task tarea:newList){
+            if(tarea.Status != 'Concluida'){
+               tarea.ActivityType__c = null;
+               tarea.TaskNumber__c = null; 
+            }
+		}
+	}
 	
 	public override void afterInsert(){
 		actulizarObjetosUltimaTarea();
         insertarFechaPrimeraActividad();
+        ActivityCounter.generaContadorTipoTarea(newList);
 	}
     
     public void validaBorradoEventos(List<Task> lista){
@@ -194,6 +209,5 @@ public without sharing class TriggerTaskHandler  extends TriggerHandler{
 		}
 		return objectAPIName;
 	}
-	
-	
+    	
 }

@@ -1,4 +1,4 @@
-<apex:component>
+<apex:component >
 	<div id="{{'markupPDF_' + solucion.producto.IdElement}}">
 		<div class="div0pm" ng-repeat="pagina in sc.documento.paginas">
 			<img class="logoPrincipal" ng-src="{{solucion.urlHeader}}" ng-if="pagina.secciones[0].nombre == 'HeaderLogo'" />

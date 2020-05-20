@@ -2,12 +2,17 @@ public without sharing class SendDocuSing_CTRL {
 	@AuraEnabled
     public static Map<String,String> generarInformacion(String recordId){
         Map<String,String> resp=new Map<String,String>();
-        Integer cant=[Select count() from dsfs__DocuSign_Status__c where dsfs__Opportunity__c=:recordId and dsfs__Envelope_Status__c IN ('Enviado','Delivered')];
-        if(cant>0){
-            resp.put('status','error');
-            resp.put('msj','No se puede envíar el contrato debido a que hay un proceso pendiente');
-            return resp;
-        }        
+        String mensaje='No se puede envíar el contrato debido a que hay un proceso pendiente';
+        List<dsfs__DocuSign_Status__c> cant=[Select dsfs__Envelope_Status__c from dsfs__DocuSign_Status__c where dsfs__Opportunity__c=:recordId and dsfs__Envelope_Status__c IN ('Enviado','Delivered','Rechazado','Completado','Entregado','Firmado/completado')];
+        for(dsfs__DocuSign_Status__c estatus:cant){
+            if(estatus.dsfs__Envelope_Status__c=='Rechazado')
+                mensaje='Solo se puede enviar el contrato digital una vez, ahora debes de seguir por el flujo manual';    
+        }
+        if(!cant.isEmpty()){
+           resp.put('status',mensaje);resp.put('msj',mensaje);return resp; 
+        }
+        
+                
         String idDocuSingEnvelope=createDocuSingEnvelope(recordId);
         Quote q;
         try{
@@ -17,7 +22,7 @@ public without sharing class SendDocuSing_CTRL {
             resp.put('msj','No existe una cotización generada');
             return resp;
         }
-        if(q.Opportunity.OwnerId!=UserInfo.getUserId()&&false){
+        if(q.Opportunity.OwnerId!=UserInfo.getUserId()){
             resp.put('status','error');
             resp.put('msj','El envío del contrato solo lo puede realizar el propietario de la oportunidad');
             return resp;

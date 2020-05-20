@@ -10,6 +10,11 @@ public class TriggerContratoFilialHandler extends TriggerHandler{
     }
     public override void beforeInsert(){
         asignarProducto(newList);
+
+    }
+
+    public override void beforeUpdate(){
+        ownerModifiedCheck(newList); 
     }
     public void asignarProducto(List<ContratoFilial__c> listProd){  
         Map<String,String> mapaProductos=new Map<String,String>();
@@ -47,4 +52,20 @@ public class TriggerContratoFilialHandler extends TriggerHandler{
             }
         }
     }
+    /**   HMDH
+     * METODO PARA VALIDAR SI EL PROPIETARIO ES DIFERENTE , ENTONCE SE ACTUALIZA EL CAMPO ModifyOwnerContract__c EN TRUE 
+     * 
+     */
+    public void ownerModifiedCheck(List<ContratoFilial__c> lstContract){  
+        System.debug('************** ENTRO UPDATE *********************');
+        for(ContratoFilial__c objContratoF : lstContract){
+            if(objContratoF.OwnerId != oldMap.get(objContratoF.Id).OwnerId  && objContratoF.ModifyOwnerContract__c  == false ){
+                System.debug('SE MODIFICO EL PROPIETARIO  ' + '* ESTE  : ' +oldMap.get(objContratoF.Id).OwnerId  + ' -----  ' + 'POR ESTE : ' +objContratoF.OwnerId  );
+                objContratoF.ModifyOwnerContract__c =  true;
+            }
+        }
+
+    }
+
+
 }

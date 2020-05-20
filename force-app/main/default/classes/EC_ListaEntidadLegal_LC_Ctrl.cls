@@ -602,5 +602,4 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
         return options;
     }
     //DV Fin
-
 }

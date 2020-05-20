@@ -103,24 +103,43 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
     }
     //Req 2331 FWY  
-    private static void ValidateOpportunityWithRFC(List<Opportunity> opp, Map<Id, Opportunity> oldMap)
-    {
-        //validar duplicado           
-        List<Opportunity> x = [
-            Select AccountId, Entidad_Cuenta__c, StageName, Familia__c, Producto_cotizacion__c, Modify_opportunity__c
-              from Opportunity
-             where StageName Not In ('Ganada', 'Perdida', 'Planeada')
-               and Modify_opportunity__c = true
-        ];
-          
-        for(Opportunity op:opp){
-            Opportunity oldOpp = oldMap.get(op.Id);
-                      
-            //ya fue ingresado pero se cambia el producto  
-            if(oldOpp.Entidad_Cuenta__c  != op.Entidad_Cuenta__c){
-                for(Opportunity opx : x){
-                    if(op.AccountId == opx.AccountId && op.Familia__c == opx.Familia__c && op.Producto_cotizacion__c == opx.Producto_cotizacion__c && op.Entidad_Cuenta__c == opx.Entidad_Cuenta__c){
-                        op.AddError ('“Ya existe una oportunidad abierta para ese mismo RFC Solución”');
+    private static void ValidateOpportunityWithRFC(List<Opportunity> newList, Map<Id, Opportunity> oldMap) {
+        Set<String> solutionList = new Set<String>();
+        Set<Id> entidadList = new Set<Id>();
+        Set<Id> accountList = new Set<Id>();
+        Set<String> productList = new Set<String>();
+        List<Opportunity> oppsToValidate = new List<Opportunity>();
+        for(Opportunity newOpp : newList){
+            if(String.isNotBlank(newOpp.Entidad_Cuenta__c) && String.isNotBlank(newOpp.Familia__c) && String.isNotBlank(newOpp.Producto_cotizacion__c)) {
+                solutionList.add(newOpp.Familia__c);   
+                entidadList.add(newOpp.Entidad_Cuenta__c);
+                accountList.add(newOpp.AccountId); 
+                productList.add(newOpp.Producto_cotizacion__c);
+                oppsToValidate.add(newOpp);
+            }
+            
+        }
+        if (!oppsToValidate.isEmpty()) {
+            //validar duplicado           
+            List<Opportunity> existingOpps = [
+                Select AccountId, Entidad_Cuenta__c, Familia__c, Producto_cotizacion__c
+                from Opportunity
+                where StageName Not In ('Ganada', 'Perdida', 'Planeada')
+                and Modify_opportunity__c = true
+                AND Familia__c IN: solutionList AND AccountId IN:accountList AND Entidad_Cuenta__c IN: entidadList
+                AND Producto_cotizacion__c IN: productList
+            ];
+            
+            if (!existingOpps.isEmpty()) {
+                for(Opportunity opp : oppsToValidate){
+                    Opportunity oldOpp = oldMap.get(opp.Id);
+                    //ya fue ingresado pero se cambia el producto  
+                    if(oldOpp.Entidad_Cuenta__c  != opp.Entidad_Cuenta__c || oldOpp.Producto_cotizacion__c  != opp.Producto_cotizacion__c){
+                        for(Opportunity existingOpp : existingOpps){
+                            if(opp.AccountId == existingOpp.AccountId && opp.Familia__c == existingOpp.Familia__c && opp.Producto_cotizacion__c == existingOpp.Producto_cotizacion__c && opp.Entidad_Cuenta__c == existingOpp.Entidad_Cuenta__c){
+                                opp.AddError ('Ya existe una oportunidad abierta para ese mismo RFC Solución.');
+                            }
+                        }
                     }
                 }
             }
@@ -128,22 +147,33 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     }
     
     //Req 2331 FWY  
-    public static void ValidatepadlockOpportunity(List<Opportunity> opp){
+    public static void ValidatepadlockOpportunity(List<Opportunity> newList){
         //Obtener recortypes 
         Id incrementoRrcdt = Schema.SObjectType.Opportunity.getRecordTypeInfosByName().get('Upselling (Incremento)').getRecordTypeId();
-        
-        List<Opportunity> o = [
-            Select AccountId, Entidad_Cuenta__c, StageName, Familia__c, Producto_cotizacion__c 
-              from Opportunity
-             where StageName Not In ('Ganada', 'Perdida')
-               and RecordTypeId =: incrementoRrcdt
-        ];
-        
-        for(Opportunity op : opp){
-            if(op.Entidad_Cuenta__c != null && op.StageName == 'Planeada' && op.RecordTypeId == incrementoRrcdt){
-                for(Opportunity opItem : o){
-                    if(op.AccountId == opItem.AccountId && op.Familia__c == opItem.Familia__c && op.Entidad_Cuenta__c == opItem.Entidad_Cuenta__c){
-                        op.AddError ('“Ya existe una oportunidad abierta para ese mismo RFC Solución”');
+        Set<String> solutionList = new Set<String>();
+        Set<Id> entidadList = new Set<Id>();
+        Set<Id> accountList = new Set<Id>();
+        List<Opportunity> oppsToValidate = new List<Opportunity>();
+        for(Opportunity newOpp : newList){
+            if(newOpp.StageName == 'Planeada' && newOpp.RecordTypeId == incrementoRrcdt && String.isNotBlank(newOpp.Entidad_Cuenta__c) && String.isNotBlank(newOpp.Familia__c)) {
+                solutionList.add(newOpp.Familia__c);   
+                entidadList.add(newOpp.Entidad_Cuenta__c); 
+                accountList.add(newOpp.AccountId); 
+                oppsToValidate.add(newOpp);
+            }
+            
+        }
+        if (!oppsToValidate.isEmpty()) {
+            List<Opportunity> existingOpps = [SELECT AccountId, Entidad_Cuenta__c, Familia__c FROM Opportunity
+                                              WHERE StageName Not In ('Ganada', 'Perdida') AND RecordTypeId =: incrementoRrcdt
+                                              AND AccountId IN:accountList AND Entidad_Cuenta__c IN: entidadList 
+                                              AND Familia__c IN: solutionList];
+            if (!existingOpps.isEmpty()) {
+                for(Opportunity newOpp : oppsToValidate){
+                    for(Opportunity existingOpp : existingOpps){
+                        if(newOpp.AccountId == existingOpp.AccountId && newOpp.Familia__c == existingOpp.Familia__c && newOpp.Entidad_Cuenta__c == existingOpp.Entidad_Cuenta__c){
+                            newOpp.AddError ('Ya existe una oportunidad abierta para ese mismo RFC Solución.');
+                        }
                     }
                 }
             }
@@ -1688,7 +1718,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                 //Determine if the opp will be added to the 'Apadrinados' campaign.
                                 if (!solutionsList.contains(solution)) {
                                     if(!Test.isRunningTest()) {
-                                        oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
+                                        //oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
                                     }
                                     oppToBeInserted.OwnerChangeRequired__c = true;   
                                 }
