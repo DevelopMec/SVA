@@ -9,7 +9,7 @@
                     <div class="col-sm-3 text-center" ng-repeat="forma in cot.schema.QuoteLineItem.FormaPago__c.values">
                         <div class="radio" ng-if="forma.value != 'American Express' || !sc.opportunity.MetodoPagoCodigos__c[producto.Product2Id__o.ProductCode]" ng-class="{'has-error': cotizacion.formCotiza.FormaPago__c.$invalid}">
                             <label>
-                                <input type="radio" ng-required="true" ng-change="pag.verifyMethod(producto, cot.schema.QuoteLineItem.TipoTarjeta__c)" ng-model="producto.FormaPago__c" value="{{forma.value}}" ng-disabled="producto.disabled['FormaPago__c']" name="FormaPago__c"/> 
+                                <input ng-if="(forma.value == 'Pago Online' && producto.Product2Id__o.ProductCode == '33') || (forma.value != 'Pago Online') " type="radio" ng-required="true" ng-change="pag.verifyMethod(producto, cot.schema.QuoteLineItem.TipoTarjeta__c)" ng-model="producto.FormaPago__c" value="{{forma.value}}" ng-disabled="producto.disabled['FormaPago__c']" name="FormaPago__c"/> 
                                 <span ng-bind="forma.label" ></span>
                             </label>
                         </div>
@@ -59,16 +59,7 @@
                 </div>
                 
                 <div class="row">
-                    
-                   <!-- <div class="col-sm-5" ng-if="producto.DATA_OpcionesMetodoPago__c.length > 0 ">
-                        <ctc-form-group
-                            ctc-field="cot.schema.QuoteLineItem.TarjetaAsociada__c"
-                            ctc-form="cotizacion.formCotiza"
-                            ctc-instance="producto"
-                            ctc-cols="[6, 6]"
-                            ctc-attrs="'ctc-min-number=\'0\''"
-                            ></ctc-form-group>
-                    </div>-->
+
 
                     <!-- Tipo Amex -->
                     <div class="col-sm-4 col-sm-offset-3" ng-if="producto.FormaPago__c == 'American Express' && !sc.opportunity.MetodoPagoCodigos__c[producto.Product2Id__o.ProductCode]">
@@ -82,18 +73,6 @@
                             ></ctc-form-group>
                     </div>
                 </div>
-
-                <!--<div class="row">
-                    <div class="col-sm-5" ng-if="producto.DATA_OpcionesMetodoPago__c.length > 0 ">
-                        <ctc-form-group
-                            ctc-field="cot.schema.QuoteLineItem.ClabeInterbancaria__c"
-                            ctc-form="cotizacion.formCotiza"
-                            ctc-instance="producto"
-                            ctc-cols="[6, 6]"
-                            ctc-attrs="'ctc-min-number=\'0\''"
-                            ></ctc-form-group>
-                    </div>
-                </div>-->
 
 
                 <div class="row">
@@ -116,57 +95,21 @@
             function FormaPagoCtrl(ctcUtils) {
                 var vm = this
                 vm.schema = {}
-
                 vm.verifyMethod = function( producto, tipo ) {
                     producto.TipoTarjeta__c = ''
                     producto.DATA_OpcionesMetodoPago__c = []
-                    /*if(producto && producto.FormaPago__c == 'Tarjeta de Crédito') {
-                        var temp = ctcUtils.filter(tipo.values, {value: 'Amex'})
-                        if(temp && temp.length > 0) {
-                            producto.TipoTarjeta__c = temp[0].label
-                        }
-                    }*/
-                    // nueva funcionalidad monoproducto
-
-
-                    // producto.OpcionesMetodoPago__c = null
-                    // producto.TarjetaAsociada__c = null
-                    // producto.ClabeInterbancaria__c = null
-                    // producto.TipoAmex__c = null
-                    // producto.NivelConsumo__c = null
-                    // producto.OtroMetodoPago__c = null
-                    // delete producto.OpcionesMetodoPago__c__o
-                    
                     producto.DATA_OpcionesMetodoPago__c = ctcUtils.changeFieldSF('FormaPago__c', producto.FormaPago__c, 'OpcionesMetodoPago__c')
-                    console.log('value fp: ', producto.DATA_OpcionesMetodoPago__c)
                     if( producto.DATA_OpcionesMetodoPago__c && producto.DATA_OpcionesMetodoPago__c.length == 1 ) {
                         producto.OpcionesMetodoPago__c = producto.DATA_OpcionesMetodoPago__c[0].value
                         producto.OpcionesMetodoPago__c__o = producto.DATA_OpcionesMetodoPago__c[0]
-                    } else {
-                        // producto.OpcionesMetodoPago__c = null
-                        // producto.TarjetaAsociada__c = null
-                        // producto.ClabeInterbancaria__c = null
-                        // delete producto.OpcionesMetodoPago__c__o
-                    }
-
+                    } 
                     var ctrl = angular.element(jQuery('#productosCtrl')).scope()
                     if(ctrl && ctrl.prod) {
                         ctrl.prod.calculaComision(producto.UnitPrice, producto)
                     }
                 }
-
-                /*vm.leerParams = function(params) {
-                    if(params) {
-                        vm.cotizacion = params.cotizacion || {}
-                        vm.producto = params.producto || {}
-                        //vm.schema = params.schema || {}
-                        vm.schema = {
-                            QuoteLineItem: params.schema.QuoteLineItem
-                        }
-                    } 
-                }*/
-                
             }
+
         })()
     </script>
 </apex:component>

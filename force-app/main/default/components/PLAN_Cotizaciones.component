@@ -135,9 +135,8 @@
                 vm.contacts = ctcUtils.app.contacts || []
                 vm.soluciones = ctcUtils.app.soluciones || []
                 vm.account = ctcUtils.app.account || []
-
-                console.log('ctcUtils: ', ctcUtils)
-
+                vm.opportunity = ctcUtils.app.opportunity || []
+                vm.includesNectar = ctcUtils.app.includesNectar || false
                 vm.cotizaciones = []
                 vm.tab = 0
                 vm.urlAddContact = ''
@@ -791,8 +790,12 @@
                         }
                         ctcUtils.query(querySoql)
                         .then(function( res ) {
-                            instance.soluciones = res || []
-
+                            if(!ctcUtils.includeNectarProd(ctcUtils.app.opportunity.Account.SegmentoComercial,ctcUtils.app.opportunity.Account.Vehiculos,ctcUtils.app.opportunity.RecordType)) {
+                                    instance.soluciones = res ? res.filter( (product) =>  product.Name != '33-Nectar') : [];
+                                }
+                                else {
+                                    instance.soluciones = res || []
+                                }
                             // si el resultado de consulta productos por familia es igual a 1 elemento, asigna el producto a QuoteLineItem
                             if( instance.productos && instance.productos.length > 0 && instance.soluciones.length == 1 ) {
                                 angular.forEach(instance.productos, function( producto, _index ) {
@@ -937,7 +940,7 @@
                             vm.contacts = contacts
 
                             // Obtener QuoteLinetItem - Partidas de presupuesto - asociadas a la oportunidad
-                            return ctcUtils.query('SELECT Id, CantidadTarjetas__c, NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
+                            return ctcUtils.query('SELECT Id, CantidadTarjetas__c,Package__c,regularTagQuantity__c,dualTagQuantity__c,virtualCardQuantity__c,physicalCardQuantity__c ,meanType__c,NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
                         })
                         .then( function( res ) {
                             // Recibe y asigna a productos los QuoteLineItems encontrados
@@ -965,7 +968,7 @@
                                 // Respaldar valores persistidos
                                 producto.Id_BK = angular.copy(producto.Id)
                                 producto.Product2Id_BK = angular.copy(producto.Product2Id)
-
+                                
                                 if(idsProductos.length > 0) {
                                     idsProductos += ', '
                                 }
@@ -983,7 +986,6 @@
                                 if( producto.FormaPago__c ) {
                                     producto.DATA_OpcionesMetodoPago__c = ctcUtils.changeFieldSF('FormaPago__c', producto.FormaPago__c, 'OpcionesMetodoPago__c')
                                 }
-
                                 if( producto.TarjetaAsociada__c ) {
                                     producto.TarjetaAsociada__c = parseFloat(producto.TarjetaAsociada__c)
                                 }
@@ -1767,6 +1769,12 @@
                     ret.Cantidad_Descuento_Positivo__c  = producto.Cantidad_Descuento_Positivo__c
                     ret.Total_Descuento_Positivo__c     = producto.Total_Descuento_Positivo__c
                     ret.NumberOfShipments__c            = producto.NumberOfShipments__c
+                    ret.Package__c                      = producto.Package__c
+                    ret.meanType__c                     = ctcUtils.app.selectedMeans.join(';');
+                    ret.physicalCardQuantity__C         = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'physicalCard__c')['0'].cardsQuantity;
+                    ret.virtualCardQuantity__C          = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'virtualCard__c')['0'].cardsQuantity;
+                    ret.dualTagQuantity__C              = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'DualTag__c')['0'].cardsQuantity;
+                    ret.regularTagQuantity__C           = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'RegularTag__c')['0'].cardsQuantity;
                     /*if((!producto.ServiceDate || !producto.Id ) || producto.IsClone ) {
                         ret.ServiceDate = new Date(closeDate)
                         ret.ServiceDate = ret.ServiceDate.getFullYear() + '-' + (ret.ServiceDate.getMonth() + 1) + '-' + ret.ServiceDate.getUTCDate()

@@ -81,16 +81,23 @@
                 // vm.comisiones = ctcUtils.app.comisiones || []
                 vm.comisiones = []
 
-                //console.log('comisiones: ', vm)
 
                 vm.init = function() {
                     var comisiones = []
                     var productCode = vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : ''
+                    let packageType = producto.Package__c;
+                    let comisionesIteracion = ctcUtils.app.comisiones;
+
                     if(productCode != '30-B' && ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
                         productCode='Transportista'
                     }
-                    for( var comision of ctcUtils.app.comisiones ) {
-                        //console.log('El código del producto es: ' + comision.Codigos)
+                    if(packageType == 'Básico') {
+                        productCode ='mBasico';
+                    } else if(packageType == 'Avanzado') {
+                        productCode = 'mAvanzado';
+                    }
+                    
+                    for( var comision of  comisionesIteracion) {
                         if( comision.Codigos && comision.Codigos.hasOwnProperty(productCode) ) {
                             comisiones.push( comision )
                             //console.log('La comisión se está incluyendo: ' + comision)

@@ -542,7 +542,7 @@
                     // console.log("strFilial: ", strFilial, "\ntemplateFiliales", templateFiliales)
                     // plantilla.Contenido_del__c += templateFiliales
                 }
-                // plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(filiales\)/g, templateFiliales);
+                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(filiales\)/g, templateFiliales);
                 
                 return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")(query)
             })
@@ -551,7 +551,7 @@
                 dataSource.Anexo__c = anexos;
                 plantilla.Contenido_del__c = replaceStr(plantilla.Contenido_del__c, dataSource);
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!filiales\)/g, templateFiliales);
-                //plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
+                plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/\(\!productosConcepto\)/g, templateConceptos);
                 replaceConceptValues(plantilla, conceptList, conceptsListTC4,'Contenido_del__c');
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp('!check', 'gi' ), '<input type="checkbox" kendoCheckBox checked="true" [(ngModel)]="model.foo" />');

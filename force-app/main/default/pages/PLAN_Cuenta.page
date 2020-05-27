@@ -148,7 +148,7 @@
                         CloseDate: '{!Opportunity.CloseDate}',
                         NumeroOportunidad__c: '{!Opportunity.NumeroOportunidad__c}',
                         LeadSource: '{!Opportunity.LeadSource}',
-                         Account: {
+                        Account: {
                             Id: '{!Opportunity.Account}',
                             Name: '{!JSENCODE(Opportunity.Account.Name)}',
                             Text_Segment__c : '{!JSENCODE(Opportunity.Account.Text_Segment__c)}',
@@ -165,6 +165,8 @@
                             Estado__c:'{!JSENCODE(Opportunity.Account.Estado__c)}',
                             DelegacionMunicipioFiscal__c:'{!JSENCODE(Opportunity.Account.DelegacionMunicipioFiscal__c)}',
                             CodigoPostal__c:'{!JSENCODE(Opportunity.Account.CodigoPostal__c)}',
+                            Vehiculos : '{!JSENCODE(Opportunity.Account.NumeroVehiculos__c)}',
+                            SegmentoComercial : '{!JSENCODE(Opportunity.Account.Text_Segment__c)}'
                         },
                         StageName: '{!Opportunity.StageName}',
                         Familia__c: '{!Opportunity.Familia__c}',
@@ -173,6 +175,7 @@
                         Maquilador__c: '{!Opportunity.Maquilador__c}',
                         PantallaIntermedia: '{!$Setup.Negocio__c.PantallaIntermediaCodigos__c}',
                         MetodoPagoCodigos__c: '{!$Setup.Negocio__c.MetodoPagoCodigos__c}',
+                        RecordType : '{!Opportunity.RecordType.DeveloperName}',
                         Owner: {
                             Name: '{!Opportunity.Owner.Name}',
                             Phone: '{!Opportunity.Owner.Phone}',
@@ -201,7 +204,6 @@
                         
                         vm.initFactory()
                         vm.initOpportunity()
-
                         var strError = ''
                         var strError2 = ''
                         if( vm.opportunity.Familia__c.length <= 0 ) {
@@ -236,15 +238,7 @@
                                     prefix: ctcUtils.prefix(schema),
                                     quoteId: '{!$CurrentPage.parameters.q}',
                                     account: opportunity.Account,
-                                    opportunity: {
-                                        Id: opportunity.Id,
-                                        Familia__c: opportunity.Familia__c,
-                                        Owner: opportunity.Owner,
-                                        Account: opportunity.Account,
-                                        CloseDate: opportunity.CloseDate,
-                                        StageName: opportunity.StageName,
-                                        Solicitar_validaci_n_descuentos__c: opportunity.Solicitar_validaci_n_descuentos__c
-                                    },
+                                    opportunity: vm.opportunity,
                                     profile: '{!$Profile.Name}',
                                     user: vm.user
                                 }
@@ -283,9 +277,9 @@
 
                                 if(ctcUtils.app.opportunity.Familia__c == 'Combustible' && accountGiro == 'Transportes, correos y almacenamiento' && (accountSubgiro == 'Servicios de mensajeria y paqueteria' || accountSubgiro == 'Autotransporte de carga')) {
                                     //console.log('Está entrando a la excepción de transportista');
-                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, ComissionInCurrency__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Segmento__c=\'' + accountSegment +  '\' AND (CodigoProducto__c = \'' + transportistaString + '\' OR CodigoProducto__c = \'30-B\') ORDER BY PaymentAccelerator__c DESC')
+                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, ComissionInCurrency__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Segmento__c=\'' + accountSegment +  '\' AND (CodigoProducto__c = \'' + transportistaString + '\' OR CodigoProducto__c = \'30-B\') ORDER BY PaymentAccelerator__c DESC, ApprovalLevel__c')
                                 } else {
-                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, ComissionInCurrency__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Familia__c=\'' + ctcUtils.app.opportunity.Familia__c +  '\' AND Segmento__c=\'' + accountSegment + '\' ORDER BY  PaymentAccelerator__c DESC')
+                                    return ctcUtils.query('SELECT Id, CodigoProducto__c, ComissionInCurrency__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, PaymentAccelerator__c, FinalPercentage__c, InitialPercentage__c, ApprovalLevel__c FROM ComisionServicio__c WHERE ApprovalLevel__c != Null AND Familia__c=\'' + ctcUtils.app.opportunity.Familia__c +  '\' AND Segmento__c=\'' + accountSegment + '\' ORDER BY  PaymentAccelerator__c DESC, ApprovalLevel__c')
                                 }                                
                                 //return ctcUtils.query('SELECT Id, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c, Segmento__c FROM ComisionServicio__c WHERE Familia__c=\'' + ctcUtils.app.opportunity.Familia__c + '\' AND Segmento__c=\'' + segmento + '\' ORDER BY MontoInicial__c ASC')
                                 //return ctcUtils.query('SELECT Id, CodigoProducto__c, Familia__c, MontoInicial__c, MontoFinal__c, Porcentaje__c FROM ComisionServicio__c WHERE Familia__c=\'' + ctcUtils.app.opportunity.Familia__c + '\' ORDER BY MontoInicial__c ASC')
@@ -312,8 +306,13 @@
                                 return ctcUtils.query('SELECT Name, Id, Family, Description, Red__c, Uso__c, Formato__c, ProductCode, SegmentoVenta__c FROM Product2 WHERE IsActive=true AND SegmentoVenta__c includes(' + segmento + ') AND Family=\'' + ctcUtils.app.opportunity.Familia__c + '\' ORDER BY Name ASC')
                             })
                             .then( function( res ) {
-                                ctcUtils.app.soluciones = res || []
-
+                                if(!ctcUtils.includeNectarProd(ctcUtils.app.opportunity.Account.SegmentoComercial,ctcUtils.app.opportunity.Account.Vehiculos,ctcUtils.app.opportunity.RecordType)) {
+                                    ctcUtils.app.soluciones = res ? res.filter( (product) =>  product.Name != '33-Nectar') : [];
+                                }
+                                else {
+                                    ctcUtils.app.includesNectar = true;
+                                    ctcUtils.app.soluciones = res || []
+                                }
                                 return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, FirstName, LastName, Name, Puesto__c, Funcion__c FROM Contact WHERE Id in (select ContactId from AccountContactRelation WHERE AccountId=\'' + ctcUtils.app.account.Id + '\') ORDER BY Name ASC')
                             })
                             .then( function( res ) {
@@ -365,7 +364,7 @@
                                         cotizacion.Editable2 = false;
                                     }
                                     ctcUtils.app.quoteRejected = false;
-                                    if(cotizacion.ApprovalStatus__c  == 'Rechazada') {
+                                    if(cotizacion.ApprovalStatus__c  == 'Rechazada' || cotizacion.ApprovalStatus__c  == 'Recuperada') {
                                         //If is rejected, the user can save the quote again without changes.
                                         ctcUtils.app.quoteRejected = true;
                                     }
@@ -400,7 +399,14 @@
                         cotizacion.Editable2 = true;
                         })
                     }
-                    
+                    ctcUtils.includeNectarProd = function(Segment,vehicles,recordType) {
+
+                    if ( ( recordType =='VentaNueva' || recordType == 'Upselling') &&  (parseInt(vehicles) <= 25 || Segment.includes('Small')) ){
+                        return true;
+                    } 
+                    return false;
+                    }
+
                     vm.initApprovalLevels = function() {
                         return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Concept__c, NumberOfShipments__c, Discount__c, MoreShipmentsMoreDiscountApproval__c, MoreShipmentsLessDiscountApproval__c, LessShipmentsMoreDiscountApproval__c, LessShipmentsLessDiscountApproval__c, MoreDiscountApproval__c, LessDiscountApproval__c FROM ConceptApprovalLevel__mdt')
                     }
@@ -550,14 +556,14 @@
                             }
                             if(ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
                                 //console.log('Está entrando a la excepción de transportista');
-                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, SuggestedPricePerSegment__c, CantidadTarjetas__c, VigenciaDescuento__c, Carrier__c FROM Concepto__c WHERE ((Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR  ((Carrier__c = true OR Producto__r.ProductCode = \'30-B\') AND Segment__c=\'' + accountSegment +  '\'))) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\')) AND Activo__c=true ORDER BY Orden__c ASC'
+                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c, Carrier__c FROM Concepto__c WHERE ((Producto__c IN(' + idsProduct2 +') AND (TipoCargo__c != \'Comisión por el servicio\' OR  ((Carrier__c = true OR Producto__r.ProductCode = \'30-B\') AND Segment__c=\'' + accountSegment +  '\'))) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\')) AND Activo__c=true ORDER BY Orden__c ASC'
                             } else {
-                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, SuggestedPricePerSegment__c, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE (Producto__c IN(' + idsProduct2 +') AND ((TipoCargo__c != \'Comisión por el servicio\' AND SuggestedPricePerSegment__c = FALSE) OR Segment__c=\'' + accountSegment +  '\')) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true AND Carrier__c = false ORDER BY Orden__c ASC'
+                                stringToQuery='SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE (Producto__c IN(' + idsProduct2 +') AND ((TipoCargo__c != \'Comisión por el servicio\' AND TipoCargo__c != \'Cobro por gestion de vehiculos\') OR Segment__c=\'' + accountSegment +  '\')) AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true AND Carrier__c = false ORDER BY Orden__c ASC'
                             }
                             ctcUtils.query(stringToQuery)
                             //ctcUtils.query('SELECT Id, Name, TipoCargo__c, NombreSistemas__c, Producto__c, Producto__r.Name, Importe__c, Obligatorio__c, Orden__c, Libre__c, SinEdicion__c, CaracteristicasSolucion__c, RecordType.DeveloperName, CantidadTarjetas__c, VigenciaDescuento__c FROM Concepto__c WHERE Producto__c IN(' + idsProduct2 +') AND (RecordType.DeveloperName=\'Conceptos\' OR RecordType.DeveloperName=\'CaracteristicasSolucion\') AND Activo__c=true ORDER BY Obligatorio__c DESC')
                             .then( function( res ) {
-                                console.log('Los conceptos son: ' + JSON.stringify(res));
+                                //console.log('Los conceptos son: ' + JSON.stringify(res));
                                 var tipoCargoConcepto = {}
                                 angular.forEach( res, function( concepto, index ) {
                                     if( concepto.Producto__c || concepto.Carrier__c == true ) {
@@ -605,24 +611,30 @@
                             angular.forEach( conceptos, function( concepto, index ) {
                                 var key = concepto.TipoCargo__c + '_' + concepto.Obligatorio__c + '_' + concepto.Libre__c
                                 concepto.key = key
-
                                 concepto.Render = angular.copy(concepto.Obligatorio__c)
                                 if ( !unicos.hasOwnProperty(key) ) {
                                     unicos[key] = concepto
-                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                    if( concepto.TipoCargo__c == 'Comisión por el servicio') {
                                         ctcUtils.app.conceptoAprobacion = concepto;
                                         conceptosUnicos.unshift(concepto)
                                     } else {
                                         conceptosUnicos.push(concepto)
+                                        if (concepto.TipoCargo__c == 'Cobro por gestion de vehiculos') {
+                                            ctcUtils.app.conceptoAprobacionMant = concepto; 
+                                        }
                                     }
                                 }
                                 
                                 if( !reRender ) {
                                     concepto.Bonificacion__c = 0
                                     concepto.TieneBonificacion = true
-                                    if( concepto.TipoCargo__c == 'Comisión por el servicio' || concepto.SuggestedPricePerSegment__c) {
+                                    if(concepto.TipoCargo__c == 'Comisión por el servicio') {
                                         concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
                                         setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(concepto.Importe__c)))}, 500);
+                                    } else if ( ['Cobro por gestion de vehiculos','Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c)) {
+                                        concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+                                        let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c) ? concepto.Bonificacion__c : concepto.PrecioFinal__c;
+                                        setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(approvalCondition)))}, 500);
                                     } else if (concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' ) {
                                         concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
                                         setTimeout(function(){ctcUtils.getApprovalOtherConcepts(concepto, ctcUtils.number(angular.copy(concepto.Bonificacion__c)), producto, null)}, 500);
@@ -779,59 +791,24 @@
 
                         ctcUtils.calculaComision = function( instance, fromCtc ) {
                             if( !fromCtc ) {
-                                var comisiones = []                                
+                                var comisiones = []
+                                                                
                                 if(instance.hasOwnProperty('Product2Id__o')){
+                                    let packageType = instance.Package__c;
                                     var productCodeTem = instance && instance.Product2Id__o && instance.Product2Id__o.ProductCode ? instance.Product2Id__o.ProductCode : ''
                                      var AplicaSegmento = instance && instance.Product2Id__o && instance.Product2Id__o.AplicaSegmento__c ? instance.Product2Id__o.AplicaSegmento__c : ''
                                     var maquilador=false
                                      productCodeTem=instance.Product2Id__o.ProductCode;
-                                    /* if(vm.opportunity.Maquilador__c!=null && vm.opportunity.Maquilador__c.toUpperCase().includes("CHEDRAUI")){
-                                        console.log("Chedraui  : " )      
-                                                        if(productCode=='48'||productCode=='101'){
-                                                           productCode='101'
-                                                           maquilador=true
-                                                        }
-                                                        if(productCode=='32'||productCode=='102'){
-                                                           productCode='102'
-                                                           maquilador=true
-                                                        }
-                                                        if(productCode=='18'||productCode=='12'||productCode=='105'){
-                                                            productCode='105'
-                                                             maquilador=true
-                                                         }                     
-                                    }
-                                    if(vm.opportunity.Maquilador__c!=null && vm.opportunity.Maquilador__c.toUpperCase().includes("WALMART")){  
-                                    console.log("Walmart : " )                                            
-                                                        if(productCode=='48'||productCode=='103'){
-                                                            productCode='103'
-                                                            maquilador=true
-                                                        }
-                                                        if(productCode=='32'||productCode=='104'){
-                                                            productCode='104'
-                                                            maquilador=true
-                                                        }
-                                                        if(productCode=='18'||productCode=='12'||productCode=='105'){
-                                                            productCode='105'
-                                                             maquilador=true
-                                                         } 
-                                                        
-                                    }*/
-                                    //console.log("Segmento:"+vm.opportunity.Owner.Segmento__c);
-                                    //console.log("Maquilador:"+maquilador);
-                                    //console.log("aplicaSe:"+AplicaSegmento);
-                                    //Se comenta la siguiente validación
-                                    /*if(vm.opportunity.Owner.Segmento__c =='Small'&&maquilador==false&&AplicaSegmento==false){                                              
-                                        productCodeTem='100'
-                                    }*/
+                                   
                                     if(productCodeTem != '30-B' && ctcUtils.app.opportunity.Familia__c == 'Combustible' && ctcUtils.app.opportunity.Account.Giro__c == 'Transportes, correos y almacenamiento' && (ctcUtils.app.opportunity.Account.Subgiro__c == 'Servicios de mensajeria y paqueteria' || ctcUtils.app.opportunity.Account.Subgiro__c == 'Autotransporte de carga')) {
                                         productCodeTem='Transportista'
-                                        //console.log('Está entrando a excepción trnasportista');
-                                    }                                    //console.log("productCode : "+ maquilador )
-                                    //console.log("productCode : "+ productCode )
-                                    //console.log("maquila : "+ vm.opportunity.Maquilador__c )
-                                    //instance.Product2Id__o.ProductCode=productCode
-                                
-                            }
+                                    }
+                                    if(packageType == 'Básico') {
+                                        productCodeTem ='mBasico';
+                                    } else if(packageType == 'Avanzado') {
+                                        productCodeTem = 'mAvanzado';
+                                    }
+                                }
                                 //console.log('Código de producto:' + productCodeTem);
                                 for( var comision of ctcUtils.app.comisionesTotal ) {                                    
                                     if ( comision.Codigos && comision.Codigos.hasOwnProperty(productCodeTem) ) {  
@@ -849,15 +826,11 @@
                                         comisionCalculada = angular.copy(comision)
                                     }
                                 })
-
-                                
-                 
-
                                 console.log("into calculaComision: ", angular.copy(instance), 'comisionCalculada: ', comisionCalculada)
                                 if( instance && instance.conceptosKey ) {
                                     angular.forEach( Object.keys(instance.conceptosKey), function( conceptoKey, index_conceptoKey ) {
                                         var concepto = instance.conceptosKey[conceptoKey]
-                                        if( concepto && concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                        if( concepto && concepto.TipoCargo__c == 'Comisión por el servicio'  ) {
 
                                             if( comisionCalculada.Porcentaje__c > -1 ) {
                                               concepto.Importe__c = comisionCalculada.Porcentaje__c
@@ -1010,7 +983,8 @@
                                  }
                                 if( model ) {
                                     var precioLista = ctcUtils.number(instance[fieldPrecioLista])
-                                    var precioFinal = ctcUtils.number(model)
+                                    var precioFinal = ctcUtils.number(model);
+                                    let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(instance.TipoCargo__c)  ? instance.Bonificacion__c : ctcUtils.number(model);
                                     var descuento = parseFloat(((precioLista - precioFinal) / precioLista) * 100).toFixed(ctcUtils.app.schema.ProductoConcepto__c.Bonificacion__c.scale)
                                     descuento = ctcUtils.number(descuento)
                                     if( descuento < 0 ) {
@@ -1029,7 +1003,7 @@
                                         instance.CantidadTarjetas__c__render = instance.CantidadTarjetas__c__renderBase
                                     }
                                     ctcUtils.cambiaVigenciaCantidad( model, instance, field, form, params, fromCtc )
-                                    ctcUtils.getApprovalLevel(instance, precioFinal);
+                                    ctcUtils.getApprovalLevel(instance, approvalCondition);
                                     ctcUtils.getApprovalOtherConcepts( instance, descuento, null, null)
 
                                 }
@@ -1037,25 +1011,17 @@
                         }
                         
                         ctcUtils.getApprovalLevel = function( instance, precioFinal ) {
-                            
                             let filteredValues = [];
                             let comisionesMap = ctcUtils.app.comisiones.map(function (comision) {
-                                console.log('NEW MAP: '+comision.FinalPercentage__c)
                                 if(comision.FinalPercentage__c != undefined) {
                                     filteredValues.push(comision.FinalPercentage__c);
                                 }
                             });
-                            
-                            //console.log('FILTERED: '+filteredValues)
                             let minFinal = Math.min(...filteredValues);
-                            //let minFinal = Math.min(...ctcUtils.app.comisiones.map(val => ctcUtils.number(val.FinalPercentage__c) ) );
                             let maxInicial = Math.max(...ctcUtils.app.comisiones.map(val => ctcUtils.number(val.InitialPercentage__c) ) );
                             let hasFinalPercentage = ctcUtils.app.comisiones.map(comision => comision.FinalPercentage__c)[0] ? true : false;
                             let hasInitialPercentage = ctcUtils.app.comisiones.map(comision => comision.InitialPercentage__c)[ctcUtils.app.comisiones.length - 1] ? true : false;
-                                console.log('CIN FINAL: ' + instance.PrecioFinal__c__approvalLevel);
-
                             for(i = 0; i <= ctcUtils.app.comisiones.length -1 ; i++) {
-                                                                console.log('CIN FINAL: ' + instance.PrecioFinal__c__approvalLevel);
 
                                 if('{!OppRecordType}' != 'Migracion'){
                                     if(ctcUtils.valueIsInRange(i,precioFinal, hasFinalPercentage, hasInitialPercentage,minFinal,maxInicial) ){
@@ -1081,7 +1047,6 @@
                                 else{
                                     instance.PrecioFinal__c__approvalLevel = 0;
                                 }
-                                console.log('CIN FINAL: ' + instance.PrecioFinal__c__approvalLevel);
                             }
                         }
                         
@@ -1099,7 +1064,6 @@
                             if( !fromCtc ) {
                                 // console.log('calcularCostoFinal field: ', field)
                                 // var concepto = params.concepto || {}
-
                                 let fieldPrecioLista = '';
                                 if(instance.TipoCargo__c == 'Comisión por el servicio'){
                                     fieldPrecioLista = ctcUtils.number(instance['PrecioLista__c']) ? 'PrecioLista__c' : 'Importe__c';
@@ -1115,6 +1079,7 @@
                                 var descuento = ctcUtils.number(instance['Bonificacion__c'])
                                 var precioFinal = parseFloat( ( precioLista - ( precioLista * ( descuento / 100 ) ) )).toFixed(ctcUtils.app.schema.ProductoConcepto__c[fieldPrecioFinal].scale)
                                 precioFinal = ctcUtils.number(precioFinal)
+                                let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(instance.TipoCargo__c)  ? instance.Bonificacion__c : precioFinal;
                                 if( field.name == 'Bonificacion__c' || precioLista >= ctcUtils.number(instance[fieldPrecioFinal]) ) {
 
                                     instance[fieldPrecioFinal] = precioFinal
@@ -1131,7 +1096,7 @@
                                     }
 
                                     ctcUtils.cambiaVigenciaCantidad( model, instance, field, form, params, fromCtc )
-                                    ctcUtils.getApprovalLevel(instance, precioFinal);
+                                    ctcUtils.getApprovalLevel(instance, approvalCondition);
                                     ctcUtils.getApprovalOtherConcepts( instance, descuento, null, null)
                                 }
                             }
@@ -1154,7 +1119,6 @@
                                 descuento = ctcUtils.app.descuentoCargoRecurrente;
                             }  
                             var envios = ctcUtils.app.envios;
-                            //console.log('Envíos:' + envios);
                             for(let approvalConcepto of responseValue){
                                 if (approvalConcepto.Concept__c == tipoDeCargo) {
                                     //console.log('Está entrando a realizar el calculo: ' + JSON.stringify(approvalConcepto));
@@ -1256,6 +1220,10 @@
                         schema.QuoteLineItem.TarjetaAsociada__c.type = 'number'
                         schema.QuoteLineItem.TarjetaAsociada__c.length = 4
                         schema.QuoteLineItem.TarjetaAsociada__c.precision = 4
+
+                        schema.QuoteLineItem.Package__c.label = 'Paquete';
+                        schema.QuoteLineItem.meanType__c.label = 'Tipo de medio';
+                        schema.QuoteLineItem.virtualCardQuantity__c.required = true;
 
                         schema.QuoteLineItem.ClabeInterbancaria__c.required = true
                         schema.QuoteLineItem.ClabeInterbancaria__c.type = 'number'
@@ -1495,7 +1463,7 @@
                     }
 
                     vm.listaCotizaciones = function(idOpportunity) {
-                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, Name, QuoteNumber, Tax, Status, Description, Subtotal,OwnerId, Owner.UserRole.Name TotalPrice, ExpirationDate, AccountId, GrandTotal, Email, Phone, OpportunityId, ContactId, IsSyncing, Familia__c, VigenciaCotizacion__c,ApprovalStatus__c, (SELECT Id, CantidadTarjetas__c, NumberOfShipments__c, Description, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c FROM QuoteLineItems WHERE Escalonamiento__c = NULL ORDER BY Id ASC) FROM Quote WHERE OpportunityId=\'' + idOpportunity + '\' ORDER BY CreatedDate ASC')
+                        return ctcUtils.invoke('PLAN_CuentaService.query', 'SELECT Id, Name, QuoteNumber, Tax, Status, Description, Subtotal,OwnerId, Owner.UserRole.Name TotalPrice, ExpirationDate, AccountId, GrandTotal, Email, Phone, OpportunityId, ContactId, IsSyncing, Familia__c, VigenciaCotizacion__c,ApprovalStatus__c, (SELECT Id, CantidadTarjetas__c, NumberOfShipments__c,Package__c, MeanType__c,physicalCardQuantity__c,virtualCardQuantity__c,dualTagQuantity__c,regularTagQuantity__c,Description, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c FROM QuoteLineItems WHERE Escalonamiento__c = NULL ORDER BY Id ASC) FROM Quote WHERE OpportunityId=\'' + idOpportunity + '\' ORDER BY CreatedDate ASC')
                     }
 
                     vm.inicializaProductos = function(productos, cotizacion, skip) {

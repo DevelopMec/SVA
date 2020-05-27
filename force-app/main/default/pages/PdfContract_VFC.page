@@ -1,27 +1,27 @@
 <apex:page applyBodyTag="false" applyHtmlTag="false" docType="html-5.0" showHeader="false" sidebar="false" standardController="QuoteLineItem" standardStylesheets="false" extensions="PLAN_CuentaService">
     <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery.min.js')}"/>
-	<script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
-	<!-- <apex:stylesheet value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.css')}" /> -->
-	<apex:stylesheet value="{!URLFOR($Resource.jqueryui_custom_theme,'jquery-ui-1.11.4.custom/jquery-ui.css')}" />
-	
-	<script src="{!URLFOR($Resource.kendoui,'/js/kendo.all.min.js')}"></script>
-	<script src="{!URLFOR($Resource.kendoui,'/js/pako_deflate.min.js')}"></script>
-	<script src="{!URLFOR($Resource.kendoui,'/js/jszip.min.js')}"></script>
+    <script src="{!URLFOR($Resource.CTC_BASE, '/jquery/jquery-ui.min.js')}"/>
+    <!-- <apex:stylesheet value="{!URLFOR($Resource.jqueryui,'jquery-ui-1.11.4/jquery-ui.css')}" /> -->
+    <apex:stylesheet value="{!URLFOR($Resource.jqueryui_custom_theme,'jquery-ui-1.11.4.custom/jquery-ui.css')}" />
+    
+    <script src="{!URLFOR($Resource.kendoui,'/js/kendo.all.min.js')}"></script>
+    <script src="{!URLFOR($Resource.kendoui,'/js/pako_deflate.min.js')}"></script>
+    <script src="{!URLFOR($Resource.kendoui,'/js/jszip.min.js')}"></script>
 
-	<script src="{!URLFOR($Resource.CTC_BASE,'/lightning/ctcLightning.js')}"></script>
-	
-	<link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.default.min.css')}" />
-	<link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.common.min.css')}" />
-	<link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}" />
-	<!-- <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.3.1026/styles/kendo.material.min.css" />
-	<link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.3.1026/styles/kendo.common-material.min.css" /> -->
-	
-	<apex:includeLightning />
-	<apex:slds />
-	
-	<input id="isPDFReady" type="checkbox" style="display: none;"></input>
-	
-	<div id="occ"></div>
+    <script src="{!URLFOR($Resource.CTC_BASE,'/lightning/ctcLightning.js')}"></script>
+    
+    <link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.default.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.kendoui,'/css/kendo.common.min.css')}" />
+    <link rel="stylesheet" href="{!URLFOR($Resource.CTC_BASE, '/font-awesome/css/font-awesome.min.css')}" />
+    <!-- <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.3.1026/styles/kendo.material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.3.1026/styles/kendo.common-material.min.css" /> -->
+    
+    <apex:includeLightning />
+    <apex:slds />
+    
+    <input id="isPDFReady" type="checkbox" style="display: none;"></input>
+    
+    <div id="occ"></div>
     
     <script> 
     var previousOnload = window.onload;
@@ -135,7 +135,7 @@
         <div style="font-size:25px;color:gray;">
            <p type='text' id='id1' />
         </div> 
-        <div id="load_scrl" class="loadingBox loader" style="display:none;">	
+        <div id="load_scrl" class="loadingBox loader" style="display:none;">    
             <svg width="1em" height="1em"><circle cx="0.5em" cy="0.5em" r="0.45em"/></svg>
         </div>
         <div class="loadingBox overlay">
@@ -151,7 +151,7 @@
         }
  
         function stopLoading() {
-            document.getElementById("id1").innerHTML='PDF Generado!!, Espere un momento...';
+            document.getElementById("id1").innerHTML='PDF Generado!! Espere un momento...';
             $('.loadingBox').hide();
         }
     </script>

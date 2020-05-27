@@ -27,11 +27,12 @@
                                     <tr>
 
                                         <th ng-bind="cot.schema.Product2.Name.label" class="th-producto nombreProducto"></th>
+                                        <th ng-if="prod.includeNectarFields" ng-bind="cot.schema.QuoteLineItem.Package__c.label" class="th-producto text-Center"></th>
                                         <th ng-bind="cot.schema.Product2.Red__c.label" class="th-producto text-center"></th>
                                         <th ng-bind="cot.schema.Product2.Uso__c.label" class="th-producto text-center"></th>
                                         <th ng-bind="cot.schema.Product2.Formato__c.label" class="th-producto text-center"></th>
                                             
-                                        <th ng-bind="cot.schema.QuoteLineItem.CantidadTarjetas__c.label"></th>
+                                        <th ng-if="!prod.includeNectarFields" ng-bind="cot.schema.QuoteLineItem.CantidadTarjetas__c.label"></th>
                                         <th ng-bind="cot.schema.QuoteLineItem.UnitPrice.label" class="precioProducto text-center"></th>
                                         <th ng-bind="cot.schema.QuoteLineItem.ServiceDate.label" class="fechaProducto text-center"></th>
                                         
@@ -58,14 +59,18 @@
                                                 ctc-tooltip-body="true"
                                             ></ctc-input>
                                         </td>
-
+                                        <td ng-if="prod.includeNectarFields">
+                                            <select class="form-control" ng-model="producto.Package__c" name="Package__c" ctc-field="cot.schema.QuoteLineItem.Package__c" 
+                                                    ng-options="paquete as paquete for paquete in ['Básico','Avanzado', 'Por comisión']" ng-change="prod.changePackage(producto)">
+                                            </select>
+                                        </td>
                                         <td class="text-center" ng-bind="producto.Product2Id__o.Red__c"></td>
                                         <td class="text-center" ng-bind="producto.Product2Id__o.Uso__c"></td>
                                         <td class="text-center" ng-bind="producto.Product2Id__o.Formato__c"></td>
 
-                                        <td>
+                                        <td ng-if="!prod.includeNectarFields">
                                             
-                                            <div ng-class="{'has-error': cotizacion.formCotiza['CantidadTarjetas__c' + producto.IdElement].$invalid}" class="ctc-input-base">
+                                            <div ng-if="!prod.includeNectarFields" ng-class="{'has-error': cotizacion.formCotiza['CantidadTarjetas__c' + producto.IdElement].$invalid}" class="ctc-input-base">
                                                 
                                                 <input ng-keyup="prod.activateSaveButton()" type="text" class="form-control" ng-model="producto.CantidadTarjetas__c" ng-required="cot.schema.QuoteLineItem.CantidadTarjetas__c.required" ctc-min-number="cotizacion.Familia__c == 'Mantenimiento' ? 0 : 1" ctc-format-number="-" ctc-field="cot.schema.QuoteLineItem.CantidadTarjetas__c" name="{{'CantidadTarjetas__c' + producto.IdElement}}" id="{{'CantidadTarjetas__c' + producto.IdElement}}" ng-disabled="producto.disabled.CantidadTarjetas__c" />
 
@@ -151,8 +156,35 @@
                                             <a ng-click="prod.eliminarComparado(comparado, producto)" class="btnb btnb-sm btnb-danger" uib-tooltip="Eliminar"  style="" tooltip-append-to-body="true" ng-if="comparado.ProductoComparado__c__o.Id && cotizacion.Editable"> 
                                                 <span class="fa fa-trash"></span> 
                                             </a>
-                                        </td>
+                                        </td >
+
                                     </tr>
+                                    
+                                    <tr ng-if="prod.includeNectarFields">
+                                        <tr ng-if="prod.includeNectarFields">
+                                            <td ng-bind="cot.schema.QuoteLineItem.meanType__c.label" ng-if="prod.includeNectarFields"/>
+                                            <td ng-repeat="check in prod.meanTypeValues" ng-if="prod.includeNectarFields">
+                                                {{check.value}}
+                                            </td>
+                                        </tr>
+                                        <td></td>
+                                        <td ng-repeat="check in prod.meanTypeValues" ng-if="prod.includeNectarFields">
+                                            <input ng-change="prod.checkedCard(check)" type="checkbox" ng-model="check.Checked" value="prod.value"  ng-checked="check.Checked" />
+                                        </td>
+                                        <tr ng-if="prod.includeNectarFields">
+                                            <td></td>
+                                            <td ng-repeat="check in prod.meanTypeValues" ng-if="prod.includeNectarFields">
+                                                <div ng-class="{'has-error': cotizacion.formCotiza['check.field' + check.Id].$invalid}" class="ctc-input-base">
+                                                
+                                                    <input  ctc-form="cotizacion.formCotiza" ng-if="check.Checked" ng-model="check.cardsQuantity" type="number"  name="{{'check.field' + check.Id}}" id="{{'check.field' + check.Id}}"   ng-min="0" ng-max="check.Field == 'virtualCard__c' ? 25 : ''" required="true" />
+                                                    
+                                                    <i class="label label-danger animated rubberBand msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza['check.field' + check.Id].$invalid" >Requerido</i>
+                                                    
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tr>
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -190,18 +222,62 @@
                 vm.cotizacion = {}
                 vm.schema = ctcUtils.app.schema || {}
                 vm.profile = ctcUtils.app.profile || ''
-
-
+                vm.opportunity = ctcUtils.app.opportunity;
                 vm.keyProductoSeleccionado = ''
                 vm.comisionServicio = 'Comisión por el servicio'
                 vm.theme = '{!$User.UIThemeDisplayed}'
                 vm.segmento = ''
                 vm.tieneAccesoEscalonamiento = false
 
-
                 vm.init = function( cotizacion ) {
                     vm.cotizacion = cotizacion || {}
+                    ctcUtils.app.includeNectarFields = vm.includeNectarFields =  cotizacion.productos[0].Product2 ? cotizacion.productos[0].Product2.Name.includes('33-Nectar') : false;
                     vm.tieneAccesoEscalonamiento = ctcUtils.app.tieneAccesoEscalonamiento
+                    vm.meanTypeValues = ctcUtils.app.includesNectar ? this.getMediaTypes() : {}; //Se accede como prod.valor dentro del componente
+                    ctcUtils.app.meanTypeValues = vm.meanTypeValues;
+                }
+
+                //La cotización contiene los campos que son devueltos de SF y para crear el multicheckbox utilizamos un objeto para poder iterarlo y trackear los cambios dentro de la vista
+                vm.getMediaTypes = function(){
+                    let objectMeans =[ {"Id":"mean1" ,"value" : "TAG Regular","Checked" : false,"Field" : "RegularTag__c","cardsQuantity" : 0 } ,
+                                        {"Id":"mean2" ,"value" : "TAG Dual","Checked" : false, "Field" : "DualTag__c" ,"cardsQuantity" : 0} ,
+                                        {"Id":"mean3" ,"value" : "Tarjetas físicas","Checked" : false, "Field" : "physicalCard__c" ,"cardsQuantity" : 0} ,
+                                        {"Id":"mean4" ,"value" : "Tarjetas virtuales","Checked" : false, "Field" : "virtualCard__c" ,"cardsQuantity" : 0} ];
+                    let product = vm.cotizacion.productos[0];
+                    ctcUtils.app.selectedMeans = product.meanType__c ? product.meanType__c.split(';') : [];
+                    let physicalCards = product.physicalCardQuantity__c;
+                    let virtualCards = product.virtualCardQuantity__c;
+                    let dualTag = product.dualTagQuantity__c;
+                    let regularTag = product.regularTagQuantity__c;
+                    objectMeans.forEach( (mean)  => {  
+                            mean.Checked = ctcUtils.app.selectedMeans.includes(mean.value);
+                            switch(mean.Field) {
+                                case 'RegularTag__c' : {
+                                    mean.cardsQuantity = regularTag;
+                                    break;
+                                }
+                                case 'DualTag__c' : {
+                                    mean.cardsQuantity = dualTag;
+                                    break;
+                                }
+                                case 'physicalCard__c' : {
+                                    mean.cardsQuantity = physicalCards;
+                                    break;
+                                }
+                                case 'virtualCard__c' : {
+                                    mean.cardsQuantity = virtualCards;
+                                    break;
+                                }
+                            }
+                        });
+                    return objectMeans;
+                }
+                vm.checkedCard = function( model ) {
+                    if(model.Checked) {
+                        ctcUtils.app.selectedMeans.includes(model.value) ? '' : ctcUtils.app.selectedMeans.push(model.value);
+                    } else {
+                        ctcUtils.app.selectedMeans.includes(model.value) ? ctcUtils.app.selectedMeans.splice(ctcUtils.app.selectedMeans.indexOf(model.value),1) : '' ;
+                    }
                 }
 
                 vm.getApprovalOtherConcepts = function( model ) {
@@ -212,6 +288,7 @@
                     	ctcUtils.getApprovalOtherConcepts( null, null, null, model )
                     }
                 }
+                
 
                 vm.activateSaveButton = function() {
                     //Activate save button. 
@@ -229,10 +306,10 @@
                         instance.conceptosKey = {}
                         instance.productoConcepto = []
                         instance.soluciones = []
-
+                        ctcUtils.app.includeNectarFields = vm.includeNectarFields = model.Name.includes('Nectar') || false;
+                        
                         var producto = params && params.producto ? params.producto : {}
                         var esProductoCotizado = typeof producto.Product2Id == 'undefined'
-
                         if( !vm.cotizacion.hasOwnProperty('Ids2Delete') ) {
                             vm.cotizacion.Ids2Delete  = {}
                         }
@@ -451,6 +528,11 @@
                             body: '<p>' + err + '</p>'
                         }
                     })
+                }
+
+                vm.changePackage = function(instance) {
+                    ctcUtils.calculaComision( instance, false );
+                    ctcUtils.obtenerConceptosUnicos( instance.conceptos,instance,false);
                 }
 
                 vm.calculaComision = function( model, instance, field, form, params, fromCtc ) {
