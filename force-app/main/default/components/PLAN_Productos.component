@@ -61,7 +61,7 @@
                                         </td>
                                         <td ng-if="prod.includeNectarFields">
                                             <select class="form-control" ng-model="producto.Package__c" name="Package__c" ctc-field="cot.schema.QuoteLineItem.Package__c" 
-                                                    ng-options="paquete as paquete for paquete in ['Básico','Avanzado', 'Por comisión']" ng-change="prod.changePackage(producto)">
+                                                    ng-options="paquete as paquete for paquete in ['Básico','Avanzado', 'Por comisión']" ng-change="prod.packageFieldChanged(producto.Package__c,producto)">
                                             </select>
                                         </td>
                                         <td class="text-center" ng-bind="producto.Product2Id__o.Red__c"></td>
@@ -231,8 +231,12 @@
 
                 vm.init = function( cotizacion ) {
                     vm.cotizacion = cotizacion || {}
-                    ctcUtils.app.includeNectarFields = vm.includeNectarFields =  cotizacion.productos[0].Product2 ? cotizacion.productos[0].Product2.Name.includes('33-Nectar') : false;
                     vm.tieneAccesoEscalonamiento = ctcUtils.app.tieneAccesoEscalonamiento
+                    this.initNectarData(cotizacion);
+                }
+
+                vm.initNectarData = function(cotizacion) {
+                    ctcUtils.app.includeNectarFields = vm.includeNectarFields =  cotizacion.productos[0].Product2 ? cotizacion.productos[0].Product2.Name.includes('33-Nectar') : false;
                     vm.meanTypeValues = ctcUtils.app.includesNectar ? this.getMediaTypes() : {}; //Se accede como prod.valor dentro del componente
                     ctcUtils.app.meanTypeValues = vm.meanTypeValues;
                 }
@@ -294,7 +298,19 @@
                     //Activate save button. 
                     ctcUtils.changeButtonStatus();
                 }
-                
+
+                vm.packageFieldChanged = function(packageType, producto) {
+                    this.changePackage(producto);
+                    //this.spliceConcept(packageType);
+                }
+                /*vm.spliceConcept(packageType) {
+                    let objectReference = ["Básico": ["Mensualidad Avanzado","Comisión por el servicio"],"Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],"Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]];
+                    alert(objectReference[packageType]);
+                    producto.conceptosUnicos.forEach( (concepto,index) => {
+                        console.log(index);
+                    });
+                }*/
+
                 vm.seleccionaProducto = function( model, instance, field, form, params, fromCtc ) {
                     if( !fromCtc ) {
                         //Activate save button.
@@ -306,8 +322,10 @@
                         instance.conceptosKey = {}
                         instance.productoConcepto = []
                         instance.soluciones = []
-                        ctcUtils.app.includeNectarFields = vm.includeNectarFields = model.Name.includes('Nectar') || false;
-                        
+                        ctcUtils.app.includeNectarFields = vm.includeNectarFields = model ? model.Name.includes('Nectar') :false ;
+                        if(!vm.includeNectarFields) {
+                            instance.Package__c = 'Comisión por el servicio';
+                        }
                         var producto = params && params.producto ? params.producto : {}
                         var esProductoCotizado = typeof producto.Product2Id == 'undefined'
                         if( !vm.cotizacion.hasOwnProperty('Ids2Delete') ) {

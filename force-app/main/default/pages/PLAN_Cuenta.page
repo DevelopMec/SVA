@@ -614,7 +614,7 @@
                                 concepto.Render = angular.copy(concepto.Obligatorio__c)
                                 if ( !unicos.hasOwnProperty(key) ) {
                                     unicos[key] = concepto
-                                    if( concepto.TipoCargo__c == 'Comisión por el servicio') {
+                                    if( 'Comisión por el servicio' == concepto.TipoCargo__c ) {
                                         ctcUtils.app.conceptoAprobacion = concepto;
                                         conceptosUnicos.unshift(concepto)
                                     } else {
@@ -624,7 +624,6 @@
                                         }
                                     }
                                 }
-                                
                                 if( !reRender ) {
                                     concepto.Bonificacion__c = 0
                                     concepto.TieneBonificacion = true
@@ -632,8 +631,8 @@
                                         concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
                                         setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(concepto.Importe__c)))}, 500);
                                     } else if ( ['Cobro por gestion de vehiculos','Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c)) {
-                                        concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
-                                        let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c) ? concepto.Bonificacion__c : concepto.PrecioFinal__c;
+                                        concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c));
+                                        let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c)  ? 70.02 : concepto.PrecioFinal__c;
                                         setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(approvalCondition)))}, 500);
                                     } else if (concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' ) {
                                         concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
@@ -655,7 +654,7 @@
                             todosConceptos = $filter('orderBy')(todosConceptos, 'Orden__c')
                             var ordenados = []
                             angular.forEach( todosConceptos, function( concepto, index ) {
-                                if( concepto.TipoCargo__c == 'Comisión por el servicio' ) {
+                                if( 'Comisión por el servicio' == concepto.TipoCargo__c ) {
                                     ordenados.unshift(concepto)
                                 } else {
                                     ordenados.push(concepto)
@@ -734,7 +733,7 @@
                                             concepto.schema.CantidadTarjetas__c.required = concepto.Bonificacion__c && typeof concepto.VigenciaDescuento__c == 'undefined'
                                         }
                                         if( concepto.Bonificacion__c ) {
-                                            concepto.VigenciaDescuento__c__render = true
+                                            concepto.VigenciaDescuento__c__render =  true
                                             concepto.CantidadTarjetas__c__render = concepto.CantidadTarjetas__c__renderBase
                                         }
                                     })
@@ -747,6 +746,7 @@
                             var keys = {}
                             var ids = {}
                             angular.forEach( producto.conceptos, function( concepto, index ) {
+                                
                                 var key = concepto.TipoCargo__c + '_' + concepto.Obligatorio__c + '_' + concepto.Libre__c
                                 if( !keys.hasOwnProperty(key) ) {
                                     keys[key] = concepto
