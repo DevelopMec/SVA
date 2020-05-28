@@ -301,16 +301,8 @@
 
                 vm.packageFieldChanged = function(packageType, producto) {
                     this.changePackage(producto);
-                    //this.spliceConcept(packageType);
+                    ctcUtils.spliceConcept(packageType,producto);
                 }
-                /*vm.spliceConcept(packageType) {
-                    let objectReference = ["Básico": ["Mensualidad Avanzado","Comisión por el servicio"],"Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],"Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]];
-                    alert(objectReference[packageType]);
-                    producto.conceptosUnicos.forEach( (concepto,index) => {
-                        console.log(index);
-                    });
-                }*/
-
                 vm.seleccionaProducto = function( model, instance, field, form, params, fromCtc ) {
                     if( !fromCtc ) {
                         //Activate save button.
@@ -324,7 +316,7 @@
                         instance.soluciones = []
                         ctcUtils.app.includeNectarFields = vm.includeNectarFields = model ? model.Name.includes('Nectar') :false ;
                         if(!vm.includeNectarFields) {
-                            instance.Package__c = 'Comisión por el servicio';
+                            instance.Package__c = '';
                         }
                         var producto = params && params.producto ? params.producto : {}
                         var esProductoCotizado = typeof producto.Product2Id == 'undefined'

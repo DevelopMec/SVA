@@ -789,6 +789,10 @@
                             ctcUtils.openModal('modalGenericoCuenta', {instance: function () {return err}, title: function() {return modalTitle}, subTitle: function() {return err }}, 'md')
                         }
 
+                        ctcUtils.spliceConcept = function(packageType,producto) {
+                            let objectReference = {"Básico": ["Mensualidad Avanzado","Comisión por el servicio"],"Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],"Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]};
+                            producto.conceptosUnicos = producto.conceptosUnicos.filter( (concepto) => !objectReference[packageType].includes(concepto.TipoCargo__c));
+                        }
                         ctcUtils.calculaComision = function( instance, fromCtc ) {
                             if( !fromCtc ) {
                                 var comisiones = []

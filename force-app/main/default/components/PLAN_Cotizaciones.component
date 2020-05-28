@@ -1153,9 +1153,11 @@
                                     }
                                     producto.columnasComparado = producto.columnasComparado.concat(nuevosCampos)
                                 })
-
                                 // Obtener conceptos únicos por QuoteLineItem y ProductoComparado__c
                                 ctcUtils.obtenerConceptosUnicos(todosConceptos, producto)
+                                if(producto.Package__c) {
+                                    ctcUtils.spliceConcept(producto.Package__c,producto);
+                                }
                                 //DYAMPI
                                 producto.Product2Id__o = {Id: producto.Product2.Family, ProductCode: producto.Product2.ProductCode,AplicaSegmento__c:producto.Product2.AplicaSegmento__c}
 
@@ -1388,6 +1390,10 @@
                                     } else if (productoCon.TipoCargo__c == 'Tarjeta titular / Stock' && productoCon.Bonificacion__c > ctcUtils.app.StockOriginal && ctcUtils.app.approvalStock != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.approvalStock);
                                     } else if (productoCon.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' && productoCon.Bonificacion__c > ctcUtils.app.StockPrimerEnvioOriginal && ctcUtils.app.approvalStockPrimerEnvio != undefined) {
+                                        finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
+                                    }  else if (productoCon.TipoCargo__c == 'Mensualidad Básico' && productoCon.Bonificacion__c > ctcUtils.app.StockPrimerEnvioOriginal && ctcUtils.app.approvalStockPrimerEnvio != undefined) {
+                                        finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
+                                    }  else if (productoCon.TipoCargo__c == 'Mensualidad Avanzado' && productoCon.Bonificacion__c > ctcUtils.app.StockPrimerEnvioOriginal && ctcUtils.app.approvalStockPrimerEnvio != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
                                     }
                                 })                            
