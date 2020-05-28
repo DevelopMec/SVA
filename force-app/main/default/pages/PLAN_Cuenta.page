@@ -790,9 +790,12 @@
                         }
 
                         ctcUtils.spliceConcept = function(packageType,producto) {
+                            let mediaTypes = ["TAG Dual","TAG Regular", "Tarjetas Físicas","Tarjetas Virtuales"];
+                            let mediaReference = ctcUtils.app.selectedMeans || [];
                             let objectReference = {"Básico": ["Mensualidad Avanzado","Comisión por el servicio"],"Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],"Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]};
-                            producto.conceptosUnicos = producto.conceptosUnicos.filter( (concepto) => !objectReference[packageType].includes(concepto.TipoCargo__c));
+                            producto.conceptosUnicos = producto.conceptosUnicos.filter( (concepto) => (!objectReference[packageType].includes(concepto.TipoCargo__c)) && ((mediaReference.includes(concepto.TipoCargo__c) && mediaTypes.includes(concepto.TipoCargo__c) || !mediaTypes.includes(concepto.TipoCargo__c))) );
                         }
+
                         ctcUtils.calculaComision = function( instance, fromCtc ) {
                             if( !fromCtc ) {
                                 var comisiones = []

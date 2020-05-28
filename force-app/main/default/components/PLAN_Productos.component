@@ -169,7 +169,7 @@
                                         </tr>
                                         <td></td>
                                         <td ng-repeat="check in prod.meanTypeValues" ng-if="prod.includeNectarFields">
-                                            <input ng-change="prod.checkedCard(check)" type="checkbox" ng-model="check.Checked" value="prod.value"  ng-checked="check.Checked" />
+                                            <input ng-change="prod.checkedCard(check,cotizacion.productos[0])" type="checkbox" ng-model="check.Checked" value="prod.value"  ng-checked="check.Checked" />
                                         </td>
                                         <tr ng-if="prod.includeNectarFields">
                                             <td></td>
@@ -245,8 +245,8 @@
                 vm.getMediaTypes = function(){
                     let objectMeans =[ {"Id":"mean1" ,"value" : "TAG Regular","Checked" : false,"Field" : "RegularTag__c","cardsQuantity" : 0 } ,
                                         {"Id":"mean2" ,"value" : "TAG Dual","Checked" : false, "Field" : "DualTag__c" ,"cardsQuantity" : 0} ,
-                                        {"Id":"mean3" ,"value" : "Tarjetas físicas","Checked" : false, "Field" : "physicalCard__c" ,"cardsQuantity" : 0} ,
-                                        {"Id":"mean4" ,"value" : "Tarjetas virtuales","Checked" : false, "Field" : "virtualCard__c" ,"cardsQuantity" : 0} ];
+                                        {"Id":"mean3" ,"value" : "Tarjetas Físicas","Checked" : false, "Field" : "physicalCard__c" ,"cardsQuantity" : 0} ,
+                                        {"Id":"mean4" ,"value" : "Tarjetas Virtuales","Checked" : false, "Field" : "virtualCard__c" ,"cardsQuantity" : 0} ];
                     let product = vm.cotizacion.productos[0];
                     ctcUtils.app.selectedMeans = product.meanType__c ? product.meanType__c.split(';') : [];
                     let physicalCards = product.physicalCardQuantity__c;
@@ -276,12 +276,15 @@
                         });
                     return objectMeans;
                 }
-                vm.checkedCard = function( model ) {
+
+                vm.checkedCard = function( model, producto ) {
                     if(model.Checked) {
                         ctcUtils.app.selectedMeans.includes(model.value) ? '' : ctcUtils.app.selectedMeans.push(model.value);
                     } else {
                         ctcUtils.app.selectedMeans.includes(model.value) ? ctcUtils.app.selectedMeans.splice(ctcUtils.app.selectedMeans.indexOf(model.value),1) : '' ;
                     }
+                    ctcUtils.obtenerConceptosUnicos( producto.conceptos,producto,true);
+                    ctcUtils.spliceConcept(producto.Package__c,producto);
                 }
 
                 vm.getApprovalOtherConcepts = function( model ) {
@@ -298,7 +301,7 @@
                     //Activate save button. 
                     ctcUtils.changeButtonStatus();
                 }
-
+                
                 vm.packageFieldChanged = function(packageType, producto) {
                     this.changePackage(producto);
                     ctcUtils.spliceConcept(packageType,producto);
@@ -400,6 +403,7 @@
                                     
                                     todosConceptos = todosConceptos.concat(producto.conceptos)
                                     ctcUtils.obtenerConceptosUnicos(todosConceptos, producto, true)
+
                                     ctcUtils.calculaComision( producto, fromCtc )
                                 }
 
@@ -409,6 +413,12 @@
                         }
                             
                         // console.log('seleccionaProducto instance: ', instance, '\n cotizacion: ', vm.cotizacion)
+                        $timeout(function(){
+                            if(vm.includeNectarFields) {
+                            instance.Package__c = instance.Package__c ? instance.Package__c : 'Por comisión';
+                            ctcUtils.spliceConcept(instance.Package__c,instance);
+                        }
+                        },500)
                     }
                 }
                 
