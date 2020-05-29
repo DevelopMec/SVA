@@ -239,6 +239,8 @@
                     ctcUtils.app.includeNectarFields = vm.includeNectarFields =  cotizacion.productos[0].Product2 ? cotizacion.productos[0].Product2.Name.includes('33-Nectar') : false;
                     vm.meanTypeValues = ctcUtils.app.includesNectar ? this.getMediaTypes() : {}; //Se accede como prod.valor dentro del componente
                     ctcUtils.app.meanTypeValues = vm.meanTypeValues;
+                    ctcUtils.obtenerConceptosUnicos(cotizacion.productos[0].conceptos,cotizacion.productos[0]);
+                    ctcUtils.spliceConcept(cotizacion.productos[0].Package__c,cotizacion.productos[0]);
                 }
 
                 //La cotización contiene los campos que son devueltos de SF y para crear el multicheckbox utilizamos un objeto para poder iterarlo y trackear los cambios dentro de la vista
@@ -254,6 +256,7 @@
                     let dualTag = product.dualTagQuantity__c;
                     let regularTag = product.regularTagQuantity__c;
                     objectMeans.forEach( (mean)  => {  
+                            
                             mean.Checked = ctcUtils.app.selectedMeans.includes(mean.value);
                             switch(mean.Field) {
                                 case 'RegularTag__c' : {
@@ -273,7 +276,7 @@
                                     break;
                                 }
                             }
-                        });
+                        });                    
                     return objectMeans;
                 }
 

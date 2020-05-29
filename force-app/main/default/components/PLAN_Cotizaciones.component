@@ -1776,11 +1776,11 @@
                     ret.Total_Descuento_Positivo__c     = producto.Total_Descuento_Positivo__c
                     ret.NumberOfShipments__c            = producto.NumberOfShipments__c
                     ret.Package__c                      = producto.Package__c
-                    ret.meanType__c                     = ctcUtils.app.selectedMeans.join(';');
-                    ret.physicalCardQuantity__C         = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'physicalCard__c')['0'].cardsQuantity;
-                    ret.virtualCardQuantity__C          = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'virtualCard__c')['0'].cardsQuantity;
-                    ret.dualTagQuantity__C              = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'DualTag__c')['0'].cardsQuantity;
-                    ret.regularTagQuantity__C           = ctcUtils.app.meanTypeValues.filter(type => type.Field == 'RegularTag__c')['0'].cardsQuantity;
+                    ret.meanType__c                     = ctcUtils.app.selectedMeans ? ctcUtils.app.selectedMeans.join(';') : '';
+                    ret.physicalCardQuantity__C         = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'physicalCard__c')['0'].cardsQuantity : '';
+                    ret.virtualCardQuantity__C          = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'virtualCard__c')['0'].cardsQuantity : '';
+                    ret.dualTagQuantity__C              = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'DualTag__c')['0'].cardsQuantity : '';
+                    ret.regularTagQuantity__C           = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'RegularTag__c')['0'].cardsQuantity : '';
                     /*if((!producto.ServiceDate || !producto.Id ) || producto.IsClone ) {
                         ret.ServiceDate = new Date(closeDate)
                         ret.ServiceDate = ret.ServiceDate.getFullYear() + '-' + (ret.ServiceDate.getMonth() + 1) + '-' + ret.ServiceDate.getUTCDate()

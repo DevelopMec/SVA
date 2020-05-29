@@ -601,7 +601,7 @@
                             })
                             return defered.promise
                         }
-
+                        
                         ctcUtils.obtenerConceptosUnicos = function( conceptos, producto, reRender ) {
                             producto.conceptosUnicos = []
                             producto.conceptosUnicosKey = {}
@@ -628,17 +628,27 @@
                                     concepto.Bonificacion__c = 0
                                     concepto.TieneBonificacion = true
                                     if(concepto.TipoCargo__c == 'Comisión por el servicio') {
+
                                         concepto.PrecioFinal2__c = ctcUtils.number(angular.copy(concepto.Importe__c))
                                         setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(concepto.Importe__c)))}, 500);
+
                                     } else if ( ['Cobro por gestion de vehiculos','Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c)) {
+
                                         concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c));
-                                        let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c)  ? 70.02 : concepto.PrecioFinal__c;
+                                        let conceptoFiltrado = producto.productoConcepto.filter( prodC =>  prodC.Concepto_Tipo_Cargo__c == concepto.TipoCargo__c);
+                                        let bonificacionActual = conceptoFiltrado[0] && conceptoFiltrado[0].Bonificacion__c ? conceptoFiltrado[0].Bonificacion__c : 0;
+                                        let approvalCondition = ['Mensualidad Avanzado','Mensualidad Básico'].includes(concepto.TipoCargo__c)  ?  bonificacionActual : concepto.PrecioFinal__c;
                                         setTimeout(function(){ctcUtils.getApprovalLevel(concepto, ctcUtils.number(angular.copy(approvalCondition)))}, 500);
+
                                     } else if (concepto.TipoCargo__c == 'Cargo por envío - Recurrente' || concepto.TipoCargo__c == 'Cargo del primer envío' || concepto.TipoCargo__c == 'Tarjeta titular / Stock' || concepto.TipoCargo__c == 'Tarjeta titular / Stock - primer envío' ) {
+                                        
                                         concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
                                         setTimeout(function(){ctcUtils.getApprovalOtherConcepts(concepto, ctcUtils.number(angular.copy(concepto.Bonificacion__c)), producto, null)}, 500);
+
                                     }else {
+
                                         concepto.PrecioFinal__c = ctcUtils.number(angular.copy(concepto.Importe__c))
+
                                     }
                                 }
                             })
