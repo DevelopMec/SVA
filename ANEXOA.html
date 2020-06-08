@@ -214,22 +214,22 @@
       </td>
     </tr>
     <tr>
-      <td colspan="1" rowspan="1">
+      <td colspan="1" rowspan="1" style="font-size: xx-small;">
         RFC (con homoclave)
         <ul></ul>
         {!EntidadLegal__c.Name}
       </td>
-      <td colspan="1" rowspan="1">
+      <td colspan="1" rowspan="1" style="font-size: xx-small;">
         Teléfono Negocio
         <ul></ul>
         {!Contrato2__c.Cuenta__r.Phone}
       </td>
-      <td colspan="1" rowspan="1">
+      <td colspan="1" rowspan="1" style="font-size: xx-small;">
         Teléfono Personal
         <ul></ul>
         {!Contrato2__c.Cuenta__r.Telefono2__c}
       </td>
-      <td colspan="1" rowspan="1">
+      <td colspan="1" rowspan="1" style="font-size: xx-small;">
         Correo Electrónico
         <ul></ul>
         {!Contact.Email}
@@ -460,38 +460,31 @@
   </tbody>
 </table>
 
+<br/>
+<br/>
+<br/>
+<br/>
+
 <table
   class="ql-table-blob"
   border="0"
   style="white-space: pre-wrap; color: rgb(112, 110, 107);"
   width="100%"
 >
-  <tbody>
-    <tr height="21">
-      <td
-        colspan="1"
-        rowspan="1"
-        valign="top"
-        height="100"
-        width="100%"
-        style="text-align: center;"
-      >
-        EL CLIENTE
-      </td>
-    </tr>
+  <tbody width="100%">
     <tr>
-      <td colspan="1" rowspan="1" width="100%" style="text-align: center;">
-        ________________________________________
+      <td width="100%" align="center">
+        <span>________________________________________</span>
       </td>
     </tr>
     <tr height="21">
-      <td colspan="1" rowspan="1" width="100%" style="text-align: center;">
-        {!Contrato2__c.Contacto__r.Name}
+      <td width="100%" align="center">
+        <span> {!Contrato2__c.Contacto__r.Name}</span>
       </td>
     </tr>
     <tr height="21">
-      <td colspan="1" rowspan="1" width="100%" style="text-align: center;">
-        Por: {!EntidadLegal__c.RazonSocial__c}
+      <td width="100%" align="center">
+        <span>Por: {!EntidadLegal__c.RazonSocial__c}</span>
       </td>
     </tr>
   </tbody>

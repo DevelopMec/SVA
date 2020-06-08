@@ -172,6 +172,8 @@
                         templateConceptos=templateConceptos+'</thead>';
                         templateConceptos=templateConceptos+'</tbody>';
                         for(var i=0;i<conceptos.length;i++){
+                            if(conceptos[i].Concepto_Tipo_Cargo__c == 'Comisión por el servicio')
+                                continue;
                             var dateV;
                             var vig='';
                             if(conceptos[i].VigenciaDescuento__c!=undefined){
@@ -196,11 +198,11 @@
                             
                             templateConceptos=templateConceptos+'<tr>';
                             templateConceptos=templateConceptos+'<td>'+conceptos[i].Concepto_Tipo_Cargo__c+'</td>';
-                            templateConceptos=templateConceptos+'<td>$'+conceptos[i].PrecioLista__c+'</td>';
+                            templateConceptos=templateConceptos+'<td>'+ (conceptos[i].Concepto_Tipo_Cargo__c != 'Comisión por el servicio' ? '$' : '')  +conceptos[i].PrecioLista__c+ (conceptos[i].Concepto_Tipo_Cargo__c == 'Comisión por el servicio' ? '%' : '') +'</td>';
                             templateConceptos=templateConceptos+'<td>'+ bon +'</td>';
                             templateConceptos=templateConceptos+'<td>'+ct+'</td>';
                             templateConceptos=templateConceptos+'<td>'+vig+'</td>';
-                            templateConceptos=templateConceptos+'<td>$'+conceptos[i].PrecioFinal__c+'</td>';
+                            templateConceptos=templateConceptos+'<td>' + (conceptos[i].Concepto_Tipo_Cargo__c != 'Comisión por el servicio' ? '$' : '')   +conceptos[i].PrecioFinal__c + (conceptos[i].Concepto_Tipo_Cargo__c == 'Comisión por el servicio' ? '%' : '')  +'</td>';
                             templateConceptos=templateConceptos+'</tr>';
                         }
                         templateConceptos=templateConceptos+'</tbody></table>';
@@ -233,6 +235,12 @@
                                     <p>DTCOM-001-04</p>
                                     <p>FECHA DE ACTUALIZACIÓN 11/03/2020</p>
                                     <p>CONTRATO <strong>CLIENTES EDENRED</strong> TC PAGO POR CONSUMO JUR</p>
+                                    </div>`
+                    top = '3cm'
+                } else if(dataSource.Product2.ProductCode == "33") {
+                    nombreProducto = 'Contrato 33-Nectar'; 
+                    leyendaHeader = `<div class="leyendaHeader">
+                                    <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/Nectar.png")}" />
                                     </div>`
                     top = '3cm'
                 } else if(contrato.Tipo_de_Facturacion__c == 'Consumo' && contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Avanzado' && dataSource.Product2.ProductCode == "30-TC4") {

@@ -645,7 +645,7 @@
 		      									</td>
 		      									<td>
 		      										<aura:if isTrue="{!index == 0}">
-		      											<label>{!product.PrecioLista2__c} %</label>
+		      											<label>{!product.PrecioLista__c} %</label>
 		      										</aura:if>
 		      										<aura:if isTrue="{!index != 0}">
 		      											<label>$ {!product.PrecioLista__c}</label>

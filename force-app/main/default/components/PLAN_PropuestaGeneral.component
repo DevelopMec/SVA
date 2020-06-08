@@ -21,7 +21,7 @@
        				<br/>
 		        	<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'Datos Cliente'">
 			            <div class="col-sm-12">
-			                <span class="dataLabelPDF" ng-style="solucion.fontColor">Nombreeeee: </span> <span ng-bind="solucion.Quote.Contact.Name"></span><br/>
+			                <span class="dataLabelPDF" ng-style="solucion.fontColor">Nombre: </span> <span ng-bind="solucion.Quote.Contact.Name"></span><br/>
 			                <span class="dataLabelPDF" ng-style="solucion.fontColor">Cliente: </span> <span ng-bind="solucion.Quote.Contact.Account.Name"></span><br/>
                             <span class="dataLabelPDF" ng-style="solucion.fontColor">Razón social: </span> <span ng-bind="solucion.Quote.Opportunity.Razon_social__c"></span><br/>
 			            </div>
@@ -309,7 +309,7 @@
                         <div ng-if="solucion.terminos == undefined">
                             <div ng-if="solucion.Product2.Name == '30-BPfleet'">
                                 <div class="col-sm-7 informacionEjecutivoBP" ng-style="solucion.titlePipe">
-                                    <p>Quedo atento para resolver cualquier duda o aclaración.</p>                  
+                                    <p>Quedo atento para resolver cualquier duda o aclaracióoon.</p>                  
                                     <p>Atentamente</p>
                                     <p><strong>Ejecutivo comercial</strong></p><br/>                    
                                     <p>Nombre: <span ng-bind="solucion.owner.Name"></span></p>
@@ -324,7 +324,10 @@
                             <div class="footerPageDiferenciales" ng-style="solucion.fondoSec">Disfrute de estos servicios con una fácil contratación.</div>
                         </div>
                         <br/><br/><br/><br/><br/>
-                        <div class="row">
+                  <!--------------------------------------------------------------------------->
+                        <div ng-if="solucion.terminos == undefined">
+                            <div ng-if="solucion.Product2.Name == '30-BPfleet'">
+                                <div class="row">
                     <div class="col-sm-6 text-center">
                         <p class="dataLabelPDF">Por Edenred México, S. A. de C.V. </p>  
                     </div>
@@ -335,7 +338,8 @@
                 </div>
 
                 <br/><br/><br/><br/><br/>
-                     <div class="row">
+
+                <div class="row">
                     <div class="col-sm-5-5 text-center">
                         <!--<div class="fontwhite">\s1\</div>-->
                         <center>{{solucion.Quote.Opportunity.Owner.Manager.Name}}</center>
@@ -350,6 +354,9 @@
                         <center><strong>Aceptada por la Empresa Cliente: </strong></center>
                     </div>
                 </div>
+                            </div>
+                        </div>
+              <!--------------------------------------------------------------------------------->
                     </div>
                     
 					<!-- FIN DIFERENCIALES -->

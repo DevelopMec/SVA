@@ -37,6 +37,8 @@
                         'PLAN_PropuestaGeneral'"></ctc-component-vfc>
                         <ctc-component-vfc name="PLAN_TicketCarHidrosina" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
                         'PLAN_TicketCarHidrosina'"></ctc-component-vfc>
+                        <ctc-component-vfc name="PLAN_Nectar" ng-if="sc.codigos[solucion.Product2.ProductCode].Name == 
+                        'PLAN_Nectar'"></ctc-component-vfc>
                         <span class="page-break" ng-if="!$last && sc.soluciones.length > 1 && sc.codigos[solucion.Product2.ProductCode]"></span>
                     </div>
                 </div>
@@ -223,7 +225,7 @@
 
                         producto.conceptosFiltrados = []
                         producto.PreciosTabla1 = []
-                        producto.PreciosTabla2 = []
+                        producto.PreciosTabla2 = [];
                         producto.DiferencialesTabla1 = []
                         producto.DiferencialesTabla2 = []
                         producto.CambioAlgunaTarifa = false
@@ -580,7 +582,17 @@
                                 //Se crea un documento para que las tablas se corten de acuerdo al tamaño de la hoja
                                 vm.paginaPdfComun(producto);
                             }
-                            
+                            if(vm.codigos[tipoPromesa].Name == 'PLAN_Nectar'){
+                                producto.fechaHoy = vm.fechaHoy//
+                                producto.owner = vm.owner;
+                                producto.titlePipe = { 'background-color': 'red'};
+                                producto.header = 'Nectar.png';
+                                producto.dateBorder = {'border': '1.5px solid red'};
+                                producto.urlHeader = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/"+producto.header+"')}"
+                                producto.urlPaloma = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/paloma.png')}"
+                                producto.Segmento__c = 'Small'
+                                vm.paginaPdfNectar(producto);
+                            }
                             //Caso para cuando es ticketCar -- Caso de prueba
                             if(vm.codigos[tipoPromesa].Name == 'PLAN_TicketCar'){
                                 if(vm.owner.Segmento__c == 'Small'){
@@ -807,7 +819,6 @@
                         
                         $timeout(function() {
                             var urlImage = "{!URLFOR($Resource.CotizacionesPDF, '/Encabezados/MonogramColorRGB.png')}"
-                            
                             var html = '<div class="page-template"><div class="watermark"></div> <div class="footer"> <img class="logoFooter" src="' + urlImage + '" />  <div style="float:right;"><span style="display:block;" class="ligaEdenred">edenred.mx</span></div> </div></div>'
 
 
@@ -945,7 +956,68 @@
                     //Se aplica algoritmo de paginación
                     vm.paginarDocumentoPdf(secciones, pagina, documento);
                 }
-                
+                vm.paginaPdfNectar = function(producto){
+                    var documento = new DocumentoPDF();
+                    var pagina = new Pagina();
+                    
+                    var secciones = [];
+                    var header = new Seccion('HeaderLogo','HeaderLogo',(new Marco(W_CONTENIDO,4.0)));
+                    secciones.push(header);
+                    var cfecha = new Seccion('Fecha','Fecha',(new Marco(W_CONTENIDO,1)));
+                    secciones.push(cfecha);
+                    
+                    var tProp = new Seccion('tPropuesta','tPropuesta',(new Marco(W_CONTENIDO,4)));
+                    secciones.push(tProp);
+                    var datosCliente = new Seccion('Datos Cliente','Datos Cliente',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(datosCliente);
+                    
+                    var textoPropuesta = new Seccion('textoPropuesta','textoPropuesta',(new Marco(W_CONTENIDO,4.3)));
+                    secciones.push(textoPropuesta);
+                    var datosPropuesta = new Seccion('datosPropuesta','datosPropuesta',(new Marco(W_CONTENIDO,1.5)));
+                    secciones.push(datosPropuesta);
+                    var textoPropuesta2 = new Seccion('textoPropuesta2','textoPropuesta2',(new Marco(W_CONTENIDO,1.5)));
+                    secciones.push(textoPropuesta2);
+                    
+                    if(producto.conceptosFiltrados.length > 0){
+                        var tablaPrecios = new SeccionTabla('tablaPrecios','tablaPrecios', producto.conceptosFiltrados);
+                        tablaPrecios.size = tablaPrecios.getSize();
+                        secciones.push(tablaPrecios);
+                    }
+                    
+                    var vigenciaIva = new Seccion('vigenciaIva','vigenciaIva',(new Marco(W_CONTENIDO,1.5)));
+                    secciones.push(vigenciaIva);
+                    
+                    /****/
+                    var comentarios = new Seccion('comentarios','comentarios',(new Marco(W_CONTENIDO,2)));
+                    secciones.push(comentarios);
+                    /****/
+                    
+                    
+                    if(producto.diferenciales.length > 0){
+                        var pipeDiferenciales = new Seccion('pipeDiferenciales','pipeDiferenciales',(new Marco(W_CONTENIDO,4)));
+                        secciones.push(pipeDiferenciales);
+                        var tablaDiferenciales = new SeccionTabla('tablaDiferenciales','tablaDiferenciales', producto.diferenciales);
+                        tablaDiferenciales.ST_ROW = 0.7;
+                        tablaDiferenciales.size = tablaDiferenciales.getSize();
+                        secciones.push(tablaDiferenciales);
+                        var pipeDiferenciales2 = new Seccion('pipeDiferenciales2','pipeDiferenciales2',(new Marco(W_CONTENIDO,1.5)));
+                        secciones.push(pipeDiferenciales2);
+                    }
+                    var contraprestacionSmall = new Seccion('contraprestacionSmall','contraprestacionSmall',new Marco(W_CONTENIDO,2));
+                    secciones.push(contraprestacionSmall);   
+
+                    var formaPagoSmall = new Seccion('formaPagoSmall','formaPagoSmall',(new Marco(W_CONTENIDO,3)));
+                    secciones.push(formaPagoSmall);
+
+                    var tablaDocumentacion = new Seccion('tablaDocumentacion','tablaDocumentacion',(new Marco(W_CONTENIDO,7.5)));
+                    secciones.push(tablaDocumentacion);
+                    
+                    var infoAdicional = new Seccion('infoAdicional','infoAdicional',(new Marco(W_CONTENIDO,4.5)));
+                    secciones.push(infoAdicional);
+                    
+                    //Se aplica algoritmo de paginación
+                    vm.paginarDocumentoPdf(secciones, pagina, documento);
+                }
                 vm.paginaPdfTicketCard = function(producto){
                     var documento = new DocumentoPDF();
                     var pagina = new Pagina();
@@ -1175,7 +1247,10 @@
         })()
     </script>
     <style type="text/css">
-        
+        .colorRed {
+            color: red;
+        }
+
         .headerMantenimiento{
             margin-top: 0.5cm !important;
         }
@@ -1458,7 +1533,9 @@
         .text-purple {
             color: #70359f;
         }
-
+        .text-green {
+            color: green;;
+        }
         .seccionDiferenciales {
             /*height: -webkit-fill-available;*/
             /*position: relative;*/

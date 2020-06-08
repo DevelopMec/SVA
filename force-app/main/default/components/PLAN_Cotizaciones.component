@@ -397,7 +397,6 @@
                                     })
                                 }
                             })
-
                             console.log("VERRRTYC::"+JSON.stringify(codigosTYC));
                             if( Object.keys(codigosTYC).length > 0 ) {
                                 var idsTYC = ''
@@ -1067,9 +1066,12 @@
                                 }
                                 //Saving original concepts values.
                                 if (productoCon.PartidaPresupuesto__c != null) {
-                                    if (productoCon.Concepto_Tipo_Cargo__c == 'Comisión por el servicio') {
+                                    if( productoCon.Concepto_Tipo_Cargo__c == 'Comisión por el servicio'  ) {
                                         ctcUtils.app.ComisionOriginal = productoCon.PrecioFinal__c;
-                                        ctcUtils.app.checkSecondApproval = true;
+                                    } else if( productoCon.Concepto_Tipo_Cargo__c == 'Mensualidad Avanzado') {
+                                        ctcUtils.app.ComisionOriginalAvanzado = productoCon.Bonificacion__c;
+                                    } else if( productoCon.Concepto_Tipo_Cargo__c == 'Mensualidad Básico' ) {
+                                        ctcUtils.app.ComisionOriginalBasico = productoCon.Bonificacion__c;
                                     } else if (productoCon.Concepto_Tipo_Cargo__c == 'Cobro por gestion de vehiculos') {
                                         ctcUtils.app.ComisionOriginalMant = productoCon.PrecioFinal__c;
                                         ctcUtils.app.checkSecondApproval = true;                                    
@@ -1380,6 +1382,10 @@
                             angular.forEach( cotizacion.productos, function( producto, index ) {
                                 angular.forEach( producto.conceptosUnicos, function( productoCon, index ) {
                                     if(productoCon.TipoCargo__c == 'Comisión por el servicio' && productoCon.PrecioFinal2__c < ctcUtils.app.ComisionOriginal && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
+                                        finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                                    }else if (productoCon.TipoCargo__c == 'Mensualidad Avanzado' && productoCon.Bonificacion__c > ctcUtils.app.ComisionOriginalAvanzado && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
+                                        finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
+                                    } else if (productoCon.TipoCargo__c == 'Mensualidad Básico' && productoCon.Bonificacion__c > ctcUtils.app.ComisionOriginalBasico && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel);
                                     } else if (productoCon.TipoCargo__c == 'Cobro por gestion de vehiculos' && productoCon.PrecioFinal__c < ctcUtils.app.ComisionOriginalMant && ctcUtils.app.conceptoAprobacionMant != undefined && ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel != undefined) {
                                         finalApprovalLevels.push(ctcUtils.app.conceptoAprobacionMant.PrecioFinal__c__approvalLevel);

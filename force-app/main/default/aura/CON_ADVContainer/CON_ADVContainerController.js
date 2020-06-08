@@ -11,7 +11,6 @@
    init : function(component, event, helper) {
     helper.getMotivosRechazo(component,event);
     console.log('init : ', ctcLightning);
-      
        var contratoId = component.get("v.recordId");
        $A.createComponent("c:DireccionesEntrega_LC", {
            "aura:id" : "recordId",

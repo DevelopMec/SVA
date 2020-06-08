@@ -176,11 +176,13 @@
                         PantallaIntermedia: '{!$Setup.Negocio__c.PantallaIntermediaCodigos__c}',
                         MetodoPagoCodigos__c: '{!$Setup.Negocio__c.MetodoPagoCodigos__c}',
                         RecordType : '{!Opportunity.RecordType.DeveloperName}',
+                        TipoVenta__c : '{!Opportunity.TipoVenta__c}',
                         Owner: {
                             Name: '{!Opportunity.Owner.Name}',
                             Phone: '{!Opportunity.Owner.Phone}',
                             Email: '{!Opportunity.Owner.Email}',
-                            Segmento__c: '{!Opportunity.Owner.Segmento__c}'
+                            Segmento__c: '{!Opportunity.Owner.Segmento__c}',
+                            Role__c: '{!Opportunity.Owner.UserRole.Name}'
                         }
                     }
                
@@ -614,9 +616,15 @@
                                 concepto.Render = angular.copy(concepto.Obligatorio__c)
                                 if ( !unicos.hasOwnProperty(key) ) {
                                     unicos[key] = concepto
-                                    if( 'Comisión por el servicio' == concepto.TipoCargo__c ) {
+                                    if( ('Comisión por el servicio' == concepto.TipoCargo__c  && !producto.Package__c) || (producto.Package__c == 'Por comisión' && 'Comisión por el servicio' == concepto.TipoCargo__c)) {
                                         ctcUtils.app.conceptoAprobacion = concepto;
                                         conceptosUnicos.unshift(concepto)
+                                    } else if(producto.Package__c && producto.Package__c == 'Avanzado' && 'Mensualidad Avanzado' == concepto.TipoCargo__c) {
+                                        ctcUtils.app.conceptoAprobacion = concepto;
+                                        conceptosUnicos.unshift(concepto);
+                                    } else if(producto.Package__c && producto.Package__c == 'Básico' && 'Mensualidad Básico' == concepto.TipoCargo__c) {
+                                        ctcUtils.app.conceptoAprobacion = concepto;
+                                        conceptosUnicos.unshift(concepto);
                                     } else {
                                         conceptosUnicos.push(concepto)
                                         if (concepto.TipoCargo__c == 'Cobro por gestion de vehiculos') {
@@ -802,10 +810,17 @@
                         ctcUtils.spliceConcept = function(packageType,producto) {
                             let mediaTypes = ["TAG Dual","TAG Regular", "Tarjetas Físicas","Tarjetas Virtuales"];
                             let mediaReference = ctcUtils.app.selectedMeans || [];
-                            let objectReference = {"Básico": ["Mensualidad Avanzado","Comisión por el servicio"],"Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],"Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]};
-                            producto.conceptosUnicos = producto.conceptosUnicos.filter( (concepto) => (!objectReference[packageType].includes(concepto.TipoCargo__c)) && ((mediaReference.includes(concepto.TipoCargo__c) && mediaTypes.includes(concepto.TipoCargo__c) || !mediaTypes.includes(concepto.TipoCargo__c))) );
-                        }
 
+                            let objectReference = {"Básico": ["Mensualidad Avanzado","Comisión por el servicio"],
+                                                "Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],
+                                                "Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]};
+
+                            producto.conceptosUnicos = producto.conceptosUnicos.filter( (concepto) => 
+                                                                                        (!objectReference[packageType].includes(concepto.TipoCargo__c)) && 
+                                                                                        ((mediaReference.includes(concepto.TipoCargo__c) && 
+                                                                                        mediaTypes.includes(concepto.TipoCargo__c) || 
+                                                                                        !mediaTypes.includes(concepto.TipoCargo__c))) );
+                        }
                         ctcUtils.calculaComision = function( instance, fromCtc ) {
                             if( !fromCtc ) {
                                 var comisiones = []

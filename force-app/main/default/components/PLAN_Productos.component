@@ -203,7 +203,7 @@
                 <c:PLAN_FormaPago ></c:PLAN_FormaPago>
                 <c:PLAN_Costos ></c:PLAN_Costos>
                 <c:PLAN_Condiciones ></c:PLAN_Condiciones>
-
+				<c:PLAN_ModalidadPago ></c:PLAN_ModalidadPago>
             </uib-tab>
         </uib-tabset>
 
@@ -237,10 +237,11 @@
 
                 vm.initNectarData = function(cotizacion) {
                     ctcUtils.app.includeNectarFields = vm.includeNectarFields =  cotizacion.productos[0].Product2 ? cotizacion.productos[0].Product2.Name.includes('33-Nectar') : false;
-                    vm.meanTypeValues = ctcUtils.app.includesNectar ? this.getMediaTypes() : {}; //Se accede como prod.valor dentro del componente
-                    ctcUtils.app.meanTypeValues = vm.meanTypeValues;
+                    ctcUtils.app.meanTypeValues = vm.meanTypeValues = ctcUtils.app.includesNectar ? this.getMediaTypes() : {}; //Se accede como prod.valor dentro del componente
+                    if(ctcUtils.app.includeNectarFields){
                     ctcUtils.obtenerConceptosUnicos(cotizacion.productos[0].conceptos,cotizacion.productos[0]);
                     ctcUtils.spliceConcept(cotizacion.productos[0].Package__c,cotizacion.productos[0]);
+                    }
                 }
 
                 //La cotización contiene los campos que son devueltos de SF y para crear el multicheckbox utilizamos un objeto para poder iterarlo y trackear los cambios dentro de la vista

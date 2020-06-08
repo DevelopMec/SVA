@@ -13,9 +13,8 @@
 					<div class="col-sm-12" ng-if="seccion.nombre == 'tPropuesta'">
 						<div class="col-sm-12">
 							<div ng-style="solucion.titlePipe" id="wallet-mxn-bar" class="barraEncabezado"></div>
-							<span class="tituloSeccion" ng-if="solucion.owner.Segmento__c != 'Small'">PROPUESTA COMERCIAL</span>
-							<span class="tituloSeccion" ng-if="solucion.owner.Segmento__c == 'Small'">PROPUESTA COMERCIAL Y CONDICIONES</span>
-							<span class="subtituloSeccion">TICKET CAR&reg;</span>
+							<span class="tituloSeccion">PROPUESTA COMERCIAL Y CONDICIONES</span>
+							<span class="subtituloSeccion">NECTAR&reg;</span>
 						</div>
 					</div>
 					<br/>
@@ -34,7 +33,7 @@
 						</div>
 					</div>
 
-					<div class="col-sm-12 seccionDatosCliente" ng-if="solucion.owner.Segmento__c == 'Small' && seccion.nombre == 'textoPropuesta'">
+					<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'textoPropuesta'">
 						<div class="col-sm-12">
 							<p>
 								Edenred es tu aliado comercial especializado y orientado a satisfacer las necesidades de tu empresa o negocio. Contamos con
@@ -56,53 +55,6 @@
 								Sirva la presente para definir el alcance de los servicios que les prestaremos, el régimen de causación y pago del servicio;
 								así como los términos y condiciones del mismo, en caso de ser aceptada esta propuesta.
 							</p>
-						</div>
-					</div>
-
-					<div class="col-sm-12 seccionDatosCliente" ng-if="solucion.owner.Segmento__c != 'Small' && seccion.nombre == 'textoPropuesta'">
-						<div class="col-sm-12">
-							<p>
-								<span class="dataLabelPDF" ng-style="solucion.fontColor">Estimado (a) </span>
-								<br/>
-							</p>
-
-							<p>
-								Por medio de la presente, le enviamos la propuesta comercial de nuestra solución
-								<b>{{solucion.Product2.Name}}</b> basada en la información que amablemente nos proporcionó:
-							</p>
-
-							<br/>
-
-							<p>
-								<span class="dataLabelPDF" ng-style="solucion.fontColor">Volumen de compra mensual:
-									<span ng-bind="solucion.UnitPrice | currency: '$ ': 2"></span>
-								</span>
-
-								<br/>
-
-								<span class="dataLabelPDF" ng-style="solucion.fontColor">Comisión:
-									<span ng-bind="(solucion.Comision | number: 2) + ' %'"></span>
-								</span>
-							</p>
-
-							<br/>
-
-						</div>
-					</div>
-
-					<div class="col-sm-12 seccionDatosCliente" ng-if="solucion.owner.Segmento__c == 'Small' && seccion.nombre == 'datosPropuesta'">
-						<div class="col-sm-4">
-							<span class="dataLabelPDF" ng-style="solucion.fontColor">Volumen de compra mensual: </span>
-							<br/>
-							<span class="dataLabelPDF" ng-style="solucion.fontColor">Número de vehículos: </span>
-							<br/>
-							<!-- <span class="dataLabelPDF" ng-style="solucion.fontColor">Número de tag´s Ticket Car&reg; GO: </span><br/> -->
-						</div>
-						<div class="col-sm-4">
-							<div ng-bind="solucion.UnitPrice | currency: '$ ': 2" class="promiseLine"></div>
-							<br/>
-							<div ng-bind="solucion.CantidadTarjetas__c" class="promiseLine"></div>
-							<br/>
 						</div>
 					</div>
 
@@ -317,7 +269,7 @@
 
 					<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'vigenciaIva'">
 						<div class="col-sm-12 text-right boldEdenred sizeIva">
-							<span>Esta propuesta tiene una vigencia de {{solucion.Quote.VigenciaCotizacion__c}}</span>
+							<span>Esta propuesta tiene una vigencia de <b>7 días</b></span>
 							<br/>
 							<span>Los costos no incluyen IVA</span>
 						</div>
@@ -333,76 +285,12 @@
 							<br/>
 						</div>
 					</div>
-
-					<div class="col-sm-12" ng-if="solucion.owner.Segmento__c != 'Small' && seccion.nombre == 'formaPago'">
-						<!-- INICIO -->
-						<div class="row seccionDatosCliente" ng-if="seccion.nombre == 'comentarios'">
-							<div class="col-sm-2">
-								<span class="dataLabelPDF" ng-style="solucion.fontColor">Comentarios:</span>
-							</div>
-							<div class="col-sm-10">
-								<div ng-bind="solucion.ComentariosCotizacion__c"></div>
-								<br/>
-							</div>
-						</div>
-
-						<!-- <div class="row seccionDatosCliente">
-			                <div class="col-sm-12" >
-			                    <div ng-bind="" class="lineaComentario"></div><br/>
-			                </div>
-			            </div> -->
-
-						<div class="row seccionDatosCliente" ng-if="seccion.nombre == 'formaPago'">
-							<div class="col-sm-6">
-								<p class="dataLabelPDF" ng-style="solucion.fontColor">Forma de pago del pedido:</p>
-								<p>
-									<span ng-if="solucion.FormaPago__c == 'TransferenciaElectronica'" class="fa fa-check-square-o"></span>
-									<span ng-if="solucion.FormaPago__c != 'TransferenciaElectronica'" class="fa fa-square-o"></span>
-									Transferencia electrónica &nbsp;&nbsp;
-
-									<br/>
-
-									<span ng-if="solucion.FormaPago__c == 'American Express'" class="fa fa-check-square-o"></span>
-									<span ng-if="solucion.FormaPago__c != 'American Express'" class="fa fa-square-o"></span>
-									American Express &nbsp;&nbsp;
-
-									<br/>
-
-									<span ng-if="solucion.FormaPago__c == 'Deposito'" class="fa fa-check-square-o"></span>
-									<span ng-if="solucion.FormaPago__c != 'Deposito'" class="fa fa-square-o"></span>
-									Depósito Bancario &nbsp;&nbsp;
-
-									<br/>
-
-									<span ng-if="solucion.FormaPago__c == 'Otros'" class="fa fa-check-square-o"></span>
-									<span ng-if="solucion.FormaPago__c != 'Otros'" class="fa fa-square-o"></span>
-									Otros:
-									<span ng-if="solucion.FormaPago__c == 'Otros'" ng-bind="solucion.OtroMetodoPago__c"></span>
-
-								</p>
-							</div>
-							<div class="col-sm-6 text-right boldEdenred">
-								<div class="col-sm-2"></div>
-								<div class="col-sm-10">
-									<span class="dataLabelPDF" ng-style="solucion.fontColor">Notas:</span>
-									<br/>
-									<p class="letraNotas">
-										<span>• Contraprestación mínima, 3 UMAS si el importe de la comisión es inferior a ese monto.</span>
-										<br/>
-										<span>• Condiciones especiales (tarjetas de reposición) de acuerdo con la negociación.</span>
-									</p>
-								</div>
-							</div>
-						</div>
-						<!-- FIN -->
-					</div>
-
 					<!-- INICIO DIFERENCIALES -->
 					<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'pipeDiferenciales'">
 						<div class="col-sm-12">
 							<div ng-style="solucion.titlePipe" id="wallet-mxn-bar" class="pipeDiferencial"></div>
 							<span class="tituloSeccion">DIFERENCIALES</span>
-							<span class="subtituloSeccion">TICKET CAR&reg;</span>
+							<span class="subtituloSeccion">NECTAR&reg;</span>
 						</div>
 					</div>
 
@@ -423,7 +311,7 @@
 										<td width="90%" ng-bind="diferencial.CaracteristicasSolucion__c">
 										</td>
 										<td class="text-center">
-											<span class="fa fa-check text-purple" ng-style="solucion.fontColor"></span>
+											<span class="fa fa-check text-green" ng-style="solucion.fontColor"></span>
 										</td>
 									</tr>
 
@@ -437,17 +325,16 @@
 					<!-- FIN DIFERENCIALES -->
 
 					<!-- CONTRAPRESTACION -->
-					<div class="col-sm-12 justificado" ng-if="solucion.owner.Segmento__c== 'Small' && seccion.nombre == 'contraprestacionSmall'">
+					<div class="col-sm-12 justificado" ng-if="seccion.nombre == 'contraprestacionSmall'">
 						<p>
-							La contraprestación mínima por el servicio será de 3 SMGV ($219.12 M.N.) Los costos no incluyen IVA En caso de pedir tarjetas
-							de reposición, se cobrará el envío por aparte ($135.00 M.N. por tarjeta).
+							La contraprestación mínima por el servicio será de 3 SMGV ($219.12 M.N.) Los costos no incluyen IVA.
 						</p>
 					</div>
 
 					<!-- FORMA PAGO -->
 					<div class="col-sm-12 seccionDatosCliente" ng-if="seccion.nombre == 'formaPagoSmall'">
 						<div class="col-sm-7">
-							<p class="dataLabelPDF" ng-style="solucion.fontColor">Forma de pago del pedido</p>
+							<p class="dataLabelPDF colorRed">Forma de pago del pedido</p>
 							<p>
 								<span ng-if="solucion.FormaPago__c == 'TransferenciaElectronica'" class="fa fa-check-square-o"></span>
 								<span ng-if="solucion.FormaPago__c != 'TransferenciaElectronica'" class="fa fa-square-o"></span>
@@ -473,7 +360,7 @@
 						</div>
 
 						<div class="col-sm-5 boldEdenred">
-							Propuesta comercial con vigencia de {{solucion.Quote.VigenciaCotizacion__c}}
+							Propuesta comercial con vigencia de <b>{{solucion.Quote.VigenciaCotizacion__c}}</b>
 						</div>
 					</div>
 					<!-- FIN FORMA PAGO -->
@@ -483,7 +370,7 @@
 					<div class="row seccionDatosCliente" ng-if="seccion.nombre == 'tablaDocumentacion'">
 						<div class="col-sm-12">
 							<!-- DOCUMENTACINON PARA CONTRATAR TICKET CAR® -->
-							<p class="dataLabelPDF" ng-style="solucion.fontColor">DOCUMENTACIÓN PARA CONTRATAR TICKET CAR®:</p>
+							<p class="dataLabelPDF colorRed" >DOCUMENTACIÓN PARA CONTRATAR NECTAR®:</p>
 							<br/>
 							<table class="table">
 								<thead class="headerTable">
@@ -559,7 +446,7 @@
 
 						<br/>
 
-						<p class="dataLabelPDF" ng-style="solucion.fontColor">
+						<p class="dataLabelPDF colorRed">
 							<b>INFORMACIÓN ADICIONAL</b>
 						</p>
 
@@ -577,12 +464,11 @@
 					</div>
 				</div>
 			</div>
-			<!-- <p>{{pagina.numPagina + ' of '+ sc.documento.numPaginas}}</p> -->
 			<div class="page-break" ng-if="sc.documento.paginas.numPaginas != pagina.numPagina"></div>
 		</div>
 		<div class="pageContainer">
 			<!-- INICIO -->
-			<div ng-if="solucion.terminos != undefined && solucion.owner.Segmento__c == 'Small'">
+			<div ng-if="solucion.terminos != undefined ">
 				<div class="row seccionDatosCliente justificado">
 					<span class="dataLabelPDF headersTerminos" ng-style="solucion.titlePipe">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Términos y Condiciones del Servicio:</span>
 					<br/>
@@ -629,47 +515,7 @@
 				</div>
 
 				<span class="page-break"></span>
-
-				<!-- <span class="dataLabelPDF" ng-style="solucion.fontColor">Por Edenred México, S.A. de C.V.</span><br/>
-	
-	                <div class="row">
-	                    <div class="col-sm-5-5 text-center">
-	                        <strong>Nombre y Firma del Apoderado </strong>
-	                    </div>
-	                    <div class="col-sm-1"></div>
-	                    <div class="col-sm-5-5 text-center">
-	                        <strong>Aceptada por la Empresa Cliente: </strong>
-	                    </div>
-	                </div>
-	
-	                <div class="row">
-	                    <div class="col-sm-5-5 text-center seccionFirma" ng-style="solucion.dateBorder">
-	                        
-	                    </div>
-	                    <div class="col-sm-1"></div>
-	                    <div class="col-sm-5-5 text-center seccionFirma" ng-style="solucion.dateBorder">
-	                        
-	                    </div>
-	                </div>
-	
-	                <br/><br/><br/>
-	
-	                <div class="row seccionDatosCliente">
-	                    <div class="col-sm-6 col-sm-offset-6 text-center">
-	                        <strong>Nombre y Firma Representante Legal</strong>
-	                    </div>
-	                </div>
-	
-	                <div class="row seccionDatosCliente">
-	                    <div class="col-sm-7 col-sm-offset-5 seccionFirmaApoderado" ng-style="solucion.dateBorder">
-	                        
-	                    </div>
-	                </div> -->
-
 			</div>
-
-			<!-- 	        <span class="page-break" ng-if="solucion.owner.Segmento__c != 'Small'"></span> -->
-
 			<div class="row">
 				<div class="col-sm-12">
 					<div ng-style="solucion.titlePipe" id="wallet-mxn-bar"></div>
