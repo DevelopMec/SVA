@@ -695,7 +695,7 @@
     function replaceConceptValues(plantilla, concepts, conceptsListTC4,field,meses) {
         concepts.forEach( function(concepto) {
             if(conceptsListTC4[concepto.Concepto_Tipo_Cargo__c]){
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioLista__c ?  concepto.PrecioLista__c : '' ;
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c = concepto.Concepto_Tipo_Cargo__c == 'Comisión por el servicio' ?  concepto.PrecioFinal__c ? concepto.PrecioFinal__c : ''   :  concepto.PrecioLista__c ?  concepto.PrecioLista__c : '' ;
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ? concepto.Bonificacion__c : '';
             let vig = '';
             if( concepto.VigenciaDescuento__c) {

@@ -1,0 +1,145 @@
+<apex:component >
+    <script type="text/ng-template" id="rangosAprobacionMP.html">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="com.close()"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Rangos de Aprobación</h4>
+        </div>
+        <div class="modal-body">
+            <ctc-error ctc-body="sc.errors"></ctc-error>
+            <table id="table-collapse" class="table table-hover">
+                <thead>
+	            	<tr>	
+                        <th class="text-center">Días Crédito<br/>Desde</th>	
+                        <th class="text-center">Días Crédito<br/>Hasta</th>	
+                        <th class="text-center">Nivel de Aprobación</th>	
+                        <th class="text-center">Acelerador de Pago</th>	
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="rango in com.rangosAprobacion" >
+                        <!--DIA INICIO-->
+                        <td ng-if="com.segmento == rango.Segmento__c  && rango.Modalidad__c == 'Pospago' && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" ng-bind="rango.DiaCreditoInicio__c" class="text-center" />
+                        <!--DIA FIN-->
+                        <td ng-if="com.segmento == rango.Segmento__c  && rango.Modalidad__c == 'Pospago' && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" ng-bind="rango.DiaCreditoFin__c " class="text-center" />
+                        <!--PREPAGO-->
+                        <td ng-if="com.segmento == rango.Segmento__c  && rango.Modalidad__c == 'Prepago' && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" class="text-center" colspan="2">Prepago</td>
+
+                        <!--NIVEL APROBACION 1-->
+                        <td ng-if="rango.NivelAprobacion__c == 1 && com.segmento == rango.Segmento__c && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" class="text-center">
+                            <span class="fa fa-circle greenCircle"></span>
+                        </td>
+                        <!--NIVEL APROBACION 2-->
+                        <td ng-if="rango.NivelAprobacion__c == 2 && com.segmento == rango.Segmento__c && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" class="text-center">
+                            <span class="fa fa-circle yellowCircle"></span>
+                        </td>
+                        <!--NIVEL APROBACION 3-->
+                        <td ng-if="rango.NivelAprobacion__c == 3 && com.segmento == rango.Segmento__c && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" class="text-center">
+                            <span class="fa fa-circle redCircle"></span>
+                        </td>
+                        <!--NIVEL APROBACION 4-->
+                        <td ng-if="rango.NivelAprobacion__c == 4 && com.segmento == rango.Segmento__c && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" class="text-center">
+                            <span class="fa fa-circle grayCircle"></span>
+                        </td>
+                        <!--ACELERADOR-->
+                        <td ng-if="com.segmento == rango.Segmento__c && (rango.CodigoProducto__c == com.productCode && rango.Solucion__c != com.oportunidad.Familia__c || com.productCode != com.productCodeOmitir && rango.Solucion__c == com.oportunidad.Familia__c)" ng-bind="rango.Acelerador__c + ' %'" class="text-center" />
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <span ng-bind="mod.oportunidad.Account.SegmentoComercial"></span>
+        <div>
+            <table id="table-collapse">
+                <thead>
+                    <tr>
+                        <th class="text-center">Crédito <span class="fa fa-circle greenCircle"></span></th>
+                        <th class="text-center">Gestor Inmediato <span class="fa fa-circle yellowCircle"></span></th>
+                        <th class="text-center">Gestor Inmediato <span class="fa fa-circle redCircle"></span></th>
+                        <th class="text-center">Gestor Inmediato <span class="fa fa-circle grayCircle"></span></th>
+                    </tr>
+                    <tr>
+                        <th class="text-center"></th>
+                        <th class="text-center">Gerente</th>
+                        <th class="text-center">Gerente</th>
+                        <th class="text-center">Gerente</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center"></th>
+                        <th class="text-center">Crédito</th>
+                        <th class="text-center">Director de BU</th>
+                        <th class="text-center">Director de BU</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center">Crédito</th>
+                        <th class="text-center">Director General</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center"></th>
+                        <th class="text-center">Crédito</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>                           
+        <div class="modal-footer">
+            <button type="button" ng-disabled="com.processing" class="btnb btnb-default" ng-click="com.close()">
+                <span class="fa fa-mail-reply fa-fw"></span>
+                Cerrar
+            </button>
+        </div>
+    </script>
+    <script type="text/javascript">
+        (function() {
+            'use strict'
+            angular.module('appEdenred')
+            .controller('rangosAprobacionMPCtrl', rangosAprobacionMPCtrl)
+
+            rangosAprobacionMPCtrl.$inject = ['ctcUtils', '$filter', '$timeout', '$uibModalInstance', 'producto', 'oportunidad', 'rangoAprobacion']
+            function rangosAprobacionMPCtrl( ctcUtils, $filter, $timeout, $uibModalInstance, producto, oportunidad, rangoAprobacion ) {
+                var vm = this
+                vm.producto = producto || ''
+                vm.oportunidad = oportunidad || '';
+                vm.rangosAprobacion = rangoAprobacion;
+                vm.segmento = '';
+                vm.productCode = '';
+                vm.productCodeOmitir = '';
+
+                vm.init = function() {
+                    vm.productCode = vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : '';
+                    vm.segmento = 
+                        vm.oportunidad.Account.SegmentoComercial.includes('Small') ? 'Small' : (
+                            vm.oportunidad.Account.SegmentoComercial.includes('Medium') ? 'Medium' : (
+                                vm.oportunidad.Account.SegmentoComercial.includes('Large') ? 'Large' : (
+                                    vm.oportunidad.Account.SegmentoComercial.includes('Key') ? 'Key' : ''
+                                )
+                            )
+                        ); // TODO: Descomentar BYPASS
+
+                    vm.obtenerProducto();
+                }
+
+                vm.obtenerProducto = function() {
+                    console.log(vm.productCode);
+                    angular.forEach(vm.rangosAprobacion, function (ra, index) {
+                        if(ra.CodigoProducto__c == vm.productCode) {
+                            vm.productCodeOmitir = ra.CodigoProducto__c;
+                        }
+                    })
+                }
+
+                vm.close = function () {
+                    $uibModalInstance.dismiss('cancel')
+                }
+                vm.init()
+
+            }
+        })()
+    </script>
+    <style type="text/css">
+        .tr-comisiones > td {
+            vertical-align: middle !important;
+        }
+    </style>
+</apex:component>

@@ -161,6 +161,7 @@
     color: rgb(62, 62, 60);
     white-space: pre-wrap;
     margin-left: 10.2pt;
+    
   "
 >
   <tbody>
@@ -181,8 +182,9 @@
   style="
     width: 488.95pt;
     color: rgb(62, 62, 60);
-    white-space: pre-wrap;
+    white-space:nowrap;
     margin-left: 10.2pt;
+    table-layout: fixed;
   "
 >
   <tbody>
@@ -229,10 +231,10 @@
         <ul></ul>
         {!Contrato2__c.Cuenta__r.Telefono2__c}
       </td>
-      <td colspan="1" rowspan="1" style="white-space: pre-wrap;">
+      <td colspan="1" rowspan="1" style="white-space:nowrap;">
         Correo Electrónico
         <ul></ul>
-        {!Contact.Email}
+        <span style="font-size: 8px;">{!Contact.Email}</span>
       </td>
     </tr>
     <tr>
@@ -289,8 +291,8 @@
   style="
     width: 488.95pt;
     color: rgb(62, 62, 60);
-    white-space: pre-wrap;
     margin-left: 10.2pt;
+    table-layout: fixed;
   "
 >
   <tbody>
@@ -342,7 +344,7 @@
       <td colspan="1" rowspan="1">
         CURP
         <ul></ul>
-        
+        {!Contrato2__c.Contacto__r.Curp__c}
       </td>
       <td colspan="1" rowspan="1">
         Teléfono de negocio
@@ -354,10 +356,10 @@
         <ul></ul>
         {!Contact.MobilePhone}
       </td>
-      <td colspan="1" rowspan="1" style="white-space: pre-wrap;">
+      <td colspan="1" rowspan="1" style="white-space:nowrap;">
         Correo electrónico
         <ul></ul>
-        {!Contact.Email}
+        <span style="font-size: 8px;">{!Contact.Email}</span>
       </td>
     </tr>
     <tr>
@@ -428,8 +430,9 @@
   style="
     width: 488.95pt;
     color: rgb(62, 62, 60);
-    white-space: pre-wrap;
+    table-layout: fixed;
     margin-left: 10.2pt;
+    white-space:nowrap;
   "
 >
   <tbody>
