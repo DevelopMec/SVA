@@ -166,7 +166,8 @@
                     .then( function( result ) {
                         var conceptos=result;
                         conceptList = result;
-                        templateConceptos='<table class="tableFilial">';
+                        templateConceptos = '<p>  Para todos los efectos de este CONTRATO las partes convienen en considerar dentro del término “CLIENTE” a la persona moral principal y a todas las personas morales filiales que se detallan a continuación:</p>'
+                        templateConceptos= templateConceptos + '<table class="tableFilial">';
                         templateConceptos=templateConceptos+'<thead>';                        
                         templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th><th>Cantidad de Tarjetas</th><th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
                         templateConceptos=templateConceptos+'</thead>';
@@ -563,7 +564,6 @@
                 replaceConceptValues(plantilla, conceptList, conceptsListTC4,'Contenido_del__c');
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(/color: rgb\(112\, 110\, 107\)\;/g, '');
                 plantilla.Contenido_del__c = plantilla.Contenido_del__c.replace(new RegExp('!check', 'gi' ), '<input type="checkbox" kendoCheckBox checked="true" [(ngModel)]="model.foo" />');
-
                 $('#contentPdf').html('');
                 $('#contentPdf').append(plantilla.Contenido_del__c);
                 
@@ -610,6 +610,8 @@
                     $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoE__c);
 
                 }
+                console.log("AQIO VOY A PINTAR LOS ID:" );
+                console.log($('#AnualidadConcepto').css("visibility"));
                 var logo;
                 if(plantilla.Logocontrato__c == undefined || plantilla.Logocontrato__c == null){
                     logo = '    <div class = "logoTC"></div>';
@@ -693,7 +695,7 @@
     function replaceConceptValues(plantilla, concepts, conceptsListTC4,field,meses) {
         concepts.forEach( function(concepto) {
             if(conceptsListTC4[concepto.Concepto_Tipo_Cargo__c]){
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ?  concepto.PrecioFinal__c : '' ;
+            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioLista__c ?  concepto.PrecioLista__c : '' ;
             conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ? concepto.Bonificacion__c : '';
             let vig = '';
             if( concepto.VigenciaDescuento__c) {

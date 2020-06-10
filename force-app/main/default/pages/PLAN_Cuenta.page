@@ -808,19 +808,50 @@
                         }
 
                         ctcUtils.spliceConcept = function(packageType,producto) {
-                            let mediaTypes = ["TAG Dual","TAG Regular", "Tarjetas Físicas","Tarjetas Virtuales"];
+                            let mediaTypes = {"TAG Dual" :  {"includeConcepts" : ['Cuota por renta mensual TAG']},
+                                            "TAG Regular" : {"includeConcepts" : ['Cuota por renta mensual TAG']}, 
+                                            "Tarjetas Físicas" : {"includeConcepts" : ['Cuota por impresión de logo a color']},
+                                            "Tarjetas Virtuales" : {"includeConcepts" : [],"excludeConcepts": ['Cargo por envío - Recurrente','Cuota por ordenamiento y/o entrega especial','Cuota por impresión de logo a color']}
+                                        };
                             let mediaReference = ctcUtils.app.selectedMeans || [];
-
+                            let excludedConcepts = ctcUtils.excludeDependencies(producto, mediaTypes, mediaReference);
                             let objectReference = {"Básico": ["Mensualidad Avanzado","Comisión por el servicio"],
                                                 "Avanzado" : ["Mensualidad Básico","Comisión por el servicio"],
                                                 "Por comisión" : ["Mensualidad Básico","Mensualidad Avanzado"]};
 
                             producto.conceptosUnicos = producto.conceptosUnicos.filter( (concepto) => 
                                                                                         (!objectReference[packageType].includes(concepto.TipoCargo__c)) && 
-                                                                                        ((mediaReference.includes(concepto.TipoCargo__c) && 
-                                                                                        mediaTypes.includes(concepto.TipoCargo__c) || 
-                                                                                        !mediaTypes.includes(concepto.TipoCargo__c))) );
+                                                                                        (mediaReference.includes(concepto.TipoCargo__c) && 
+                                                                                        Object.keys(mediaTypes).includes(concepto.TipoCargo__c) || 
+                                                                                        !Object.keys(mediaTypes).includes(concepto.TipoCargo__c)) 
+                                                                                        );
+                            
+                            producto.conceptosUnicos = producto.conceptosUnicos.filter( concepto =>  !excludedConcepts.includes(concepto)); 
                         }
+
+                        ctcUtils.excludeDependencies = function(producto, mediaTypes, mediaReference) {
+                            let conceptsToExclude = [];
+                            let conceptsToInclude = [];
+                            for(let key in mediaTypes) {
+                                producto.conceptosUnicos.forEach(concepto => {
+                                    if(!mediaReference.includes(key) && mediaTypes[key].hasOwnProperty('includeConcepts')  && mediaTypes[key].includeConcepts.includes(concepto.TipoCargo__c) ) {
+                                        if(!conceptsToExclude.includes(concepto) && !conceptsToInclude.includes(concepto)){
+                                            conceptsToExclude.push(concepto);
+                                        }
+                                    } else if(mediaReference.includes(key) && mediaTypes[key].hasOwnProperty('includeConcepts')  && mediaTypes[key].includeConcepts.includes(concepto.TipoCargo__c) ) {
+                                        conceptsToInclude.push(concepto);
+                                        if(conceptsToExclude.includes(concepto)){
+                                            conceptsToExclude.splice(conceptsToExclude.indexOf(concepto),1);
+                                        }
+                                    }
+                                    if(mediaReference.includes(key) && mediaTypes[key].hasOwnProperty('excludeConcepts')  && mediaTypes[key].excludeConcepts.includes(concepto.TipoCargo__c) ) {
+                                        conceptsToExclude.push(concepto);
+                                    }
+                                });
+                            }
+                            return conceptsToExclude;
+                        }
+
                         ctcUtils.calculaComision = function( instance, fromCtc ) {
                             if( !fromCtc ) {
                                 var comisiones = []
