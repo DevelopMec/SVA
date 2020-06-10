@@ -610,8 +610,7 @@
                     $('#contentPdf').append('<div class="page-break"></div>'+plantilla.AnexoE__c);
 
                 }
-                console.log("AQIO VOY A PINTAR LOS ID:" );
-                console.log($('#AnualidadConcepto').css("visibility"));
+                setDisplayAttribute(plantilla, conceptList);
                 var logo;
                 if(plantilla.Logocontrato__c == undefined || plantilla.Logocontrato__c == null){
                     logo = '    <div class = "logoTC"></div>';
@@ -726,6 +725,13 @@
             plantilla[field] = plantilla[field].replace(new RegExp('!hoymes', 'gi' ), meses[fecha.getMonth()+1]);
             plantilla[field] = plantilla[field].replace(new RegExp('!hoyanio', 'gi' ), fecha.getFullYear());
         }
+    }
+    function setDisplayAttribute(plantilla, concepts) {
+        let elementos = $(".conceptForm");    
+        elementos.each(function(index,element){
+            console.log($(element).attr("id"));
+        })
+        
     }
 
     function replaceStr( textHml, datasource ) {
