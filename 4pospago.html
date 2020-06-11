@@ -72,14 +72,7 @@
   con la clave {!EntidadLegal__c.Name}, lo cual acredita con la copia simple de
   la constancia de inscripción correspondiente y que se agrega al presente como
   parte del Anexo “A”; y que tiene su domicilio fiscal en:
-  <span
-    style="
-      color: rgb(112, 110, 107);
-      background-color: rgb(255, 255, 255);
-      font-size: 14px;
-    "
-    >{!Contrato2__c.FiscalAddressText__c}</span
-  >
+  {!Contrato2__c.FiscalAddressText__c}
   <b>(iii)</b> Que su representante legal tiene las facultades legales
   suficientes para obligarlo en los términos de éste Contrato, lo cual acredita
   con la copia simple del testimonio notarial que las contiene y del cual se
@@ -388,20 +381,17 @@
       </td>
       <td>
         !PrecioFinal.Anualidad - Grande!PrecioFinal.Anualidad - Pyme PESOS más
-        IVA. Bonificación del: !Bonificacion.Anualidad -
-        Grande!Bonificacion.Anualidad - Pyme %; con vigencia al
+        IVA. Bonificación del: !Bonificacion.Anualidad - Grande!Bonificacion.Anualidad - Pyme %; con vigencia al
         !vigencia.Anualidad - Pyme !vigencia.Anualidad - Grande
       </td>
     </tr>
-    <tr id="Cuota por transacción con TAG +IVA" class="conceptForm">
+    <tr id="Cuota por transacción con TAG+IVA" class="conceptForm">
       <td align="left">Cargo por transacción</td>
       <td>
         Cuota transaccional que contempla transacciones Aceptadas y Rechazadas.
       </td>
       <td>
-        Precio de Transacción Autorizada: !PrecioFinal.Cuota por transacción con
-        TAG +IVA Precio de Transacción Rechazada: !PrecioFinal.Cuota por
-        transacción con TAG+IVA
+        Precio de Transacción Autorizada: !PrecioFinal.Cuota por transacción con TAG +IVA Precio de Transacción Rechazada: !PrecioFinal.Cuota por transacción con TAG+IVA
       </td>
     </tr>
     <tr id="Cargo por envío - Recurrente" class="conceptForm">
@@ -437,7 +427,7 @@
       </td>
     </tr>
     <tr id="Cuota por renta mensual TAG" class="conceptForm">
-      <td align="left">NFC cargo mensual</td>
+      <td align="left">NFC Cargo mensual</td>
       <td>
         Costo mensual del servicio de validación de presencia vehicular
         (dispositivos tecnológicos)
@@ -488,11 +478,7 @@
   resto de las filiales para todas las negociaciones y acuerdos de la relación
   comercial con EDENRED.
 </p>
-<p>
-  Para todos los efectos de este CONTRATO las partes convienen en considerar
-  dentro del término “CLIENTE” a la persona moral principal y a todas las
-  personas morales filiales que se detallan a continuación:
-</p>
+
 <div>(!filiales)</div>
 <p>
   <b style="color: rgb(62, 62, 60); background-color: rgb(255, 255, 255);"
@@ -543,7 +529,7 @@
   cuenta de ese periodo; <b>iii) </b>Liquidar el importe total facturado al
   CLENTE en el CFDI y complemento de estado de cuenta de combustibles, y de
   cualquier factura (CFDI) presentada por EDENRED a
-  los {!Contracto2__c.DiasLiquidacionFactura__c} días naturales de haberse
+  los ___ días naturales de haberse
   emitido dicho comprobante. El numerario referido será entregado a los
   AFILIADOS cuando éstos soliciten el reembolso de los consumos efectuados
   mediante el Sistema TC; <b>iv)</b> A pagar cualquier cantidad que resulte del
@@ -651,8 +637,7 @@
     >Las partes convienen que la duración del presente contrato es por tiempo
     indefinido, no obstante, si alguna de las partes deseara dar por terminado
     el contrato, deberá informar a la otra mediante escrito previo y en forma
-    fehaciente con {!Contrato2__c.CancelacionContrato__c} 30 60 90 </span
-  >días de anticipación a la fecha de terminación deseada, dando solo así por
+    fehaciente con 30{!Contrato2__c.UsoMarcaLogotipo__c} 60 {!Contrato2__c.UsoMarcaLogotipo__c} 90  {!Contrato2__c.UsoMarcaLogotipo__c} días de anticipación a la fecha de terminación deseada, dando solo así por
   terminado el contrato, sin responsabilidad alguna y sin necesidad de previa
   declaración judicial, subsistiendo la obligación de pago de las cantidades
   adeudadas por EL CLIENTE a la fecha de terminación.

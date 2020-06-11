@@ -71,17 +71,7 @@
   <span style="font-family: Helvetica;">
     {!EntidadLegal__c.Name}, lo cual acredita con la copia simple de la
     constancia de inscripción correspondiente y que se agrega al presente como
-    parte del Anexo “A”; y que tiene su domicilio fiscal en: </span
-  ><span
-    style="
-      color: rgb(112, 110, 107);
-      background-color: rgb(255, 255, 255);
-      font-size: 14px;
-    "
-    >{!Contrato2__c.FiscalAddressText__c}</span
-  ><span style="font-family: Helvetica;"> </span
-  ><b style="font-family: Helvetica;">(iii)</b
-  ><span style="font-family: Helvetica;"> </span>Que su representante legal
+    parte del Anexo “A”; y que tiene su domicilio fiscal en: {!Contrato2__c.FiscalAddressText__c}<b style="font-family: Helvetica;">(iii)</b>Que su representante legal
   tiene las facultades legales suficientes para obligarlo en los términos de
   éste Contrato, lo cual acredita con la copia simple del testimonio notarial
   que las contiene y del cual se agrega al presente”; <b>(iv)</b> Que conoce el
@@ -380,7 +370,7 @@
   style="color: rgb(62, 62, 60); white-space: pre-wrap;"
 >
   <tbody>
-    <tr>
+        <tr>
       <td align="left">
         <span style="font-weight: 700; width: 33%;">CONCEPTO</span>
       </td>
@@ -392,7 +382,7 @@
       </td>
     </tr>
 
-    <tr id="AnualidadConcepto">
+    <tr id="Anualidad - Grande Anualidad - Pyme" class="conceptForm">
       <td colspan="1" rowspan="1">Anualidad</td>
       <td colspan="1" rowspan="1">
         Cantidad que se paga anualmente durante la vigencia del presente
@@ -403,20 +393,20 @@
       </td>
       <td colspan="1" rowspan="1">
          !PrecioFinal.Anualidad - Grande!PrecioFinal.Anualidad - Pyme PESOS más IVA. Bonificación del:
-         !Bonificacion.Anualidad - Grande!Bonificacion.Anualidad - Pyme %; con vigencia al !vigencia.Anualidad - Pyme !vigencia.Anualidad - Grande
+        !Bonificacion.Anualidad - Grande!Bonificacion.Anualidad - Pyme %; con vigencia al !vigencia.Anualidad - Pyme !vigencia.Anualidad - Grande
       </td>
     </tr>
-    <tr>
+    <tr id="Cuota por transacción con TAG +IVA" class="conceptForm">
       <td colspan="1" rowspan="1">Cargo por transacción</td>
       <td colspan="1" rowspan="1">
         Cuota transaccional que contempla transacciones Aceptadas y Rechazadas.
       </td>
       <td colspan="1" rowspan="1">
         Precio de Transacción Autorizada:  !PrecioFinal.Cuota por transacción con TAG +IVA Precio de
-        Transacción Rechazada:  !PrecioFinal.Cuota por transacción con TAG +IVA
+        Transacción Rechazada:  !PrecioFinal.Cuota por transacción con TAG+IVA
       </td>
     </tr>
-    <tr>
+    <tr id="Cargo por envío - Recurrente" class="conceptForm">
       <td colspan="1" rowspan="1">Cargo por envío</td>
       <td colspan="1" rowspan="1">
         Cantidad que se paga por cada envío de dispositivos tecnológicos.
@@ -426,7 +416,7 @@
         vigencia al !vigencia.Cargo por envío - Recurrente
       </td>
     </tr>
-    <tr>
+    <tr id="Cargo por refacturacion" class="conceptForm">
       <td colspan="1" rowspan="1">Cargo por re-facturación</td>
       <td colspan="1" rowspan="1">
         Cantidad que se paga por la emisión de cada CFDI y/o complemento de
@@ -437,7 +427,7 @@
          !PrecioFinal.Cargo por refacturacion + IVA
       </td>
     </tr>
-    <tr>
+    <tr id="Cargo por tarjeta activa" class="conceptForm">
       <td colspan="1" rowspan="1">Cargo por Tarjeta Activa</td>
       <td colspan="1" rowspan="1">
         Cuota anual por cuenta activa en el Sistema TC
@@ -447,7 +437,7 @@
         Bonificación: del !Bonificacion.Cargo por tarjeta activa%; con vigencia al !vigencia.Cargo por tarjeta activa
       </td>
     </tr>
-    <tr>
+    <tr id="TAG Ticket Car" class="conceptForm">
       <td colspan="1" rowspan="1">Presencia vehicular</td>
       <td colspan="1" rowspan="1">
         Precio de las etiquetas de presencia (dispositivos tecnológicos).
@@ -457,7 +447,7 @@
         vigencia al !vigencia.TAG Ticket Car
       </td>
     </tr>
-    <tr>
+    <tr id="Cuota por renta mensual TAG" class="conceptForm">
       <td colspan="1" rowspan="1">NFC cargo mensual</td>
       <td colspan="1" rowspan="1">
         Costo mensual del servicio de validación de presencia vehicular
@@ -468,7 +458,7 @@
         vigencia al !vigencia.Cuota por renta mensual TAG
       </td>
     </tr>
-    <tr>
+    <tr id="Cuota por transacción con TAG" class="conceptForm">
       <td colspan="1" rowspan="1">NFC Cargo por transacción</td>
       <td colspan="1" rowspan="1">
         Costo por transacción del servicio de validación de presencia vehicular
@@ -479,8 +469,8 @@
         vigencia al !vigencia.Cuota por transacción con TAG
       </td>
     </tr>
-    <td colspan="1" rowspan="1">Periodo de facturación</td><td colspan="1" rowspan="1">Periodicidad Día de Corte</td><td colspan="1" rowspan="1">{!Contrato2__c.FrecuenciaFacturacion__c}</td></tr>
-    <tr>
+    <tr><td colspan="1" rowspan="1">Periodo de facturación</td><td colspan="1" rowspan="1">Periodicidad Día de Corte</td><td colspan="1" rowspan="1">{!Contrato2__c.FrecuenciaFacturacion__c}</td></tr>
+    <tr id="Comisión por el servicio" class="conceptForm">
       <td colspan="1" rowspan="1">Comisión de servicios</td>
       <td colspan="1" rowspan="1">
         Porcentaje calculado sobre el valor total (incluyendo IVA) de los
@@ -491,7 +481,7 @@
         Actualización (UMA)
       </td>
     </tr>
-    <tr>
+    <tr id="Tarjeta titular" class="conceptForm">
       <td colspan="1" rowspan="1">Primer Tarjeta</td>
       <td colspan="1" rowspan="1">
         Nuevas altas: Para los efectos de esta cláusula y por razón del volumen de emisión de monederos, EDENRED puede otorgar un descuento en el precio de cada monedero que adquiera el CLIENTE. (El importe, de todos los Pedidos de Monederos realizados en el periodo será facturado al finalizar el “Periodo de Facturación”).
@@ -501,7 +491,7 @@
         Bonificación: del !Bonificacion.Tarjeta titular%; con vigencia al !vigencia.Tarjeta titular
       </td>
     </tr>
-    <tr>
+    <tr id="Reposición de tarjetas" class="conceptForm">
       <td colspan="1" rowspan="1">Tarjeta más vías</td>
       <td colspan="1" rowspan="1">
         Reposiciones: Para los efectos de esta cláusula y por razón del volumen de emisión de monederos, EDENRED puede otorgar un descuento en el precio de cada monedero que adquiera el CLIENTE. (El importe, de todos los Pedidos de Monederos realizados en el periodo será facturado al finalizar el “Periodo de Facturación”).
@@ -687,10 +677,7 @@
   Las partes convienen que la duración del presente contrato es por tiempo
   indefinido. Si alguna de las partes deseara dar por terminado el contrato,
   deberá informar a la otra mediante escrito previo y en forma fehaciente con
-  <span style="font-size: 14px; background-color: rgb(255, 255, 255);"
-    >{!Contrato2__c.CancelacionContrato__c}</span
-  >
-  30 60 90 días de anticipación a la fecha de terminación deseada, dando solo
+  30{!Contrato2__c.UsoMarcaLogotipo__c} 60 {!Contrato2__c.UsoMarcaLogotipo__c} 90  {!Contrato2__c.UsoMarcaLogotipo__c} días de anticipación a la fecha de terminación deseada, dando solo
   así por terminado el contrato, sin responsabilidad alguna y sin necesidad de
   previa declaración judicial, subsistiendo la obligación de pago de las
   cantidades adeudadas por EL CLIENTE a la fecha de terminación.

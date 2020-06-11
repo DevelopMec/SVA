@@ -166,8 +166,7 @@
                     .then( function( result ) {
                         var conceptos=result;
                         conceptList = result;
-                        templateConceptos = '<p>  Para todos los efectos de este CONTRATO las partes convienen en considerar dentro del término “CLIENTE” a la persona moral principal y a todas las personas morales filiales que se detallan a continuación:</p>'
-                        templateConceptos= templateConceptos + '<table class="tableFilial">';
+                        templateConceptos= '<table class="tableFilial">';
                         templateConceptos=templateConceptos+'<thead>';                        
                         templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th><th>Cantidad de Tarjetas</th><th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
                         templateConceptos=templateConceptos+'</thead>';
@@ -541,12 +540,13 @@
                         filial.EntidadLegal__c.Name = filial.EntidadLegal__c.Name || ''
                         // filial.Contacto__c.Name = filial.Contacto__c.Name || ''
                         var representanteLegal = contrato.Contacto__r && contrato.Contacto__r.Name ? contrato.Contacto__r.Name : ''
-
+                        templateFiliales = '<p>  Para todos los efectos de este CONTRATO las partes convienen en considerar dentro del término “CLIENTE” a la persona moral principal y a todas las personas morales filiales que se detallan a continuación:</p>'
                         // strFilial += '<tr> <td>FILIAL</td> <td>' +  nombreFilial + '</td> <td>' + filial.EntidadLegal__c.Direccion__c + '</td> <td>' + filial.EntidadLegal__c.Name + '</td> <td>' + filial.Contacto__c.Name + '</td> <td></td> </tr>'
                         strFilial += '<tr> <td>FILIAL</td> <td>' +  nombreFilial + '</td> <td>' + filial.EntidadLegal__c.Direccion__c + '</td> <td>' + filial.EntidadLegal__c.Name + '</td> <td>' + representanteLegal + '</td> <td></td> </tr>'
 
                     }
-                    templateFiliales = '<table class="tableFilial"><thead> <tr> <th rowspan="2">Entidad</th> <th rowspan="2" style="width: 20%">Razón social</th> <th rowspan="2">Domicilio fiscal</th> <th rowspan="2" style="width: 20%">RFC</th> <th rowspan="1" colspan="2" style="width: 40%">Representante legal</th> </tr> <tr> <th style="width: 15%">Nombre</th> <th style="width: 25%">Firma</th> </tr> </thead> <tbody>' + strFilial + '</tbody> </table>';
+                    
+                    templateFiliales = templateFiliales +  '<table class="tableFilial"><thead> <tr> <th rowspan="2">Entidad</th> <th rowspan="2" style="width: 20%">Razón social</th> <th rowspan="2">Domicilio fiscal</th> <th rowspan="2" style="width: 20%">RFC</th> <th rowspan="1" colspan="2" style="width: 40%">Representante legal</th> </tr> <tr> <th style="width: 15%">Nombre</th> <th style="width: 25%">Firma</th> </tr> </thead> <tbody>' + strFilial + '</tbody> </table>';
 
                     // console.log("strFilial: ", strFilial, "\ntemplateFiliales", templateFiliales)
                     // plantilla.Contenido_del__c += templateFiliales
@@ -694,16 +694,20 @@
     function replaceConceptValues(plantilla, concepts, conceptsListTC4,field,meses) {
         concepts.forEach( function(concepto) {
             if(conceptsListTC4[concepto.Concepto_Tipo_Cargo__c]){
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c = concepto.Concepto_Tipo_Cargo__c == 'Comisión por el servicio' ?  concepto.PrecioFinal__c ? concepto.PrecioFinal__c : ''   :  concepto.PrecioLista__c ?  concepto.PrecioLista__c : '' ;
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ? concepto.Bonificacion__c : '';
-            let vig = '';
-            if( concepto.VigenciaDescuento__c) {
-                let dateV = new Date(concepto.VigenciaDescuento__c);
-                let dia=dateV.getUTCDate().toString().length>1 ? dateV.getUTCDate()+'' : '0'+dateV.getUTCDate();
-                let mes=(dateV.getUTCMonth() + 1).toString().length>1 ? (dateV.getUTCMonth() + 1)+'' : '0'+(dateV.getUTCMonth() + 1);
-                vig=dia+'-'+mes+'-'+dateV.getUTCFullYear();
-            }
-            conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].VigenciaDescuento__c = vig;
+                if(concepto.Concepto_Tipo_Cargo__c == 'Comisión por el servicio'){
+                    conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioFinal__c ? concepto.PrecioFinal__c : '';
+                } else {
+                    conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].PrecioFinal__c =  concepto.PrecioLista__c ?  concepto.PrecioLista__c : '' ;
+                }
+                conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].Bonificacion__c = concepto.Bonificacion__c ? concepto.Bonificacion__c : '';
+                let vig = '';
+                if( concepto.VigenciaDescuento__c) {
+                    let dateV = new Date(concepto.VigenciaDescuento__c);
+                    let dia=dateV.getUTCDate().toString().length>1 ? dateV.getUTCDate()+'' : '0'+dateV.getUTCDate();
+                    let mes=(dateV.getUTCMonth() + 1).toString().length>1 ? (dateV.getUTCMonth() + 1)+'' : '0'+(dateV.getUTCMonth() + 1);
+                    vig=dia+'-'+mes+'-'+dateV.getUTCFullYear();
+                }
+                conceptsListTC4[concepto.Concepto_Tipo_Cargo__c].VigenciaDescuento__c = vig;
             }
         });
         replaceConceptsInHtml(plantilla,conceptsListTC4,field);
@@ -729,8 +733,16 @@
     function setDisplayAttribute(plantilla, concepts) {
         let elementos = $(".conceptForm");    
         elementos.each(function(index,element){
-            console.log($(element).attr("id"));
-        })
+            let includeRow =  false;
+            concepts.forEach(concepto => {
+                if($(element).attr("id").includes(concepto.Concepto_Tipo_Cargo__c )) {
+                    includeRow = true;
+                }
+            });
+            if(!includeRow) {
+                $(element).css("display","none");                
+            }
+        });
         
     }
 
