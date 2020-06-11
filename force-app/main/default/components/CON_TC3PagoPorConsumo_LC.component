@@ -718,7 +718,6 @@
         let fecha = new Date();
         for(let concepto in data){
             let includesAnualidad = concepto.includes('Anualidad');
-            conceptoAnualidadSelected = ( !conceptoAnualidadSelected &&  concepto.includes('Anualidad') )  ? true : conceptoAnualidadSelected;
             data[concepto].precioFinalReemplazo  = `(!PrecioFinal.${concepto})`;
             data[concepto].bonificacionReemplazo =  `(!Bonificacion.${concepto})`;
             data[concepto].vigenciaReemplazo  = `(!vigencia.${concepto})`;
@@ -728,6 +727,7 @@
             plantilla[field] = plantilla[field].replace(new RegExp('!hoyDia', 'gi' ), fecha.getDate());
             plantilla[field] = plantilla[field].replace(new RegExp('!hoymes', 'gi' ), meses[fecha.getMonth()+1]);
             plantilla[field] = plantilla[field].replace(new RegExp('!hoyanio', 'gi' ), fecha.getFullYear());
+            conceptoAnualidadSelected = ( !conceptoAnualidadSelected &&  concepto.includes('Anualidad') )  ? true : conceptoAnualidadSelected;
         }
     }
     function setDisplayAttribute(plantilla, concepts) {
