@@ -243,6 +243,8 @@
                                     <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/Nectar.png")}" />
                                     </div>`
                     top = '3cm'
+                    dataSource.nectarPaloma = `<img  src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/paloma.png")}" />`
+
                 } else if(contrato.Tipo_de_Facturacion__c == 'Consumo' && contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Avanzado' && dataSource.Product2.ProductCode == "30-TC4") {
                     nombreProducto = 'Contrato Ticket Car 4.0 Pospago'; 
                     leyendaHeader = `<div class="leyendaHeader">
@@ -259,6 +261,7 @@
                                     <p>TCBV030519</p>
                                     <p><strong>DTCOM-002/ 19</strong></p>
                                     </div>`
+                    
                     top = '3cm'
 
                 } else if( contrato.Tipo_de_Facturacion__c == 'Pedido' && contrato.TipoPago__c == 'Prepago' && contrato.Item_Contratacion__c == 'TC Avanzado' && dataSource.Product2.ProductCode == "30" ){
