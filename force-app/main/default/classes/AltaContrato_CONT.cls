@@ -4,7 +4,15 @@ public without sharing class AltaContrato_CONT {
             '30-TC4'=>new List<comboWP>{new comboWP('Virtual','Virtual')},
                 '30-B'=>new List<comboWP>{new comboWP('Virtual','Virtual'),new comboWP('Fisico','Fisico')},
                     '31-Tipo_Maquila__c'=>new List<comboWP>{new comboWP('Daimler Mantenimiento','Daimler Mantenimiento')},
-                        '31'=>new List<comboWP>{new comboWP('A Demanda','A Demanda'),new comboWP('Semanal','Semanal'),new comboWP('Quincenal','Quincenal'),new comboWP('DIAMES01','DIAMES01'),new comboWP('Especial al 24','Especial al 24')}
+                        '31'=>new List<comboWP>{new comboWP('A Demanda','A Demanda'),new comboWP('Semanal','Semanal'),new comboWP('Quincenal','Quincenal'),new comboWP('DIAMES01','DIAMES01'),new comboWP('Especial al 24','Especial al 24')},
+                        '33-ComoFactura__c'=>new List<comboWP>{new comboWP('Empresa','Empresa')},
+                        '33-Frecuencia_de_Pedido__c'=>new List<comboWP>{new comboWP('Mensual','Mensual')},
+                        '33-FrecuenciaFacturacion__c'=>new List<comboWP>{new comboWP('Mensual','Mensual')},
+                        '33-Facturacion_Cargos__c'=>new List<comboWP>{new comboWP('Separado del consumo','Separado del consumo')},
+                        '33-Facturacion_Plasticos__c'=>new List<comboWP>{new comboWP('Separado del consumo','Separado del consumo')},
+                        '33-TipoPago__c'=>new List<comboWP>{new comboWP('Prepago','Prepago')},
+                        '33-Item_Contratacion__c'=>new List<comboWP>{new comboWP('Nectar','Nectar')},
+                        '33-Package__c'=>new List<comboWP>{new comboWP('Básico','Básico'),new comboWP('Avanzado','Avanzado'),new comboWP('Por comisión','Por comisión')}
     };
     
     @AuraEnabled
@@ -144,6 +152,15 @@ public without sharing class AltaContrato_CONT {
                     this.listaValores=mapProd.get(prodCode);
                 }else if(this.api=='Tipo_Maquila__c'&&mapProd.containsKey(prodCode+'-Tipo_Maquila__c')&&prodCode=='31'){
                     this.listaValores=mapProd.get(prodCode+'-Tipo_Maquila__c');
+                }else if(prodCode=='33' ){
+                    for(String field :  mapProd.KeySet()) {
+                        if(prodCode+'-'+this.api == field){
+                            this.listaValores=mapProd.get(prodCode+'-'+this.api);
+                        }
+                    }
+                    if(this.listaValores == null || this.listaValores.size() == 0 ){
+                        this.listaValores=getValores(des.getPicklistValues(),this.api,prodCode);
+                    }
                 }else{
                     this.listaValores=getValores(des.getPicklistValues(),this.api,prodCode);
                 }
