@@ -168,7 +168,9 @@
                         conceptList = result;
                         templateConceptos= '<table class="tableFilial">';
                         templateConceptos=templateConceptos+'<thead>';                        
-                        templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th><th>Cantidad de Tarjetas</th><th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
+                        templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th>';
+                        templateConceptos=templateConceptos+'<th>Cantidad de Tarjetas</th>';
+                        templateConceptos=templateConceptos+'<th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
                         templateConceptos=templateConceptos+'</thead>';
                         templateConceptos=templateConceptos+'</tbody>';
                         for(var i=0;i<conceptos.length;i++){
@@ -835,7 +837,25 @@
     .ql-table-blob{
         border-collapse: collapse;
         border-color: black;
-    } 
+    }
+    .borderedLeft{
+        border-top-left-radius: 150px; 
+        border-bottom-left-radius: 150px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: 80px;
+        margin-left: 20%;
+        margin-top: 15px;
+    }
+    .borderedRight{
+        width: 60%;
+        margin-top: 15px;
+        border-top-right-radius: 150px; 
+        border-bottom-right-radius: 150px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-right: 80px;
+    }
     .page-template {
         position: absolute;
         width:100%;
