@@ -2,7 +2,7 @@
 		<div style="margin: 40px 0;">
 			<div  style="width: 85%;">
 				<div style="display: block;width: 100%;text-align: right;">
-					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Fecha:</span><input style="width: 30%;border-style:solid;border-radius: 300px;border-color: red;text-align: center;height: 40px;" type="text" name="fecha"></div>
+					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Fecha: {!fechaHoy}</span></div>
 				</div>
 
 				<div >
@@ -12,9 +12,9 @@
 					</div>
 				</div>
 				<div>
-					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Nombre:</span><input  style=" width: 70%;border-style:solid;border-top-color: transparent;border-left-color: transparent;border-right-color: transparent;border-bottom-color: #DCDCDC;" type="text" name="nombre"></div>
-					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Cliente:</span><input  style=" width: 70%;border-style:solid;border-top-color: transparent;border-left-color: transparent;border-right-color: transparent;border-bottom-color: #DCDCDC;" type="text" name="nombreComercial"></div>
-					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Razón social:</span><input  style=" width: 70%;border-style:solid;border-top-color: transparent;border-left-color: transparent;border-right-color: transparent;border-bottom-color: #DCDCDC;" type="text" name="razonSocial"></div>
+					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Nombre:{!Contact.Name}</span></div>
+					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Cliente:{!Account.Name}</span></div>
+					<div  style="width: 100%;margin: 20px 0;vertical-align: top;"><span style="font-weight: bold;color:black;font-size: 15px;">Razón social: {!EntidadLegal__c.RazonSocial__c}</span></div>
 				</div>
 				<div  style="font-size: 15px;font-weight: 100;color:black;">
 					<span><p>Edenred es tu aliado comercial especializado y orientado a satisfacer las necesidades de tu empresa o negocio. Contamos con soluciones exclusivas para incrementar tu
@@ -34,9 +34,9 @@
 				</div>
 			<div class="comentarios">
 				<div style="display: inline-block;vertical-align: top;">
-					<span style="font-weight: bold;color:red;font-size: 15px;">Comentarios:</span>
+					<span style="font-weight: bold;color:red;font-size: 15px;">Comentarios: {!Contrato2__c.Comentarios}</span>
 				</div>				
-				<textarea rows="10" cols="100"  style="display: inline-block;vertical-align: top;width: 100%;height: 80px;"></textarea></div>
+			</div>
 		</div>
 		<div style="margin: 40px 0;">
 			<div class="divTituloFecha">
@@ -50,7 +50,7 @@
 						<tr bgcolor="red" >
 
 							<td colspan="2" width="90%">
-								<div  style="display: inline-block;text-align: center;padding:5px 0;width: 100%;"><span style="font-size: 15px;color:white;">Descripción</span></div>
+								<div  style="display: inline-block;text-align: center;padding:5px 0;width: 100%;"><span style="font-size: 15px;">Descripción</span></div>
 							</td>
 						</tr>
 						<tr>
@@ -252,16 +252,6 @@
 								{!nectarPaloma}
 							</td>
 						</tr>
-
-						<tr>
-							<td bgcolor="#eeeeee" align="center">
-								<div style="margin: 10px 5px;"><span> </span></div>
-							</td>
-
-							<td bgcolor="#eeeeee" align="center">
-								{!nectarPaloma}
-							</td>
-						</tr>
 					</table>
 				</div>
 			<div style="width: 90%; margin: auto;">
@@ -271,28 +261,10 @@
 					<div  style="font-size: 15px;color:red;font-weight: bold;">
 						<span>Forma de pago del pedido</span>
 					</div>
-					<div style="width: 80%;display: block;">
-						<input style="display: inline-block;" type="checkbox" id="transElectronica">
-						<div  style="font-size: 15px;color:black;font-weight: lighter;display: inline-block;">Transferencia Electrónica</div>
-					</div>
-					<div style="width: 80%;display: block;">
-						<input style="display: inline-block;" type="checkbox" id="amex">
-						<div  style="font-size: 15px;color:black;font-weight: lighter;display: inline-block;">American Express</div>
-					</div>
-					<div style="width: 80%;display: block;">
-						<input style="display: inline-block;" type="checkbox" id="deposito">
-						<div  style="font-size: 15px;color:black;font-weight: lighter;display: inline-block;">Depósito Bancario</div>
-					</div>
-					<div style="width: 80%;display: block;">
-						<input style="display: inline-block;" type="checkbox" id="online">
-						<div  style="font-size: 15px;color:black;font-weight: lighter;display: inline-block;">Pago Online</div>
-					</div>
-					<div style="width: 80%;display: block;">
-						<input style="display: inline-block;" type="checkbox" id="otros">
-						<div  style="font-size: 15px;color:black;font-weight: lighter;display: inline-block;">otros</div>
-					</div>
+						!check
+						<p  style="font-size: 15px;color:black;font-weight: lighter;display: inline;">{!FormaPago__c}</p>
 				</div>
-				<div style="display: inline-block;text-align: right;width: calc(50% - 10px);vertical-align: top;margin: 20px 0;">
+				<div style="display: block;text-align: right;width: calc(50% - 10px);margin: 20px 0;">
 					<span style="font-size: 15px;color:black;font-weight: lighter;">Propuesta comercial con vigencia de <strong style="font-size: 15px;color:black;font-weight: bold;">7 días</strong></span>
 				</div>
 			</div>
@@ -306,13 +278,12 @@
 			<div style="width: 90%;margin: auto;padding: 50px 0;">
             <table class="ql-table-blob tableFilial" width="100%">
 					<tr bgcolor="red">
-	
-						<td width="20%">
-							<div  style="display: inline-block;text-align: center;padding:5px 0;width: 100%;"><span style="font-size: 15px;color:white;">Persona Física</span></div>
-						</td>
-						<td width="20%">
-							<div  style="display: inline-block;text-align: center;padding:5px 0;width: 100%;"><span style="font-size: 15px;color:white;">Persona Moral</span></div>
-						</td>
+						<th width="20%">
+							<div  style="display: inline-block;text-align: center;padding:5px 0;width: 100%;"><span style="font-size: 15px;">Persona Física</span></div>
+						</th>
+						<th width="20%">
+							<div  style="display: inline-block;text-align: center;padding:5px 0;width: 100%;"><span style="font-size: 15px;">Persona Moral</span></div>
+						</th>
 					</tr>
 					<tr>
 						<td bgcolor="#eeeeee" >
@@ -467,8 +438,8 @@
 					<p><b>XXI. INDEPENDENCIA LABORAL.</b> EDENRED y el CLIENTE son partes contratantes totalmente independientes, por lo que no  existe ningún nexo o relación obrero- patronal entre ellas, ni entre los trabajadores de una de ellas con la otra y viceversa,  quedando entendido que cada una de las partes será la única responsable del pago de salarios, sueldos, prestaciones, derechos,  IMSS, INFONAVIT, AFORE y demás obligaciones que a cada una de las partes le corresponda con motivo del personal que cada  una deba contratar para el cumplimiento de las obligaciones estipuladas en estos TYC.</p>
 				</span>
 			</div>
-			<div  style="  background-color:red;border-top-right-radius: 300px;border-bottom-right-radius: 300px;padding: 20px;width: 50%;">
-				<span style="  font-size: 20px;color:white;font-weight: bold;">Anexo:</span>
+			<div  class="borderedRight" style=" background-color:red;">
+				<span style="  font-size: 15px;color:white;font-weight: bold;">Anexo:</span>
 			</div>
 			
 			<div class="firmas" style="margin: 20px 0;">

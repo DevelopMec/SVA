@@ -150,7 +150,7 @@
                 
                 console.log("filiales: ", filiales)
 
-                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Product2.ProductCode,Quote.Opportunity.Name,Quote.Opportunity.StageName,Quote.Opportunity.Owner.Name,Quote.Opportunity.Contacto__r.Name,Quote.Opportunity.Contacto__r.Email,Quote.OpportunityId,Quote.Opportunity.ActaConstitutivaCliente__c, Quote.Opportunity.CURP__c,Quote.Opportunity.CedulaRFC__c,Quote.Opportunity.ComprobanteDomicilioCliente__c,Quote.Opportunity.ComprobanteDomicilioFiscal__c, Quote.Opportunity.ConstanciaRFC__c, Quote.Opportunity.ConstanciaRFCCliente__c,Quote.Opportunity.IdentificacionOficialCliente__c,Quote.Opportunity.IdentificacionOficialVigente__c, Quote.Opportunity.PoderNotarial__c,Quote.Opportunity.RegistroPatronal__c, Quote.Opportunity.RegistroPatronalOPAM__c,Quote.Opportunity.Familia__c, Quote.Opportunity.Owner.Manager.Name,Quote.Owner.Name,Quote.AccountId,Quote.Account.RazonSocial__c,Quote.Account.Direccion__c,Quote.Account.RFC__c,Quote.Account.Owner.Name,Quote.Account.BillingAddress, Quote.Account.Sector__c,Quote.Account.TipoPersona__c,Quote.Contact.Email,Quote.Contact.CorreoAP__c,Quote.Contact.Name,Quote.Contact.FirstName,Quote.Contact.LastName,Quote.Contact.Puesto__c,Quote.Contact.MobilePhone,Quote.Contact.Phone,Quote.Contact.AreaTrabajo__c,Quote.Account.Ciudad__c,Quote.Account.Calle__c,Quote.Account.NumeroExterior__c,Quote.Account.Colonia__c,Quote.Account.ColMpoCpEdo__c,Quote.Account.CodigoPostal__c FROM QuoteLineItem WHERE Id ='{!QuoteLineItem.Id}'")
+                return ctcLightning.remote("CON_ContractsContainer_CTRL.executeQueryRA")("SELECT Product2.ProductCode,Quote.Opportunity.Name,Quote.Opportunity.StageName,Quote.Opportunity.Owner.Name,Quote.Opportunity.Contacto__r.Name,Quote.Opportunity.Contacto__r.Email,Quote.OpportunityId,Quote.Opportunity.ActaConstitutivaCliente__c, Quote.Opportunity.CURP__c,Quote.Opportunity.CedulaRFC__c,Quote.Opportunity.ComprobanteDomicilioCliente__c,Quote.Opportunity.ComprobanteDomicilioFiscal__c, Quote.Opportunity.ConstanciaRFC__c, Quote.Opportunity.ConstanciaRFCCliente__c,Quote.Opportunity.IdentificacionOficialCliente__c,Quote.Opportunity.IdentificacionOficialVigente__c, Quote.Opportunity.PoderNotarial__c,Quote.Opportunity.RegistroPatronal__c, Quote.Opportunity.RegistroPatronalOPAM__c,Quote.Opportunity.Familia__c, Quote.Opportunity.Owner.Manager.Name,Quote.Owner.Name,Quote.AccountId,Quote.Account.RazonSocial__c,Quote.Account.Direccion__c,Quote.Account.RFC__c,Quote.Account.Owner.Name,Quote.Account.BillingAddress, Quote.Account.Sector__c,Quote.Account.TipoPersona__c,Quote.Contact.Email,Quote.Contact.CorreoAP__c,Quote.Contact.Name,Quote.Contact.FirstName,Quote.Contact.LastName,Quote.Contact.Puesto__c,Quote.Contact.MobilePhone,Quote.Contact.Phone,Quote.Contact.AreaTrabajo__c,Quote.Account.Ciudad__c,Quote.Account.Calle__c,Quote.Account.NumeroExterior__c,Quote.Account.Colonia__c,Quote.Account.ColMpoCpEdo__c,Quote.Account.CodigoPostal__c,Quote.Account.Name FROM QuoteLineItem WHERE Id ='{!QuoteLineItem.Id}'")
             })
             .then( function( res ) {
                 console.log("res qli: ", res)
@@ -168,8 +168,10 @@
                         conceptList = result;
                         templateConceptos= '<table class="tableFilial">';
                         templateConceptos=templateConceptos+'<thead>';                        
-                        templateConceptos=templateConceptos+'<th>Tipo de Tarjeta</th><th>Precio Original</th><th>BN %</th>';
-                        templateConceptos=templateConceptos+'<th>Cantidad de Tarjetas</th>';
+                        templateConceptos=templateConceptos+'<th>' + (dataSource.Product2.ProductCode != '33' ? 'Tipo de tarjeta' : '')  +'</th>';
+                        templateConceptos=templateConceptos+'<th>Precio Original</th><th>BN %</th>';
+                        if(dataSource.Product2.ProductCode != '33')
+                            templateConceptos=templateConceptos+'<th>Cantidad de Tarjetas</th>';
                         templateConceptos=templateConceptos+'<th>Vigencia (DD-MM-AAAA)</th><th>Precio Final</th>';
                         templateConceptos=templateConceptos+'</thead>';
                         templateConceptos=templateConceptos+'</tbody>';
@@ -202,7 +204,8 @@
                             templateConceptos=templateConceptos+'<td>'+conceptos[i].Concepto_Tipo_Cargo__c+'</td>';
                             templateConceptos=templateConceptos+'<td>'+ (conceptos[i].Concepto_Tipo_Cargo__c != 'Comisión por el servicio' ? '$' : '')  +conceptos[i].PrecioLista__c+ (conceptos[i].Concepto_Tipo_Cargo__c == 'Comisión por el servicio' ? '%' : '') +'</td>';
                             templateConceptos=templateConceptos+'<td>'+ bon +'</td>';
-                            templateConceptos=templateConceptos+'<td>'+ct+'</td>';
+                            if(dataSource.Product2.ProductCode != '33')
+                                templateConceptos=templateConceptos+'<td>'+ct+'</td>';
                             templateConceptos=templateConceptos+'<td>'+vig+'</td>';
                             templateConceptos=templateConceptos+'<td>' + (conceptos[i].Concepto_Tipo_Cargo__c != 'Comisión por el servicio' ? '$' : '')   +conceptos[i].PrecioFinal__c + (conceptos[i].Concepto_Tipo_Cargo__c == 'Comisión por el servicio' ? '%' : '')  +'</td>';
                             templateConceptos=templateConceptos+'</tr>';
@@ -245,8 +248,9 @@
                                     <img class="logoEdenred2" src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/Nectar.png")}" />
                                     </div>`
                     top = '3cm'
-                    dataSource.nectarPaloma = `<img  src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/paloma.png")}" />`
-
+                    dataSource.nectarPaloma = `<img  src="{!URLFOR($Resource.CotizacionesPDF, "/Encabezados/paloma.png")}" />`;
+                    var today = new Date();
+                    dataSource.fechaHoy = today.getDate() + '-' +(today.getMonth()+1) +'-'+ today.getFullYear();
                 } else if(contrato.Tipo_de_Facturacion__c == 'Consumo' && contrato.TipoPago__c == 'Pospago' && contrato.Item_Contratacion__c == 'TC Avanzado' && dataSource.Product2.ProductCode == "30-TC4") {
                     nombreProducto = 'Contrato Ticket Car 4.0 Pospago'; 
                     leyendaHeader = `<div class="leyendaHeader">
