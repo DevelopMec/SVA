@@ -172,7 +172,7 @@
                                             <input ng-change="prod.checkedCard(check,cotizacion.productos[0])" type="checkbox" ng-model="check.Checked" value="prod.value"  ng-checked="check.Checked" />
                                         </td>
                                         <tr ng-if="prod.includeNectarFields">
-                                            <td></td>
+                                            <td>Cantidad de tarjetas</td>
                                             <td ng-repeat="check in prod.meanTypeValues" ng-if="prod.includeNectarFields">
                                                 <div ng-class="{'has-error': cotizacion.formCotiza['check.field' + check.Id].$invalid}" class="ctc-input-base">
                                                 
@@ -285,6 +285,7 @@
                     if(model.Checked) {
                         ctcUtils.app.selectedMeans.includes(model.value) ? '' : ctcUtils.app.selectedMeans.push(model.value);
                         if(model.Field == "virtualCard__c") {
+                            producto.NumberOfShipments__c = '';
                             producto.disabled.NumberOfShipments__c = true;
                             ctcUtils.app.schema.QuoteLineItem.NumberOfShipments__c.required = false;
                         }

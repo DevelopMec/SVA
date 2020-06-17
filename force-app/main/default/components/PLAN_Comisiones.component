@@ -2,7 +2,8 @@
     <script type="text/ng-template" id="comisiones.html">
         <div class="modal-header">
             <button type="button" class="close" ng-click="com.close()"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">% de Comisiones para familia {{com.producto.Product2Id__o.Family}}</h4>
+            <h4 ng-if="!['Avanzado','Básico'].includes(com.producto.Package__c)" class="modal-title">% de Comisiones para familia {{com.producto.Product2Id__o.Family}}</h4>
+            <h4 ng-if="['Avanzado','Básico'].includes(com.producto.Package__c)" class="modal-title">% de descuento para Mensualidad</h4>
         </div>
         <div class="modal-body">
             <ctc-error ctc-body="sc.errors"></ctc-error>
