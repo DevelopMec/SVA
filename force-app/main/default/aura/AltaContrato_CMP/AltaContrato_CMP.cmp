@@ -1,4 +1,4 @@
-<aura:component controller="AltaContrato_CONT" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+<aura:component controller="AltaContrato_CONT" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,force:lightningQuickAction" access="global" >
     <aura:attribute name="dependencias" type="Map"/>
     <aura:attribute name="data" type="Object"/>
     <aura:attribute name="entidadSel" type="Object"/>
@@ -7,16 +7,14 @@
     <aura:attribute name="entidadesFiliales" type="List"/>
     <aura:attribute name="filialesAdd" type="List"/>
     <aura:attribute name="direcciones" type="List"/>
-    
+    <aura:attribute name="metodosPago" type="List"/>
+    <aura:attribute name="establecimientos" type="List"/>
+    <aura:attribute name="bankAccSel" type="String" description="Almacena la cuenta bancaria seleccionada(ID dentro de afiliados" default=""/>
     <aura:attribute name="listGrupos" type="List"/>
     <aura:attribute name="grupoPrimeNoConsultados" type="Boolean" default="true"/>
     <aura:attribute name="showSpinnerPrime" type="Boolean" default="false"/>
     <aura:attribute name="personalizacionDeTarjetas" type="Boolean" default="false"/>
-    
-    <aura:attribute name="esPospago" type="Boolean" default="false"/>
-    
     <aura:attribute name="recordId" type="String" default=""/>
-    
     <aura:attribute name="advInfo" type="Map"/>
     <aura:attribute name="disabled" type="Boolean" default="false" />
     <aura:attribute name="saved" type="Boolean" default="false" />
@@ -26,11 +24,112 @@
     <aura:attribute name="isCreditEvaluationButtonVisible" type="Boolean" default="false"/>
     <aura:attribute name="StatusCreditEval_InProcess" type="Boolean" default="false"/>
     <aura:attribute name="StatusCreditEval_Approved" type="Boolean" default="false"/>
-
     <aura:handler name="init" value="{!this}" action="{!c.getInfoHeader}"/>
-    <!--aura:handler name="init" value="{!this}" action="{!c.getInfo}"/-->
+    <aura:attribute name="modalCreate" type="Boolean" default="false"/>
+    <aura:attribute name="modalCreateEstab" type="Boolean" default="false"/>
+    <!--Atributos de SIGLO-->
+    <aura:attribute name="blockEdition" type="Boolean" default="false" description="Si está en true, los campos se deshabilitan."/>
     
+    <!--aura:handler name="init" value="{!this}" action="{!c.getInfo}"/-->
     <lightning:card title="">
+        <aura:if isTrue="{!v.modalCreate}">            
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            <lightning:buttonIcon iconName="utility:close" onclick="{!c.cerrarModalCrear}" variant="bare" class="rellenoBlanco"/>
+                            <span class="slds-assistive-text">Cerrar</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Nuevo Método de Pago</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1">
+                        <lightning:recordEditForm onsubmit="{!c.guardarRegistro}"
+                                                  onerror="{!c.errorGuardar}"
+                                                  onsuccess="{!c.resgistroGuardado}"
+                                                  objectApiName="BankAccount__c">
+                            <lightning:messages />
+                            <div style="width:100%;">
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Name" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="CLABE__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField disabled="true" fieldName="Cuenta__c" value="{!v.data.headerData.Quote.Opportunity.AccountId}"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="PaymentType__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Bank__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Reference__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="StandardiziedBankKey__c" required="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-m-top_medium" style="float:right;">
+                                <lightning:button variant="brand" type="submit" name="save" label="Guardar" />
+                            </div>
+                        </lightning:recordEditForm>
+                    </div>
+                    <footer class="slds-modal__footer"></footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>                        
+        </aura:if>
+        <!--aura:if isTrue="{!v.modalCreateEstab}">            
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            <lightning:buttonIcon iconName="utility:close" onclick="{!c.cerrarModalCrearEstab}" variant="bare" class="rellenoBlanco"/>
+                            <span class="slds-assistive-text">Cerrar</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Nuevo Establecimiento</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1">
+                        <lightning:recordEditForm onsubmit="{!c.guardarRegistroEstab}"
+                                                  onerror="{!c.errorGuardarEstab}"
+                                                  onsuccess="{!c.resgistroGuardadoEstab}"
+                                                  objectApiName="Establishment__c">
+                            <lightning:messages />
+                            <div style="width:100%;">
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Name" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Tradename__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField disabled="true" fieldName="Cuenta__c" value="{!v.data.headerData.Quote.Opportunity.AccountId}"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="PaymentType__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Bank__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="Reference__c" required="true"/>
+                                </div>
+                                <div style="width:40%;display:inline-block;margin-left:8%;">
+                                    <lightning:inputField fieldName="StandardiziedBankKey__c" required="true"/>
+                                </div>
+                            </div>
+                            <div class="slds-m-top_medium" style="float:right;">
+                                <lightning:button variant="brand" type="submit" name="save" label="Guardar" />
+                            </div>
+                        </lightning:recordEditForm>
+                    </div>
+                    <footer class="slds-modal__footer"></footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>                        
+        </aura:if-->
         <aura:if isTrue="{!v.showSpinnerPrime}">
             <lightning:spinner size="large"/>
         </aura:if>
@@ -63,7 +162,7 @@
                                 <div name="Busqueda Entidad Legal" class="slds-m-around_medium">
                                     <div>
                                         <div style="width:25%;display:inline-block;vertical-align:middle;">
-                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" required="true" class="{!if(or(v.data.contrato.Entidad_Cuenta__c=='',v.data.contrato.Entidad_Cuenta__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.data.ECdisp}" value="{!v.data.contrato.Entidad_Cuenta__c}" label="Entidades Legales" onchange="{!c.cambioEntidad}"/>
+                                            <lightning:combobox disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}" required="true" class="{!if(or(v.data.contrato.Entidad_Cuenta__c=='',v.data.contrato.Entidad_Cuenta__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.data.ECdisp}" value="{!v.data.contrato.Entidad_Cuenta__c}" label="Entidades Legales" onchange="{!c.cambioEntidad}"/>
                                         </div>
                                         <div style="width:70%;display:inline-block;margin-left:5%;vertical-align:middle;">
                                             <div style="width:30%;display:inline-block;vertical-align:middle;" class="slds-align_absolute-center">
@@ -82,57 +181,168 @@
                                     </div>
                                     <div>
                                         <div style="width:25%;display:inline-block;margin-top:1px;vertical-align:top;">
-                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" required="true" class="{!if(or(v.data.contrato.Contacto__c=='',v.data.contrato.Contacto__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.representantes}" label="Representante legal" value="{!v.data.contrato.Contacto__c}"/>
+                                            <lightning:combobox disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}" required="true" class="{!if(or(v.data.contrato.Contacto__c=='',v.data.contrato.Contacto__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.representantes}" label="Representante legal" value="{!v.data.contrato.Contacto__c}"/>
                                         </div>                                
                                     </div>
                                     <div>
                                         <div style="width:25%;display:inline-block;margin-top:1px;vertical-align:top;">
-                                            <lightning:combobox required="true" class="{!if(or(v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c=='',v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.data.contactosCuenta}" label="Administrador de Plataforma" value="{!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c}" disabled="true"/>
+                                            <lightning:combobox required="true" class="{!if(or(v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c=='',v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.data.contactosCuenta}" label="{!if(v.data.headerData.Product2.IsAffiliate__c, 'Interlocutor' , 'Administrador de Plataforma')}" value="{!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c}" disabled="true" title="Este valor se ingresa en la oportunidad" />
                                         </div>                                
                                     </div>
                                     <div>
                                         <div style="width:95%;display:inline-block;vertical-align:middle;">
-                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" required="true" class="{!if(or(v.data.contrato.FiscalAddress__c=='',v.data.contrato.FiscalAddress__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.direcciones}" label="Dirección Fiscal" value="{!v.data.contrato.FiscalAddress__c }" onchange="{!c.cambioDireccion}"/>
+                                            <lightning:combobox disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}" required="true" class="{!if(or(v.data.contrato.FiscalAddress__c=='',v.data.contrato.FiscalAddress__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" options="{!v.direcciones}" label="Dirección Fiscal" value="{!v.data.contrato.FiscalAddress__c }" onchange="{!c.cambioDireccion}"/>
                                         </div>       
                                         <!--div style="width:70%;display:inline-block;vertical-align:middle;margin-left:5%;">
                                             <lightning:input type="text" label="Dirección seleccionada" aura:id="dirSel" disabled="true"/>                                                                       
                                         </div-->  
-                                    </div> 
+                                    </div>
+                                    <aura:if isTrue="{!v.data.headerData.Product2.SendToSIGLO__c}">
+                                        <div class="slds-grid slds-gutters">
+                                            <div class="slds-col slds-m-left_medium slds-m-right_medium">
+                                                <aura:if isTrue="{!v.entidadSel.EntidadLegal__r.PersonType__c == 'Persona Moral - Mexicana'}">
+                                                    <div>
+                                                        <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                            <lightning:input type="text" name="input1SIGLO" label="Número de firma electrónica avanzada" value="{!v.entidadSel.EntidadLegal__r.FEA__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números." disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}"/>
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                                <aura:if isTrue="{!or(v.entidadSel.EntidadLegal__r.PersonType__c == 'Persona Moral - Mexicana', v.entidadSel.EntidadLegal__r.PersonType__c == 'Persona Moral - Extranjera' )}">
+                                                    <div>
+                                                        <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                            <lightning:input type="date" name="input2SIGLO" label="Fecha de constitución de la empresa" value="{!v.entidadSel.EntidadLegal__r.DeedDate__c}" required="true" disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}"/>
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                                <div>
+                                                    <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                        <lightning:input type="text" name="input3SIGLO" label="Número de cuenta" value="{!v.entidadSel.EntidadLegal__r.AccountNumber__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números." disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}"/>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                        <lightning:input type="text" name="input4SIGLO" label="Número de la clave" value="{!v.entidadSel.EntidadLegal__r.KeyNumber__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números." disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col">
+                                                <div>
+                                                    <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                        <lightning:input type="text" name="input5SIGLO" label="Geolocalización" value="{!v.entidadSel.EntidadLegal__r.Geolocation__c}" required="true" maxlength="40" minlength="1" disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}"/>
+                                                    </div>
+                                                </div>
+                                                <aura:if isTrue="{!or(v.entidadSel.EntidadLegal__r.PersonType__c == 'Persona Moral - Mexicana', v.entidadSel.EntidadLegal__r.PersonType__c == 'Persona Moral - Extranjera' )}">
+                                                    <div>
+                                                        <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                            <label class="slds-form-element__label" for="text-input-id-1">
+                                                                <abbr class="slds-required" title="required">* </abbr>Giro, Actividad o Objeto Social</label>
+                                                            <c:CustomLookup selectedRecord="{!v.entidadSel.EntidadLegal__r.EconomicActivity__r}" objectAPIName="EconomicActivity__c" IconName="custom:custom44"/>
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                                <aura:if isTrue="{!v.entidadSel.EntidadLegal__r.PersonType__c == 'Persona Moral - Mexicana'}">
+                                                    <div>
+                                                        <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                                            <lightning:input type="text" name="input6SIGLO" label="Número de escritura de la persona moral" value="{!v.entidadSel.EntidadLegal__r.DeedNumber__c}" required="true" maxlength="30" minlength="1" disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}"/>
+                                                        </div>
+                                                    </div>
+                                                </aura:if>
+                                            </div>
+                                        </div>
+                                    </aura:if>
                                 </div>
                             </div>
                         </div>
-                        <div class="slds-m-around_medium">
+                        <div class="{!if(v.data.headerData.Product2.IsAffiliate__c, 'slds-hide','slds-m-around_medium slds-show')}">
+                            <div class="slds-m-around_medium">
+                                <div class="seccionDiv">
+                                    <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                                        Filiales
+                                    </h2>
+                                </div>
+                                <div>
+                                    <div name="Filiales" class="slds-m-around_medium" style="height:12em;overflow:auto;">
+                                        <table>
+                                            <thead>
+                                                <tr style="border-bottom:1px solid gray;">
+                                                    <th>TIPO DE PERSONA</th>
+                                                    <th>RAZON SOCIAL</th>
+                                                    <th>RFC</th>
+                                                    <th><center>ADMINISTRADOR DE PLATAFORMA</center></th>--
+                                                    <th><center>Agregar</center></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <aura:iteration items="{!v.entidadesFiliales}" var="item" indexVar="index">
+                                                    <aura:if isTrue="{!or(and(item.EntidadLegal__r.PersonType__c == v.entidadSel.EntidadLegal__r.PersonType__c, v.data.headerData.Product2.SendToSIGLO__c), not(v.data.headerData.Product2.SendToSIGLO__c) )}">
+                                                        <tr style="border-bottom:1px solid gray;">
+                                                            <td>{!item.EntidadLegal__r.RecordType.Name}</td>
+                                                            <td>{!item.EntidadLegal__r.RazonSocial__c}</td>
+                                                            <td>{!item.Name}</td>
+                                                            <td style="vertical-align:middle;" >
+                                                                <center>
+                                                                    <lightning:combobox disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}" style="width:80%;" options="{!v.data.contactosCuenta}" variant="label-hidden" value="{!item.filial.PlatformAdministrator__c}"/>                                                       
+                                                                </center>
+                                                            </td>
+                                                            <td>
+                                                                <center>
+                                                                    <lightning:input disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}" style="margin-top:0.5em;" type="checkbox-button" label="" id="{!index}" name="{!item.Id}" checked="{!item.check}" onchange="{!c.agregarFilial}"/>
+                                                                </center>                                                        
+                                                            </td>
+                                                        </tr>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="{!if(and(v.data.headerData.Product2.IsAffiliate__c,v.data.headerData.Product2.Family=='Benefits'), 'slds-m-around_medium slds-show' , 'slds-hide')}">
+                            <div class="enlinea  slds-m-around_small" style="width: 98%;">
+                                <div class="enlinea">
+                                    <img src="{!$Resource.Iconos + '/IconosAltaContrato/metodoPago.png'}" width="50" height="50" />
+                                </div>
+                                <div class="enlinea" style="float:right;">
+                                    <lightning:button class="enlinea" label="Actualizar tabla" variant="brand" onclick="{!c.getCuentasBancarias}"/>
+                                    <lightning:button class="enlinea slds-m-left_small" label="Nueva Cuenta Bancaria" variant="brand" onclick="{!c.crearMetodoPago}"/>
+                                </div>
+                            </div>
                             <div class="seccionDiv">
                                 <h2 style="padding-left:1em;" class="slds-text-heading_small">
-                                    Filiales
+                                    Cuentas Bancarias
                                 </h2>
                             </div>
                             <div>
-                                <div name="Filiales" class="slds-m-around_medium" style="height:12em;overflow:auto;">
+                                <div name="metodosPago" class="slds-m-around_medium" style="height:12em;overflow:auto;">
                                     <table>
                                         <thead>
                                             <tr style="border-bottom:1px solid gray;">
-                                                <th>TIPO DE PERSONA</th>
-                                                <th>RAZON SOCIAL</th>
-                                                <th>RFC</th>
-                                                <th><center>ADMINISTRADOR DE PLATAFORMA</center></th>
+                                                <th>Nombre</th>
+                                                <th>Nombre de Banco</th>
+                                                <th>Cuenta CLABE</th>
+                                                <th>Número de Cuenta Bancaria</th>
+                                                <th><center>Referencia Bancaria</center></th>
                                                 <th><center>Agregar</center></th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <aura:iteration items="{!v.entidadesFiliales}" var="item" indexVar="index">
+                                            <aura:iteration items="{!v.metodosPago}" var="item" indexVar="index">
                                                 <tr style="border-bottom:1px solid gray;">
-                                                    <td>{!item.EntidadLegal__r.RecordType.Name}</td>
-                                                    <td>{!item.EntidadLegal__r.RazonSocial__c}</td>
                                                     <td>{!item.Name}</td>
-                                                    <td style="vertical-align:middle;" >
+                                                    <td>{!item.Bank__c}</td>
+                                                    <td>{!item.CLABE__c}</td>
+                                                    <td>{!item.StandardiziedBankKey__c}</td>
+                                                    <td style="text-align: center;">{!item.Reference__c}</td>
+                                                    <td>
                                                         <center>
-                                                            <lightning:combobox disabled="{!v.data.etapa!='Contrato'}" style="width:80%;" options="{!v.data.contactosCuenta}" variant="label-hidden" value="{!item.filial.PlatformAdministrator__c}"/>                                                       
-                                                        </center>
+                                                            <lightning:input aura:id="paymentMethodId" style="margin-top:0.5em;" type="checkbox-button" label="" id="{!'metodoPago' + index}" name="{!item.Id}" checked="{! v.bankAccSel == item.Id}" onchange="{!c.agregarCuentaBancaria}"/>
+                                                        </center>                                                        
                                                     </td>
                                                     <td>
                                                         <center>
-                                                            <lightning:input disabled="{!v.data.etapa!='Contrato'}" style="margin-top:0.5em;" type="checkbox-button" label="" id="{!index}" name="{!item.Id}" checked="{!item.check}" onchange="{!c.agregarFilial}"/>
+                                                            <lightning:buttonIcon name="{!item.Id}" iconName="utility:edit" variant="border-filled" onclick="{!c.editRecord}" alternativeText="Editar" title="Editar" />
                                                         </center>                                                        
                                                     </td>
                                                 </tr>
@@ -141,26 +351,59 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
-                        <!--div name="seccionFunciones" class="slds-m-around_medium">                            
-                            <div class="seccionDiv">
-                                <h2 style="padding-left:1em;" class="slds-text-heading_small">
-                                    Funciones de Contactos
-                                </h2>
-                            </div>
-                            <div class="slds-m-around_medium">
-                                <aura:iteration items="{!v.data.funcionesContactos}" var="funcion">
-                                    <div style="width:100%;margin-top:1em;">
-                                        <div style="width:40%;vertical-align:middle;display:inline-block;">
-                                            <div class="slds-text-heading_small" style="vertical-align:middle;">{!funcion.Role__c}</div>
-                                        </div>
-                                        <div style="width:40%;vertical-align:middle;display:inline-block;">
-                                            <lightning:combobox required="true" options="{!v.data.contactosCuenta}" label="Seleccione una Opción" value="{!funcion.ContactId__c}" class="{!if(or(funcion.ContactId__c=='',funcion.ContactId__c==null) ,'classError slds-m-around_small','slds-m-around_small')}" onchange="{!c.seleccionarContacto}"/>
-                                        </div>
+                        </div> 
+                        <aura:if isTrue="{!v.data.headerData.Product2.IsAffiliate__c}">
+                            <div class="{!if(and(v.data.headerData.Product2.IsAffiliate__c,v.data.headerData.Product2.Family=='Benefits'), 'slds-hide','slds-m-around_medium slds-show')}">
+                                <div class="enlinea  slds-m-around_small" style="width: 98%;">
+                                    <div class="enlinea">
+                                        <img src="{!$Resource.Iconos + '/IconosAltaContrato/establecimiento.png'}" width="40" height="40" />
                                     </div>
-                                </aura:iteration>
-                            </div>
-                        </div-->                        
+                                    <div class="enlinea" style="float:right;">
+                                        <lightning:button class="enlinea" label="Actualizar tabla" variant="brand" onclick="{!c.getEstablecimientos}"/>
+                                        <lightning:button class="enlinea slds-m-left_small" label="Nuevo Establecimiento" variant="brand" onclick="{!c.crearEstablecimiento}"/>
+                                    </div>
+                                </div>
+                                <div class="seccionDiv">
+                                    <h2 style="padding-left:1em;" class="slds-text-heading_small">
+                                        Información adicional-Establecimientos
+                                    </h2>
+                                </div>
+                                <div>
+                                    <div name="infoAdicional" class="slds-m-around_medium" style="height:12em;overflow:auto;">
+                                        <table>
+                                            <thead>
+                                                <tr style="border-bottom:1px solid gray;">
+                                                    <th>Nombre comercial</th>
+                                                    <th>Dirección</th>
+                                                    <th>Cuenta Bancaria</th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <aura:iteration items="{!v.establecimientos}" var="item" indexVar="index">
+                                                    <tr style="border-bottom:1px solid gray;">
+                                                        <td>{!item.Name}</td>
+                                                        <td>Calle: &nbsp;{!item.Street__c} &nbsp;Num. Int.: &nbsp; {!item.InternalNumber__c} &nbsp;Num.Ext: &nbsp;{!item.ExternalNumber__c}  &nbsp;C.P.: &nbsp;{!item.PostalCode__c} &nbsp;&nbsp;Colonia:{!item.Settlement__c}</td>               
+                                                        <td>{!item.Bank__r.Name}</td>
+                                                        <td>
+                                                            <center>
+                                                                <lightning:input aura:id="establishmentId" style="margin-top:0.5em;" type="checkbox-button" label="" id="{!index}" name="{!item.Id}" checked="{!item.check}" onchange="{!c.agregarEstablecimiento}"/>
+                                                            </center>                                                        
+                                                        </td>
+                                                        <td>
+                                                            <center>
+                                                                <lightning:buttonIcon name="{!item.Id}" iconName="utility:edit" variant="border-filled" onclick="{!c.editRecord}" alternativeText="Editar" title="Editar" />
+                                                            </center>                                                        
+                                                        </td>
+                                                    </tr>
+                                                </aura:iteration>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> 
+                        </aura:if>
                         <div>
                             <aura:iteration items="{!v.secciones}" var="seccion" indexVar="indice">
                                 <div name="seccionFacturacion" class="slds-m-around_medium">                            
@@ -175,24 +418,25 @@
                                                 <!--div class="{!if(campo.ocultar,'slds-hide','slds-show '+if(seccion.sizeSecc>6,'slds-size_1-of-6','slds-size_1-of-'+seccion.sizeSecc))}" style="display:inline-block;vertical-align:middle;"-->
                                                 <div class="{!if(campo.ocultar,'slds-hide','slds-show slds-size_1-of-6')}" style="display:inline-block;vertical-align:middle;">
                                                     <aura:if isTrue="{!campo.tipo=='PICKLIST'}">
-                                                        <lightning:combobox aura:id="pickListField" disabled="{!or(and(campo.deshabilitado,and(campo.value!=null,campo.value!='')),v.data.etapa!='Contrato')}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" id="{!seccion.nombreSeccion+';'+indice}" name="{!campo.api+';'+indiceCampo}" label="{!campo.etiqueta}" value="{!campo.value}" placeholder="Seleccione una opción" options="{!campo.listaValores}" onchange="{!c.handleChange}"/>
+                                                        <lightning:combobox disabled="{!or(and(campo.deshabilitado,and(campo.value!=null,campo.value!='')),or(v.data.etapa!='Contrato', v.blockEdition))}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" id="{!seccion.nombreSeccion+';'+indice}" name="{!campo.api+';'+indiceCampo}" label="{!campo.etiqueta}" value="{!campo.value}" placeholder="Seleccione una opción" options="{!campo.listaValores}" onchange="{!c.handleChange}"/>
                                                         <aura:set attribute="else">
                                                             <aura:if isTrue="{!campo.tipo=='MULTIPICKLIST'}">
-                                                                <ui:inputSelect disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" required="{!campo.requerido}" label="{!campo.etiqueta}" multiple="true" value="{!campo.value}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small slds-select','slds-m-around_small slds-select')}">                                                                   
-                                                                    <aura:iteration items="{!campo.listaValores}" var="it">
-                                                                        <ui:inputSelectOption label="{!it.label}" text="{!it.value}"/>
-                                                                    </aura:iteration>
-                                                                </ui:inputSelect>
-                                                                
+                                                                <div class="slds-m-around_medium">
+                                                                    <ui:inputSelect disabled="{!or(campo.deshabilitado,or(v.data.etapa!='Contrato', v.blockEdition))}" required="{!campo.requerido}" label="{!campo.etiqueta}" multiple="true" value="{!campo.value}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small slds-select','slds-m-around_small slds-select')}">                                                                   
+                                                                        <aura:iteration items="{!campo.listaValores}" var="it">
+                                                                            <ui:inputSelectOption label="{!it.label}" text="{!it.value}"/>
+                                                                        </aura:iteration>
+                                                                    </ui:inputSelect>
+                                                                </div>
                                                                 <aura:set attribute="else">
                                                                     <aura:if isTrue="{!or(campo.tipo=='CURRENCY',campo.tipo=='DOUBLE')}">
-                                                                        <lightning:input disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" type="number" formatter="{!if(campo.tipo=='CURRENCY','currency','')}"  step="{!if(campo.tipo=='CURRENCY','0.01','1')}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
+                                                                        <lightning:input disabled="{!or(campo.deshabilitado,or(v.data.etapa!='Contrato', v.blockEdtition))}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" type="number" formatter="{!if(campo.tipo=='CURRENCY','currency','')}"  step="{!if(campo.tipo=='CURRENCY','0.01','1')}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
                                                                         <aura:set attribute="else">
                                                                             <aura:if isTrue="{!campo.tipo=='BOOLEAN'}">
-                                                                                <lightning:input disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" class="slds-m-around_small" id="{!seccion.nombreSeccion+';'+indice}" style="display:inline-block;vertical-align:middle;" type="checkbox" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" checked="{!campo.value}" onchange="{!c.handleChange}"/>
+                                                                                <lightning:input disabled="{!or(campo.deshabilitado,or(v.data.etapa!='Contrato', v.blockEdition))}" class="slds-m-around_small" id="{!seccion.nombreSeccion+';'+indice}" style="display:inline-block;vertical-align:middle;" type="checkbox" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" checked="{!campo.value}" onchange="{!c.handleChange}"/>
                                                                                 <aura:set attribute="else">
                                                                                     <div onkeypress="{!c.ingresoValor}" name="{!campo.api}">
-                                                                                        <lightning:input maxlength="{!if(or(campo.api=='Sucursal_Facturacion_Global__c',or(campo.api=='GrupoFacturacionGlobal_Text__c',campo.api=='Cliente_Facturacion_Global__c')),3,255)}"  disabled="{!or(campo.deshabilitado,v.data.etapa!='Contrato')}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" style="display:inline-block;vertical-align:middle;" type="{!campo.tipo}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
+                                                                                        <lightning:input maxlength="{!if(or(campo.api=='Sucursal_Facturacion_Global__c',or(campo.api=='GrupoFacturacionGlobal_Text__c',campo.api=='Cliente_Facturacion_Global__c')),3,255)}"  disabled="{!or(campo.deshabilitado,or(v.data.etapa!='Contrato', v.blockEdition))}" required="{!campo.requerido}" class="{!if(and(campo.requerido,or(campo.value=='',campo.value==null)) ,'classError slds-m-around_small','slds-m-around_small')}" style="display:inline-block;vertical-align:middle;" type="{!campo.tipo}" label="{!campo.etiqueta}" name="{!campo.api+';'+indiceCampo}" value="{!campo.value}"/>
                                                                                     </div>
                                                                                 </aura:set>
                                                                             </aura:if>
@@ -225,7 +469,6 @@
                         </div>                                                
                     </div>
                 </div>
-                
                 <div>
                     <lightning:buttonGroup class="button-group-container">
                         <aura:if isTrue="{!v.isCreditEvaluationButtonVisible}">
@@ -233,59 +476,59 @@
                                 <lightning:icon iconName="utility:locker_service_api_viewer" title="Evaluación Crédito" class="creditEvaluation-button"/>
                             </lightning:button>                    
                         </aura:if>                        
-                        <lightning:button disabled="{!or(v.isFinishButtonDisabled,v.data.etapa!='Contrato')}" class="slds-m-around_small" variant="bare" name="Finalizado" onclick="{!c.guardar}" >
+                        <lightning:button disabled="{!or(v.isFinishButtonDisabled,or(v.data.etapa!='Contrato', v.blockEdition))}" class="slds-m-around_small" variant="bare" name="Finalizado" onclick="{!c.guardar}" >
                             <lightning:icon iconName="utility:success" title="Finalizar" class="finish-button"/>
                         </lightning:button>
-                        <lightning:button disabled="{!v.data.etapa!='Contrato'}" class="slds-m-around_small" variant="bare" name="En proceso" onclick="{!c.guardar}" >
+                        <lightning:button disabled="{!or(v.data.etapa!='Contrato', v.blockEdition)}" class="slds-m-around_small" variant="bare" name="En proceso" onclick="{!c.guardar}" >
                             <lightning:icon iconName="utility:save" title="Guardar" class="save-button"/>
                         </lightning:button>
-                        <lightning:button disabled="{!and(v.data.headerData.Quote.Opportunity.Owner.Segmento__c=='Small',and(!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,!v.esPospago))}" class="slds-m-around_small" variant="bare" onclick="{!c.sendEmail}" >
+                        <lightning:button class="slds-m-around_small" variant="bare" onclick="{!c.sendEmail}" >
                             <lightning:icon iconName="utility:email" title="Enviar" class="send-button"/>
                             <aura:if isTrue="{!v.isSending}">
                                 <lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
                             </aura:if>
                         </lightning:button>
-                        <lightning:button disabled="{!and(v.data.headerData.Quote.Opportunity.Owner.Segmento__c=='Small',and(!v.data.contrato.PartidaPresupuesto__r.Quote.Opportunity.RejectedContract__c,!v.esPospago))}" class="slds-m-around_small" variant="bare" onclick="{!c.generarPDF}" >
+                        <lightning:button disabled="{!v.data.headerData.Product2.No_genera_contrato__c}" class="slds-m-around_small" variant="bare" onclick="{!c.generarPDF}" >
                             <lightning:icon iconName="utility:page" title="Descargar PDF" class="pdf-button"/>
                             <aura:if isTrue="{!v.isPDFGenerated}">
                                 <lightning:spinner size="small" variant="brand" alternativeText="Generando el Contrato"/>
                             </aura:if>
                         </lightning:button>
+                        <lightning:button class="{!if(v.data.headerData.Product2.IsAffiliate__c,'slds-m-around_small slds-show',' slds-hide')}" variant="bare" onclick="{!c.openAffiliatePDF}" >
+                            <lightning:icon iconName="utility:touch_action" title="Alta_Afiliado" class="touch-action"/>
+                        </lightning:button>
                     </lightning:buttonGroup>
                 </div>
-                
-                 <aura:if isTrue="{!v.isCreditEvaluationButtonVisible}">
-                <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
-                                <div class="slds-modal__container">
-                                    <div class="slds-modal__header">
-                                        <h2 id="header43" class="slds-text-heading--medium">Evaluación Crédito</h2>
-                                    </div>
-                                    <div class="slds-modal__content slds-p-around--medium">
-                                        <div style="overflow:scroll; height:300px;">
-                                            <c:CreditEvaluation aura:id="evalcredito" IdOportunidad="{! v.data.IdOpp }"/>
-                                        </div>
-                                    </div>
-                                    <div class="slds-modal__footer">
-                                         <aura:if isTrue="{!v.StatusCreditEval_InProcess}">
-                                             <div class="slds-text-align_left slds-text-heading_small">La Evaluación de Crédito se encuentra en proceso de aprobación</div>
-                                             <aura:set attribute="else">
-                                                 <aura:if isTrue="{!v.StatusCreditEval_Approved}"> 
-                                                 <div class="slds-text-align_left slds-text-heading_small">Evaluación de Crédito aprobada</div>
-                                                  <aura:set attribute="else">
-                                              			<lightning:button variant="brand" label="Guardar" name="GuardarEvaluacionCredito" onclick="{!c.GuardarEvaluacionCredito}"/>
-                                                        <lightning:button variant="brand" label="Enviar a Aprobación" name="GuardarEvaluacionCredito" onclick="{!c.AprobacionEvaluacionCredito}"/>       
-                                                     </aura:set> 
-                                                 </aura:if>
-                                              
-                                            </aura:set> 
-                                        </aura:if>
-                                        
-                                        <button class="slds-button slds-button_neutral" onclick="{!c.cerrarEvaluacionCredito}">Cerrar</button>
-                                    </div>
+                <aura:if isTrue="{!v.isCreditEvaluationButtonVisible}">
+                    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
+                        <div class="slds-modal__container">
+                            <div class="slds-modal__header">
+                                <h2 id="header43" class="slds-text-heading--medium">Evaluación Crédito</h2>
+                            </div>
+                            <div class="slds-modal__content slds-p-around--medium">
+                                <div style="overflow:scroll; height:300px;">
+                                    <c:CreditEvaluation aura:id="evalcredito" IdOportunidad="{! v.data.IdOpp }"/>
                                 </div>
                             </div>
-                            <div class="slds-backdrop " aura:id="Modalbackdrop"></div> 
-                 </aura:if>    
+                            <div class="slds-modal__footer">
+                                <aura:if isTrue="{!v.StatusCreditEval_InProcess}">
+                                    <div class="slds-text-align_left slds-text-heading_small">La Evaluación de Crédito se encuentra en proceso de aprobación</div>
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.StatusCreditEval_Approved}"> 
+                                            <div class="slds-text-align_left slds-text-heading_small">Evaluación de Crédito aprobada</div>
+                                            <aura:set attribute="else">
+                                                <lightning:button variant="brand" label="Guardar" name="GuardarEvaluacionCredito" onclick="{!c.GuardarEvaluacionCredito}"/>
+                                                <lightning:button variant="brand" label="Enviar a Aprobación" name="GuardarEvaluacionCredito" onclick="{!c.AprobacionEvaluacionCredito}"/>       
+                                            </aura:set> 
+                                        </aura:if>
+                                    </aura:set> 
+                                </aura:if>
+                                <button class="slds-button slds-button_neutral" onclick="{!c.cerrarEvaluacionCredito}">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-backdrop " aura:id="Modalbackdrop"></div> 
+                </aura:if>    
             </div>            
         </div>                
     </lightning:card>

@@ -5,27 +5,48 @@
         secc.EntidadLegal={"isOpen":true,"name":"EntidadLegal"};
         secc.Filiales={"isOpen":true,"name":"Filiales"};
         component.set("v.secciones",secc);
-        console.log('IDQLI::'+component.get("v.recordId"));
+        //console.log('IDQLI::'+component.get("v.recordId"));
+        console.log("getInfoHeader2");
 		var action=component.get("c.getInfoQli");
         action.setParams({idQli:component.get("v.recordId")});
         action.setCallback(this,function(response){
             console.log("return");
             var state=response.getState();
             if(state=='SUCCESS'){
-                //console.log(JSON.stringify(response.getReturnValue()));
+                //console.log("DATA:"+JSON.stringify(response.getReturnValue()));
                 var result=response.getReturnValue();
                 component.set("v.data",result);
-                if(true){
-                    component.set("v.representantes",result.representantes[result.contrato.Entidad_Cuenta__c]);
-                    component.set("v.entidadSel",result.mapaEC[result.contrato.Entidad_Cuenta__c]);
-                    var tem='';
-                    if(result.mapaEC[result.contrato.Entidad_Cuenta__c]){
-                        tem=result.mapaEC[result.contrato.Entidad_Cuenta__c].Id;
-                    }else{
-                        tem='';
+                
+                //Inicio SIGLO
+                let sendToSIGLO = result.headerData.Product2.SendToSIGLO__c;
+                if (sendToSIGLO) {
+                    if (result.contrato.Entidad_Legal__c == undefined) {
+                		component.set("v.blockEdition", true);
+                        helper.showToast(component,event,"warning","Falta información","Favor de relacionar una Entidad Legal a la oportunidad.");
+                    } else if (result.contrato.Entidad_Legal__r.CountryOrigin__c == undefined) {
+                		component.set("v.blockEdition", true);
+                        helper.showToast(component,event,"warning","Falta información","Favor de agregar el 'País de origen' en la Entidad Legal relacionada a la oportunidad.");
                     }
-                    helper.cambioEL(component,event,tem,'init');
                 }
+                //Fin SIGLO
+                
+                component.set("v.metodosPago",result.metodosPago);
+                component.set("v.establecimientos",result.establecimientos);
+                //console.log("esta***** :"+JSON.stringify(result.establecimientos));
+                component.set("v.representantes",result.representantes[result.contrato.Entidad_Cuenta__c]);
+                if(result.establecimientosGuardados && result.establecimientosGuardados.length > 0){
+                    helper.setCheckedEstablishments(component,result.establecimientosGuardados);
+                }
+                
+                component.set("v.entidadSel",result.mapaEC[result.contrato.Entidad_Cuenta__c]);
+                var tem='';
+                if(result.mapaEC[result.contrato.Entidad_Cuenta__c]){
+                    tem=result.mapaEC[result.contrato.Entidad_Cuenta__c].Id;
+                }else{
+                    tem='';
+                }
+                helper.cambioEL(component,event,tem,'init');
+                
                 if(result.direcciones!=null){
                     var listDirecciones=[];
                     for(var i=0;i<result.direcciones.length;i++){
@@ -55,7 +76,7 @@
                 helper.getInfo(component, event,'init');
             }else{
                 component.set("v.showSpinner",false);
-                console.log("Error");
+                //console.log("Error");
             }
         });
         $A.enqueueAction(action);
@@ -111,7 +132,7 @@
         var ind = event.getSource().get("v.id");
         var ch = event.getSource().get("v.checked");
         var info=component.get("v.entidadesFiliales");   
-        console.log('::'+JSON.stringify(info));
+        //console.log('::'+JSON.stringify(info));
         var ecDisp=component.get("v.data.ECdisp");
         if(ch){
             if(!info[ind].filial.PlatformAdministrator__c){
@@ -137,6 +158,22 @@
         
         component.set("v.data.ECdisp",ecDisp);
     },
+    agregarCuentaBancaria: function(component,event,helper) {
+    	let bankIdentifier = event.getSource().get("v.name");
+        let isCheck = event.getSource().get("v.checked");
+		component.set('v.bankAccSel','');
+        if(isCheck){
+            component.set('v.bankAccSel',bankIdentifier);
+        }
+    },
+    agregarEstablecimiento : function(component, event, helper) {
+        let establishmentId = event.getSource().get("v.name");
+        let isCheck = event.getSource().get("v.checked");
+        
+        if(!isCheck){
+			event.getSource().set("v.checked",false);            
+        }
+    },
     seleccionarContacto : function(component, event, helper) {
         //console.log(JSON.stringify(component.get("v.data.funcionesContactos")));
     },
@@ -146,8 +183,11 @@
         //var datosContact=component.get("v.data.funcionesContactos");
         var datosContrato=component.get("v.data.contrato");
         
+        let bankAccSel = component.get("v.bankAccSel");
+		let checkedEstablishments = helper.getCheckedEstablishments(component, event, helper);
+                
         if(operacion=='Finalizado'){
-                     console.log(datosContrato['Personalizacion_de_Tarjetas__c']);
+                     //console.log(datosContrato['Personalizacion_de_Tarjetas__c']);
             //console.log(JSON.stringify(datosContact));
             if(datosContrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c==null||datosContrato.PartidaPresupuesto__r.Quote.Opportunity.Contacto__c==''){
                 component.set("v.showSpinner",false);
@@ -182,7 +222,7 @@
                 }
             } */               
         }
-        
+        datosContrato['Bank_Account__c']= bankAccSel;
         datosContrato['EtapaContrato__c']=operacion;                        
         var info=component.get("v.secciones");
         for(var i=0;i<info.length;i++){
@@ -211,7 +251,7 @@
                         helper.showToast(component,event,"error","Error","Necesita adjuntar el layout de personalización de tarjetas!!");
                         return;
                     }else{
-                        helper.guardarContrato(component,event,null,datosContrato,operacion);
+                        helper.guardarContrato(component,event,datosContrato,operacion, checkedEstablishments);
                     }
                 }else{
                     component.set("v.showSpinner",false);
@@ -221,7 +261,7 @@
             });
             $A.enqueueAction(action);
         }else{
-            helper.guardarContrato(component,event,null,datosContrato,operacion);
+            helper.guardarContrato(component,event,datosContrato,operacion, checkedEstablishments);
         }
         //helper.guardarContrato(component,event,datosContact,datosContrato,operacion);
     },
@@ -250,7 +290,7 @@
         cmp.set('v.saved', true);
     },
     handleChange : function(component, event, helper) {
-        console.log("cambio");
+        //console.log("cambio");
         component.set("v.showSpinner",true);
         var seccTem=event.getSource().get("v.id");
         var campoTem=event.getSource().get("v.name");
@@ -332,8 +372,8 @@
         }
     },
     generarPDF : function(component, event, helper){
-        //component.set("v.generandoPDF",!component.get("v.generandoPDF"));
         window.open('/apex/PdfContract_VFC?id='+component.get("v.recordId"),'_blank');
+        //component.set("v.generandoPDF",!component.get("v.generandoPDF"));
         /*var evt = $A.get("e.force:navigateToComponent");
         evt.setParams({
             componentDef : "c:CON_TC3PagoPorConsumo_LC",
@@ -375,7 +415,7 @@
             var state=response.getState();
             if(state=='SUCCESS'){
                 var result=response.getReturnValue();
-                console.log(JSON.stringify(result));
+                //console.log(JSON.stringify(result));
                 if(!result.idTemplate){
                     helper.showToast(component,event,"warning","Falta información","No se encontro la plantilla");
                     return;
@@ -399,6 +439,87 @@
                 window.open('/one/one.app#/alohaRedirect/_ui/core/email/author/EmailAuthor?p2_lkid=' + result.idCont + '&p3_lkid=' + result.oppId + '&doc_id=' + result.pdfId + '&p24=' + result.email + '&template_id=' + result.idTemplate + '&saveURL=' + result.oppId,"_blank");
             }else{
                 helper.showToast(component,event,"error","Error","Error al consultar parametros para email");
+            }
+        });
+        $A.enqueueAction(action);
+    },
+    openAffiliatePDF : function(component, event, helper) {
+        let contractId =  component.get('v.data.contrato.Id');
+        let vfPage = component.get('v.data.headerData.Quote.Opportunity.Familia__c') == 'Ticket Car' ?  '/apex/PLAN_AltaAfiliadosTC_VF' : '/apex/PLAN_AltaAfiliadosDES_VF' ;        
+        window.open(vfPage + '?contractId=' + contractId);
+    },
+    crearMetodoPago: function(component, event, helper) {
+        //component.set("v.modalCreate",true);
+        var createRecordEvent = $A.get("e.force:createRecord");
+        createRecordEvent.setParams({
+            "entityApiName": "BankAccount__c",
+            "navigationLocation" : "LOOKUP",
+            "defaultFieldValues" : {
+                "Cuenta__c" : component.get("v.data.headerData.Quote.Opportunity.AccountId")
+            }
+        });
+        createRecordEvent.fire();
+    },
+    editRecord : function(component, event, helper) {
+        var idReg = event.getSource().get("v.name");
+        var editRecordEvent = $A.get("e.force:editRecord");
+        editRecordEvent.setParams({
+            "recordId": idReg
+        });
+        editRecordEvent.fire();
+    },
+    crearEstablecimiento: function(component, event, helper) {
+        //component.set("v.modalCreateEstab",true);
+        var createRecordEvent = $A.get("e.force:createRecord");
+        createRecordEvent.setParams({
+            "entityApiName": "Establishment__c",
+            "navigationLocation" : "LOOKUP",
+            "defaultFieldValues" : {
+                "Account__c" : component.get("v.data.headerData.Quote.Opportunity.AccountId")
+            }
+        });
+        createRecordEvent.fire();
+    },
+    getEstablecimientos: function(component, event, helper) {
+        component.set('v.showSpinner', true);
+        var action=component.get("c.getEstablecimientosRefresh");
+        var idC=component.get("v.data.headerData.Quote.Opportunity.AccountId");
+        var idCn=component.get("v.data.contrato.Id");
+        //console.log(idC);
+        //console.log(idCn);
+        action.setParams({idCuenta : idC,contratoId : idCn});
+        action.setCallback(this,function(response){
+            var state=response.getState();
+            var result=response.getReturnValue();
+            //console.log(state);
+            //console.log(JSON.stringify(result));
+            if(state=='SUCCESS'){
+                //var result=response.getReturnValue();
+                component.set("v.establecimientos",result.establecimientos);                
+                if(result.establecimientosGuardados && result.establecimientosGuardados.length > 0){
+                    helper.setCheckedEstablishments(component,result.establecimientosGuardados);
+                }
+                component.set('v.showSpinner', false);
+            }else{
+                component.set('v.showSpinner', false);
+                helper.showToast(component,event,'error',"Error","Error al obtener Establecimientos");
+            }
+        });
+        $A.enqueueAction(action);        
+    },
+    getCuentasBancarias: function(component, event, helper) {
+        component.set('v.showSpinner', true);
+        var action=component.get("c.getMetodosPago");
+        action.setParams({idCuenta : component.get("v.data.headerData.Quote.Opportunity.AccountId")});
+        action.setCallback(this,function(response){
+            var state=response.getState();
+            if(state=='SUCCESS'){
+                var result=response.getReturnValue();
+                component.set("v.metodosPago",result.metodosPago);
+                component.set('v.showSpinner', false);
+            }else{
+                component.set('v.showSpinner', false);
+                helper.showToast(component,event,'error',"Error","Error al obtener métodos de pago");
             }
         });
         $A.enqueueAction(action);
