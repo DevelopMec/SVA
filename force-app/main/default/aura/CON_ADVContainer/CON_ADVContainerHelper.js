@@ -566,7 +566,7 @@
 	getCotizacion : function(component, idCotizacion){
 		
 		var action = component.get("c.executeQuery");
-		var query = 'SELECT Id, CantidadTarjetas__c, Description,Product2.IDInterno__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c FROM QuoteLineItem WHERE Id=\'' + idCotizacion + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC';
+		var query = 'SELECT Id, CantidadTarjetas__c,meanType__c,dualTagQuantity__c,physicalCardQuantity__c,regularTagQuantity__c,virtualCardQuantity__c,Description,Product2.IDInterno__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c FROM QuoteLineItem WHERE Id=\'' + idCotizacion + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC';
 		var dataSource;
 		action.setParams({
 			query: query
@@ -577,7 +577,7 @@
 				var returnedValue = response.getReturnValue()[0]
 				dataSource= component.get("v.dataSource")
 				dataSource.QuoteLineItem = returnedValue;
-				
+				console.log(returnedValue);
 				if(returnedValue.FormaPago__c == 'TransferenciaElectronica'){
 					component.set("v.transferenciaElectronica",true)
 				}
@@ -587,20 +587,25 @@
 				else if(returnedValue.FormaPago__c == 'Deposito'){
 					component.set("v.depositoBancario",true)
 				}
+				else if(returnedValue.FormaPago__c == 'Pago Online'){
+					component.set("v.pagoOnline",true)
+				}
 				else if(returnedValue.FormaPago__c == 'Otros'){
 					component.set("v.otros",true)
 				}
 				component.set("v.dataSource", dataSource);
-                
-                //if(returnedValue.Product2.IDInterno__c=='30'||returnedValue.Product2.IDInterno__c=='31'){
-                    component.set("v.loadingPage",true);
-                    var cmp=component.find("camposCon");
-                    cmp.iniciar(dataSource.QuoteLineItem.Id);
-                //}
-                
-				console.log('Datos de Contrato: ', dataSource);
-				
-				
+
+				if(returnedValue.Product2 && returnedValue.Product2.IDInterno__c && returnedValue.Product2.IDInterno__c == '33'){
+					component.set('v.tiposDeMedio',returnedValue.meanType__c.split(';'));
+					component.set('v.dualTagQuantity__c',returnedValue.dualTagQuantity__c);
+					component.set('v.regularTagQuantity__c',returnedValue.regularTagQuantity__c);
+					component.set('v.physicalCardQuantity__c',returnedValue.physicalCardQuantity__c);
+					component.set('v.virtualCardQuantity__c',returnedValue.virtualCardQuantity__c);
+				}
+
+                component.set("v.loadingPage",true);
+                var cmp=component.find("camposCon");
+                cmp.iniciar(dataSource.QuoteLineItem.Id);
 			}
 			else{
 				

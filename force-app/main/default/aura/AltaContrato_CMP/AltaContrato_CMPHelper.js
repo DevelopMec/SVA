@@ -48,6 +48,8 @@
     },
     cambioEL : function(component, event, enSel,origen) {
         var datos=component.get("v.data");
+        console.log('Datos:');
+        console.log(datos);
         component.set("v.entidadSel",datos.mapaEC[enSel]);
         component.set("v.representantes",datos.representantes[enSel]);        
         var listEl=[];
@@ -79,8 +81,23 @@
             component.set("v.data.ECdisp",listEcDisp);            
             //component.set("v.filialesAdd",listEl);
         }
+        if(datos.contrato.Producto__c == '33-Nectar') {
+            this.setDefaultPickList(component,'pickListField');
+        }
         component.set("v.showSpinner",false);
         //console.log("del::"+JSON.stringify(listEcDisp));
+    },
+    setDefaultPickList : function(component,idPickList) {
+        setTimeout(()=>{
+            let pickListFields = component.find(idPickList);
+            if(Array.isArray(pickListFields) && pickListFields.length > 0) {
+                pickListFields.forEach( (field) => {
+                    if(field.get('v.options').length = 1){
+                        field.set('v.value',field.get('v.options')[0].value);
+                    }
+                });
+            }
+        },1000);
     },
     agregarFiliales : function(component,idEL) {
         var filiales=component.get("v.filialesAdd");

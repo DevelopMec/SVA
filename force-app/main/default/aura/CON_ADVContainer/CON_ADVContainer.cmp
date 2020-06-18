@@ -20,15 +20,22 @@
 	<aura:attribute name="eLExist" type="boolean" default="false"/>
 	<aura:attribute name="transferenciaElectronica" type="boolean" default="false"/>
 	<aura:attribute name="amex" type="boolean" default="false"/>
+	<aura:attribute name="pagoOnline" type="boolean" default="false"/>
 	<aura:attribute name="depositoBancario" type="boolean" default="false"/>
 	<aura:attribute name="otros" type="boolean" default="false"/>
     <aura:attribute name="isXML" type="boolean" default="true"/>
     <aura:attribute name="isSendXML" type="boolean" default="false"/>
 	<aura:attribute name="urlPDF" type="string"/>
 	<aura:attribute name="subCuentas" type="List"/>
+	<aura:attribute name="tiposDeMedio" type="List"/>
     <aura:attribute name="app_edenred" type="Map" default="{render: false}"/>
     <aura:attribute name="dirEntregaCMP" type="Aura.Component" />
-    
+	
+	<aura:attribute name="dualTagQuantity__c" type="Integer" default="0"/>
+	<aura:attribute name="physicalCardQuantity__c" type="Integer" default="0"/>
+	<aura:attribute name="regularTagQuantity__c" type="Integer" default="0"/>
+	<aura:attribute name="virtualCardQuantity__c" type="Integer" default="0"/>
+	
     <aura:attribute name="spinAs400" type="boolean" default="false"/>
     <aura:attribute name="clientesCompletos" type="boolean" default="false"/>
     
@@ -551,6 +558,30 @@
 									</tr>
 									
 								</tbody>
+								<aura:if isTrue="{!v.tiposDeMedio.length > 0}">
+									<tfoot>
+										<tr>
+											<th>Tipos de medio</th>
+										</tr>
+										<tr>
+											<aura:iteration items="{!v.tiposDeMedio}" var="medio">
+												<th>{!medio}</th>
+												<aura:if isTrue="{!medio == 'Tarjetas Físicas'}">
+													<th><lightning:input type="text" value="{!v.physicalCardQuantity__c}" disabled="true"/></th>
+												</aura:if>
+												<aura:if isTrue="{!medio == 'Tarjetas Virtuales'}">
+													<th><lightning:input type="text" value="{!v.virtualCardQuantity__c}" disabled="true"/></th>
+												</aura:if>
+												<aura:if isTrue="{!medio == 'TAG Regular'}">
+													<th><lightning:input type="text" value="{!v.regularTagQuantity__c}" disabled="true"/></th>
+												</aura:if>
+												<aura:if isTrue="{!medio == 'TAG Dual'}">
+													<th><lightning:input type="text" value="{!v.dualTagQuantity__c}" disabled="true"/></th>
+												</aura:if>
+											</aura:iteration>
+										</tr>
+									</tfoot>
+								</aura:if>
 							</table>
 						</div>
 					</div>
@@ -576,6 +607,9 @@
 								</lightning:layoutItem>
 								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
 									<ui:inputCheckbox label="Deposito bancario" name="depBancario" value="{!v.depositoBancario}" required="true" disabled="true"/>
+								</lightning:layoutItem>
+								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
+									<ui:inputCheckbox label="Pago online" name="pagoOnline" value="{!v.pagoOnline}" required="true" disabled="true"/>
 								</lightning:layoutItem>
 								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
 									<ui:inputCheckbox label="Otros" name="otros" value="{!v.otros}" required="true" disabled="true"/>

@@ -844,7 +844,7 @@
                                             conceptsToExclude.splice(conceptsToExclude.indexOf(concepto),1);
                                         }
                                     }
-                                    if(mediaReference.includes(key) && mediaTypes[key].hasOwnProperty('excludeConcepts')  && mediaTypes[key].excludeConcepts.includes(concepto.TipoCargo__c) ) {
+                                    if(mediaReference.includes(key) && mediaReference.length == 1 && mediaTypes[key].hasOwnProperty('excludeConcepts')  && mediaTypes[key].excludeConcepts.includes(concepto.TipoCargo__c) ) {
                                         conceptsToExclude.push(concepto);
                                     }
                                 });
