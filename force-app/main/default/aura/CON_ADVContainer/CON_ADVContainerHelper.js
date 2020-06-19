@@ -591,6 +591,9 @@
 				else if(returnedValue.FormaPago__c == 'Deposito'){
 					component.set("v.depositoBancario",true)
 				}
+				else if(returnedValue.FormaPago__c == 'Pago Online'){
+					component.set("v.pagoOnline",true)
+				}
 				else if(returnedValue.FormaPago__c == 'Otros'){
 					component.set("v.otros",true)
 				}
