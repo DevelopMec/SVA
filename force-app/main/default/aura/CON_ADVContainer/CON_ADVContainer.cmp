@@ -655,7 +655,30 @@
                                             <label>{!v.dataSource.Opportunity.Competidor__c}</label>
                                         </td>
                                     </tr>
-                                    
+                                    <aura:if isTrue="{!v.tiposDeMedio.length > 0}">
+									<tfoot>
+										<tr>
+											<th>Tipos de medio</th>
+										</tr>
+										<tr>
+											<aura:iteration items="{!v.tiposDeMedio}" var="medio">
+												<th>{!medio}</th>
+												<aura:if isTrue="{!medio == 'Tarjetas Físicas'}">
+													<th><lightning:input type="text" value="{!v.physicalCardQuantity__c}" disabled="true"/></th>
+												</aura:if>
+												<aura:if isTrue="{!medio == 'Tarjetas Virtuales'}">
+													<th><lightning:input type="text" value="{!v.virtualCardQuantity__c}" disabled="true"/></th>
+												</aura:if>
+												<aura:if isTrue="{!medio == 'TAG Regular'}">
+													<th><lightning:input type="text" value="{!v.regularTagQuantity__c}" disabled="true"/></th>
+												</aura:if>
+												<aura:if isTrue="{!medio == 'TAG Dual'}">
+													<th><lightning:input type="text" value="{!v.dualTagQuantity__c}" disabled="true"/></th>
+												</aura:if>
+											</aura:iteration>
+										</tr>
+									</tfoot>
+								</aura:if>
                                 </tbody>
                             </table>
                         </div>
