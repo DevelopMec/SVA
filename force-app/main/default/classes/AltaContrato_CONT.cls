@@ -12,7 +12,8 @@ public without sharing class AltaContrato_CONT {
                         '33-Facturacion_Plasticos__c'=>new List<comboWP>{new comboWP('Separado del consumo','Separado del consumo')},
                         '33-TipoPago__c'=>new List<comboWP>{new comboWP('Prepago','Prepago')},
                         '33-Item_Contratacion__c'=>new List<comboWP>{new comboWP('Nectar','Nectar')},
-                        '33-Package__c'=>new List<comboWP>{new comboWP('Básico','Básico'),new comboWP('Avanzado','Avanzado'),new comboWP('Por comisión','Por comisión')}
+                        '33-Package__c'=>new List<comboWP>{new comboWP('Básico','Básico'),new comboWP('Avanzado','Avanzado'),new comboWP('Por comisión','Por comisión')},
+                        '33-CondicionesPagoPlazo__c'=>new List<comboWP>{new comboWP('0','0')}
     };
     
     @AuraEnabled
