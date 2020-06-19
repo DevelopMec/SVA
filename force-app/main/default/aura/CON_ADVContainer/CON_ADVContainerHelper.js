@@ -603,7 +603,13 @@
 				}
 				//CEAM:3375 <<<
 				component.set("v.dataSource", dataSource);
-                
+                if(returnedValue.Product2 && returnedValue.Product2.IDInterno__c && returnedValue.Product2.IDInterno__c == '33'){
+					component.set('v.tiposDeMedio',returnedValue.meanType__c.split(';'));
+					component.set('v.dualTagQuantity__c',returnedValue.dualTagQuantity__c);
+					component.set('v.regularTagQuantity__c',returnedValue.regularTagQuantity__c);
+					component.set('v.physicalCardQuantity__c',returnedValue.physicalCardQuantity__c);
+					component.set('v.virtualCardQuantity__c',returnedValue.virtualCardQuantity__c);
+				}
                 //if(returnedValue.Product2.IDInterno__c=='30'||returnedValue.Product2.IDInterno__c=='31'){
                     component.set("v.loadingPage",true);
                     var cmp=component.find("camposCon");
