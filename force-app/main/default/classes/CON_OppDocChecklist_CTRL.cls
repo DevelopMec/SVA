@@ -135,8 +135,10 @@ public virtual class CON_OppDocChecklist_CTRL {
 			Map<String, Object> mapERD = new Map<String, Object>();
 			Negocio__c n = [SELECT Id, CodigosRegistroPatronal__c FROM Negocio__c LIMIT 1];
 			Opportunity opp = [SELECT Id, Codigo_Producto_cotizacion__c,RecordType.DeveloperName FROM Opportunity WHERE Id = :oppId LIMIT 1];
+			QuoteLineItem qli = [SELECT id, DocumentType__c FROM QuoteLineItem WHERE Quote.OpportunityId = :oppId LIMIT 1];//CEAM:3375
 			mapERD.put('employerRegistrationCodes', n);
 			mapERD.put('opportunity', opp);
+			mapERD.put('quoteLine', qli);//CEAM:3375
 			return mapERD;
 		} catch(System.Exception e) {
 			return getMapException(e);
@@ -175,8 +177,11 @@ public virtual class CON_OppDocChecklist_CTRL {
 	*/
 	@AuraEnabled
 	public static Object getContactLegalRepresentative(Id oppId) {
-		List<Opportunity> listOpps = [SELECT Id FROM Opportunity WHERE Id = :oppId AND Contacto__r.Funcion__c = 'Representante Legal' AND Contacto__r.Extranjero__c = true];
-		return listOpps;
+        //Inicio cambio SIGLO
+		//List<Opportunity> listOpps = [SELECT Id FROM Opportunity WHERE Id = :oppId AND Contacto__r.Funcion__c = 'Representante Legal' AND Contacto__r.Extranjero__c = true];
+		List<Opportunity> listOpps = [SELECT Id FROM Opportunity WHERE Id = :oppId AND Contacto__r.Funcion__c = 'Representante Legal' AND Contacto__r.Nationality__c != '' AND Contacto__r.Nationality__c != null AND Contacto__r.Nationality__c != 'MEXICO'];
+        //Fin cambio SIGLO
+        return listOpps;
 	}
 	
 	/**

@@ -131,7 +131,7 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
 			
 			List<String> errors = new List<String>();
 			//Set<String> fieldsToSave = new Set<String>{'RecordTypeId','Estatus__c', 'Name', 'RazonSocial__c', 'Calle__c', 'NumeroExterior__c', 'Colonia__c', 'DelegacionMunicipioFiscal__c', 'CodigoPostal__c', 'Ciudad__c', 'Estado__c'};
-			Set<String> fieldsToSave = new Set<String>{'RecordTypeId','Estatus__c', 'Name', 'RazonSocial__c','Address__c'};
+			Set<String> fieldsToSave = new Set<String>{'RecordTypeId','Estatus__c', 'Name', 'RazonSocial__c','Address__c', 'CountryOrigin__c'};
 			Id recordTypeFisica = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByName().get('Persona Física').getRecordTypeId();
 			Id recordTypeMoral = Schema.SObjectType.EntidadLegal__c.getRecordTypeInfosByName().get('Persona Moral').getRecordTypeId();
 			
@@ -278,7 +278,7 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
 		Map<String, Object> response = new Map<String, Object>();
 		if ( String.isNotBlank( idEntidadCuenta ) ) {
 			//DV
-            response.put('records', [SELECT Id, Cuenta__c, Cuenta__r.Name, EntidadLegal__c, EntidadLegal__r.Calle__c, EntidadLegal__r.TipoSociedad_PL__c,EntidadLegal__r.Ciudad__c, EntidadLegal__r.Direccion_Cuenta__c, EntidadLegal__r.CodigoPostal__c, EntidadLegal__r.Colonia__c, EntidadLegal__r.Cuenta__c, EntidadLegal__r.DelegacionMunicipioFiscal__c, EntidadLegal__r.Estado__c, EntidadLegal__r.Estatus__c, EntidadLegal__r.RazonSocial__c, EntidadLegal__r.NumeroExterior__c, EntidadLegal__r.NumeroInterior__c,EntidadLegal__r.Address__c, EntidadLegal__r.Name, EntidadLegal__r.RecordTypeId, (SELECT Id FROM Administraci_n_de_Ventas__r) FROM EntidadCuenta__c WHERE Id =: idEntidadCuenta]);
+            response.put('records', [SELECT Id, Cuenta__c, Cuenta__r.Name, EntidadLegal__c, EntidadLegal__r.Calle__c, EntidadLegal__r.TipoSociedad_PL__c, EntidadLegal__r.CountryOrigin__c,EntidadLegal__r.Ciudad__c, EntidadLegal__r.Direccion_Cuenta__c, EntidadLegal__r.CodigoPostal__c, EntidadLegal__r.Colonia__c, EntidadLegal__r.Cuenta__c, EntidadLegal__r.DelegacionMunicipioFiscal__c, EntidadLegal__r.Estado__c, EntidadLegal__r.Estatus__c, EntidadLegal__r.RazonSocial__c, EntidadLegal__r.NumeroExterior__c, EntidadLegal__r.NumeroInterior__c,EntidadLegal__r.Address__c, EntidadLegal__r.Name, EntidadLegal__r.RecordTypeId, (SELECT Id FROM Administraci_n_de_Ventas__r) FROM EntidadCuenta__c WHERE Id =: idEntidadCuenta]);
 		    //DV
         } else {
 			response.put('error', 'Parameter @idEntidadCuenta is required');
@@ -434,8 +434,11 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
 	public static void actualizaEstatusEntidad( ContactoEntidad__c contactoEntidad ) {
 		// Verificar si Contacto agregado es extranjero - calvarez 14 de mayo de 2018
 		List<EntidadCuenta__c> entidades = [SELECT Id,Cuenta__r.Sector__c,Cuenta__r.Segmento2__c, EntidadLegal__c, EntidadLegal__r.RecordType.Name, EntidadLegal__r.Estatus__c,EntidadLegal__r.CargaInicial__c FROM EntidadCuenta__c WHERE Id =: contactoEntidad.Entidad_Cuenta__c ];
-		List<ContactoEntidad__c> listaContactos = [ SELECT Id FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =: contactoEntidad.Entidad_Cuenta__c AND Contacto__r.Extranjero__c  = true ];
-		List<ContactoEntidad__c> listaContactos2 = [ SELECT Id FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =:  contactoEntidad.Entidad_Cuenta__c  ];
+		//Inicio cambio SIGLO
+        //List<ContactoEntidad__c> listaContactos = [ SELECT Id FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =: contactoEntidad.Entidad_Cuenta__c AND Contacto__r.Extranjero__c  = true ];
+        List<ContactoEntidad__c> listaContactos = [ SELECT Id FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =: contactoEntidad.Entidad_Cuenta__c AND Contacto__r.Nationality__c != '' AND Contacto__r.Nationality__c != null AND Contacto__r.Nationality__c != 'MEXICO' ];
+		//Fin cambio SIGLO
+        List<ContactoEntidad__c> listaContactos2 = [ SELECT Id FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =:  contactoEntidad.Entidad_Cuenta__c  ];
 		
 		if( entidades != null && entidades.size() > 0  ) {
 			if(!entidades[0].EntidadLegal__r.CargaInicial__c){
@@ -602,4 +605,14 @@ public without sharing class EC_ListaEntidadLegal_LC_Ctrl {
         return options;
     }
     //DV Fin
+  
+    @AuraEnabled
+    public static List<String> getPaisOrigen(){
+        Schema.DescribeFieldResult fieldResult = EntidadLegal__c.CountryOrigin__c.getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        List<String> options2 = new List<String>();
+        
+        for (Schema.PicklistEntry plValue : ple) { options2.add(plValue.getLabel()); }
+        return options2;
+    }
 }

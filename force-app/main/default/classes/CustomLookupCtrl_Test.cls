@@ -27,4 +27,16 @@ public without sharing class CustomLookupCtrl_Test {
             System.assert(searchedUsers.size() == 2 ,'The class return the two users inserted in the test class.');
         }
     }
+    
+    @isTest
+    static void fetchLookupValuesForEconomicActivity() {
+        User userToRun = [SELECT Id FROM User WHERE Alias = 'alias2'];
+        System.runAs(userToRun){
+            Test.startTest();
+            	List<sObject> searchedUsers = CustomLookupCtrl.fetchLookupValues('ABARROTES', 'EconomicActivity__c');
+            Test.stopTest();
+            System.debug(searchedUsers);
+            System.assert(searchedUsers.isEmpty(),'The class return an empty list because we did not insert EconomicActivity__c records in the test class.');
+        }
+    }
 }

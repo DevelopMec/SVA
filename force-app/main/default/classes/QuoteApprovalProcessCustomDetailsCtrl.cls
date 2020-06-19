@@ -20,6 +20,7 @@ public with sharing class QuoteApprovalProcessCustomDetailsCtrl {
         @AuraEnabled public List<ProductoConcepto__c> conceptos{get;set;}
         @AuraEnabled public Decimal elapsedTime{get;set;}
         @AuraEnabled public Boolean isQuote{get;set;}
+        @AuraEnabled public Boolean isPospago{get;set;}//CEAM:3375
     }
 
 /**
@@ -40,6 +41,7 @@ public with sharing class QuoteApprovalProcessCustomDetailsCtrl {
         Id quoteId = null;
         Id recordIdCast = recordId;
         Id processInstanceId = null;
+        Boolean isPospago = false;//CEAM:3375
         //Identify if the current record is a ProcessInstanceStep or a ProcessInstanceWorkItem and get the necesary data. 
         if (recordIdCast.getSobjectType() == Schema.ProcessInstanceStep.getSObjectType()) {
             List<ProcessInstanceStep> stepInfo = [Select ProcessInstance.ElapsedTimeInDays, ProcessInstanceId, ProcessInstance.TargetObjectId, StepStatus, ElapsedTimeInDays 
@@ -71,12 +73,15 @@ public with sharing class QuoteApprovalProcessCustomDetailsCtrl {
         }
         if (isQuote) {
             //Get QuoteLineItems data. 
+            //CEAM:3375 >>
             Quote quoteInfo = [SELECT Opportunity.Account.Segmento_Logo__c, Opportunity.Account.Ejecutivo_Logo__c, Opportunity.Account.Busines__c,
                                Opportunity.Account.Sum_turnover_volume__c, Opportunity.Account.Giro__c, Opportunity.Elapsed_days__c,
                                Opportunity.Owner.Name, Opportunity.Account.Sector__c, Opportunity.Maquilador__c, Opportunity.RecordType.Name, Owner.Name,
                                ApprovalRequestComments__c,Opportunity.Gestor__c, Opportunity.CloseDate, Opportunity.Competidor__c,
                                RequiredApprovalLevel__c, GrantedApprovalLevel__c, NumberOfShipments__c, (SELECT Id, Product2Id, Product2.ProductCode,
-                               Product2.Name, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, CantidadTarjetas__c, UnitPrice, ServiceDate
+                               Product2.Name, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, CantidadTarjetas__c, UnitPrice, ServiceDate,
+                               PaymentMethod__c, ContractingItem__c, ReleasePeriod__c, OperatingLine__c, CreditDays__c, WarrantyType__c, CreditWeeks__c, 
+                               ReleasesNumber__c, TotalCreditDays__c, WarrantyValue__c, PreAnalysis__c
                                FROM QuoteLineItems) FROM Quote WHERE Id =: quoteId];
             if(quoteInfo.RequiredApprovalLevel__c != null) {
                 List<ProcessInstanceStep> listStepInfo = [SELECT Comments FROM ProcessInstanceStep WHERE 
@@ -99,13 +104,19 @@ public with sharing class QuoteApprovalProcessCustomDetailsCtrl {
             Set<Id> quoteLineItemIds = new Set<Id>();
             for (QuoteLineItem quoteLI : quoteInfo.QuoteLineItems) {
                 quoteLineItemIds.add(quoteLI.Id);
+                // CEAM:3375 >>>
+                if(quoteLI.PaymentMethod__c == 'Pospago'){
+                    isPospago = true;
+                }
+                // CEAM:3375 <<<
             }
             //Get ProductoConcepto__c records related to the QuoteLineItem related to the Quote in approval process.
             List<ProductoConcepto__c> conceptos = [SELECT Concepto__r.TipoCargo__c, PrecioLista__c, PrecioLista2__c, PrecioFinal__c,
                                                    Bonificacion__c, VigenciaDescuento__c, CantidadTarjetas__c, ApprovalLevel__c FROM ProductoConcepto__c 
                                                    WHERE PartidaPresupuesto__c IN: quoteLineItemIds ORDER BY Concepto__r.Orden__c];
             res.conceptos = conceptos;
-            res.quoteInfo = quoteInfo; 
+            res.quoteInfo = quoteInfo;
+            res.isPospago = isPospago; // CEAM:3375
         }
         res.isQuote = isQuote; 
         

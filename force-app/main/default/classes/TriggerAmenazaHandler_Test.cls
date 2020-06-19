@@ -59,7 +59,9 @@ public without sharing class TriggerAmenazaHandler_Test {
                 DoNotCall = false,
                 Activo__c = true,
                 CopiarDireccionCuenta__c = false,
-                Extranjero__c = false,
+                //Inicio cambio SIGLO
+                //Extranjero__c = false,
+                //Fin cambio SIGLO
                 Funcion__c = 'Representante Legal',
                 Curp__c = 'PEGD911226MMCRYN04',
                 FM3__c = false,
@@ -130,7 +132,7 @@ public without sharing class TriggerAmenazaHandler_Test {
                 Contacto__c = acc.Contacts[0].Id,
                 Competidor__c = 'Amex',
                 Descripcion__c = 'prueba',
-                Estatus__c = 'En atención',
+                Estatus__c = 'Identificada',
                 Familia__c = 'Ayuda Social',
                 FechaAtricion__c = system.today(),
                 Motivo__c = 'Autoconsumo',
@@ -206,7 +208,7 @@ public without sharing class TriggerAmenazaHandler_Test {
                 Cuenta__c = acc.Id,
                 Competidor__c = 'Amex',
                 Descripcion__c = 'prueba',
-                Estatus__c = 'En atención',
+                Estatus__c = 'Identificada',
                 Familia__c = 'Ayuda Social',
                 FechaAtricion__c = system.today(),
                 Motivo__c = 'Autoconsumo',

@@ -13,13 +13,18 @@ global class Batch_UpdateActivityCounterTask implements Database.Batchable<sObje
             FROM Task 
             WHERE Status = 'Concluida' 
             AND TaskSubtype != 'Email' 
-            AND ActivityType__c = null 
-            AND TaskNumber__c = null 
             AND createdDate >= :fiscalYear
+            ORDER BY createdDate ASC
         ]);
     }
     global void execute(Database.BatchableContext BC, List<Task> listTask){
-        if(listTask.size() > 0){ActivityCounter.generaContadorTipoTarea(listTask);}
+        if(listTask.size() > 0){
+            for(Task tarea : listTask){
+                List<Task> listtaskNew = new List<Task>();
+                listtaskNew.add(tarea);
+                ActivityCounter.generaContadorTipoTarea(listtaskNew);
+            }
+        }
     }
     global void finish(Database.BatchableContext BC){}
 }

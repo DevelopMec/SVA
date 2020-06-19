@@ -11,6 +11,10 @@ Version       Date         Author                   Description
 @isTest
 public class WorkDays_tst {
 
-    @isTest static void testMethod1(){         
+    @isTest static void testMethodgetWorkDays(){         
+
+        Test.startTest();
+            WorkDays.getWorkDays(Datetime.now(),Datetime.now().addDays(5));
+        Test.stopTest();
     }
 }

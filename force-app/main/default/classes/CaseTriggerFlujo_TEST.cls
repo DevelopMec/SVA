@@ -128,10 +128,11 @@ public class CaseTriggerFlujo_TEST {
         update caso;
         
         GruposAtencionFlujo_CONT.escalarRechazarCaso(caso.Id, 'test', 'escalar');
-        caso.Status='En Proceso';
+        caso.Status='Concluido';
         update caso;
         
         GruposAtencionFlujo_CONT.escalarRechazarCaso(caso.Id, 'test', 'escalar');
+
         
         Test.stopTest();
         

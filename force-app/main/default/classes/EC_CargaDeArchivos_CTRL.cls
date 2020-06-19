@@ -416,22 +416,22 @@ public class EC_CargaDeArchivos_CTRL {
 		Boolean foreignFlag = false;
 
 		if(eC != null){
-
-			List<ContactoEntidad__c> listContactos = [SELECT Id,Contacto__c,Contacto__r.Extranjero__c FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =: eC.Id];
-			
+			//Inicio cambio SIGLO
+			//List<ContactoEntidad__c> listContactos = [SELECT Id,Contacto__c,Contacto__r.Extranjero__c FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =: eC.Id];
+			List<ContactoEntidad__c> listContactos = [SELECT Id,Contacto__c,Contacto__r.Nationality__c FROM ContactoEntidad__c WHERE Entidad_Cuenta__c =: eC.Id];
+            //Fin cambio SIGLO
 			if(listContactos.size() > 0){
 
 				for(ContactoEntidad__c cE : listContactos){
 
 					if(!foreignFlag){
-
-						if(cE.Contacto__r.Extranjero__c == true){
-
+					//Inicio cambio SIGLO
+						//if(cE.Contacto__r.Extranjero__c == true){
+						if(cE.Contacto__r.Nationality__c != '' && cE.Contacto__r.Nationality__c != '' && cE.Contacto__r.Nationality__c != 'MEXICO'){
 							foreignFlag = true;
 							break;
-
 						}
-
+					//Fin cambio SIGLO
 					}
 
 				}

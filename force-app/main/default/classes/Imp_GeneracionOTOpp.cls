@@ -17,8 +17,8 @@ public class Imp_GeneracionOTOpp {
         Map<Id,Product2> productosQLI = new Map<Id,Product2>();
         
         try{
-        	//Lista que contiene lar ordenes de trabajo relacionadas a las opp entrantes
-        	WorkOrder ordenOpp = [Select Id ,Oportunidad__c,Oportunidad__r.SyncedQuoteId,Estatus__c,Entidad_Legal__c,IDProductoOpp__c,AccountId,OT_Inactiva__c from WorkOrder where Id =: otId AND Estatus__c = 'Cancelada' AND OT_Inactiva__c = false];		        		                
+            //Lista que contiene lar ordenes de trabajo relacionadas a las opp entrantes
+            WorkOrder ordenOpp = [Select Id ,Oportunidad__c,Oportunidad__r.SyncedQuoteId,Estatus__c,Entidad_Legal__c,IDProductoOpp__c,AccountId,OT_Inactiva__c from WorkOrder where Id =: otId AND Estatus__c = 'Cancelada' AND OT_Inactiva__c = false];                                        
             
             ContratoFilial__c cF = new ContratoFilial__c();
             if(ordenOpp != null){
@@ -54,11 +54,12 @@ public class Imp_GeneracionOTOpp {
                     newWorkOrder.AccountId = ordenOpp.AccountId;
                     newWorkOrder.Entidad_Legal__c = ordenOpp.Entidad_Legal__c;
                     newWorkOrder.Codigo_AS400__c = contrato.CodigoAs400__c;
+                    system.debug('Imp_GeneracionOTOpp: asignar Codigo_AS400__c por Contrato2');
                     ordenOpp.OT_Inactiva__c = true;
                 }
                 //Son Contratos Filiales
                 else{
-                    cF = [Select Id,Orden_de_trabajo__c, CodigoAS400__c from ContratoFilial__c Where Orden_de_trabajo__c =: ordenOpp.Id];
+                    cF = [Select Id, Orden_de_trabajo__c, CodigoAS400__c from ContratoFilial__c Where Orden_de_trabajo__c =: ordenOpp.Id];
                     newWorkOrder.FechaInicio__c = System.today();
                     newWorkOrder.StartDate = System.today();
                     newWorkOrder.OT_Principal__c = false;
@@ -72,10 +73,11 @@ public class Imp_GeneracionOTOpp {
                     newWorkOrder.AccountId = ordenOpp.AccountId;
                     
                     newWorkOrder.Codigo_AS400__c = cF.CodigoAs400__c;
+                    newWorkOrder.Contrato_Filial__c = cF.Id;
+                    system.debug('Imp_GeneracionOTOpp: asignar Codigo_AS400__c por ContratoFilial, asignar lookup');
                     
-                    wOContratoFiliales.put(ordenOpp.Id,newWorkOrder);
+                    wOContratoFiliales.put(ordenOpp.Id, newWorkOrder);
                     ordenOpp.OT_Inactiva__c = true;
-                    
                 }
             }
             try{
@@ -86,7 +88,7 @@ public class Imp_GeneracionOTOpp {
                 if(newWorkOrder.OT_Principal__c != true){
                     cF.Orden_de_trabajo__c = newWorkOrder.Id;
                     update cF;
-                }	
+                }   
                 
                 pR = new PageReference ('/'+newWorkOrder.Id);
             }catch(Exception e){

@@ -122,7 +122,10 @@ private class EC_CargaDeArchivos_CTRL_TEST {
 		Contact contacto = new Contact();
 		contacto.LastName = 'Sola';
 		contacto.AccountId = cuenta.Id;
-		contacto.Extranjero__c = true;
+        //Inicio cambio SIGLO
+		//contacto.Extranjero__c = true;
+        contacto.Nationality__c = 'PERU';
+        //Fin cambio SIGLO
 		contacto.Funcion__c = 'Representante Legal';
         contacto.Curp__c='BADD110313HCMLNS09';
 		insert contacto;

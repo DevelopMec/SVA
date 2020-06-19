@@ -262,6 +262,7 @@ global with sharing class PLAN_CuentaService {
                             Integer approvalPrimerEnvio = 1;
                             Integer approvalTarjetaStock = 1;
                             Integer approvalTarjetaStockPrimer = 1;
+                            Integer approvalCredito = 1;
                             oportunidad.Solicitar_validaci_n_descuentos__c = false;
                             if(OppRecordType != 'Migracion'){
                                 if(quoteData != null && quoteData != 'null') {
@@ -274,6 +275,7 @@ global with sharing class PLAN_CuentaService {
                                         approvalPrimerEnvio = (Integer)quoteInfo.get('approvalPrimerEnvio');
                                         approvalTarjetaStock = (Integer)quoteInfo.get('approvalTarjetaStock');
                                         approvalTarjetaStockPrimer = (Integer)quoteInfo.get('approvalTarjetaStockPrimer');
+                                        approvalCredito = (Integer)quoteInfo.get('approvalCredito');
                                         String quoteId = (string)quoteInfo.get('Id');
                                         comment = (string)quoteInfo.get('userComment');
                                         String owner = (string)quoteInfo.get('owner');
@@ -325,6 +327,7 @@ global with sharing class PLAN_CuentaService {
                                         throw new CustomException('Producto ' + solucion.Product2Id + ' no tiene entrada de lista de precios, en lista Edenred.');      
                                     }
                                 }
+                                solucion.PreAnalysis__c = approvalCredito;
                                 //Map<String, String> mapTest = new Map<String, String>();
                                 //mapTest.put('desc', solucion.Description);
                                 //response.put('QLI_' + indexQLI++, solucion.Description);

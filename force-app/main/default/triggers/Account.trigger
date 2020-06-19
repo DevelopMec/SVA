@@ -1,4 +1,7 @@
-trigger Account on Account (before insert, after insert, after update) {
+trigger Account on Account (after delete, after insert, after undelete, after update, before delete, before insert, before update) {
+
+	new TriggerAccountHandler().run();
+
     if(Trigger.isInsert && Trigger.isBefore){
         Profile perfil = [SELECT Name FROM Profile WHERE Id =: UserInfo.getProfileId()];
         for(Account cuenta : Trigger.new){

@@ -102,7 +102,7 @@ public class AltaContrato_CONT_TEST {
         
         AltaContrato_CONT.getInfoPlantilla(qli.Id);
         AltaContrato_CONT.getInfoQli(qli.Id);
-        AltaContrato_CONT.guardarInfo( c2, '', new list<String>() , false);
+        AltaContrato_CONT.guardarInfo( c2, '', new list<String>() , false, null);
         Contrato2__c c2Te=[Select Id,PartidaPresupuesto__r.Quote.OpportunityId,PartidaPresupuesto__r.Quote.Opportunity.OwnerId from Contrato2__c where Id=:c2.Id];        
         AltaContrato_CONT.generarAfiliados(c2Te, new List<Affiliate__c>{af});
         AltaContrato_CONT.getEstablecimientosRefresh(ac.Id,c2Te.Id);

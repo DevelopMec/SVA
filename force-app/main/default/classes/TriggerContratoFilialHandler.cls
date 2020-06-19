@@ -16,6 +16,11 @@ public class TriggerContratoFilialHandler extends TriggerHandler{
     public override void beforeUpdate(){
         ownerModifiedCheck(newList); 
     }
+
+    public override void afterUpdate(){
+        sendToSIGLO(newList); 
+    }
+
     public void asignarProducto(List<ContratoFilial__c> listProd){  
         Map<String,String> mapaProductos=new Map<String,String>();
         Map<String,String> mapaProductosAs4=new Map<String,String>();
@@ -62,6 +67,35 @@ public class TriggerContratoFilialHandler extends TriggerHandler{
             if(objContratoF.OwnerId != oldMap.get(objContratoF.Id).OwnerId  && objContratoF.ModifyOwnerContract__c  == false ){
                 System.debug('SE MODIFICO EL PROPIETARIO  ' + '* ESTE  : ' +oldMap.get(objContratoF.Id).OwnerId  + ' -----  ' + 'POR ESTE : ' +objContratoF.OwnerId  );
                 objContratoF.ModifyOwnerContract__c =  true;
+            }
+        }
+
+    }
+
+    //Valida si existe algun cambio en los campos que se envian a SIGLO
+    public void sendToSIGLO(List<ContratoFilial__c> lstContract){
+        System.debug('-------SendToSIGLO---------');
+        Set<Id> contractIds = new Set<Id>();
+        for(ContratoFilial__c newContract : newMap.values()){
+            ContratoFilial__c oldContract = oldMap.get(newContract.Id);
+            if(newContract.Contrato_2__c != oldContract.Contrato_2__c || newContract.Producto__c != oldContract.Producto__c){
+                   contractIds.add(newContract.Id);
+               }
+        }
+        if(!contractIds.isEmpty()){
+            List<ContratoFilial__c> cfOpp = [SELECT Contrato_2__c, Producto__c, Contrato_2__r.PartidaPresupuesto__r.Quote.OpportunityId
+                                                FROM ContratoFilial__c 
+                                                WHERE Id IN: contractIds 
+                                                AND Contrato_2__r.PartidaPresupuesto__r.Quote.OpportunityId != null];
+            List<Opportunity> oppListUPD = new List<Opportunity>();
+            for(ContratoFilial__c cf : cfOpp){
+                Opportunity oppToUpdate = new Opportunity(Id= cf.Contrato_2__r.PartidaPresupuesto__r.Quote.OpportunityId, SendToSIGLO__c = true);
+                oppListUPD.add(oppToUpdate);
+                
+            }
+
+            if(!oppListUPD.isEmpty()){
+                update oppListUPD;
             }
         }
 

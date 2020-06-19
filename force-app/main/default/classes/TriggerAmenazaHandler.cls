@@ -20,7 +20,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
     }
     
     public override void beforeInsert(){
-        validateBU(newList, null);
+        //validateBU(newList, null);
         validateRFCSolcionAssignment(newList, null);
         List<OpportunityAndThreatValidation__mdt> threatValidation = [SELECT isActive__c FROM OpportunityAndThreatValidation__mdt WHERE DeveloperName = 'Threat'];
         if ((!threatValidation.isEmpty() && threatValidation[0].isActive__c == true) || Test.isRunningTest()) {
@@ -28,7 +28,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
             Set<Id> secs = new Set<Id>();
             Set<String> sfs = new Set<String>();
             for(Amenaza__c a : this.newList){
-                if(a.Estatus__c == 'En atención'){
+                if(a.Estatus__c == 'Identificada'){
                     sas.add(a.Cuenta__c);
                     secs.add(a.EntidadCuenta_RB__c);
                     sfs.add(a.Familia__c);
@@ -38,7 +38,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
             List<Amenaza__c> las = [
                 Select Id, Cuenta__c, EntidadCuenta_RB__c, Familia__c, Estatus__c
                 from Amenaza__c
-                where Estatus__c = 'En atención'
+                where Estatus__c = 'Identificada'
                 and Cuenta__c in: sas
                 and EntidadCuenta_RB__c in: secs
                 and Familia__c in: sfs
@@ -50,9 +50,9 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
             }
             
             for(Amenaza__c a : this.newList){
-                if(a.Estatus__c == 'En atención'){
+                if(a.Estatus__c == 'Identificada'){
                     if(scas.contains(a.Cuenta__c + '|' + a.EntidadCuenta_RB__c + '|' + a.Familia__c)){
-                        a.AddError ('Ya existe un registro de amenaza con estatus "En atención" para eso mismo RFC Solución');
+                        a.AddError ('Ya existe un registro de amenaza con estatus "Identificada" para eso mismo RFC Solución');
                     }
                 }
             }
@@ -61,7 +61,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
     
     public override void beforeUpdate(){
         validateRFCSolcionAssignment(newList, oldMap);
-        validateBU(newList, oldMap);
+        //validateBU(newList, oldMap);
     }
     
     //Validate if the RFC-Solution has already an executive assigned. 
@@ -133,7 +133,7 @@ public without sharing class TriggerAmenazaHandler extends TriggerHandler{
 						creation.
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-    public static void validateBU(List<Amenaza__c> newList, Map<Id, Amenaza__c> oldMap){
+    /*public static void validateBU(List<Amenaza__c> newList, Map<Id, Amenaza__c> oldMap){
         List<Amenaza__c> threatsToValidate = new List<Amenaza__c> ();
         Set<Id> threatsAccIds = new Set<Id>();
         Set<String> threatsSolutions = new Set<String>();

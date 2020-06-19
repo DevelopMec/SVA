@@ -1,11 +1,12 @@
 /**
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-* @change	13/03/2020 Add opp validaction activation or deactivation with OpportunityAndThreatValidation__mdt.
-* @change	19/03/2020 creaPostADV method functionality moved to 'Estatus de la Oportundiad' process builder.
-* @change	-/03/2020 Add validateRFCSolcionAssignment method [Freeway 2900].
-* @change	27/03/2020 Add validateBU method [Freeway 2901].
+* @change   13/03/2020 Add opp validaction activation or deactivation with OpportunityAndThreatValidation__mdt.
+* @change   19/03/2020 creaPostADV method functionality moved to 'Estatus de la Oportundiad' process builder.
+* @change   -/03/2020 Add validateRFCSolcionAssignment method [Freeway 2900].
+* @change   27/03/2020 Add validateBU method [Freeway 2901].
 * @change   30/03/2020 Add ownerBUValidation method [Freeway 2901].
-* @change	30/04/2020 Add sendPartnersAndAliancesMail method [Freeway 3216].
+* @change   30/04/2020 Add sendPartnersAndAliancesMail method [Freeway 3216].
+* @change   18/06/2020 Add validateLegalRepresentativeData method [Freeway 3219].
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
 public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
@@ -18,7 +19,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     public String newAffiliateRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('RT_NuevaAfiliacion').getRecordTypeId();
     public String newSolutionRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('RT_NuevaSolucion').getRecordTypeId();
     public Set<String> affiliateRecordTypes = new Set<String>{newAffiliateRecordType,newSolutionRecordType};
-        public Map<String,ServiceGroups__c> mapGruposGlob;
+    public Map<String,ServiceGroups__c> mapGruposGlob;
     public Map<String,User> mapUserGlob;    
     
     private List<Opportunity> lisFECGlob;
@@ -63,17 +64,18 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         
         List<OpportunityAndThreatValidation__mdt> threatValidation = [SELECT isActive__c FROM OpportunityAndThreatValidation__mdt WHERE DeveloperName = 'Opportunity'];
         if ((!threatValidation.isEmpty() && threatValidation[0].isActive__c == true) || Test.isRunningTest()) {
-        	ValidateOpportunityWithRFC(this.newList, this.oldMap); //req 2331 FRWY
+            ValidateOpportunityWithRFC(this.newList, this.oldMap); //req 2331 FRWY
         }
         validateRFCSolcionAssignment(newList, oldMap);
-        validateBU(newList, oldMap);
+        //validateBU(newList, oldMap);
+        validateLegalRepresentativeData(newList, oldMap);
     }
     
     public override void beforeInsert(){
         asignarCamposIniciales(newList);
         //validarSemaforos(newList);
         validacionesBP();
-        validateBU(newList, null);
+        //validateBU(newList, null);
         List<OpportunityAndThreatValidation__mdt> threatValidation = [SELECT isActive__c FROM OpportunityAndThreatValidation__mdt WHERE DeveloperName = 'Opportunity'];
         if ((!threatValidation.isEmpty() && threatValidation[0].isActive__c == true) || Test.isRunningTest()) {
             ValidatepadlockOpportunity(newList); //Valida duplicados de op solo incrementos- cambio FWY 2331 HU
@@ -86,7 +88,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         oppPerdidaOTCancelada(this.newList, this.oldMap );
         validarActualizacionFechaEC();
         if (sendMail) {
-        	sendPartnersAndAliancesMail(newList, oldMap);
+            sendPartnersAndAliancesMail(newList, oldMap);
         }
     }
     
@@ -95,6 +97,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             opp.TimestampCotizacion__c=DateTime.now();
         }            
     }
+    
     public void validarCambiosCampos(List<Opportunity> listOpps,Map<Id, Opportunity> oldMapSec){
         for(Opportunity opp: listOpps){
             if(opp.StageName!=oldMapSec.get(opp.Id).StageName&&opp.StageName=='Cotización'){
@@ -102,6 +105,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             }
         }
     }
+    
     //Req 2331 FWY  
     private static void ValidateOpportunityWithRFC(List<Opportunity> newList, Map<Id, Opportunity> oldMap) {
         Set<String> solutionList = new Set<String>();
@@ -180,8 +184,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
     }
 
-    public static boolean ValidateOpDuplicadedIncremento(Opportunity op)
-    {
+    public static boolean ValidateOpDuplicadedIncremento(Opportunity op){
         boolean result=false;
         List<Opportunity> o=new List<Opportunity>();
         o=[Select Entidad_Cuenta__c,StageName,Familia__c,Producto_cotizacion__c 
@@ -194,14 +197,13 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                      and RecordTypeId =: op.RecordTypeId];
         system.debug('result encontrados  '+o.size());
         
-         for(Opportunity opp:o){
-             if(opp.StageName != 'Ganada' || opp.StageName != 'Perdida')
+        for(Opportunity opp:o){
+            if(opp.StageName != 'Ganada' || opp.StageName != 'Perdida')
                 if(o.size()>0)
                 {
                    result=true; 
                 }
-        
-         }
+        }
         system.debug('result duplicate '+result);
         return result;
     }
@@ -303,6 +305,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
         return res;
     }
+    
     public boolean esUpselling(List<ContratoFilial__c> listSub,String familia,String idOp){
         boolean res=false;
         for(ContratoFilial__c cf : listSub){
@@ -599,37 +602,36 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     private void validarDirEntrega(List<Opportunity> newList){
         //DVM Para validar que tenga una dirección de entrega asociada
         //Arma un mapa con las oportunidades que pasan a ADV
-            Map<Id,Opportunity> oppsAltaCliente = new Map<Id,Opportunity>();
-            for(Opportunity opp : newList){ if( opp.StageName == 'Alta de cliente' ){ oppsAltaCliente.put(opp.Id, opp); } }
+        Map<Id,Opportunity> oppsAltaCliente = new Map<Id,Opportunity>();
+        for(Opportunity opp : newList){ if( opp.StageName == 'Alta de cliente' ){ oppsAltaCliente.put(opp.Id, opp); } }
             
-            if(oppsAltaCliente.size() > 0){
-                //Arma un Mapa de contratos identificados por el ID de OPP
-                List<Contrato2__c> contratosRel = new List<Contrato2__c>([SELECT Id,EtapaContrato__c, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.OpportunityId FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId = :oppsAltaCliente.keySet() order by CreatedDate ASC]);
-                Map<Id,Contrato2__c> mapContratos = new Map<Id,Contrato2__c>();
-                for(Contrato2__c contrato : contratosRel){ mapContratos.put(contrato.PartidaPresupuesto__r.Quote.OpportunityId, contrato); }
+        if(oppsAltaCliente.size() > 0){
+            //Arma un Mapa de contratos identificados por el ID de OPP
+            List<Contrato2__c> contratosRel = new List<Contrato2__c>([SELECT Id,EtapaContrato__c, DireccionesAuxiliares__c, PartidaPresupuesto__r.Quote.OpportunityId FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId = :oppsAltaCliente.keySet() order by CreatedDate ASC]);
+            Map<Id,Contrato2__c> mapContratos = new Map<Id,Contrato2__c>();
+            for(Contrato2__c contrato : contratosRel){ mapContratos.put(contrato.PartidaPresupuesto__r.Quote.OpportunityId, contrato); }
                 
-                //Arma un mapa de objeto intermedio de direcciones identificados por el ID de la opp
-                Set<Contrato_Direccion__c> dirEntregaRel = new Set<Contrato_Direccion__c>([SELECT Id, ContratoId__r.PartidaPresupuesto__r.Quote.OpportunityId FROM Contrato_Direccion__c WHERE ContratoId__r.PartidaPresupuesto__r.Quote.OpportunityId =: oppsAltaCliente.keySet()]);
-                Map<Id,Contrato_Direccion__c> mapDirEntrega = new Map<Id,Contrato_Direccion__c>();
-                for(Contrato_Direccion__c dirEntrega : dirEntregaRel){ mapDirEntrega.put(dirEntrega.ContratoId__r.PartidaPresupuesto__r.Quote.OpportunityId, dirEntrega);}    
-                
-                for(Opportunity oppADV : oppsAltaCliente.Values()){
-                    System.debug('========');
-                    //System.debug('mapDirEntrega  ' + mapDirEntrega.containsKey(oppADV.Id));
-                    //System.debug('mapContratos  ' + mapContratos.get(oppADV.Id).DireccionesAuxiliares__c);
-                    if(mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).EtapaContrato__c != 'Finalizado'){
-                        oppADV.addError('Necesita Finalizar el contrato para poder pasar a ADV');
-                    }
-                    if(!mapDirEntrega.containsKey(oppADV.Id) && !affiliateRecordTypes.contains(oppADV.recordTypeId) && mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).DireccionesAuxiliares__c == false ){
-                        oppADV.addError('Necesita agregar una Dirección de Entrega para poder pasar a ADV');
-                    }
+            //Arma un mapa de objeto intermedio de direcciones identificados por el ID de la opp
+            Set<Contrato_Direccion__c> dirEntregaRel = new Set<Contrato_Direccion__c>([SELECT Id, ContratoId__r.PartidaPresupuesto__r.Quote.OpportunityId FROM Contrato_Direccion__c WHERE ContratoId__r.PartidaPresupuesto__r.Quote.OpportunityId =: oppsAltaCliente.keySet()]);
+            Map<Id,Contrato_Direccion__c> mapDirEntrega = new Map<Id,Contrato_Direccion__c>();
+            for(Contrato_Direccion__c dirEntrega : dirEntregaRel){ mapDirEntrega.put(dirEntrega.ContratoId__r.PartidaPresupuesto__r.Quote.OpportunityId, dirEntrega);}    
+               
+            for(Opportunity oppADV : oppsAltaCliente.Values()){
+                System.debug('========');
+                //System.debug('mapDirEntrega  ' + mapDirEntrega.containsKey(oppADV.Id));
+                //System.debug('mapContratos  ' + mapContratos.get(oppADV.Id).DireccionesAuxiliares__c);
+                if(mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).EtapaContrato__c != 'Finalizado'){
+                    //oppADV.addError('Necesita Finalizar el contrato para poder pasar a ADV');
+                }
+                if(!mapDirEntrega.containsKey(oppADV.Id) && !affiliateRecordTypes.contains(oppADV.recordTypeId) && mapContratos.containsKey(oppADV.Id) && mapContratos.get(oppADV.Id).DireccionesAuxiliares__c == false ){
+                    oppADV.addError('Necesita agregar una Dirección de Entrega para poder pasar a ADV');
                 }
             }
         }
+    }
     
     /*corrección de codificación Rodolfo Ricardo Sánchez 15-Mayo-18*/
     public void validarCamposOpp(List<Opportunity> newList){
-        
         List<Id> oppIdList = new List<Id>();
         List<Id> oppIdListContrato = new List<Id>();
         List<Opportunity> oppFilterList = new List<Opportunity>();
@@ -689,17 +691,53 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
 
         /*************/    
         Set<String> oppSinMetodoPago=new Set<String>();
+        Set<String> oppDocModPago=new Set<String>();//CEAM:3375
+        Set<String> requiredDocModPago=new Set<String>();//CEAM:3375
+        List<DocumentosModalidadPago__mdt> docsModPago = new List<DocumentosModalidadPago__mdt>();//CEAM:3375
         if(oppIdListContrato!=null&&oppIdListContrato.size()>0){
-            List<Quote> lstQuoteContrato = [SELECT Id, OpportunityId, (SELECT Id,FormaPago__c FROM QuoteLineItems WHERE Escalonamiento__c = null limit 1) FROM Quote WHERE OpportunityId IN: oppIdListContrato AND IsSyncing = true ];
+            List<Quote> lstQuoteContrato = [SELECT Id, OpportunityId, (SELECT Id,FormaPago__c, DocumentType__c FROM QuoteLineItems WHERE Escalonamiento__c = null limit 1) FROM Quote WHERE OpportunityId IN: oppIdListContrato AND IsSyncing = true ];
             for( Quote q : lstQuoteContrato ) {
                 for(QuoteLineItem qli:q.QuoteLineItems){
                     if(qli.FormaPago__c==null&&!oppSinMetodoPago.contains(q.OpportunityId)){
                         oppSinMetodoPago.add(q.OpportunityId);
                     }
+                    if(qli.DocumentType__c != null){//CEAM:3375 >>>
+                        oppDocModPago.add(qli.DocumentType__c);//
+                    }//CEAM:3375 <<<
                 }
             }
         }
         /************/
+        //CEAM:3375 >>>
+        if(oppDocModPago.size() > 0) {
+            system.debug('oppDocModPago: '+oppDocModPago);
+            docsModPago = [SELECT Id, Label, FormatoBuroOriginal__c, CartaStandBy__c, EstadosFinancieros__c, DeclaracionesHacienda__c, EstudioRiesgo__c, FianzaCredito__c FROM DocumentosModalidadPago__mdt Where Label =: oppDocModPago Limit 1];
+        }
+
+        if(docsModPago.size() > 0) {
+            for(DocumentosModalidadPago__mdt docModPago: docsModPago) {
+                if(docModPago.FormatoBuroOriginal__c) {
+                    requiredDocModPago.add(Schema.DocumentosModalidadPago__mdt.fields.FormatoBuroOriginal__c.getDescribe().getLabel());
+                }
+                if(docModPago.CartaStandBy__c) {
+                    requiredDocModPago.add(Schema.DocumentosModalidadPago__mdt.fields.CartaStandBy__c.getDescribe().getLabel());
+                }
+                if(docModPago.EstadosFinancieros__c) {
+                    requiredDocModPago.add(Schema.DocumentosModalidadPago__mdt.fields.EstadosFinancieros__c.getDescribe().getLabel());
+                }
+                if(docModPago.DeclaracionesHacienda__c) {
+                    requiredDocModPago.add(Schema.DocumentosModalidadPago__mdt.fields.DeclaracionesHacienda__c.getDescribe().getLabel());
+                }
+                if(docModPago.EstudioRiesgo__c) {
+                    requiredDocModPago.add(Schema.DocumentosModalidadPago__mdt.fields.EstudioRiesgo__c.getDescribe().getLabel());
+                }
+                if(docModPago.FianzaCredito__c) {
+                    requiredDocModPago.add(Schema.DocumentosModalidadPago__mdt.fields.FianzaCredito__c.getDescribe().getLabel());
+                }
+            }
+        }
+        system.debug('requiredDocModPago: '+ requiredDocModPago);
+        //CEAM:3375 <<<
         
         for( Opportunity opp : newList ) {
            if( opp.StageName.startsWithIgnoreCase('Alta de cliente') ) {
@@ -710,6 +748,28 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                if(oppSinMetodoPago.contains(opp.Id)&&!affiliateRecordTypes.contains(opp.recordTypeId)){
                    opp.addError('Debe agregar un metodo de pago en la cotización para poder pasar a Contrato');
                }
+               /*
+				if( opp.StageName == 'Contrato' ) {//CEAM:3375 >>>
+                        if(requiredDocModPago.size() > 0) {
+                            String reqdocuments = '';
+                            for(String reqdoc : requiredDocModPago) {
+                                for( ContentDocumentLink att : mapOppAttch.get(opp.Id) ) {
+                                    if( att.ContentDocument != null && String.isNotBlank(att.ContentDocument.Title) ) {
+                                        system.debug('reqdoc: '+ reqdoc);
+                                        system.debug('att.ContentDocument.Title: '+ att.ContentDocument.Title);
+                                        if(reqdoc != att.ContentDocument.Title){
+                                            reqdocuments+=reqdoc+',';
+                                        }
+                                    }
+                                }
+                            }
+                            if(reqdocuments != '') {
+                                opp.addError('No puede cambiar la etapa de la oportunidad, requiere adjuntar los documentos: '+ reqdocuments.removeEnd(','));
+                            }
+                        }
+                    }//CEAM:3375 <<<				
+
+				*/
            }
         }   
 
@@ -788,9 +848,29 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             //Se recorren las Oportunidades Filtradas
             List<Contrato2__c> listaContratos = new List<Contrato2__c>();
             getDatosGrupo();
-			//List<ConnectApi.BatchInput> batchInputs = new List<ConnectApi.BatchInput>();
+            //List<ConnectApi.BatchInput> batchInputs = new List<ConnectApi.BatchInput>();
             for( Opportunity opp : oppFilterList ) {
-                try {
+                try {/*
+                    if( opp.StageName == 'Contrato' ) {//CEAM:3375 >>>
+                        if(requiredDocModPago.size() > 0) {
+                            String reqdocuments = '';
+                            for(String reqdoc : requiredDocModPago) {
+                                for( ContentDocumentLink att : mapOppAttch.get(opp.Id) ) {
+                                    if( att.ContentDocument != null && String.isNotBlank(att.ContentDocument.Title) ) {
+                                        system.debug('reqdoc: '+ reqdoc);
+                                        system.debug('att.ContentDocument.Title: '+ att.ContentDocument.Title);
+                                        if(reqdoc != att.ContentDocument.Title){
+                                            reqdocuments+=reqdoc+',';
+                                        }
+                                    }
+                                }
+                            }
+                            if(reqdocuments != '') {
+                                opp.addError('No puede cambiar la etapa de la oportunidad, requiere adjuntar los documentos: '+ reqdocuments.removeEnd(','));
+                            }
+                        }
+                    } */ //CEAM:3375 <<<
+
                     if( opp.StageName == 'Alta de cliente' ) {
                         Boolean isContratofirmado = false;
                         Boolean isIdDelCliente = false;
@@ -814,10 +894,8 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                             if( att.ContentDocument != null && String.isNotBlank(att.ContentDocument.Title) ) {
                                 if( att.ContentDocument.Title.indexOf('Contrato o Propuesta firmados') != -1 ) {
                                     isContratofirmado = true;
-
                                 } else if( att.ContentDocument.Title.indexOf('Id. de Cliente') != -1 ) {
                                     isIdDelCliente = true;
-                                    
                                 } else if( att.ContentDocument.Title.indexOf('Registro Patronal') != -1 ) {
                                     isRegistroPatronal = true;                                    
                                 }
@@ -848,7 +926,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                             } else {
                                                 //System.debug('usuarioFalse:'+usuarioFalse);
                                                 usuarioADV = getEjecutioADVTRUE('Ejecutivo_de_Administracion_de_Ventas', 'Clientes Edenred', 'ADV_Edenred'); //Original manda a llamar al método comentado getEjecutioADVFALSE;
-    
                                             }
     
                                             if( usuarioADV != null ) {
@@ -899,11 +976,9 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                             }
                                         } else {
                                             opp.addError('No puede cambiar la etapa de la oportunidad por que el contarto no tiene un numero de asignacion ADV');
-                                 
                                         }
                                     } else {
                                         opp.addError('No puede cambiar la etapa de la oportunidad por que no tiene un contrato asociado');
-                           
                                     }
                                 } else {
                                     opp.addError('No puede cambiar la etapa de la oportunidad por que no tiene un Contrato Finalizado Firmado');
@@ -925,11 +1000,10 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             }
             /*if( batchInputs != null && batchInputs.size() > 0 ) {
                 System.debug('CHATTERPOSTS:'+batchInputs.size());
-				ConnectApi.ChatterFeeds.postFeedElementBatch(Network.getNetworkId(), batchInputs);
+                ConnectApi.ChatterFeeds.postFeedElementBatch(Network.getNetworkId(), batchInputs);
             }*/
             actualizarGrupos();
         }
-                           
     }  
     
     public void getDatosGrupo(){
@@ -978,6 +1052,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         }
         return usr;
     }
+    
     private void restructureQueue(String grupoAtencion,Integer index,List<String> usuariosColaActual){
         System.debug('::restructureQueue::');
         System.debug('INI::'+usuariosColaActual);
@@ -987,6 +1062,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         System.debug('FIN::'+usuariosColaActual);
         mapGruposGlob.get(grupoAtencion).Users__c=String.join(usuariosColaActual, ';');
     }
+    
     private void actualizarGrupos(){
         System.debug('::actualizarGrupos::');
         List<ServiceGroups__c> listUp = new List<ServiceGroups__c>();
@@ -1088,7 +1164,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                 }
             }
 
-
             for( Opportunity opp: opps ) {
                 // Verificar que la oportunidad está cambiando a StageName = 'Alta de cliente'
                 if( oldMap.containsKey(opp.Id) && opp.StageName != null && opp.StageName == 'Alta de cliente' && oldMap.get(opp.Id).StageName != 'Alta de cliente' ) {
@@ -1130,8 +1205,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                         update negocio;
                         System.debug('Después de actualizar de nuevo');
                     }
-
-
                 }
             }
         }
@@ -1244,8 +1317,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             
             //Loop para verificar de la lista de Opp entrante cuales de ellas cambiaron de etapa y asignarlas al set de Ids
             for(Opportunity opp: opps ) {
-                
-                
                 // Verificar que la oportunidad está cambiando a StageName = 'Implementación'
                 if(oldMap.containsKey(opp.Id) && opp.StageName != null && opp.StageName == 'Implementación' && oldMap.get(opp.Id).StageName != 'Implementación' ) {
                     Boolean flagOpp = false;
@@ -1261,7 +1332,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
             }
             
             if(oppsIdValidado.size() > 0){
-                
                 //Loop para obtener los Id de las cotizaciones sincronizadas y en base a estás obtener las partidas relacionadas
                 for(Opportunity oportunidad : [Select SyncedQuoteId from Opportunity where Id in: oppsIdValidado]){
                     System.debug(oportunidad.SyncedQuoteId);
@@ -1288,13 +1358,19 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                 Map<Id,String> oppProducto = new Map<Id,String>();
                 
                 //Se instancian las OT principales y se agregan a la lista de OTs a guardar, se agrega el Id de Contrato a un set de Ids para la posterior busqueda de filiales
-                for(Contrato2__c contratos : [Select Id, Name,TipoPedidoTarjetas__c, Entidad_Legal__c, CodigoAs400__c, PartidaPresupuesto__r.Quote.OpportunityId,Personalizacion_de_Tarjetas__c, PartidaPresupuesto__r.Quote.Opportunity.AccountId, PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c,PartidaPresupuesto__r.Product2Id,PartidaPresupuesto__r.Product2.ProductCode from Contrato2__c where PartidaPresupuesto__c in: qlitems]){
+                for(Contrato2__c contratos : [Select Id, Name, TipoPedidoTarjetas__c, Entidad_Legal__c, CodigoAs400__c,
+                                                     PartidaPresupuesto__r.Quote.OpportunityId,Personalizacion_de_Tarjetas__c,
+                                                     PartidaPresupuesto__r.Quote.Opportunity.AccountId,
+                                                     PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c,
+                                                     PartidaPresupuesto__r.Product2Id, PartidaPresupuesto__r.Product2.ProductCode, 
+                                                     (Select Id from Contratos_Filial__r where isPrime__c = true)
+                                                from Contrato2__c
+                                               where PartidaPresupuesto__c in: qlitems]){
                     if(contratos.CodigoAs400__c != null && contratos.PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c != '1' && contratos.PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c != '3' && contratos.PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c != '9'){
                         WorkOrder ot = new WorkOrder();
                         ot.FechaInicio__c = System.today();
                         ot.StartDate = System.today();
                         ot.OT_Principal__c = true;
-                        
                         
                         //Se valida el campo OT_Estatus_Pedido_Fondos__c para determinar si la OT requiere pasar por la etapa de Pedido de tarjetas y capacitación o si se va directo a Pedido
                         if(productosQLI.get(contratos.PartidaPresupuesto__r.Product2Id).OT_Estatus_Pedido_Fondos__c == true){
@@ -1309,7 +1385,13 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                         ot.Entidad_Legal__c = contratos.Entidad_Legal__c;
                         //Se agrega el rastreo del nombre de la relación
                         ot.NombreEL__c = contratos.Name;
+                        
                         ot.Codigo_AS400__c = contratos.CodigoAs400__c;
+                        if(contratos.Contratos_Filial__r != null && !contratos.Contratos_Filial__r.isEmpty()){
+                            ot.Contrato_Filial__c = contratos.Contratos_Filial__r[0].Id;
+                        }
+                        system.debug('TriggerOpportunityHandler: asignar Codigo_AS400__c por Contrato2');
+                        
                         ot.Personalizacion_de_tarjetas__c = contratos.Personalizacion_de_Tarjetas__c;
                         ot.LayoutPersonalizacionTarjetas__c = '';
                         
@@ -1318,7 +1400,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                             ot.LayoutPersonalizacionTarjetas__c = Test.isRunningTest() ? '' : (mapOppAttach.isEmpty() ? '' : (mapOppAttach.containsKey(ot.Oportunidad__c) ? mapOppAttach.get(ot.Oportunidad__c) : ''));
                                 /*oppProductoWO.put(ot.NombreEL__c,contratos.PartidaPresupuesto__r.Product2.ProductCode);*/
                                 oppProducto.put(ot.Oportunidad__c,contratos.PartidaPresupuesto__r.Product2.ProductCode);
-                            
                             
                             if(productosWOrder.size() == 0){
                                 productosWOrder.add(contratos.PartidaPresupuesto__r.Quote.Opportunity.Codigo_Producto_cotizacion__c);
@@ -1353,6 +1434,8 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                         //Se agrega el nombre del contrato filial
                         ot.NombreEL__c = contratosFilial.Name;
                         ot.Codigo_AS400__c = contratosFilial.CodigoAs400__c;
+                        ot.Contrato_Filial__c = contratosFilial.Id;
+                        system.debug('TriggerOpportunityHandler: asignar Codigo_AS400__c por ContratoFilial, asignar lookup');
                         ot.Personalizacion_de_Tarjetas__c = contratosFilial.Contrato_2__r.Personalizacion_de_Tarjetas__c;
                         ot.LayoutPersonalizacionTarjetas__c = '';
                         
@@ -1370,15 +1453,10 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     }
                 }
                 
-                
                 Map<String,String> mapPersonalizacionTarjetas = new Map<String,String>();
-                
                 
                 if(ordenesTrabajo.size()>0){
                     System.debug(ordenesTrabajo);
-                    
-                    
-                    
                     //        if(productosWOrder.size() > 0){
                     
                     //         List<PersonalizacionTarjetas__mdt> pT = [SELECT Id, Label,CodigoProductos__c FROM PersonalizacionTarjetas__mdt];
@@ -1405,7 +1483,6 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     //   }
                     
                     //   System.debug('codigoOpp:'+codigoOpp);
-                    
                     
                     //         for(Attachment atta :[SELECT Id, Name, ParentId FROM Attachment WHERE ParentId IN: oppsId AND Name IN: codigoOpp]){
                     //             System.debug('Attachments :'+atta);
@@ -1488,7 +1565,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     }
 
    //Edenred
-	// 12/03/2020 Freway 2324. Method creaTareaADV is replaced by creaPostADV.
+    // 12/03/2020 Freway 2324. Method creaTareaADV is replaced by creaPostADV.
     /*public ConnectApi.BatchInput creaPostADV( Contrato2__c contrato, Opportunity opp ) {
         ConnectApi.FeedItemInput feedItemInput = new ConnectApi.FeedItemInput();
         ConnectApi.MentionSegmentInput mentionSegmentInput = new ConnectApi.MentionSegmentInput();
@@ -1511,8 +1588,8 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
         return batchInput;*/
         //DYAMPI
         /*return new Task(isAlert__c=true,Subject='Se te ha asignado un Folio para Alta de Cliente: '+ opp.NumeroAltaCliente__c ,OwnerId=opp.IdEjecutivoADV__c,
-		WhatId=contrato.Id,Description='Esta tarea esta relacionada a la oportunidad que se le ha asignado, favor de revisarla para el proceso de Alta de cliente',
-		Priority='Normal',Status='No iniciada',ActivityDate= system.today());*/
+        WhatId=contrato.Id,Description='Esta tarea esta relacionada a la oportunidad que se le ha asignado, favor de revisarla para el proceso de Alta de cliente',
+        Priority='Normal',Status='No iniciada',ActivityDate= system.today());*/
     //}
 
     //Validate if the RFC-Solution has already an executive assigned. 
@@ -1550,6 +1627,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
                 }
             }
+            List<Opportunity> oppsToBeInserted = new List<Opportunity>();
             if (!rolesWithoutLocks.contains(currentUserRole) && fieldSalesRolesList.contains(currentUserRole)) {
                 List<ContratoFilial__c> contratosActivos = [SELECT Entidad_Cuenta__c, Entidad_Cuenta__r.Cuenta__c, Producto__r.Family, Owner.Name, OwnerId FROM ContratoFilial__c
                                                             WHERE Entidad_Cuenta__r.Cuenta__c IN: oppsAccIds AND Producto__r.Family != null
@@ -1570,8 +1648,35 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                     }
                     if (contratosMap.containsKey(oppToValidate.AccountId + '-' + oppToValidate.Entidad_Cuenta__c + '-' + solucionAmenaza)) {
                         oppToValidate.addError('Ya existe un ejecutivo asignado para ese RFC en esa solución.');
+                    } else {
+                        oppsToBeInserted.add(oppToValidate);
                     }
                 }    
+            }
+            if (!oppsToBeInserted.isEmpty()) {
+                List<User> userRoleName = [SELECT UserRole.Name FROM User WHERE Id =: UserInfo.getUserId()];
+                if (!userRoleName.IsEmpty()) {
+                    List<Roles_BusinessUnits_Solutions__mdt> bUSolutions = [Select AllowedSolutions__c
+                                                                            FROM Roles_BusinessUnits_Solutions__mdt
+                                                                            WHERE MasterLabel =: userRoleName[0].UserRole.Name
+                                                                            AND BusinessUnit__c != 'Multiproducto'];
+                    if (!bUSolutions.isEmpty()) {
+                        List<String> solutionsList = bUSolutions[0].AllowedSolutions__c.split(',');
+                        for (Opportunity oppToBeInserted : oppsToBeInserted) {
+                            String solution = oppToBeInserted.Familia__c;
+                            if (solution == 'Ayuda Social') {
+                                solution = 'Ayuda social';
+                            }
+                            //Determine if the opp will be added to the 'Apadrinados' campaign.
+                            if (!solutionsList.contains(solution)) {
+                                if(!Test.isRunningTest()) {
+                                    oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
+                                }
+                                oppToBeInserted.OwnerChangeRequired__c = true;   
+                            }
+                        }
+                    }
+                }                
             }
         }
     }
@@ -1596,13 +1701,13 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     
     /**
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-* @Created	27/03/2020 	Description: Check if there is an excecutive already assigned to the business unit related
-						to the solution added to the opp record, if so, show a message and avoid the record
-						creation. If tue user create an opp related to an other business unit solution, the opp is 
-						related to the 'Apadrinados' campaign.
+* @Created  27/03/2020  Description: Check if there is an excecutive already assigned to the business unit related
+                        to the solution added to the opp record, if so, show a message and avoid the record
+                        creation. If tue user create an opp related to an other business unit solution, the opp is 
+                        related to the 'Apadrinados' campaign.
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
-    public static void validateBU(List<Opportunity> newList, Map<Id, Opportunity> oldMap){
+    /*public static void validateBU(List<Opportunity> newList, Map<Id, Opportunity> oldMap){
         List<Opportunity> oppsToValidate = new List<Opportunity> ();
         Set<Id> threatsAccIds = new Set<Id>();
         Set<String> oppsSolutions = new Set<String>();
@@ -1645,7 +1750,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                 if (fieldSalesRole.DoNotApplyLocks__c) {
                     rolesWithoutLocks.add(fieldSalesRole.MasterLabel);
                 } else {
-                 	fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
+                    fieldSalesRolesList.add(fieldSalesRole.MasterLabel);
                 }
             }
             if (!rolesWithoutLocks.contains(currentUserRole) && fieldSalesRolesList.contains(currentUserRole)) {
@@ -1718,7 +1823,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                 //Determine if the opp will be added to the 'Apadrinados' campaign.
                                 if (!solutionsList.contains(solution)) {
                                     if(!Test.isRunningTest()) {
-                                        //oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
+                                        oppToBeInserted.CampaignId = System.Label.ApadrinadosCampaignId;
                                     }
                                     oppToBeInserted.OwnerChangeRequired__c = true;   
                                 }
@@ -1728,12 +1833,12 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                 }
             }
         }
-    }
+    }*/
     
 /**
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-* @Created	30/03/2020 	Description: If the opp needs an owner change, validate if the new owner is from the correct
-						business unit based on the opp solution. 
+* @Created  30/03/2020  Description: If the opp needs an owner change, validate if the new owner is from the correct
+                        business unit based on the opp solution. 
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
     public static void ownerBUValidation(List<Opportunity> newList, Map<Id, Opportunity> oldMap){
@@ -1788,13 +1893,13 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
     
 /**
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-* @Created	29/04/2020 	Description: If the opp is related to an aliance or partner, it sends the mail to the contact
-						designed to the aliance or partner when the opp changes to the 'Implementación' stage.
+* @Created  29/04/2020  Description: If the opp is related to an aliance or partner, it sends the mail to the contact
+                        designed to the aliance or partner when the opp changes to the 'Implementación' stage.
 * ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 */
     public static void sendPartnersAndAliancesMail(List<Opportunity> newList, Map<Id, Opportunity> oldMap){ 
         List<Opportunity> oppsToValidate = new List<Opportunity>(); 
-        Set<String> partnersAndAaliances = new Set<String>(); 
+        Set<String> partnersAndAaliances = new Set<String>();
         for(Opportunity opp: newList){
             if (opp.StageName != oldMap.get(opp.Id).StageName && oldMap.get(opp.Id).StageName == 'Alta de cliente' && opp.StageName == 'Implementación' && String.isNotEmpty(opp.PartnersAliances__c)) {
                 oppsToValidate.add(opp);
@@ -1836,7 +1941,7 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                                 List<String> emailAdresses = new List<String>();
                                 if (!Test.isRunningTest()) {
-                                	emailAdresses.addAll(contactsMap.get(alianzaOrPartner));
+                                    emailAdresses.addAll(contactsMap.get(alianzaOrPartner));
                                 } else {
                                     emailAdresses.add('correoparaclasestest@correotest.com');
                                 }
@@ -1859,6 +1964,129 @@ public without sharing class TriggerOpportunityHandler  extends TriggerHandler{
                         }
                     }
                     Messaging.sendEmail(mails);
+                }
+            }
+        }
+    }
+
+/**
+* ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+* @Created  17/06/2020  Description: If the opp is related to a product that is sent to SIGLO, when the stage
+						changes from 'Alta de cliente' to 'Implementación', it checks legal representative mandatory
+						fields.
+* ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+*/
+    public static void validateLegalRepresentativeData(List<Opportunity> newList, Map<Id, Opportunity> oldMap){
+        Set<Id> oppIds = new Set<Id>();
+        Set<Opportunity> oppsToValidate = new Set<Opportunity>();
+        for(Opportunity opp: newList){
+            if (opp.StageName != oldMap.get(opp.Id).StageName && oldMap.get(opp.Id).StageName == 'Alta de cliente' 
+                && opp.StageName == 'Implementación') {
+                    oppIds.add(opp.Id);
+                    oppsToValidate.add(opp);
+                }
+        }
+        if (!oppsToValidate.isEmpty()) {
+            List<Contrato2__c> contratosList = [SELECT Id, PartidaPresupuesto__r.Quote.OpportunityId, Contacto__r.Id, Contacto__r.Funcion__c,
+                                                Contacto__r.Gender__c, Contacto__r.Birthdate, Contacto__r.BirthCountry__c, Contacto__r.BirthState__c,
+                                                Contacto__r.OtherBirthState__c, Contacto__r.Nationality__c, Contacto__r.ProfessionName__c, Contacto__r.ElectorID__c,
+                                                Entidad_Legal__r.PersonType__c FROM Contrato2__c WHERE PartidaPresupuesto__r.Quote.OpportunityId IN: oppIds
+                                                AND Contacto__c != NULL AND Contacto__r.Funcion__c = 'Representante Legal' AND Entidad_Legal__c != NULL
+                                                AND PartidaPresupuesto__r.Product2.SendToSIGLO__c = TRUE AND Entidad_Legal__r.PersonType__c != NULL];
+            if (!contratosList.isEmpty()) {
+                Map<Id, Contrato2__c> oppsContractsMap = new Map<Id, Contrato2__c>();
+                for (Contrato2__c contract: contratosList) {
+                    oppsContractsMap.put(contract.PartidaPresupuesto__r.Quote.OpportunityId, contract);
+                }
+                Set<Opportunity> foreingOpps = new Set<Opportunity>();
+                Set<Id> contactIds = new Set<Id>();
+                
+                //Mapa de la oportunidad y los campos del representante legal faltantes.
+                Map<Id, Set<String>> oppsWihtError = new Map<Id, Set<String>>();
+                
+                //Set de las oportunidades con error, pues faltan campos del representante legal.
+                Set<Opportunity> finalOppsWithErrors = new Set<Opportunity>();
+                for (Opportunity oppToValidate: oppsToValidate) {
+                    if (oppsContractsMap.containsKey(oppToValidate.Id)) {
+                        String personType = oppsContractsMap.get(oppToValidate.Id).Entidad_Legal__r.PersonType__c;
+                        Set<String> emptyFields = new Set<String>();
+                        //Validaciones para personas físicas
+                        if (personType.contains('Física')) {
+                            if(oppsContractsMap.get(oppToValidate.Id).Contacto__r.Gender__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.Gender__c == '') {
+                                emptyFields.add(Schema.Contact.fields.Gender__c.getDescribe().getLabel());
+                            }
+                            if (oppsContractsMap.get(oppToValidate.Id).Contacto__r.Birthdate == null) {
+                                emptyFields.add(Schema.Contact.fields.Birthdate.getDescribe().getLabel());
+                            }
+                            if (oppsContractsMap.get(oppToValidate.Id).Contacto__r.BirthCountry__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.BirthCountry__c == '') {
+                                emptyFields.add(Schema.Contact.fields.BirthCountry__c.getDescribe().getLabel());
+                            } else {
+                                //Validación para persona nacida en Mexico
+                                if (oppsContractsMap.get(oppToValidate.Id).Contacto__r.BirthCountry__c == 'MEXICO' && (oppsContractsMap.get(oppToValidate.Id).Contacto__r.BirthState__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.BirthState__c == '')) {
+                                    emptyFields.add(Schema.Contact.fields.BirthState__c.getDescribe().getLabel());
+                                    //Validación para persona nacida en un país diferente a Mexico
+                                } else if (oppsContractsMap.get(oppToValidate.Id).Contacto__r.BirthCountry__c != 'MEXICO' && (oppsContractsMap.get(oppToValidate.Id).Contacto__r.OtherBirthState__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.OtherBirthState__c == '')) {
+                                    emptyFields.add(Schema.Contact.fields.OtherBirthState__c.getDescribe().getLabel());
+                                }
+                            }
+                            if (oppsContractsMap.get(oppToValidate.Id).Contacto__r.Nationality__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.Nationality__c == '') {
+                                emptyFields.add(Schema.Contact.fields.Nationality__c.getDescribe().getLabel());
+                            }
+                            if (oppsContractsMap.get(oppToValidate.Id).Contacto__r.ProfessionName__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.ProfessionName__c == '') {
+                                emptyFields.add(Schema.Contact.fields.ProfessionName__c.getDescribe().getLabel());
+                            }
+                            //Validación para persona física mexicana
+                            if (personType.contains('Mexicana') && (oppsContractsMap.get(oppToValidate.Id).Contacto__r.ElectorId__c == null || oppsContractsMap.get(oppToValidate.Id).Contacto__r.ElectorId__c == '')) {
+                                emptyFields.add(Schema.Contact.fields.ElectorId__c.getDescribe().getLabel());
+                                //Si la entidad legal es tipo 'Persona Física - Extranjera', se debe adjuntar el Pasaporte, FM2 o FM3 del representante legal. 
+                                //Oportunidades de entidades legales tipo 'Persona Física - Extranjera' se agregan en una lista para revisar los archivos adjuntos del contacto.
+                            } else if (personType.contains('Extranjera')) {
+                                foreingOpps.add(oppToValidate);
+                                contactIds.add(oppsContractsMap.get(oppToValidate.Id).Contacto__r.Id);
+                            }
+                        }
+                        if (!emptyFields.isEmpty()) {
+                            oppsWihtError.put(oppToValidate.Id, emptyFields);
+                            finalOppsWithErrors.add(oppToValidate);
+                        }
+                    }
+                }
+                Map <Id, ContentDocumentLink> contactDocs = new Map <Id, ContentDocumentLink>();
+                if (!foreingOpps.isEmpty()) {
+                    //Query para obtener los archivos adjuntos del Pasaporte, FM2 o FM3 del representante legal.
+                    List<ContentDocumentLink> documents = [SELECT Id, LinkedEntityId, ContentDocument.Title FROM ContentDocumentLink WHERE
+                                                           LinkedEntityId IN: contactIds AND (ContentDocument.Title LIKE '%FM2%' OR
+                                                                                              ContentDocument.Title LIKE '%FM3%' OR ContentDocument.Title LIKE '%Pasaporte%')];
+                    if(!documents.isEmpty()) {
+                        for (ContentDocumentLink document: documents) {
+                            contactDocs.put(document.LinkedEntityId, document);
+                        }
+                    }
+                    //Se recorren las oportunidades con entidades legales extranjeras y si el representante legal no tiene el archivo adjunto,
+                    //del Pasaporte, FM2 o FM3, la oportunidad se agrega al set de oportunidades con error.                     
+                    for (Opportunity foreignOpp : foreingOpps) {
+                        if (!contactDocs.containsKey(oppsContractsMap.get(foreignOpp.Id).Contacto__r.Id)) {
+                            if (oppsWihtError.containsKey(foreignOpp.Id)) {
+                                Set<String> emptyFields = oppsWihtError.get(foreignOpp.Id);
+                                emptyFields.add('Pasaporte, FM2 o FM3');
+                                oppsWihtError.put(foreignOpp.Id, emptyFields);
+                            } else {
+                                oppsWihtError.put(foreignOpp.Id, new Set<String>{'Pasaporte, FM2 o FM3'});
+                                finalOppsWithErrors.add(foreignOpp);
+                            }
+                        }
+                    }                    
+                }
+                if (!finalOppsWithErrors.isEmpty()) {
+                    for (Opportunity oppWithError: finalOppsWithErrors) {
+                        String strEmptyFields = '';
+                        for(String str : oppsWihtError.get(oppWithError.Id)){
+                            strEmptyFields += '"' + str + '"' + ', ' ;
+                        }
+                        strEmptyFields = strEmptyFields.replaceAll(', $','.');
+                        oppWithError.addError('Para cambiar a la etapa de Implementación, es necesario llenar los siguientes campos del Representante Legal: ' + strEmptyFields);
+                    }
+                    
                 }
             }
         }

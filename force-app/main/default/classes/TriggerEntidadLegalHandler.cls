@@ -45,7 +45,7 @@ public with sharing class TriggerEntidadLegalHandler extends TriggerHandler {
 		
 		
 	}
-
+	
 	/**
 		* @author calvarez@ctconsulting.com.mx
 		* @date 02/04/2018
@@ -69,6 +69,7 @@ public with sharing class TriggerEntidadLegalHandler extends TriggerHandler {
 	public override void afterUpdate() {
         //DYAMPI
 		//creaActualizaDireccion(this.newList ,this.oldList);
+		sendToSIGLO(this.newList);
 	}
 
 	/**
@@ -263,6 +264,40 @@ public with sharing class TriggerEntidadLegalHandler extends TriggerHandler {
      			EntidadLegal__c=cuenta.ID,CodigoPostal_Tt__c=cuenta.CodigoPostal__c,DelegacionMunicipio_Tt__c=cuenta.DelegacionMunicipioFiscal__c,Estado_Tt__c=cuenta.Estado__c,Ciudad_Tt__c=cuenta.Ciudad__c));
      	}
      	insert mapaDirecciones;
-     }*/
+	 }*/
+	 
+	 //Valida si existe algun cambio en los campos que se envian a SIGLO
+	 public void sendToSIGLO(List<EntidadLegal__c> listaEntidades){
+		System.debug('-------SendToSIGLO---------');
+		Set<Id> elIds = new Set<Id>();
+        for(EntidadLegal__c newEl : newMap.values()){
+            EntidadLegal__c oldEl = oldMap.get(newEl.Id);
+            if(newEl.RecordTypeId != oldEl.RecordTypeId || newEl.CountryOrigin__c != oldEl.CountryOrigin__c || newEl.DeedDate__c != oldEl.DeedDate__c || newEl.EconomicActivity__c != oldEl.EconomicActivity__c || newEl.Calle__c != oldEl.Calle__c || newEl.NumeroExterior__c != oldEl.NumeroExterior__c || 
+				newEl.NumeroInterior__c != oldEl.NumeroInterior__c || newEl.Colonia__c != oldEl.Colonia__c || newEl.Estado__c != oldEl.Estado__c || newEl.DelegacionMunicipioFiscal__c != oldEl.DelegacionMunicipioFiscal__c || 
+				newEl.CodigoPostal__c != oldEl.CodigoPostal__c || newEl.FEA__c != oldEl.FEA__c || newEl.DeedNumber__c != oldEl.DeedNumber__c || newEl.RazonSocial__c != oldEl.RazonSocial__c || 
+				newEl.PersonType__c != oldEl.PersonType__c || newEl.Name != oldEl.Name){
+					elIds.add(newEl.Id);
+               }
+		}
+		if(!elIds.isEmpty()){
+			List<Contrato2__c> contratoOpp = [SELECT Entidad_Legal__r.RecordTypeId, Entidad_Legal__r.CountryOrigin__c, Entidad_Legal__r.DeedDate__c, Entidad_Legal__r.EconomicActivity__c, 
+												Entidad_Legal__r.Calle__c, Entidad_Legal__r.NumeroExterior__c, Entidad_Legal__r.NumeroInterior__c, Entidad_Legal__r.Colonia__c, 
+												Entidad_Legal__r.Estado__c, Entidad_Legal__r.DelegacionMunicipioFiscal__c, Entidad_Legal__r.CodigoPostal__c, Entidad_Legal__r.FEA__c, 
+												Entidad_Legal__r.DeedNumber__c, Entidad_Legal__r.RazonSocial__c, Entidad_Legal__r.PersonType__c, Entidad_Legal__r.Name,
+												PartidaPresupuesto__r.Quote.OpportunityId
+												FROM Contrato2__c 
+												WHERE Entidad_Legal__c IN: elIds 
+												AND PartidaPresupuesto__r.Quote.OpportunityId != null];
+			List<Opportunity> oppListUPD = new List<Opportunity>();
+			for(Contrato2__c contrato : contratoOpp){
+				Opportunity oppToUpdate = new Opportunity(Id= contrato.PartidaPresupuesto__r.Quote.OpportunityId, SendToSIGLO__c = true);
+                oppListUPD.add(oppToUpdate);
+			}
 
+			if(!oppListUPD.isEmpty()){
+				update oppListUPD;
+			}
+		}
+
+    }
 }

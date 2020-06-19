@@ -21,10 +21,12 @@ public without sharing class Notificacion_SolicitudPausaOT_CONT {
         List<valoresWP> listMotivos= new List<valoresWP>();
         Schema.DescribeFieldResult fieldResult = WorkOrder.Motivo_del_estatus__c.getDescribe();
         for(Schema.PicklistEntry pickListVal : fieldResult.getPicklistValues()){
-            valoresWP te=new valoresWP();
-            te.label=pickListVal.getLabel();
-            te.value=pickListVal.getValue();
-            listMotivos.add(te);
+            if(pickListVal.getValue().endsWith('.')){
+                valoresWP te = new valoresWP();
+                te.label = pickListVal.getLabel();
+                te.value = pickListVal.getValue();
+                listMotivos.add(te);
+            }
         }
         res.listM=listMotivos;
         return res;
@@ -163,7 +165,7 @@ public without sharing class Notificacion_SolicitudPausaOT_CONT {
         String IdOTnum = wo.WorkOrderNumber;
         String IdOT = wo.Id;
         String gestorOP=wo.Oportunidad__r.Owner.ManagerId;
-   		String duenoOP=wo.Oportunidad__r.OwnerId;
+       String duenoOP=wo.Oportunidad__r.OwnerId;
         String duenoOT=wo.OwnerId;
         String gestorOT=u.ManagerId;
         
@@ -381,7 +383,7 @@ public without sharing class Notificacion_SolicitudPausaOT_CONT {
                 wo.Pendiente_Pausa__c=false;
                 wo.OrigenPausa__c='Aceptada';
                 wo.estadoRechaza__c=false;
-    			wo.estadoAcepRecha__c=false;
+          wo.estadoAcepRecha__c=false;
                 wo.Estatus__c='Pausada';
                 wo.Motivo_del_estatus__c=wo.PremotivoPausa__c;
                 wo.Motivo_de_pausa__c=wo.PremotivoPausa__c;
@@ -404,7 +406,7 @@ public without sharing class Notificacion_SolicitudPausaOT_CONT {
                       from WorkOrder where Id=:recordId];
         wo.Pendiente_Pausa__c=false;
         wo.estadoRechaza__c=false;
-    	wo.estadoAcepRecha__c=false;
+      wo.estadoAcepRecha__c=false;
         wo.PremotivoPausa__c='';
         update wo;  
         system.debug('ow ' +wo);

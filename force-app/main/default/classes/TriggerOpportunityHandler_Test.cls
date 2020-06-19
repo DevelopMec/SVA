@@ -12,7 +12,8 @@ public without sharing class TriggerOpportunityHandler_Test {
         * @12/03/2020 Desarrollo Freeway: Add method validateRFCSolcionAssignmentTest to improve coverage.
         * @30/03/2020 Improve coverage. Add setup and ownerBUValidationTest methods.
         * @30/04/2020 sendPartnersAndAliancesMailTest method added to cover sendPartnersAndAliancesMail class method.
-    */
+        * @17/06/2020 validateFieldsRelatedTest method added to cover validateFieldsRelated class method.
+	*/
 
     @testSetup
     public static void setup(){
@@ -761,7 +762,9 @@ public without sharing class TriggerOpportunityHandler_Test {
                 DoNotCall = false,
                 Activo__c = true,
                 CopiarDireccionCuenta__c = false,
-                Extranjero__c = false,
+                //Inicio cambio SIGLO
+                //Extranjero__c = false,
+                //Fin cambio SIGLO
                 Funcion__c = 'Representante Legal',
                 Curp__c = 'PEGD911226MMCRYN04',
                 FM3__c = false,
@@ -1069,11 +1072,19 @@ public without sharing class TriggerOpportunityHandler_Test {
                                               StageName = 'Planeada', CloseDate = System.today().addDays(5),
                                               Solicitar_validaci_n_descuentos__c = false, OwnerId = u.Id, IdEjecutivoADV__c = u.Id,
                                               Entidad_Cuenta__c = ec.Id, Familia__c = 'Vestimenta');
-           
+            
+            Opportunity opp2 = new Opportunity(AccountId = acc.Id, Name = 'Prueba', Pricebook2Id = pricebookId,
+                                              StageName = 'Planeada', CloseDate = System.today().addDays(5),
+                                              Solicitar_validaci_n_descuentos__c = false, OwnerId = u.Id, IdEjecutivoADV__c = u.Id,
+                                              Entidad_Cuenta__c = ec.Id, Familia__c = 'Combustible');
+           List<Opportunity> oppsToInsert = new List<Opportunity>();
+            oppsToInsert.add(opp);
+            oppsToInsert.add(opp2);
+
             String errorMessage = '';
             Test.startTest();
             try {
-            	insert opp;
+            	insert oppsToInsert;
             } catch(Exception e) {
                 errorMessage = e.getMessage();
             }
@@ -1319,6 +1330,203 @@ public without sharing class TriggerOpportunityHandler_Test {
         Test.stopTest();
         List<Task> emailSend = [Select Id, Subject FROM Task WHERE WhatId =: opp.Id AND Subject Like '%: Alianza Edenred%'];
 		System.assert(!emailSend.isEmpty(), 'El correo fue enviado');
+    }
+    
+    @isTest
+    static void validateFieldsRelatedTest(){
+        User uAdmin = [SELECT Id FROM User WHERE UserRole.DeveloperName = 'CRM_Manager' AND Profile.Name='Administrador del sistema' AND IsActive = true ORDER BY Name LIMIT 1];
+        Profile prof = [SELECT Id FROM Profile WHERE Name = 'Administrador del sistema' LIMIT 1];
+        
+        System.runAs(uAdmin){
+            Map<String,ID> userRolesMap = new Map<String,ID>();
+            for (UserRole userRole : [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName IN ('Ejecutivo_de_Administracion_de_Ventas')]) userRolesMap.put(userRole.DeveloperName, userRole.Id);
+
+            //CUSTOM SETTING/
+            List<ContadorRegistros_CS__c> contador = new List<ContadorRegistros_CS__c>();
+            contador.add(new ContadorRegistros_CS__c(Name = 'ADV_OPAM', NumeroRegistro__c = -1));
+            contador.add(new ContadorRegistros_CS__c(Name = 'ADV_Edenred', NumeroRegistro__c = -1));
+            insert contador;
+            
+            User usuarioADV = new User(LastName = 'ADV', Email = 'adv@amamama.com', Username = 'adv@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id, Asignaciones_PL__c = 'Altas de Cliente', FiltroAsignacion_MSPL__c = 'Clientes OPAM;Clientes Edenred', UserRoleId = userRolesMap.get('Ejecutivo_de_Administracion_de_Ventas'), isActive = true);
+            insert usuarioADV;
+        }
+        
+        User u = new User(LastName = 'last', Email = 'puser000@amamama.com', Username = 'puser000@amamama.com' + System.currentTimeMillis(), CompanyName = 'TEST', Title = 'title', Alias = 'alias', TimeZoneSidKey = 'America/Los_Angeles', EmailEncodingKey = 'UTF-8', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = prof.Id);
+        insert u;
+
+        List<sObject> objs = new List<sObject>();
+
+        Pricebook2 pr = new Pricebook2(Name='Edenred', isActive=true);        
+
+        Id pricebookId = Test.getStandardPricebookId();
+        
+        //insert Product2
+        Product2 p = new Product2(Family = 'Despensa', Formato__c = 'Chip + Pin', MonederoElectronico__c = true, Name = 'Ticket Car 3.0', ProductCode = '30', Red__c = 'Cerrada', SegmentoVenta__c = 'Key;Large;Medium;Small', TipoSolucion__c = 'Básico', Uso__c = 'Herramienta',IsActive = true, SendToSIGLO__c = true);
+        Product2 p2 = new Product2(Family = 'Despensa', Formato__c = 'Chip + Pin', MonederoElectronico__c = true, Name = 'Ecovale Combustible Edenred Diesel', ProductCode = '60-D', Red__c = 'Cerrada', SegmentoVenta__c = 'Key;Large;Medium;Small', TipoSolucion__c = 'Básico', Uso__c = 'Herramienta',IsActive = true, SendToSIGLO__c = true);
+        //insert Account
+        Account acc = new Account(Name = 'Cuenta prueba', NumberOfEmployees = 12, NumeroEmpleados__c = '1-25');
+
+        objs.add(pr);
+        objs.add(p);
+        objs.add(p2);
+        objs.add(acc);
+        insert objs;
+        objs.clear();
+        
+        Id pricebookId2 = pr.Id;
+        
+        //insert Contact
+        Contact cont = new Contact(LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com');
+		insert cont;
+        
+        //insert Opportunity
+        Opportunity opp = new Opportunity(Contacto__c = cont.Id ,PartnersAliances__c = 'Acceso a salario ya trabajado - Minu', Familia__c = 'Despensa', RecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('VentaNueva').getRecordTypeId(), AccountId = acc.Id, Name = 'Prueba', Pricebook2Id = pricebookId2,StageName = 'Prospecting', CloseDate = System.today().addDays(5),Solicitar_validaci_n_descuentos__c = false, OwnerId = u.Id, IdEjecutivoADV__c = u.Id);
+
+        Contact cont2 = new Contact(Funcion__c = 'Representante Legal', LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com', Curp__c = 'FOMC950206MMCRTN04');
+        Contact cont3 = new Contact(LastName = 'Contacto prueba', AccountId = acc.Id, Puesto__c = 'Consultor', Email = 'pruebasxyz@mail.com');
+
+        //insert PricebookEntry
+        PricebookEntry pbe = new PricebookEntry(Pricebook2Id = pricebookId, Product2Id = p.Id, UnitPrice = 10000, IsActive = true);
+        PricebookEntry pbe2 = new PricebookEntry(Pricebook2Id = pricebookId2, Product2Id = p.Id, UnitPrice = 10000, IsActive = true);
+
+        //insert Concepto__c
+        Concepto__c c = new Concepto__c(TipoCargo__c = 'Anualidad - Grande', Producto__c = p.Id, Importe__c = 1.1);
+        Concepto__c c1 = new Concepto__c(TipoCargo__c = 'Tarjeta titular', Producto__c = p.Id, Importe__c = 2.2);
+        Concepto__c c2 = new Concepto__c(TipoCargo__c = 'Tarjeta titular', Producto__c = p2.Id, Importe__c = 3.3);
+        Concepto__c c3 = new Concepto__c(TipoCargo__c = 'Anualidad - Grande', Producto__c = p2.Id, Importe__c = 4.4);
+        Concepto__c c4 = new Concepto__c(TipoCargo__c = 'Anualidad - Grande', Producto__c = p2.Id, Importe__c = 5.5);
+        
+        EntidadLegal__c el = new EntidadLegal__c(RFC__c = 'HIJD93061278A', Name = 'HIJD93061278A', CountryOrigin__c = 'PERU');
+        objs.add(el);
+        objs.add(opp);
+        objs.add(cont2);
+        objs.add(cont3);
+        objs.add(pbe);
+        objs.add(pbe2);
+        objs.add(c);
+        objs.add(c1);
+        objs.add(c2);
+        objs.add(c3);
+        objs.add(c4);
+        insert objs;
+        objs.clear();
+
+        //insert Quote
+        Quote quot = new Quote(Name = 'Cotización prueba', OpportunityId = opp.Id, ContactId = cont.Id, Pricebook2Id = pricebookId);
+
+        OpportunityLineItem oli = new OpportunityLineItem(OpportunityId = opp.Id, Quantity = 200, TotalPrice = 2000, PricebookEntryId = pbe2.Id, ServiceDate = System.today().addDays(5));
+
+        //insert QuoteLineItem 
+        QuoteLineItem qli = new QuoteLineItem(Quantity = 1, UnitPrice = 12, QuoteId = quot.Id, PricebookEntryId = pbe2.Id, Product2Id = p.Id, CantidadTarjetas__c = 10,Etapa__c = 'Cotización', ServiceDate = System.today().addDays(5));       
+
+        //insert ProductoComparado__c
+        ProductoComparado__c pc = new ProductoComparado__c(ProductoCotizado__c = qli.Id, ProductoComparado__c = p2.Id);
+        
+        //insert ProductoConcepto__c
+        ProductoConcepto__c pcon = new ProductoConcepto__c(Concepto__c = c.Id, PartidaPresupuesto__c = qli.Id,EsProductoComparado__c = false);
+        ProductoConcepto__c pcon2 = new ProductoConcepto__c(Concepto__c = c1.Id, PartidaPresupuesto__c = qli.Id,EsProductoComparado__c = false);
+        ProductoConcepto__c pcon3 = new ProductoConcepto__c(Concepto__c = c2.Id, PartidaPresupuesto__c = qli.Id,EsProductoComparado__c = false);
+        ProductoConcepto__c pcon4 = new ProductoConcepto__c(Concepto__c = c3.Id, ProductoComparadoID__c = pc.Id,EsProductoComparado__c = true);
+        ProductoConcepto__c pcon5 = new ProductoConcepto__c(Concepto__c = c4.Id, ProductoComparadoID__c = pc.Id,EsProductoComparado__c = true);
+        
+        Precio_Litro__c pl=new Precio_Litro__c(Precio_por_litro__c=1);
+        insert pl;
+        
+        String mapeoJSON = '{"Opportunity": {"Id": "'+opp.Id+'"},"Quote": {"ContactId": "'+cont.Id+'","Familia__c": "Despensa","VigenciaCotizacion__c": "7 días"},"QuoteLineItem": [{"Product2Id": "'+p.Id+'","CantidadTarjetas__c": 98,"Quantity": 1,"UnitPrice": 178,"FormaPago__c": "TransferenciaElectronica","OpcionesMetodoPago__c": "BBVA Bancomer","TarjetaAsociada__c": 987,"ClabeInterbancaria__c": "737237373728292101","TipoAmex__c": null,"NivelConsumo__c": null,"OtroMetodoPago__c": null,"Cantidad_Descuento__c": 1,"Total_Descuento__c": 3,"Escalonamiento1__c": false}],"ProductoComparado__c": [{"ProductoComparado__c": "'+p2.Id+'"}],"IndexProductoComparado": {"0":0},"ProductoConcepto__c": [{"Concepto__c": "'+c.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 3,"EsProductoComparado__c": false,"CantidadTarjetas__c": 0,"PrecioFinal__c": 3,"VigenciaDescuento__c": null},{"Concepto__c": "'+c1.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": false,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null},{"Concepto__c": "'+c2.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": false,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null},{"Concepto__c": "'+c3.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": true,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null},{"Concepto__c": "'+c4.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": true,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null}],"IndexPConceptoCotizado": {"0": 0,"1": 0,"2": 0},"IndexPConceptoComparado": {"0":0,"1":0},"Ids2Delete": {"QuoteLineItem": [],"ProductoConcepto__c": [],"ProductoComparado__c": []},"IdsConEscalonamiento": {}}';
+
+        Map<String, Object> mapaR1 = PLAN_CuentaService.guardaCotizacion(mapeoJSON, null);
+
+        List<Quote> objQoute = (List<Quote>)mapaR1.get('Instance_Quote');
+        List<Database.UpsertResult> objQouteLineItem = (List<Database.UpsertResult>)mapaR1.get('Upsert_QuoteLineItem');
+        List<Database.UpsertResult> objProductoComparado = (List<Database.UpsertResult>)mapaR1.get('Upsert_ProductoComparado__c');
+        List<Database.UpsertResult> objProductoConcepto = (List<Database.UpsertResult>)mapaR1.get('Upsert_ProductoConcepto__c');
+        
+        QuoteLineItem qli3 = new QuoteLineItem(Escalonamiento__c = objQouteLineItem[0].getId(), Quantity = 3, UnitPrice = 44, QuoteId = objQoute[0].Id, PricebookEntryId = pbe2.Id, Product2Id = p.Id, CantidadTarjetas__c = 10,Etapa__c = 'Cotización', ServiceDate = System.today().addDays(5));
+        QuoteLineItem qli4 = new QuoteLineItem(Escalonamiento__c = objQouteLineItem[0].getId(), Quantity = 3, UnitPrice = 44, QuoteId = objQoute[0].Id, PricebookEntryId = pbe2.Id, Product2Id = p.Id, CantidadTarjetas__c = 10,Etapa__c = 'Cotización', ServiceDate = System.today().addDays(5));
+
+        QuoteLineItem qli5 = qli.clone(false,false,false,false);
+        insert qli3;
+        
+        ProductoConcepto__c pcon6 = new ProductoConcepto__c(Concepto__c = c.Id, PartidaPresupuesto__c = qli3.Id,EsProductoComparado__c = false);
+        ProductoConcepto__c pcon7 = new ProductoConcepto__c(Concepto__c = c1.Id, PartidaPresupuesto__c = qli3.Id,EsProductoComparado__c = false);
+        ProductoConcepto__c pcon8 = new ProductoConcepto__c(Concepto__c = c2.Id, PartidaPresupuesto__c = qli3.Id,EsProductoComparado__c = false);
+
+        objs.add(pcon6);
+        objs.add(pcon7);
+        objs.add(pcon8);
+        insert objs;
+
+        String mapeoJSON1 = '{"Opportunity": {"Id": "'+opp.Id+'"},"Quote": {"ContactId": "'+cont.Id+'","OpportunityId": "'+opp.Id+'","Familia__c": "Despensa","VigenciaCotizacion__c": "7 días","Id": "'+objQoute[0].Id+'"},"QuoteLineItem": [{"Product2Id": "'+p.Id+'","CantidadTarjetas__c": 98,"Quantity": 1,"UnitPrice": 178,"FormaPago__c": "TransferenciaElectronica","OpcionesMetodoPago__c": "BBVA Bancomer","TarjetaAsociada__c": 987,"ClabeInterbancaria__c": "737237373728292101","TipoAmex__c": null,"NivelConsumo__c": null,"OtroMetodoPago__c": null,"Cantidad_Descuento__c": 1,"Total_Descuento__c": 3,"Id": "'+objQouteLineItem[0].getId()+'","Escalonamiento1__c": true}],"ProductoComparado__c": [{"ProductoComparado__c": "'+p2.Id+'","Id": "'+objProductoComparado[0].getId()+'"}],"IndexProductoComparado": {"0":0},"ProductoConcepto__c": [{"Concepto__c": "'+c.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 3,"EsProductoComparado__c": false,"CantidadTarjetas__c": 0,"PrecioFinal__c": 3,"VigenciaDescuento__c": null,"Id":"'+objProductoConcepto[0].getId()+'"},{"Concepto__c": "'+c1.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": false,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null,"Id":"'+objProductoConcepto[1].getId()+'"},{"Concepto__c": "'+c2.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": false,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null,"Id":"'+objProductoConcepto[2].getId()+'"},{"Concepto__c": "'+c3.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": true,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null,"Id":"'+objProductoConcepto[3].getId()+'"},{"Concepto__c": "'+c4.Id+'","Bonificacion__c": 0,"PrecioLista2__c": 0,"EsProductoComparado__c": true,"CantidadTarjetas__c": 0,"PrecioFinal__c": 135,"VigenciaDescuento__c": null,"Id":"'+objProductoConcepto[4].getId()+'"}],"IndexPConceptoCotizado": {"0": 0,"1": 0,"2": 0},"IndexPConceptoComparado": {"0":0,"1":0},"Ids2Delete": {"QuoteLineItem": [],"ProductoConcepto__c": [],"ProductoComparado__c": []},"IdsConEscalonamiento": {}}';
+
+        opp.Description = 'Comentario de prueba';
+        update opp;
+        
+        Attachment attOpp1 = new Attachment (parentId = opp.Id, Name = 'Contrato o Propuesta firmados', Body = Blob.valueOf('Blah Blah'));
+        Attachment attOpp2 = new Attachment (parentId = opp.Id, Name = 'Id. de Cliente', Body = Blob.valueOf('Blah Blah'));
+        Attachment attOpp3 = new Attachment (parentId = opp.Id, Name = 'Registro Patronal', Body = Blob.valueOf('Blah Blah'));
+        List<Attachment> listaAtt = new List<Attachment>();
+        listaAtt.add(attOpp1);
+        listaAtt.add(attOpp2);
+        listaAtt.add(attOpp3);
+        insert listaAtt;
+
+        List<ContentVersion> cvs = new List<ContentVersion>();
+        cvs.add(new ContentVersion(Title = 'Contrato o Propuesta firmados', PathOnClient = 'Penguins.jpg', VersionData = Blob.valueOf('Test Content'), IsMajorVersion = true ));
+        cvs.add(new ContentVersion(Title = 'Id. de Cliente', PathOnClient = 'Penguins.jpg', VersionData = Blob.valueOf('Test Content'), IsMajorVersion = true ));
+        cvs.add(new ContentVersion(Title = 'Registro Patronal', PathOnClient = 'Penguins.jpg', VersionData = Blob.valueOf('Test Content'), IsMajorVersion = true ));
+        insert cvs;
+
+        List<ContentDocument> documents = [SELECT Id, Title, LatestPublishedVersionId FROM ContentDocument];
+
+        //create ContentDocumentLink  record 
+        List<ContentDocumentLink> lcdl = new List<ContentDocumentLink>();
+        for( ContentDocument cd : documents) {
+            lcdl.add(new ContentDocumentLink(LinkedEntityId = opp.Id, ContentDocumentId = cd.Id, ShareType = 'V'));
+        }
+        insert lcdl;
+
+        List<QuoteLineItem> listQlis = [SELECT Id FROM QuoteLineItem WHERE Quote.OpportunityId =: opp.Id];
+        Contrato2__c contrato2 = new Contrato2__c(Entidad_Legal__c = el.Id, Contacto__c = cont2.Id, EtapaContrato__c='Finalizado',PartidaPresupuesto__c = listQlis[0].Id, CodigoAS400__c = '11-11-12345-122', Personalizacion_de_Tarjetas__c = true);
+        insert contrato2;
+        Test.startTest();
+        CatalogoDirecciones__c direccion = new CatalogoDirecciones__c();
+        direccion.Calle_Tt__c = 'Lago Alberto';
+        direccion.Ciudad_Tt__c = 'CDMX';
+        direccion.CodigoPostal_Tt__c = '11420';
+        direccion.Colonia_Tt__c = 'Polanco';
+        direccion.CuentaID__c = acc.Id;
+        direccion.DelegacionMunicipio_Tt__c = 'Miguel Hidalgo';
+        direccion.Estado_Tt__c = 'CDMX';
+        direccion.Name = 'Lago Alberto';
+        direccion.Tipo_Pt__c ='Cuenta';
+        
+        insert direccion;
+        
+        Contrato_Direccion__c condir = new Contrato_Direccion__c();
+        condir.ContratoID__c = contrato2.Id;
+        condir.DireccionID__c = direccion.Id;
+        insert condir;
+        opp.StageName = 'Alta de cliente';
+        update opp;
+
+
+        Negocio__c nuevo= new Negocio__c(IdOportunidadOPAM__c = 422, IdCuentaOPAM__c = 12, EmailCSV__c = 'car@gmail.com', PantallaIntermediaCodigos__c = '30,3,50');
+        insert nuevo;
+        List<ContratoFilial__c> lin=new List<ContratoFilial__c>();
+        lin.add(new ContratoFilial__c(CodigoAS400__c=contrato2.CodigoAS400__c, Name = contrato2.CodigoAS400__c ,Contrato_2__c = contrato2.Id, Entidad_Cuenta__c = contrato2.Entidad_Cuenta__c, IsPrime__c=true));
+        lin.add(new ContratoFilial__c(CodigoAS400__c='11-11-12345-123', Name = contrato2.CodigoAS400__c ,Contrato_2__c = contrato2.Id, Entidad_Cuenta__c = contrato2.Entidad_Cuenta__c, IsPrime__c=false));
+        insert lin;
+       	String errorMessage = '';
+        try{
+            opp.StageName = 'Implementación';
+            opp.CodigoClienteAS400__c = '1234';
+            update opp;
+        }catch(Exception e){
+            errorMessage = e.getMessage();
+        }
+
+        Test.stopTest();
+		System.assert(errorMessage.contains('Para cambiar a la etapa de Implementación, es necesario llenar los siguientes campos del Representante Legal:'), 'Un mensaje de error es enviado con los campos faltantes del Representante Legal.');
     }
 
 }

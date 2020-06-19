@@ -44,6 +44,7 @@ private class EC_ListaEntidadLegal_LC_Test {
 		el.Address__c=cd.Id;
 		EC_ListaEntidadLegal_LC_Ctrl.guardaEntidadLegal( el );
 		EC_ListaEntidadLegal_LC_Ctrl.getTipoDeSociedad();
+        EC_ListaEntidadLegal_LC_Ctrl.getPaisOrigen();
 	}
 
 	@isTest(seeAllData=false)
@@ -59,13 +60,15 @@ private class EC_ListaEntidadLegal_LC_Test {
 			ActaConstitutivaCliente__c = true, AltaSHCP__c = true, CedulaRFC__c = true, ComprobanteDomicilioCliente__c = true, ComprobanteDomicilioFiscal__c = true, ConstanciaRFC__c = true, ConstanciaRFCCliente__c = true, ContratoFirmado__c = true, CURP__c = true, FM3__c = true, AdjuntoA__c = true, IdentificacionOficialCliente__c = true, PoderNotarial__c = true, RegistroPatronal__c = true, RFC__c = true, RFCDoc__c = true, Name = 'DocumentosOportunidad'));
 		insert tipos;
 
-
 		Account cuenta = new Account(Name ='Cuenta maestra',NumeroEmpleados__c = '1-25',NumeroVehiculos__c = '1');
 		insert cuenta;
 		Contact contacto = new Contact();
 		contacto.LastName = 'Sola';
 		contacto.AccountId = cuenta.Id;
-		contacto.Extranjero__c = true;
+        //Inicio cambio SIGLO
+		//contacto.Extranjero__c = true;
+		contacto.Nationality__c = 'PERU';
+        //Fin cambio SIGLO
 		contacto.Funcion__c = 'Representante Legal';
         contacto.Curp__c = 'VAVR950615MVZZZB10';
         contacto.isCurp__c = true;
@@ -82,7 +85,6 @@ private class EC_ListaEntidadLegal_LC_Test {
         insert cE;
 
         EC_ListaEntidadLegal_LC_Ctrl.actualizaEstatusEntidad(eL, 'Completa');
-
 
 		EC_ListaEntidadLegal_LC_Ctrl.eliminaEntidadCuenta( eC.Id );
 		//EC_ListaEntidadLegal_LC_Ctrl.getAddressAccount( cuenta.Id );

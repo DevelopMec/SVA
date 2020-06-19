@@ -2,10 +2,10 @@ public without sharing class SendDocuSing_CTRL {
 	@AuraEnabled
     public static Map<String,String> generarInformacion(String recordId){
         Map<String,String> resp=new Map<String,String>();
-        String mensaje='No se puede envíar el contrato debido a que hay un proceso pendiente';
+        String mensaje='Solo se puede enviar el contrato digital una vez, ahora debes de seguir por el flujo manual”';
         List<dsfs__DocuSign_Status__c> cant=[Select dsfs__Envelope_Status__c from dsfs__DocuSign_Status__c where dsfs__Opportunity__c=:recordId and dsfs__Envelope_Status__c IN ('Enviado','Delivered','Rechazado','Completado','Entregado','Firmado/completado')];
         for(dsfs__DocuSign_Status__c estatus:cant){
-            if(estatus.dsfs__Envelope_Status__c=='Rechazado')
+            if(estatus.dsfs__Envelope_Status__c=='Completado')
                 mensaje='Solo se puede enviar el contrato digital una vez, ahora debes de seguir por el flujo manual';    
         }
         if(!cant.isEmpty()){
@@ -41,14 +41,16 @@ public without sharing class SendDocuSing_CTRL {
             resp.put('status','success');
         }else{
             resp.put('status','error');
-            resp.put('msj','No se ha generado la propuesta comercial, por favor vaya a la cotización y genere el pdf');
+            resp.put('msj','No se ha generado la propuesta comercial, por favor vaya a la COTIZACIÓN y genere el pdf');
         }
         return resp;
     }
     public static String createDocuSingEnvelope(String idOpp){
+		dsfs__EnvelopeConfiguration__c lstconfiguracion=[SELECT id from dsfs__EnvelopeConfiguration__c where name='Edenred' limit 1];
         dsfs__DocuSign_Envelope__c de=new dsfs__DocuSign_Envelope__c(
             dsfs__DocuSign_Email_Subject__c='Documentos pendientes de firma',
             dsfs__DocuSign_Email_Message__c='Le envió esa solicitud de su firma electrónica, revise el documento y fírmelo electrónicamente',
+            dsfs__EnvelopeConfiguration__c =lstconfiguracion.id,
             dsfs__Source_Object__c=idOpp);
         insert de;
         return de.Id;
@@ -57,6 +59,7 @@ public without sharing class SendDocuSing_CTRL {
         dsfs__DocuSign_Envelope_Document__c ded= new dsfs__DocuSign_Envelope_Document__c(
             dsfs__DocuSign_EnvelopeID__c=idDsE,
             dsfs__Extension__c='pdf', 
+            //dsfs__SFDocument_Type__c='Attachment', 
             dsfs__External_Document_Id__c=idDoc, 
             dsfs__Document_Name__c=nameDoc);
          insert ded;

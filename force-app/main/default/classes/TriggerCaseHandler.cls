@@ -30,7 +30,7 @@ public without sharing class TriggerCaseHandler extends TriggerHandler {
     }
     
     public override void beforeInsert() {
-        System.debug('::beforeInsert::');
+        system.debug('::beforeInsert::');
         asignarGrupoAtencionInicial(this.newList);
         
         this.mapaTiposRegistro = getTiposRegistro(this.newList);
@@ -47,14 +47,17 @@ public without sharing class TriggerCaseHandler extends TriggerHandler {
     
     public override void beforeUpdate() {
         System.debug('::beforeUpdate::');
+
         String  strIdTicket = '';
         Boolean  blnCloseCase = false;
+        
+        
         this.mapaTiposRegistro = getTiposRegistro(this.newList);
         this.mapaUsuariosCreadores = getCreatorUsers(this.newList);
         verificarCambiosCasos();
         asignarPropietarios();
 
-        // SE AÑADE SECCION DE CODIGO PARA EL CAMPO Resolution_time_holidays__c 
+         // Hector Diaz :  SE AÑADE SECCION DE CODIGO PARA EL CAMPO Resolution_time_holidays__c 
         for(Case caso : newList){
             if(caso.Status != oldMap.get(caso.Id).Status && caso.Status == 'Concluido'){
                 blnCloseCase  = true;
@@ -76,7 +79,8 @@ public without sharing class TriggerCaseHandler extends TriggerHandler {
                 System.debug(objEscalionExist);
             }
         }
-         
+        
+        //FIN CAMBIO Hector Diaz ********
     }
     
     public override void afterUpdate() {
