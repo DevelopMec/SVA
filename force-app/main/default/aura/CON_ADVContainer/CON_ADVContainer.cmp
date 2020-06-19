@@ -1,46 +1,53 @@
 <aura:component access="global" implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName" controller="CON_ContractsContainer_CTRL" >
     <!-- <ltng:require scripts="{!join(',', $Resource.BOOTSTRAP4 + '/js/jquery-3.2.1.slim.min.js', $Resource.BOOTSTRAP4 + '/js/popper.min.js', $Resource.BOOTSTRAP4 + '/js/bootstrap.min.js')}" styles="{!$Resource.BOOTSTRAP4 + '/css/bootstrap.min.css'}"/> -->
     <ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js')}" afterScriptsLoaded="{!c.init}"/>
-    <aura:attribute name="cuenta" type="String"/>
-    <aura:attribute name="oppId" type="String"/>
-    <aura:attribute name="dataSource" type="Object"/>
-    <aura:attribute name="entidadLegal" type="Object"/>
-    <aura:attribute name="filialesSource" type="List"/>
-    <aura:attribute name="attachmentSourceOpp" type="List"/>
-    <aura:attribute name="attachmentSource" type="List"/>
-    <aura:attribute name="documents" type="Object[]"/>
-    <aura:attribute name="productosSource" type="List"/>
-    <aura:attribute name="isOpen" type="boolean" default="false"/>
-    <aura:attribute name="btnActionSave" type="boolean" default="false"/>
-    <aura:attribute name="btnInactive" type="boolean" default="false"/>
-    <aura:attribute name="btnInactiveCheck" type="boolean" default="true"/>
-    <aura:attribute name="btnActionAprobar" type="boolean" default="false"/>
-    <aura:attribute name="btnActionRechazar" type="boolean" default="false"/>
+	<aura:attribute name="cuenta" type="String"/>
+	<aura:attribute name="oppId" type="String"/>
+	<aura:attribute name="dataSource" type="Object"/>
+	<aura:attribute name="entidadLegal" type="Object"/>
+	<aura:attribute name="filialesSource" type="List"/>
+	<aura:attribute name="attachmentSourceOpp" type="List"/>
+	<aura:attribute name="attachmentSource" type="List"/>
+	<aura:attribute name="documents" type="Object[]"/>
+	<aura:attribute name="productosSource" type="List"/>
+	<aura:attribute name="isOpen" type="boolean" default="false"/>
+	<aura:attribute name="btnActionSave" type="boolean" default="false"/>
+	<aura:attribute name="btnInactive" type="boolean" default="false"/>
+	<aura:attribute name="btnInactiveCheck" type="boolean" default="true"/>
+	<aura:attribute name="btnActionAprobar" type="boolean" default="false"/>
+	<aura:attribute name="btnActionRechazar" type="boolean" default="false"/>
     <aura:attribute name="btnActionXML" type="boolean" default="false"/>
-    <aura:attribute name="eLExist" type="boolean" default="false"/>
-    <aura:attribute name="transferenciaElectronica" type="boolean" default="false"/>
-    <aura:attribute name="amex" type="boolean" default="false"/>
-    <aura:attribute name="depositoBancario" type="boolean" default="false"/>
-    <aura:attribute name="otros" type="boolean" default="false"/>
+	<aura:attribute name="eLExist" type="boolean" default="false"/>
+	<aura:attribute name="transferenciaElectronica" type="boolean" default="false"/>
+	<aura:attribute name="amex" type="boolean" default="false"/>
+	<aura:attribute name="pagoOnline" type="boolean" default="false"/>
+	<aura:attribute name="depositoBancario" type="boolean" default="false"/>
+	<aura:attribute name="otros" type="boolean" default="false"/>
     <aura:attribute name="isXML" type="boolean" default="true"/>
     <aura:attribute name="isSendXML" type="boolean" default="false"/>
-    <aura:attribute name="urlPDF" type="string"/>
-    <aura:attribute name="subCuentas" type="List"/>
+	<aura:attribute name="urlPDF" type="string"/>
+	<aura:attribute name="subCuentas" type="List"/>
+	<aura:attribute name="tiposDeMedio" type="List"/>
     <aura:attribute name="app_edenred" type="Map" default="{render: false}"/>
     <aura:attribute name="dirEntregaCMP" type="Aura.Component" />
-    
+	
+	<aura:attribute name="dualTagQuantity__c" type="Integer" default="0"/>
+	<aura:attribute name="physicalCardQuantity__c" type="Integer" default="0"/>
+	<aura:attribute name="regularTagQuantity__c" type="Integer" default="0"/>
+	<aura:attribute name="virtualCardQuantity__c" type="Integer" default="0"/>
+	
     <aura:attribute name="spinAs400" type="boolean" default="false"/>
     <aura:attribute name="clientesCompletos" type="boolean" default="false"/>
     
     <aura:attribute name="motivosRechazoList" type="List"/>
     <aura:attribute name="motivosRechazoSelec" type="List"/>
-    <aura:attribute name="historicoMotivosRechazo" type="List"/>
+	<aura:attribute name="historicoMotivosRechazo" type="List"/>
     
-    
+	
     <aura:attribute name="loadingPage" type="boolean" default="false"/>
     <aura:attribute name="modalErrores" type="boolean" default="false"/>
     <aura:attribute name="listaErrores" type="List"/>
-    
+
     <!--  -->
     <!--DVM: INICIO, 2 Julio, Para atender el requerimiento de mostrar todos los contactos con funcion AP en la pantalla ADV --> 
     <aura:attribute name="columnas" type="List"/>
