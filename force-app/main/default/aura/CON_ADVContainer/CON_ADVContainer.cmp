@@ -1,6 +1,6 @@
 <aura:component access="global" implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName" controller="CON_ContractsContainer_CTRL" >
-	<!-- <ltng:require scripts="{!join(',', $Resource.BOOTSTRAP4 + '/js/jquery-3.2.1.slim.min.js', $Resource.BOOTSTRAP4 + '/js/popper.min.js', $Resource.BOOTSTRAP4 + '/js/bootstrap.min.js')}" styles="{!$Resource.BOOTSTRAP4 + '/css/bootstrap.min.css'}"/> -->
-	<ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js')}" afterScriptsLoaded="{!c.init}"/>
+    <!-- <ltng:require scripts="{!join(',', $Resource.BOOTSTRAP4 + '/js/jquery-3.2.1.slim.min.js', $Resource.BOOTSTRAP4 + '/js/popper.min.js', $Resource.BOOTSTRAP4 + '/js/bootstrap.min.js')}" styles="{!$Resource.BOOTSTRAP4 + '/css/bootstrap.min.css'}"/> -->
+    <ltng:require scripts="{!join(',', 	$Resource.CTC_BASE + '/lightning/ctcLightning.js')}" afterScriptsLoaded="{!c.init}"/>
 	<aura:attribute name="cuenta" type="String"/>
 	<aura:attribute name="oppId" type="String"/>
 	<aura:attribute name="dataSource" type="Object"/>
@@ -48,25 +48,28 @@
     <aura:attribute name="modalErrores" type="boolean" default="false"/>
     <aura:attribute name="listaErrores" type="List"/>
 
-<!--  -->
+    <!--  -->
     <!--DVM: INICIO, 2 Julio, Para atender el requerimiento de mostrar todos los contactos con funcion AP en la pantalla ADV --> 
     <aura:attribute name="columnas" type="List"/>
     <aura:attribute name="contactosAP" type="Contact[]"/>
-    <!--DVM: FIN, 2 Julio-->
+	<!--DVM: FIN, 2 Julio-->
+	
+	<!--CEAM:3375-->
+	<aura:attribute name="DocumentType" type="String"/>
     
     <aura:handler name="hideSpin" event="c:CON_ADVContainderHideSpin" action="{!c.hideSpinGlobal}"/>
     
-	<aura:registerEvent name="generatePDF" type="c:CON_GeneratePDF_EVENT"/>
-	<aura:handler event="c:CON_PdfReady_EVENT" action="{!c.hidePDFSpinner}"/>
+    <aura:registerEvent name="generatePDF" type="c:CON_GeneratePDF_EVENT"/>
+    <aura:handler event="c:CON_PdfReady_EVENT" action="{!c.hidePDFSpinner}"/>
     
-
-	<!--aura:handler name="init" value="{!this}" action="{!c.init}"/-->
     
-        <aura:if isTrue="{!v.loadingPage}">
-            <div style="position: fixed;z-index: 999;overflow: visible;margin: auto;top: 0;left: 0;bottom: 0;right: 0;">
-                <lightning:spinner size="large"/>
-            </div>
-        </aura:if>
+    <!--aura:handler name="init" value="{!this}" action="{!c.init}"/-->
+    
+    <aura:if isTrue="{!v.loadingPage}">
+        <div style="position: fixed;z-index: 999;overflow: visible;margin: auto;top: 0;left: 0;bottom: 0;right: 0;">
+            <lightning:spinner size="large"/>
+        </div>
+    </aura:if>
     
     <div class="slds-p-horizontal_large slds-p-vertical_large">
         <aura:if isTrue="{!or(v.dataSource.QuoteLineItem.Product2.IDInterno__c=='30',v.dataSource.QuoteLineItem.Product2.IDInterno__c=='31')}">
@@ -90,146 +93,155 @@
                 <lightning:spinner size="large"/>
             </aura:if>
         </div>
-		<div class="slds-m-horizontal_xx-large slds-p-around_x-large contract-container-border">
-			<div>
-				<strong class="slds-text-heading_large slds-align_absolute-center slds-p-bottom_large">
+        <div class="slds-m-horizontal_xx-large slds-p-around_x-large contract-container-border">
+            <div>
+                <strong class="slds-text-heading_large slds-align_absolute-center slds-p-bottom_large">
                     Formato Alta Cliente
-				</strong>
+                </strong>
                 <aura:if isTrue="{!v.dataSource.Opportunity.RecordType.DeveloperName=='Migracion'}">                
                     <div class="slds-text-heading_medium slds-align_absolute-center slds-p-bottom_large">
                         Migración de la SubCuenta {!v.dataSource.Opportunity.Contrato_Filial__r.CodigoAS400__c}
                     </div>
                 </aura:if>
-			</div>
-			<lightning:layout multipleRows="true">
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Numero Alta Cliente" name="altaCliente" type="text"  step="any" value="{!v.dataSource.Opportunity.NumeroAltaCliente__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Territorio Numero" name="territorioNumero" type="text"  step="any" value="{!v.dataSource.User.NumeroTerritorio__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Oportunidad" name="Oportunidad" type="text"  step="any" value="{!v.dataSource.Opportunity.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Nombre Ejecutivo" name="nombreEjecutivo" type="text"  step="any" value="{!v.dataSource.Opportunity.Owner.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Gestor de la Oportunidad" name="gestorOportunidad" type="text"  step="any" value="{!v.dataSource.User.Manager.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+            </div>
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <lightning:input label="Numero Alta Cliente" name="altaCliente" type="text"  step="any" value="{!v.dataSource.Opportunity.NumeroAltaCliente__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Territorio Numero" name="territorioNumero" type="text"  step="any" value="{!v.dataSource.User.NumeroTerritorio__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Oportunidad" name="Oportunidad" type="text"  step="any" value="{!v.dataSource.Opportunity.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <lightning:input label="Nombre Ejecutivo" name="nombreEjecutivo" type="text"  step="any" value="{!v.dataSource.Opportunity.Owner.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Gestor de la Oportunidad" name="gestorOportunidad" type="text"  step="any" value="{!v.dataSource.User.Manager.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     <lightning:input label="Venta Trade Marketing" name="VentaTradeMarketing" type="Text" step="any" value="{!v.dataSource.Opportunity.VentaTradeMarketing_PL__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-										
-				</lightning:layoutItem>
-
-			</lightning:layout>
-
-			<div class="separador" id="separadorEL"></div>
-
-			<div class="slds-section slds-is-open slds-p-top_medium" id="sectionEL">
-				<h3 class="slds-section__title slds-theme_shade">
-					<span class="slds-truncate slds-p-horizontal_small tableFontSize" title="funcionalidades">
-						Entidad Legal / Filiales
-					</span>
-				</h3>
-			</div>
-			<lightning:layout >
-				
-				<table class="slds-table slds-table_bordered slds-table_cell-buffer tableFontSize" id="tableEL" style="text-align:center;">
-					<thead >
-						<tr class="slds-text-title_caps tableFontSize" >
+                    
+                </lightning:layoutItem>
+                
+            </lightning:layout>
+            
+            <div class="separador" id="separadorEL"></div>
+            
+            <div class="slds-section slds-is-open slds-p-top_medium" id="sectionEL">
+                <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small tableFontSize" title="funcionalidades">
+                        Entidad Legal / Filiales
+                    </span>
+                </h3>
+            </div>
+            <lightning:layout >
+                
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer tableFontSize" id="tableEL" style="text-align:center;">
+                    <thead >
+                        <tr class="slds-text-title_caps tableFontSize" >
                             <aura:if isTrue="{!v.btnInactiveCheck}">
                                 <th scope="col" name="hideCol" style="text-align:center;">
                                     <div class="slds-truncate" ></div>
                                 </th>
                             </aura:if>
-							<th scope="col" style="text-align:center;">
+                            <th scope="col" style="text-align:center;">
                                 <center>
                                     <div class="slds-truncate" >Tipo</div>
                                 </center>
-							</th>
-							<th scope="col" style="text-align:center;">                                
-                                    <div class="slds-truncate" title="Tipo">Tipo Persona</div>
-							</th>
+                            </th>
+                            <th scope="col" style="text-align:center;">                                
+                                <div class="slds-truncate" title="Tipo">Tipo Persona</div>
+                            </th>
                             <th scope="col" style="text-align:center;">
                                 <center>
                                     <div class="slds-truncate" title="Nombre">Razón Social</div>
                                 </center>
-							</th>
-							<th scope="col" style="text-align:center;">
-								<div class="slds-truncate" title="RFC">RFC</div>
-							</th>
+                            </th>
                             <th scope="col" style="text-align:center;">
-								<div class="slds-truncate" title="RFC">Administrador de Plataforma</div>
-							</th>
+                                <div class="slds-truncate" title="RFC">RFC</div>
+                            </th>
                             <th scope="col" style="text-align:center;">
-								<div class="slds-truncate" title="RFC">Email</div>
-							</th>
-							<th scope="col" style="text-align:center;">
-								<div class="slds-truncate" title="AS400">Cód. As400/Id. OPAM</div>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<aura:if isTrue="{!v.eLExist}">
-							<tr >
+                                <div class="slds-truncate" title="País de origen">País de origen</div>
+                            </th>
+                            <th scope="col" style="text-align:center;">
+                                <div class="slds-truncate" title="RFC">Administrador de Plataforma</div>
+                            </th>
+                            <th scope="col" style="text-align:center;">
+                                <div class="slds-truncate" title="RFC">Email</div>
+                            </th>
+                            <th scope="col" style="text-align:center;">
+                                <div class="slds-truncate" title="AS400">Cód. As400/Id. OPAM</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:if isTrue="{!v.eLExist}">
+                            <tr >
                                 <aura:if isTrue="{!v.btnInactiveCheck}">
-									<th scope="row" name="hideCol" style="text-align:center;">
+                                    <th scope="row" name="hideCol" style="text-align:center;">
                                         <center>
                                             <input type="radio" id="{!v.entidadLegal.Id}" name="update" onclick="{!c.updateData}" />
                                         </center>
-									</th>
-                        		</aura:if>
-								<th scope="row" style="text-align:center;">
-                                    <center>EL</center>
-								</th>
-								<td data-label="Account Name" style="text-align:center;">
-                                    <center>
-									<div class="slds-truncate" title="{!v.entidadLegal.RecordType}">{!v.entidadLegal.RecordType}</div>
-                                    </center>
-								</td>
-								<td style="text-align:center;">
-									<div class="slds-truncate" title="{!v.entidadLegal.RazonSocial__c}">{!v.entidadLegal.RazonSocial__c}</div>
-								</td>
-								<td style="text-align:center;">
-									<div class="slds-truncate" title="{!v.entidadLegal.Name}">{!v.entidadLegal.Name}</div>
-								</td>
-                                <td style="text-align:center;">
-									<div class="slds-truncate" title="{!v.dataSource.Opportunity.Contacto__r.Name}">{!v.dataSource.Opportunity.Contacto__r.Name}</div>
-								</td>
-                                <td style="text-align:center;">
-									<div class="slds-truncate" title="{!v.dataSource.Opportunity.Contacto__r.Email}">{!v.dataSource.Opportunity.Contacto__r.Email}</div>
-								</td>
-								<td>
-									<lightning:input label="AS400" type="text"  step="any" value="{!v.dataSource.Contrato2__c.CodigoAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="{!v.entidadLegal.Disabled}" />
-								</td>
-							</tr>
-						</aura:if>
-						<aura:iteration items="{!v.filialesSource}" var="filial" indexVar="indexF">
-
-							<tr>
-                                <aura:if isTrue="{!v.btnInactiveCheck}">
-									<th scope="row" name="hideCol" style="text-align:center;">									
-										<input type="radio" id="{!filial.Entidad_Cuenta__r.EntidadLegal__r.Id}" name="update" onclick="{!c.updateData}" />									
-									</th>
+                                    </th>
                                 </aura:if>
-								<td scope="row" style="text-align:center;">
-									F
-								</td>
-								<td style="text-align:center;">
-									<div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name}</div>
-								</td>
-								<td style="text-align:center;">
-									<div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c}</div>
-								</td>
-								<td style="text-align:center;">
-									<div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.Name}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.Name}</div>
-								</td>
+                                <th scope="row" style="text-align:center;">
+                                    <center>EL</center>
+                                </th>
+                                <td data-label="Account Name" style="text-align:center;">
+                                    <center>
+                                        <div class="slds-truncate" title="{!v.entidadLegal.RecordType}">{!v.entidadLegal.RecordType}</div>
+                                    </center>
+                                </td>
                                 <td style="text-align:center;">
-									<div class="slds-truncate" title="{!filial.PlatformAdministrator__r.Name}">{!filial.PlatformAdministrator__r.Name}</div>
-								</td>
+                                    <div class="slds-truncate" title="{!v.entidadLegal.RazonSocial__c}">{!v.entidadLegal.RazonSocial__c}</div>
+                                </td>
                                 <td style="text-align:center;">
-									<div class="slds-truncate" title="{!filial.PlatformAdministrator__r.Email}">{!filial.PlatformAdministrator__r.Email}</div>
-								</td>
-								<td >
-									<lightning:input label="AS400" type="text" step="any" value="{!filial.CodigoAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="{!filial.Disabled}" />
-
-								</td>
-							</tr>
-						</aura:iteration>
+                                    <div class="slds-truncate" title="{!v.entidadLegal.Name}">{!v.entidadLegal.Name}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!v.entidadLegal.CountryOrigin__c}">{!v.entidadLegal.CountryOrigin__c}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!v.dataSource.Opportunity.Contacto__r.Name}">{!v.dataSource.Opportunity.Contacto__r.Name}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!v.dataSource.Opportunity.Contacto__r.Email}">{!v.dataSource.Opportunity.Contacto__r.Email}</div>
+                                </td>
+                                <td>
+                                    <lightning:input label="AS400" type="text"  step="any" value="{!v.dataSource.Contrato2__c.CodigoAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="{!v.entidadLegal.Disabled}" />
+                                </td>
+                            </tr>
+                        </aura:if>
+                        <aura:iteration items="{!v.filialesSource}" var="filial" indexVar="indexF">
+                            
+                            <tr>
+                                <aura:if isTrue="{!v.btnInactiveCheck}">
+                                    <th scope="row" name="hideCol" style="text-align:center;">									
+                                        <input type="radio" id="{!filial.Entidad_Cuenta__r.EntidadLegal__r.Id}" name="update" onclick="{!c.updateData}" />									
+                                    </th>
+                                </aura:if>
+                                <td scope="row" style="text-align:center;">
+                                    F
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.RecordType.Name}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.RazonSocial__c}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.Name}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.Name}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!filial.Entidad_Cuenta__r.EntidadLegal__r.Name}">{!filial.Entidad_Cuenta__r.EntidadLegal__r.CountryOrigin__c}</div>
+                                </td>                                
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!filial.PlatformAdministrator__r.Name}">{!filial.PlatformAdministrator__r.Name}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <div class="slds-truncate" title="{!filial.PlatformAdministrator__r.Email}">{!filial.PlatformAdministrator__r.Email}</div>
+                                </td>
+                                <td >
+                                    <lightning:input label="AS400" type="text" step="any" value="{!filial.CodigoAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="{!filial.Disabled}" />
+                                    
+                                </td>
+                            </tr>
+                        </aura:iteration>
                         <aura:if isTrue="{!or(v.dataSource.QuoteLineItem.Product2.IDInterno__c=='30',v.dataSource.QuoteLineItem.Product2.IDInterno__c=='31')}">
                             <tr>
                                 <td colspan="8">
@@ -241,26 +253,83 @@
                                 </td>
                             </tr>
                         </aura:if>
-					</tbody>
-				</table>
-			</lightning:layout>
-            
+                    </tbody>
+                </table>
+            </lightning:layout>
+            <aura:if isTrue="{!v.dataSource.Product2__c.SendToSIGLO__c}">
+                <div class="slds-section slds-is-open slds-p-top_medium" id="sectionEL">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <span class="slds-truncate slds-p-horizontal_small tableFontSize" title="funcionalidades">
+                            Detalle de la Entidad Legal
+                        </span>
+                    </h3>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-m-left_medium slds-m-right_medium">
+                        <aura:if isTrue="{!v.entidadLegal.PersonType__c == 'Persona Moral - Mexicana'}">
+                            <div>
+                                <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                    <lightning:input disabled="true" type="text" name="input1SIGLO" label="Número de firma electrónica avanzada" value="{!v.entidadLegal.FEA__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números."/>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!or(v.entidadLegal.PersonType__c == 'Persona Moral - Mexicana', v.entidadLegal.PersonType__c == 'Persona Moral - Extranjera' )}">
+                            <div>
+                                <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                    <lightning:input disabled="true" type="date" name="input2SIGLO" label="Fecha de constitución de la empresa" value="{!v.entidadLegal.DeedDate__c}" required="true"/>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <div>
+                            <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                <lightning:input disabled="true" type="text" name="input3SIGLO" label="Número de cuenta" value="{!v.entidadLegal.AccountNumber__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números."/>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                <lightning:input disabled="true" type="text" name="input4SIGLO" label="Número de la clave" value="{!v.entidadLegal.KeyNumber__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números."/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col">
+                        <div>
+                            <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                <lightning:input disabled="true" type="text" name="input5SIGLO" label="Geolocalización" value="{!v.entidadLegal.Geolocation__c}" required="true" maxlength="40" minlength="1"/>
+                            </div>
+                        </div>
+                        <aura:if isTrue="{!or(v.entidadLegal.PersonType__c == 'Persona Moral - Mexicana', v.entidadLegal.PersonType__c == 'Persona Moral - Extranjera' )}">
+                            <div>
+                                <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                    <lightning:input disabled="true" type="text" name="input3SIGLO" label="Giro, Actividad o Objeto Social" value="{!v.entidadLegal.EconomicActivity__c}" required="true" maxlength="25" minlength="1" pattern="[0-9]{1,25}" messageWhenPatternMismatch="Favor de incluir sólo números."/>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.entidadLegal.PersonType__c == 'Persona Moral - Mexicana'}">
+                            <div>
+                                <div style="width:100%;display:inline-block;vertical-align:top;" class="slds-p-top_x-small">
+                                    <lightning:input disabled="true" type="text" name="input6SIGLO" label="Número de escritura de la persona moral" value="{!v.entidadLegal.DeedNumber__c}" required="true" maxlength="30" minlength="1"/>
+                                </div>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </aura:if>
             <div class="separador" id="separadorEL"></div>
-
-			<div class="slds-section slds-is-open slds-p-top_medium" id="sectionEL">
-				<h3 class="slds-section__title slds-theme_shade">
-					<span class="slds-truncate slds-p-horizontal_small tableFontSize" title="funcionalidades">
-						Subcuentas asociadas
-					</span>
-				</h3>
-			</div>
+            
+            <div class="slds-section slds-is-open slds-p-top_medium" id="sectionEL">
+                <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small tableFontSize" title="funcionalidades">
+                        Subcuentas asociadas
+                    </span>
+                </h3>
+            </div>
             
             <lightning:layout >	
-				<table class="slds-table slds-table_bordered slds-table_cell-buffer tableFontSize">
-			        <tr>
-			            <th  scope="row" ></th> 
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer tableFontSize">
+                    <tr>
+                        <th  scope="row" ></th> 
                         
-			            <th scope="col">
+                        <th scope="col">
                             <div class="slds-truncate" >Tipo</div>
                         </th>
                         <th scope="col">
@@ -275,17 +344,17 @@
                         <th scope="col">
                             <div class="slds-truncate" title="AS400">Cód. As400/Id. OPAM</div>
                         </th>
-			        </tr>   
-			        <aura:iteration items="{!v.subCuentas}" var="cuenta">
+                    </tr>   
+                    <aura:iteration items="{!v.subCuentas}" var="cuenta">
                         <tr>
                             <td>
-                     
+                                
                             </td>
-                           <td >
+                            <td >
                                 <div class="slds-truncate">{!cuenta.Name}</div>
                             </td>
-                           <td data-label="Account Name">
-                               <div class="slds-truncate" title="{!v.entidadLegal.RecordType}">{!v.entidadLegal.RecordType}</div>
+                            <td data-label="Account Name">
+                                <div class="slds-truncate" title="{!v.entidadLegal.RecordType}">{!v.entidadLegal.RecordType}</div>
                             </td>
                             <td >
                                 <div class="slds-truncate" title="{!v.entidadLegal.RazonSocial__c}">{!v.entidadLegal.RazonSocial__c}</div>
@@ -297,8 +366,8 @@
                                 <lightning:input type="text"  label="Código	 AS400" value="{!cuenta.CodigoAS400}"  messageWhenValueMissing="Campo requerido" required="true"/>
                             </td>
                         </tr>
-			        </aura:iteration>
-			    </table>
+                    </aura:iteration>
+                </table>
                 <div class="slds-grid slds-gutters">
                     <div class="slds-col">
                         <lightning:buttonIcon disabled="{!v.btnInactive}" iconName="utility:add"  alternativeText="Agrega SubCuentas" onclick="{!c.addRows}"/>
@@ -306,141 +375,155 @@
                     <div class="slds-col">
                         <lightning:buttonIcon disabled="{!v.btnInactive}" iconName="utility:dash"  alternativeText="Agrega SubCuentas" onclick="{!c.deleteRow}"/>
                     </div>			 		
-				</div>
-			</lightning:layout>
+                </div>
+            </lightning:layout>
             
             
-			<!-- <div class="slds-section slds-is-open slds-p-top_medium">
-				<h3 class="slds-section__title slds-theme_shade">
-					<span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
-						Filiales
-					</span>
-				</h3>
-			</div>
-			<lightning:layout>
-				<table class="slds-table slds-table_bordered slds-table_cell-buffer">
-					<thead>
-						<tr class="slds-text-title_caps">
-							<th scope="col">
-								<div class="slds-truncate" ></div>
-							</th>
-							<th scope="col">
-								<div class="slds-truncate" title="Tipo">Tipo</div>
-							</th>
-							<th scope="col">
-								<div class="slds-truncate" title="Nombre">Nombre</div>
-							</th>
-							<th scope="col">
-								<div class="slds-truncate" title="RFC">RFC</div>
-							</th>
-							<th scope="col">
-								<div class="slds-truncate" title="AS400">AS400</div>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-													
-						
-						
-					</tbody>
-				</table>
-			
-			</lightning:layout> -->
-
-			<div class="separador"></div>
-
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Nombre del Grupo" name="nombreCuenta" type="text"  step="any" value="{!v.dataSource.Account.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="ID Grupo AS400" name="idGrupoAS400" type="text"  step="any" value="{!v.dataSource.Account.CodigoClienteAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+            <!-- <div class="slds-section slds-is-open slds-p-top_medium">
+    <h3 class="slds-section__title slds-theme_shade">
+     <span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
+      Filiales
+     </span>
+    </h3>
+   </div>
+   <lightning:layout>
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+     <thead>
+      <tr class="slds-text-title_caps">
+       <th scope="col">
+        <div class="slds-truncate" ></div>
+       </th>
+       <th scope="col">
+        <div class="slds-truncate" title="Tipo">Tipo</div>
+       </th>
+       <th scope="col">
+        <div class="slds-truncate" title="Nombre">Nombre</div>
+       </th>
+       <th scope="col">
+        <div class="slds-truncate" title="RFC">RFC</div>
+       </th>
+       <th scope="col">
+        <div class="slds-truncate" title="AS400">AS400</div>
+       </th>
+      </tr>
+     </thead>
+     <tbody>
+             
+      
+      
+     </tbody>
+    </table>
+   
+   </lightning:layout> -->
+            
+            <div class="separador"></div>
+            
+            <lightning:layout >
+                <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <lightning:input label="Nombre del Grupo" name="nombreCuenta" type="text"  step="any" value="{!v.dataSource.Account.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="ID Grupo AS400" name="idGrupoAS400" type="text"  step="any" value="{!v.dataSource.Account.CodigoClienteAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     <lightning:input label="Razon Social" name="razonSocial" type="text"  step="any" value="{!v.dataSource.Account.RazonSocial__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true" class="razonSocialLightning"/>
-					<!-- Cambio RFC Cuenta -> EL -->
-					<lightning:input label="RFC" name="rfc" type="text"  step="any" value="{!v.dataSource.Account.RFC__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Representante Legal" name="Representante" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Contacto__r.Name}" required="true" disabled="true"/>
+                    <!-- Cambio RFC Cuenta -> EL -->
+                    <lightning:input label="RFC" name="rfc" type="text"  step="any" value="{!v.dataSource.Account.RFC__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Representante Legal" name="Representante" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Contacto__r.Name}" required="true" disabled="true"/>
                     <lightning:input label="Email del Representante Legal" name="RepresentanteEmail" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Contacto__r.Email}" required="true" disabled="true"/>
                     <lightning:input label="CURP" name="curp" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Curp__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <aura:if isTrue="{!v.dataSource.Product2__c.SendToSIGLO__c}">
+                        <lightning:input label="Género" name="Género" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Gender__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                        <lightning:input label="Fecha de nacimiento" name="Fecha de nacimiento" type="date" format="mm/dd/yyyy" value="{!v.dataSource.ContactRepresentanteLegal.Birthdate}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                        <aura:if isTrue="{!v.dataSource.ContactRepresentanteLegal.BirthCountry__c == 'MEXICO'}">
+                            <lightning:input label="Entidad Federativa de Nacimiento" name="Entidad Federativa de Nacimiento" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.BirthState__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                            <aura:set attribute="else">
+                                <lightning:input label="Entidad Federativa de Nacimiento" name="Otra Entidad Federativa de Nacimiento" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.OtherBirthState__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                            </aura:set>
+                        </aura:if>
+                        <lightning:input label="País de nacimiento" name="País de nacimiento" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.BirthCountry__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                        <lightning:input label="Nacionalidad" name="Nacionalidad" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Nationality__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                        <lightning:input label="Ocupación" name="Ocupación" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.ProfessionName__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                        <lightning:input label="Clave de elector" name="Clave de elector" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.ElectorID__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    </aura:if>
                     <!--lightning:input label="SubCuenta" name="subcuenta" type="text"  step="any" value="{!v.dataSource.Opportunity.Contrato_Filial__r.CodigoAS400__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/-->
                     <lightning:input label="Telefono 1" name="telefono" type="text"  step="any" value="{!v.dataSource.Account.Phone}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Telefono 2" name="telefono2" type="text"  step="any" value="{!v.dataSource.Account.Telefono2__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Giro" name="giro" type="text"  step="any" value="{!v.dataSource.Account.Giro__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Solución" name="familia" type="text"  step="any" value="{!v.dataSource.Opportunity.Familia__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Telefono 2" name="telefono2" type="text"  step="any" value="{!v.dataSource.Account.Telefono2__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Giro" name="giro" type="text"  step="any" value="{!v.dataSource.Account.Giro__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Solución" name="familia" type="text"  step="any" value="{!v.dataSource.Opportunity.Familia__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     <lightning:input label="Producto" name="producto" type="text"  step="any" value="{!v.dataSource.Opportunity.Producto_cotizacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     <lightning:input label="Origen de Venta" name="origenVenta" type="text"  step="any" value="{!v.dataSource.Opportunity.LeadSource}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     <lightning:input label="Suborigen de Venta" name="SuborigenVenta" type="text"  step="any" value="{!v.dataSource.Opportunity.SubOrigen__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     <lightning:input label="Soluciones White Label" name="SolucionesWhiteLabel" type="text"  step="any" value="{!v.dataSource.Opportunity.Maquilador__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Competidor" name="competidor" type="text"  step="any" value="{!v.dataSource.Opportunity.Competidor__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                    <lightning:input label="Competidor" name="competidor" type="text"  step="any" value="{!v.dataSource.Opportunity.Competidor__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
                     
                     
-				</lightning:layoutItem>
-				<aura:if isTrue="{!v.app_edenred.render == true}">
-					<div id="visorDocumentos">
-						<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
-							<strong class="slds-text-heading_small">
-								Visor de Documentos Cargados
-							</strong>
-							<aura:iteration items="{!v.attachmentSource}" var="document" indexVar="index">
-								<lightning:layout >
-									<lightning:layoutItem flexibility="shrink" padding="around-small" size="4">
-										<div>
-											<strong>{!document.Name}</strong>
-										</div>
-									</lightning:layoutItem>
-									<lightning:layoutItem flexibility="shrink" padding="around-small" size="8" class="slds-align_absolute-center">
-										<div>
-											<a target="_blank" class="slds-button slds-button--brand" href="{!'/' + document.Id}">Ver</a>
-										</div>
-									</lightning:layoutItem>
-								</lightning:layout>
-								<aura:if isTrue="{!v.isOpen}">
-									<div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open  slds-modal_medium">
-								        <div class="slds-modal__container">
-								          <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
-								          <div class="slds-modal__header">
-								            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
-								            
-								            <span class="slds-assistive-text">Cerrar</span>
-								            </button>
-								            <h2 id="header99" class="slds-text-heading--medium"></h2>
-								          </div>
-								          <!--###### MODAL BOX BODY Part Start From Here ######-->
-								          <div class="slds-modal__content slds-p-around--large">
-								          	<iframe  class = "frameImg" width="100%" height="1200" src="{!v.urlPDF}" frameborder="0"></iframe>
-
-								          </div>
-								          <!--###### MODAL BOX FOOTER Part Start From Here ######-->
-								          <div class="slds-modal__footer">
-								            <button class="slds-button slds-button_destructive" onclick="{!c.closeModel}" >Cerrar</button>
-								          
-								          </div>
-								        </div>
-								      </div>
-								      <div class="slds-backdrop slds-backdrop--open"></div>
-								</aura:if>
-							</aura:iteration>
-						</lightning:layoutItem>
-					</div>
-				</aura:if>
-				
-			</lightning:layout>
-
-			
-			<!--div class="separador"></div-->
-
-			<!-- DVM: INICIO, 2 Julio se comenta este bloque para cubrir el requerimiento de mostrar TODOS los contactos administradores de plataforma de la cuenta 
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Representante Legal" name="rLegal" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Puesto" name="puesto" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Puesto__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Correo" name="correo" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Email}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Telefono" name="telefono" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Phone}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Quien Administra la Plataforma" name="adminPlataforma" type="text"  step="any" value="{!v.dataSource.ContactAdministrador.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Puesto" name="puestoAd" type="text"  step="any" value="Quien administra Plataforma" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Correo" name="correoAd" type="text"  step="any" value="{!v.dataSource.ContactAdministrador.Email}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Telefono" name="telefonoAd" type="text"  step="any" value="{!v.dataSource.ContactAdministrador.Phone}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout>
+                </lightning:layoutItem>
+                <aura:if isTrue="{!v.app_edenred.render == true}">
+                    <div id="visorDocumentos">
+                        <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                            <strong class="slds-text-heading_small">
+                                Visor de Documentos Cargados
+                            </strong>
+                            <aura:iteration items="{!v.attachmentSource}" var="document" indexVar="index">
+                                <lightning:layout >
+                                    <lightning:layoutItem flexibility="shrink" padding="around-small" size="4">
+                                        <div>
+                                            <strong>{!document.Name}</strong>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="shrink" padding="around-small" size="8" class="slds-align_absolute-center">
+                                        <div>
+                                            <a target="_blank" class="slds-button slds-button--brand" href="{!'/' + document.Id}">Ver</a>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                                <aura:if isTrue="{!v.isOpen}">
+                                    <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open  slds-modal_medium">
+                                        <div class="slds-modal__container">
+                                            <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                                            <div class="slds-modal__header">
+                                                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                                    
+                                                    <span class="slds-assistive-text">Cerrar</span>
+                                                </button>
+                                                <h2 id="header99" class="slds-text-heading--medium"></h2>
+                                            </div>
+                                            <!--###### MODAL BOX BODY Part Start From Here ######-->
+                                            <div class="slds-modal__content slds-p-around--large">
+                                                <iframe  class = "frameImg" width="100%" height="1200" src="{!v.urlPDF}" frameborder="0"></iframe>
+                                                
+                                            </div>
+                                            <!--###### MODAL BOX FOOTER Part Start From Here ######-->
+                                            <div class="slds-modal__footer">
+                                                <button class="slds-button slds-button_destructive" onclick="{!c.closeModel}" >Cerrar</button>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-backdrop slds-backdrop--open"></div>
+                                </aura:if>
+                            </aura:iteration>
+                        </lightning:layoutItem>
+                    </div>
+                </aura:if>
+                
+            </lightning:layout>
+            
+            
+            <!--div class="separador"></div-->
+            
+            <!-- DVM: INICIO, 2 Julio se comenta este bloque para cubrir el requerimiento de mostrar TODOS los contactos administradores de plataforma de la cuenta 
+   <lightning:layout >
+    <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Representante Legal" name="rLegal" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Puesto" name="puesto" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Puesto__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Correo" name="correo" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Email}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Telefono" name="telefono" type="text"  step="any" value="{!v.dataSource.ContactRepresentanteLegal.Phone}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Quien Administra la Plataforma" name="adminPlataforma" type="text"  step="any" value="{!v.dataSource.ContactAdministrador.Name}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Puesto" name="puestoAd" type="text"  step="any" value="Quien administra Plataforma" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Correo" name="correoAd" type="text"  step="any" value="{!v.dataSource.ContactAdministrador.Email}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Telefono" name="telefonoAd" type="text"  step="any" value="{!v.dataSource.ContactAdministrador.Phone}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+   </lightning:layout>
             DVM: FIN, 2 Julio -->
             
             <!--DVM: INICIO, 2 Julio, Solución para mostrar todos los contactos en pantalla ADV-->
@@ -451,114 +534,128 @@
             
             <div class="separador"></div>
             
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="10" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Correo que recibe la factura" name="recibeFactura" type="text"  step="any" value="{!v.dataSource.Contrato2__c.CorreoRecibeFactura__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout>
-             
             <lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="10" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Otros correos" name="OtrosCorreos" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Otros_correos__c}" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout>
-
-			
-
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
-					<!--lightning:input label="Direccion Fiscal" name="direccionFiscal" type="text"  step="any" value="{!v.dataSource.Account.DireccionFiscal}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/-->
-					<lightning:input label="Direccion Fiscal" name="direccionFiscal" type="text"  step="any" value="{!if(and(v.dataSource.Contrato2__c.FiscalAddressText__c!=null,v.dataSource.Contrato2__c.FiscalAddressText__c!='C.P'),v.dataSource.Contrato2__c.FiscalAddressText__c,v.dataSource.Contrato2__c.DireccionFiscal__c)}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout>
+                <lightning:layoutItem flexibility="auto" size="10" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <lightning:input label="Correo que recibe la factura" name="recibeFactura" type="text"  step="any" value="{!v.dataSource.Contrato2__c.CorreoRecibeFactura__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <lightning:layout >
+                <lightning:layoutItem flexibility="auto" size="10" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <lightning:input label="Otros correos" name="OtrosCorreos" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Otros_correos__c}" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            
+            
+            <lightning:layout >
+                <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <!--lightning:input label="Direccion Fiscal" name="direccionFiscal" type="text"  step="any" value="{!v.dataSource.Account.DireccionFiscal}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/-->
+                    <lightning:input label="Direccion Fiscal" name="direccionFiscal" type="text"  step="any" value="{!if(and(v.dataSource.Contrato2__c.FiscalAddressText__c!=null,v.dataSource.Contrato2__c.FiscalAddressText__c!='C.P'),v.dataSource.Contrato2__c.FiscalAddressText__c,v.dataSource.Contrato2__c.DireccionFiscal__c)}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                </lightning:layoutItem>
+            </lightning:layout>
             
             <!-- DVM: Requerimiento de Direcciones de Entrega-->
             <lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
                     {!v.dirEntregaCMP}
-				</lightning:layoutItem>
-			</lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
             <!-- DVM: Requerimiento de Direcciones de Entrega-->
             
-<!-- 			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Direcciones Auxiliares" name="dAux" type="text"  step="any" value="" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout> -->
-
-			<div class="separador"></div>
-
-			<div class="slds-section slds-is-open slds-p-top_medium">
-				<h3 class="slds-section__title slds-theme_shade">
-					<span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
-						Condiciones Comerciales
-					</span>
-				</h3>
-			</div>
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
-					<h3 class="slds-section-title--divider dividerTable">Soluciones {!v.dataSource.Name}</h3>
-					<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
-					  <div class="slds-form-element">
-							<table class="slds-table slds-table_bordered slds-table_cell-buffer">
-								<thead>
-									<tr>
-										<th scope="col">
-									        <div class="slds-truncate" title="Nombre del producto">Nombre del producto</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Cobertura">Cobertura</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Uso">Uso</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Seguridad">Seguridad</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Cantidad de tarjetas">Cantidad de tarjetas</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Precio de venta">Volumen de emisión</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Fecha">Fecha</div>
-									    </th>
-									    <th scope="col">
-									        <div class="slds-truncate" title="Competidor">Competidor</div>
-									    </th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td data-label="Nombre del producto">
-        									<lightning:input label="ProductName" name="nombreProducto" type="text"  step="any" value="{!v.dataSource.Product2__c.Name}" disabled="true"/>
-      									</td>
-      									<td>
-      										<label>{!v.dataSource.Product2__c.Red__c}</label>
-      									</td>
-      									<td>
-      										<label>{!v.dataSource.Product2__c.Uso__c}</label>
-      									</td>
-      									<td>
-      										<label>{!v.dataSource.Product2__c.Formato__c}</label>
-      									</td>
-      									<td>
-      										<lightning:input label="CantidadTarjetas" name="cantidadTarjetas" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.CantidadTarjetas__c}" disabled="true"/>
-      									</td>
-      									<td>
-      										<label>{!v.dataSource.QuoteLineItem.UnitPrice}</label>
-      									</td>
-      									<td>
-      										<label>{!v.dataSource.QuoteLineItem.ServiceDate}</label>
-      									</td>
-      									<td>
-      										<label>{!v.dataSource.Opportunity.Competidor__c}</label>
-      									</td>
-									</tr>
-									
-								</tbody>
-								<aura:if isTrue="{!v.tiposDeMedio.length > 0}">
+            <!-- 			<lightning:layout >
+    <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Direcciones Auxiliares" name="dAux" type="text"  step="any" value="" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+   </lightning:layout> -->
+            
+            <div class="separador"></div>
+            
+            <div class="slds-section slds-is-open slds-p-top_medium">
+                <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
+                        Condiciones Comerciales
+                    </span>
+                </h3>
+            </div>
+            <lightning:layout >
+                <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <h3 class="slds-section-title--divider dividerTable">Soluciones {!v.dataSource.Name}</h3>
+                    <div class="slds-form--stacked slds-p-top--medium slds-p-bottom--medium slds-m-bottom--x-small">
+                        <div class="slds-form-element">
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <thead>
+                                    <tr class="slds-line-height_reset slds-border--bottom">
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Nombre del producto">Nombre del producto</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Cobertura">Cobertura</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Uso">Uso</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Seguridad">Seguridad</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Cantidad de tarjetas">Cantidad<br/>de tarjetas</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Precio de venta">Volumen de<br/>emisión</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Fecha">Fecha</div>
+                                        </th>
+                                        <aura:if isTrue="{!v.dataSource.Product2__c.SendToSIGLO__c}">
+                                            <th scope="col">
+                                                <div class="slds-has-flexi-truncate" title="Número estimado de transacciones">Número<br/>estimado de<br/>transacciones</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Realizará sus operaciones en dólares?">Realizará sus<br/>operaciones<br/>en dólares?</div>
+                                            </th>
+                                        </aura:if>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Competidor">Competidor</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="slds-line-height_reset slds-border--bottom">
+                                        <td data-label="Nombre del producto">
+                                            <lightning:input label="ProductName" name="nombreProducto" type="text"  step="any" value="{!v.dataSource.Product2__c.Name}" disabled="true"/>
+                                        </td>
+                                        <td>
+                                            <label>{!v.dataSource.Product2__c.Red__c}</label>
+                                        </td>
+                                        <td>
+                                            <label>{!v.dataSource.Product2__c.Uso__c}</label>
+                                        </td>
+                                        <td>
+                                            <label>{!v.dataSource.Product2__c.Formato__c}</label>
+                                        </td>
+                                        <td>
+                                            <lightning:input label="CantidadTarjetas" name="cantidadTarjetas" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.CantidadTarjetas__c}" disabled="true"/>
+                                        </td>
+                                        <td>
+                                            <label>{!v.dataSource.QuoteLineItem.UnitPrice}</label>
+                                        </td>
+                                        <td>
+                                            <label>{!v.dataSource.QuoteLineItem.ServiceDate}</label>
+                                        </td>
+                                        <aura:if isTrue="{!v.dataSource.Product2__c.SendToSIGLO__c}">
+                                            <td>
+                                                <label>{!v.dataSource.QuoteLineItem.Quote.TransactionsEstimatedNumber__c}</label>
+                                            </td>
+                                            <td>
+                                                <label>{!v.dataSource.QuoteLineItem.Quote.OperationsInDollars__c}</label>
+                                            </td>
+                                        </aura:if>
+                                        <td>
+                                            <label>{!v.dataSource.Opportunity.Competidor__c}</label>
+                                        </td>
+                                    </tr>
+                                    <aura:if isTrue="{!v.tiposDeMedio.length > 0}">
 									<tfoot>
 										<tr>
 											<th>Tipos de medio</th>
@@ -582,141 +679,226 @@
 										</tr>
 									</tfoot>
 								</aura:if>
-							</table>
-						</div>
-					</div>
-
-					<h3 class="slds-section-title--divider dividerTable">(Metodo de pago - {!v.dataSource.Name}/{!v.dataSource.Product2__c.Name})</h3>
-					<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
-						<div class="slds-form-element">
-							<lightning:layout >
-								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
-									<ui:inputCheckbox label="Transferencia electronica" name="transElectronica" value="{!v.transferenciaElectronica}" required="true" disabled="true"/>
-									<aura:if isTrue="{!v.transferenciaElectronica}">
-										<lightning:input label="Opciones de metodo de pago" name="opcPago" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.OpcionesMetodoPago__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-										<!--<lightning:input label="Tarjeta asociada" name="tarjAsoc" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.TarjetaAsociada__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>-->
-										<!--<lightning:input label="Clabe interbancaria" name="clabeInt" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.ClabeInterbancaria__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>-->
-									</aura:if>
-								</lightning:layoutItem>
-								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
-									 <ui:inputCheckbox label="American Express" name="AM" value="{!v.amex}" required="true" disabled="true"/>
-									 <aura:if isTrue="{!v.amex}">
-										<lightning:input label="Tipo" name="tipoAmex" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.TipoAmex__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-										<lightning:input label="Nivel de Consumo" name="nivelConsumo" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.NivelConsumo__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-									</aura:if>
-								</lightning:layoutItem>
-								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
-									<ui:inputCheckbox label="Deposito bancario" name="depBancario" value="{!v.depositoBancario}" required="true" disabled="true"/>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <h3 class="slds-section-title--divider dividerTable">(Metodo de pago - {!v.dataSource.Name}/{!v.dataSource.Product2__c.Name})</h3>
+                    <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                        <div class="slds-form-element">
+                            <lightning:layout >
+                                <lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
+                                    <ui:inputCheckbox label="Transferencia electronica" name="transElectronica" value="{!v.transferenciaElectronica}" required="true" disabled="true"/>
+                                    <aura:if isTrue="{!v.transferenciaElectronica}">
+                                        <lightning:input label="Opciones de metodo de pago" name="opcPago" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.OpcionesMetodoPago__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                                        <!--<lightning:input label="Tarjeta asociada" name="tarjAsoc" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.TarjetaAsociada__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>-->
+                                        <!--<lightning:input label="Clabe interbancaria" name="clabeInt" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.ClabeInterbancaria__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>-->
+                                    </aura:if>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
+                                    <ui:inputCheckbox label="American Express" name="AM" value="{!v.amex}" required="true" disabled="true"/>
+                                    <aura:if isTrue="{!v.amex}">
+                                        <lightning:input label="Tipo" name="tipoAmex" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.TipoAmex__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                                        <lightning:input label="Nivel de Consumo" name="nivelConsumo" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.NivelConsumo__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                                    </aura:if>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
+                                    <ui:inputCheckbox label="Deposito bancario" name="depBancario" value="{!v.depositoBancario}" required="true" disabled="true"/>
 								</lightning:layoutItem>
 								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
 									<ui:inputCheckbox label="Pago online" name="pagoOnline" value="{!v.pagoOnline}" required="true" disabled="true"/>
-								</lightning:layoutItem>
-								<lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
-									<ui:inputCheckbox label="Otros" name="otros" value="{!v.otros}" required="true" disabled="true"/>
-									<aura:if isTrue="{!v.otros}">
-										<lightning:input label="Otro metodo de pago" name="otroMP" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.OtroMetodoPago__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-									</aura:if>
-								</lightning:layoutItem>
-							</lightning:layout>
-							
-<!-- 							<table class="slds-table slds-table_bordered slds-table_cell-buffer">
-								<thead>
-									<tr>
-										<th scope="col">
-									       
-									    </th>
-									    <th scope="col">
-									       
-									    </th>
-									    <th scope="col">
-									      
-									    </th>
-									    <th scope="col">
-									        
-									    </th>
-									</tr>
-								</thead>
-								<tbody>
-									
-								</tbody>
-							</table> -->
-						</div>
+								</lightning:layoutItem> 
+                                <lightning:layoutItem flexibility="auto" size="3" class="slds-p-horizontal_medium slds-p-top_medium">
+                                    <ui:inputCheckbox label="Otros" name="otros" value="{!v.otros}" required="true" disabled="true"/>
+                                    <aura:if isTrue="{!v.otros}">
+                                        <lightning:input label="Otro metodo de pago" name="otroMP" type="text"  step="any" value="{!v.dataSource.QuoteLineItem.OtroMetodoPago__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+                                    </aura:if>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                            
+                            <!-- 							<table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+         <tr>
+          <th scope="col">
+                
+             </th>
+             <th scope="col">
+                
+             </th>
+             <th scope="col">
+               
+             </th>
+             <th scope="col">
+                 
+             </th>
+         </tr>
+        </thead>
+        <tbody>
+         
+        </tbody>
+       </table> -->
+                        </div>
 					</div>
-
-						 <span class="page-break"></span>
-					
-						<h3 class="slds-section-title--divider dividerTable">(Costos {!v.dataSource.Name}/{!v.dataSource.Product2__c.Name})</h3>
-						<div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
-							<div class="slds-form-element">
-								<table class="slds-table slds-table_bordered slds-table_cell-buffer">
-									<thead>
-										<tr>
-											<th scope="col">
-										       <div class="slds-truncate" title="Concepto">Concepto</div>
-										    </th>
-										    <th scope="col">
-										       <div class="slds-truncate" title="Costo inicial">Costo inicial</div>
-										    </th>
-										    <th scope="col">
-										      <div class="slds-truncate" title="Costo final">Costo final</div>
-										    </th>
-										    <th scope="col">
-										        <div class="slds-truncate" title="%Descuento">Descuento</div>
-										    </th>
-										    <th scope="col">
-										        <div class="slds-truncate" title="vigencia del descuento">Vigencia del descuento</div>
-										    </th>
-										    <th scope="col">
-										        <div class="slds-truncate" title="#tarjetas">#Tarjetas</div>
-										    </th>
-										</tr>
-									</thead>
-									<tbody>
-										<aura:iteration items="{!v.productosSource}" var="product" indexVar="index">
-											<tr>
-												<td>
-		      										<label>{!product.Concepto__r.TipoCargo__c}</label>
-		      									</td>
-		      									<td>
-		      										<aura:if isTrue="{!index == 0}">
-		      											<label>{!product.PrecioLista__c} %</label>
-		      										</aura:if>
-		      										<aura:if isTrue="{!index != 0}">
-		      											<label>$ {!product.PrecioLista__c}</label>
-		      										</aura:if>
-		      									</td>
-		      									<td>
-		      										<aura:if isTrue="{!index == 0}">
-		      											<label>{!product.PrecioFinal__c} %</label>
-		      										</aura:if>
-		      										<aura:if isTrue="{!index != 0}">
-		      											<label>$ {!product.PrecioFinal__c}</label>
-		      										</aura:if>
-		      										
-		      									</td>
-		      									<td>
-		      										<label>{!product.Bonificacion__c} %</label>
-		      									</td>
-		      									<td>
-		      										<label>{!product.VigenciaDescuento__c}</label>
-		      									</td>
-		      									<td>
-		      										<label>{!product.CantidadTarjetas__c}</label>
-		      									</td>
-											</tr>
-										</aura:iteration>
-										
-									</tbody>
-								</table>
-							</div>
-							
-						</div>
 					
 
-				</lightning:layoutItem>
-			</lightning:layout>
+                    <!--CEAM:3375 >>> -->
+                    <aura:if isTrue="{!v.dataSource.QuoteLineItem.PaymentMethod__c == 'Pospago'}">
+                        <span class="page-break"></span>
+                        
+                        <h3 class="slds-section-title--divider dividerTable">(Modalidad de Pago {!v.dataSource.Name}/{!v.dataSource.Product2__c.Name})</h3>
+                        
+                        <div class="slds-scrollable">
+                            <div class="slds-form-element">
+                                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Ítem Contratación">Ítem Contratación</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Periodo de Liberación">Periodo de Liberación</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Línea Operativa">Línea Operativa</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Días de Crédito">Días de Crédito</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Tipo de Garantía">Tipo de Garantía</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Semanas de Crédito">Semanas de Crédito</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Número de Liberaciones">Número de Liberaciones</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Total de Días de Crédito">Total de Días de Crédito</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Valor de la Garantía">Valor de la Garantía</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            <!--  WarrantyValue__c, TotalCreditDays__c, ReleasesNumber__c, CreditWeeks__c, WarrantyType__c, CreditDays__c, PaymentMethod__c, OperatingLine__c, ReleasePeriod__c, ContractingItem__c -->
+                                            <tr>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.ContractingItem__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.ReleasePeriod__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        $ <lightning:formattedNumber value="{!v.dataSource.QuoteLineItem.OperatingLine__c}" maximumFractionDigits="2" minimumFractionDigits="2"/>
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.CreditDays__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.WarrantyType__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.CreditWeeks__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.ReleasesNumber__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>{!v.dataSource.QuoteLineItem.TotalCreditDays__c}</label>
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        $ <lightning:formattedNumber value="{!v.dataSource.QuoteLineItem.WarrantyValue__c}" maximumFractionDigits="2" minimumFractionDigits="2"/>
+                                                    </label>
+                                                </td>
+                                            </tr>                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <!--CEAM:3375 <<<-->
 
-			<div class="separador"></div>
+                    
+                    <span class="page-break"></span>
+                    
+                    <h3 class="slds-section-title--divider dividerTable">(Costos {!v.dataSource.Name}/{!v.dataSource.Product2__c.Name})</h3>
+                    <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+                        <div class="slds-form-element">
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Concepto">Concepto</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Costo inicial">Costo inicial</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Costo final">Costo final</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="%Descuento">Descuento</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="vigencia del descuento">Vigencia del descuento</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="#tarjetas">#Tarjetas</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:iteration items="{!v.productosSource}" var="product" indexVar="index">
+                                        <tr>
+                                            <td>
+                                                <label>{!product.Concepto__r.TipoCargo__c}</label>
+                                            </td>
+                                            <td>
+                                                <aura:if isTrue="{!index == 0}">
+                                                    <label>{!product.PrecioLista__c} %</label>
+                                                </aura:if>
+                                                <aura:if isTrue="{!index != 0}">
+                                                    <label>$ {!product.PrecioLista__c}</label>
+                                                </aura:if>
+                                            </td>
+                                            <td>
+                                                <aura:if isTrue="{!index == 0}">
+                                                    <label>{!product.PrecioFinal__c} %</label>
+                                                </aura:if>
+                                                <aura:if isTrue="{!index != 0}">
+                                                    <label>$ {!product.PrecioFinal__c}</label>
+                                                </aura:if>
+                                                
+                                            </td>
+                                            <td>
+                                                <label>{!product.Bonificacion__c} %</label>
+                                            </td>
+                                            <td>
+                                                <label>{!product.VigenciaDescuento__c}</label>
+                                            </td>
+                                            <td>
+                                                <label>{!product.CantidadTarjetas__c}</label>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <div class="separador"></div>
             
             <c:AltaContratoADV aura:id="camposCon" recordId="{!v.dataSource.QuoteLineItem.Id}"/>
             <!--aura:if isTrue="{!or(v.dataSource.QuoteLineItem.Product2.IDInterno__c=='30',v.dataSource.QuoteLineItem.Product2.IDInterno__c=='31')}">
@@ -727,122 +909,122 @@
                     </aura:if>
                 </aura:set>
             </aura:if-->
-			
-			<!-- <div class="slds-section slds-is-open slds-p-top_medium">
-				<h3 class="slds-section__title slds-theme_shade">
-					<span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
-						Funcionalidades
-					</span>
-				</h3>
-			</div>
+            
+            <!-- <div class="slds-section slds-is-open slds-p-top_medium">
+    <h3 class="slds-section__title slds-theme_shade">
+     <span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
+      Funcionalidades
+     </span>
+    </h3>
+   </div>
 
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Frecuencia del pedido" name="fpedido" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Frecuencia_de_Pedido__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Especial por dia" name="epDia" type="text"  step="any" value="{!v.dataSource.Contrato2__c.EspecialDia__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Periodicidad de complemento" name="pComplemento" type="text"  step="any" value="{!v.dataSource.Contrato2__c.PeriodicidadComplemento__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Frecuencia del estado de cuenta" name="fEstadoCuenta" type="text"  step="any" value="{!v.dataSource.Contrato2__c.FrecuenciaEstadoCuenta__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Producto de factura global" name="pfGlobal" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Producto_Factura_Global__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Cliente de facturacion" name="cFacturacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Cliente_Facturacion_Global__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Facturacion de plasticos" name="fPlasticos" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Facturacion_Plasticos__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					 <ui:inputCheckbox label="Consolidador" name="consolidador" value="{!v.dataSource.Contrato2__c.Consolidador__c}"  required="true" disabled="true"/>
-					<lightning:input label="Ligado a" name="ligadoa" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Ligado_a__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Correo que factura" name="correoFactura" type="text"  step="any" value="{!v.dataSource.Contrato2__c.CorreoRecibeFactura__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Tipo de facturacion" name="tFacturacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Tipo_de_Facturacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Sucursal de facturacion global" name="sfGlobal" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Sucursal_Facturacion_Global__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Facturacion de cargos" name="fCargos" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Facturacion_Cargos__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Facturacion de comision" name="fComision" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Facturacion_Comision__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
+   <lightning:layout >
+    <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Frecuencia del pedido" name="fpedido" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Frecuencia_de_Pedido__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Especial por dia" name="epDia" type="text"  step="any" value="{!v.dataSource.Contrato2__c.EspecialDia__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Periodicidad de complemento" name="pComplemento" type="text"  step="any" value="{!v.dataSource.Contrato2__c.PeriodicidadComplemento__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Frecuencia del estado de cuenta" name="fEstadoCuenta" type="text"  step="any" value="{!v.dataSource.Contrato2__c.FrecuenciaEstadoCuenta__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Producto de factura global" name="pfGlobal" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Producto_Factura_Global__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Cliente de facturacion" name="cFacturacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Cliente_Facturacion_Global__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Facturacion de plasticos" name="fPlasticos" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Facturacion_Plasticos__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+      <ui:inputCheckbox label="Consolidador" name="consolidador" value="{!v.dataSource.Contrato2__c.Consolidador__c}"  required="true" disabled="true"/>
+     <lightning:input label="Ligado a" name="ligadoa" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Ligado_a__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Correo que factura" name="correoFactura" type="text"  step="any" value="{!v.dataSource.Contrato2__c.CorreoRecibeFactura__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Tipo de facturacion" name="tFacturacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Tipo_de_Facturacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Sucursal de facturacion global" name="sfGlobal" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Sucursal_Facturacion_Global__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Facturacion de cargos" name="fCargos" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Facturacion_Cargos__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Facturacion de comision" name="fComision" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Facturacion_Comision__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
 
-			</lightning:layout>
+   </lightning:layout>
 
-			<div class="separador"></div>
+   <div class="separador"></div>
 
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Linea operativa" name="lOperativa" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Linea_Operativa__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Ventana de riesgo" name="fComision" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Ventana_de_Riesgos__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Frecuencia de liberacion automatico" name="flAutomatico" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Frecuencia_Liberacion_Automatica__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout>
+   <lightning:layout >
+    <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Linea operativa" name="lOperativa" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Linea_Operativa__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Ventana de riesgo" name="fComision" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Ventana_de_Riesgos__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="6" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Frecuencia de liberacion automatico" name="flAutomatico" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Frecuencia_Liberacion_Automatica__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+   </lightning:layout>
 
-			<div class="separador"></div>
+   <div class="separador"></div>
 
 
-			<lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Dia de liberacion" name="dliberacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia_Liberacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Proxima carga" name="pCarga" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Proxima_Carga__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Dia de la semana" name="dSemana" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia_de_la_Semana__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<lightning:input label="Dia" name="dia" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Dia de inicio" name="diaInicio" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia_Inicio__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					
-				</lightning:layoutItem>
-			</lightning:layout>
+   <lightning:layout >
+    <lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Dia de liberacion" name="dliberacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia_Liberacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Proxima carga" name="pCarga" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Proxima_Carga__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Dia de la semana" name="dSemana" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia_de_la_Semana__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <lightning:input label="Dia" name="dia" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Dia de inicio" name="diaInicio" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Dia_Inicio__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     
+    </lightning:layoutItem>
+   </lightning:layout>
 
-			<div class="slds-section slds-is-open slds-p-top_medium">
-					<h3 class="slds-section__title slds-theme_shade">
-						<span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
-							Condiciones Operativas
-						</span>
-					</h3>
-				</div>
-			<lightning:layout >
-				
-				<lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
-					<ui:inputCheckbox label="VIP" name="vip"  value="{!v.dataSource.Contrato2__c.VIP__c}" required="true" disabled="true"/>
-					<ui:inputCheckbox label="Ticket bomba" name="ticketBomba"  value="{!v.dataSource.Contrato2__c.TicketBomba__c}" required="true" disabled="true"/>
-					<ui:inputCheckbox label="Maneja nota vale" name="mnVale" value="{!v.dataSource.Contrato2__c.Maneja_Nota_Vale__c}" required="true" disabled="true"/>
-					<ui:inputCheckbox label="Controla presencia" name="cPresencia" value="{!v.dataSource.Contrato2__c.Controla_Presencia_Vehiculo_NFC__c}" required="true" disabled="true"/>
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
-					<ui:inputCheckbox label="Permite autorizacion telefonica" name="paTelefonica"  value="{!v.dataSource.Contrato2__c.Permite_autorizacion_telefonica__c}"  required="true" disabled="true"/>
-					<ui:inputCheckbox label="Control volumetrico" name="controlVolumetrico" value="{!v.dataSource.Contrato2__c.ControlVolumetrico__c}" required="true" disabled="true"/>
-					<ui:inputCheckbox label="No mostrar KM" name="nmKM"  value=""  required="true" disabled="true"/>
-					<lightning:input label="Modo de transaccion" name="mTransaccion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Modo_Transaccion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-				<lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:input label="Item de contratacion" name="itemContratacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Item_Contratacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-					<ui:inputCheckbox label="Bomba propia" name="bPropia" value="{!v.dataSource.Contrato2__c.BombaPropia__c}"  required="true" disabled="true"/>
-					<ui:inputCheckbox label="Maneja conductores" name="mConductores" value="{!v.dataSource.Contrato2__c.Maneja_Conductores__c}"  required="true" disabled="true"/>
-					<ui:inputCheckbox label="Opera TC Truck" name="operaTruck" value="{!v.dataSource.Contrato2__c.Opera_TC_Truck__c}"  required="true" disabled="true"/>
-					<lightning:input label="Modo de offline" name="modoOffline" type="text"  step="any" value="" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
-				</lightning:layoutItem>
-			</lightning:layout> -->
-			<aura:if isTrue="{!v.historicoMotivosRechazo.length > 0}">
-			<h3 class="slds-section-title--divider dividerTable">Última solicitud.</h3>
-					<aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
-						<lightning:layout >
-							<lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"    type="text" label="Estatus" name="Estatus" value="{!rechazo.Opportunity_status__c}" />
-							</lightning:layoutItem>
-							<lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"    type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
-							</lightning:layoutItem>
-							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
-								<lightning:input  disabled="true"    type="text" label="Comentarios del comercial para ADC" name="comentariosComercial" value="{!rechazo.Comercial_comments__c}" />
-							</lightning:layoutItem>
-							<lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
-								<div class="row">
-									<p class="header">Fecha inicio ADV</p>
-									<lightning:input variant="label-hidden" type="datetime" disabled="true" name="fechaInicio" value="{!rechazo.ADV_Start_Date__c}" />
-								</div>
-							</lightning:layoutItem>
-						</lightning:layout>
-					</aura:iteration>
-			</aura:if>
+   <div class="slds-section slds-is-open slds-p-top_medium">
+     <h3 class="slds-section__title slds-theme_shade">
+      <span class="slds-truncate slds-p-horizontal_small" title="funcionalidades">
+       Condiciones Operativas
+      </span>
+     </h3>
+    </div>
+   <lightning:layout >
+    
+    <lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
+     <ui:inputCheckbox label="VIP" name="vip"  value="{!v.dataSource.Contrato2__c.VIP__c}" required="true" disabled="true"/>
+     <ui:inputCheckbox label="Ticket bomba" name="ticketBomba"  value="{!v.dataSource.Contrato2__c.TicketBomba__c}" required="true" disabled="true"/>
+     <ui:inputCheckbox label="Maneja nota vale" name="mnVale" value="{!v.dataSource.Contrato2__c.Maneja_Nota_Vale__c}" required="true" disabled="true"/>
+     <ui:inputCheckbox label="Controla presencia" name="cPresencia" value="{!v.dataSource.Contrato2__c.Controla_Presencia_Vehiculo_NFC__c}" required="true" disabled="true"/>
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
+     <ui:inputCheckbox label="Permite autorizacion telefonica" name="paTelefonica"  value="{!v.dataSource.Contrato2__c.Permite_autorizacion_telefonica__c}"  required="true" disabled="true"/>
+     <ui:inputCheckbox label="Control volumetrico" name="controlVolumetrico" value="{!v.dataSource.Contrato2__c.ControlVolumetrico__c}" required="true" disabled="true"/>
+     <ui:inputCheckbox label="No mostrar KM" name="nmKM"  value=""  required="true" disabled="true"/>
+     <lightning:input label="Modo de transaccion" name="mTransaccion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Modo_Transaccion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+    <lightning:layoutItem flexibility="auto" size="4" class="slds-p-horizontal_medium slds-p-top_medium">
+     <lightning:input label="Item de contratacion" name="itemContratacion" type="text"  step="any" value="{!v.dataSource.Contrato2__c.Item_Contratacion__c}" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+     <ui:inputCheckbox label="Bomba propia" name="bPropia" value="{!v.dataSource.Contrato2__c.BombaPropia__c}"  required="true" disabled="true"/>
+     <ui:inputCheckbox label="Maneja conductores" name="mConductores" value="{!v.dataSource.Contrato2__c.Maneja_Conductores__c}"  required="true" disabled="true"/>
+     <ui:inputCheckbox label="Opera TC Truck" name="operaTruck" value="{!v.dataSource.Contrato2__c.Opera_TC_Truck__c}"  required="true" disabled="true"/>
+     <lightning:input label="Modo de offline" name="modoOffline" type="text"  step="any" value="" messageWhenValueMissing="Campo requerido" required="true" disabled="true"/>
+    </lightning:layoutItem>
+   </lightning:layout> -->
+            <aura:if isTrue="{!v.historicoMotivosRechazo.length > 0}">
+                <h3 class="slds-section-title--divider dividerTable">Última solicitud.</h3>
+                <aura:iteration items="{!v.historicoMotivosRechazo}" var="rechazo">
+                    <lightning:layout >
+                        <lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
+                            <lightning:input  disabled="true"    type="text" label="Estatus" name="Estatus" value="{!rechazo.Opportunity_status__c}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto"   class="slds-p-horizontal_medium slds-p-top_medium">
+                            <lightning:input  disabled="true"    type="text" label="Motivo de rechazo" name="MotivoRechazo" value="{!rechazo.Rejection_Reason__c}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
+                            <lightning:input  disabled="true"    type="text" label="Comentarios del comercial para ADC" name="comentariosComercial" value="{!rechazo.Comercial_comments__c}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto"  class="slds-p-horizontal_medium slds-p-top_medium">
+                            <div class="row">
+                                <p class="header">Fecha inicio ADV</p>
+                                <lightning:input variant="label-hidden" type="datetime" disabled="true" name="fechaInicio" value="{!rechazo.ADV_Start_Date__c}" />
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:iteration>
+            </aura:if>
             <lightning:layout >
-				<lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
-					<lightning:textarea name="comentariosAdministracion" value="{!v.dataSource.Opportunity.Comentarios_Ejecutivo__c}" label="Comentarios del Comercial para ADC" maxlength="300" />
+                <lightning:layoutItem flexibility="auto" size="12" class="slds-p-horizontal_medium slds-p-top_medium">
+                    <lightning:textarea name="comentariosAdministracion" value="{!v.dataSource.Opportunity.Comentarios_Ejecutivo__c}" label="Comentarios del Comercial para ADC" maxlength="300" />
                     <div class="slds-m-top_xx-small slds-m-bottom_xx-small">
                         <lightning:dualListbox aura:id="motivosDeRechazo"
                                                disableReordering="true"
@@ -853,39 +1035,39 @@
                                                options="{!v.motivosRechazoList}" 
                                                value="{!v.motivosRechazoSelec}"/>
                     </div>
-					<lightning:textarea name="comentariosAdministracion" value="{!v.dataSource.Contrato2__c.Comentarios_ADV__c}" label="Comentarios Administracion de ventas" maxlength="300" />
-
-				</lightning:layoutItem>
-			</lightning:layout>
-		</div>
-		<div>
-			<lightning:buttonGroup class="button-group-container">
-				<!-- <button disabled="{!v.btnInactive}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.guardaContrato}">
-					<lightning:icon iconName="utility:save" title="Guardar" class="save-button"/>
-					<aura:if isTrue="{!v.btnActionSave}">
-						<lightning:spinner size="medium" variant="brand"/>
-					</aura:if>
-				</button> -->
-				<button disabled="{!v.btnInactive}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.aprobarADV}">
-					<lightning:icon iconName="utility:success" title="Aprobar" class="finish-button"/>
-					<aura:if isTrue="{!v.btnActionAprobar}">
-						<lightning:spinner size="medium" variant="brand" alternativeText="-"/>
-					</aura:if>
-				</button>
-				<button  class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.rechazarADV}">
-					<lightning:icon iconName="utility:clear" title="Rechazar" class="send-button"/>
-					<aura:if isTrue="{!v.btnActionRechazar}">
-						<lightning:spinner size="medium" variant="brand" alternativeText="-"/>
-					</aura:if>
-				</button>
+                    <lightning:textarea name="comentariosAdministracion" value="{!v.dataSource.Contrato2__c.Comentarios_ADV__c}" label="Comentarios Administracion de ventas" maxlength="300" />
+                    
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+        <div>
+            <lightning:buttonGroup class="button-group-container">
+                <!-- <button disabled="{!v.btnInactive}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.guardaContrato}">
+     <lightning:icon iconName="utility:save" title="Guardar" class="save-button"/>
+     <aura:if isTrue="{!v.btnActionSave}">
+      <lightning:spinner size="medium" variant="brand"/>
+     </aura:if>
+    </button> -->
+                <button disabled="{!v.btnInactive}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.aprobarADV}">
+                    <lightning:icon iconName="utility:success" title="Aprobar" class="finish-button"/>
+                    <aura:if isTrue="{!v.btnActionAprobar}">
+                        <lightning:spinner size="medium" variant="brand" alternativeText="-"/>
+                    </aura:if>
+                </button>
+                <button  class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.rechazarADV}">
+                    <lightning:icon iconName="utility:clear" title="Rechazar" class="send-button"/>
+                    <aura:if isTrue="{!v.btnActionRechazar}">
+                        <lightning:spinner size="medium" variant="brand" alternativeText="-"/>
+                    </aura:if>
+                </button>
                 <button disabled="{!v.isXML}" class="slds-button slds-button_icon slds-button_icon-border-filled button-size" onclick="{!c.generaXML}">
-					<lightning:icon iconName="utility:share_file" title="Generar XMLs" class="finish-button"/>
-					<aura:if isTrue="{!v.btnActionXML}">
-						<lightning:spinner size="medium" variant="brand" alternativeText="-"/>
-					</aura:if>
-				</button>
-			</lightning:buttonGroup>
-		</div>
+                    <lightning:icon iconName="utility:share_file" title="Generar XMLs" class="finish-button"/>
+                    <aura:if isTrue="{!v.btnActionXML}">
+                        <lightning:spinner size="medium" variant="brand" alternativeText="-"/>
+                    </aura:if>
+                </button>
+            </lightning:buttonGroup>
+        </div>
         <aura:if isTrue="{!v.modalErrores}">
             <div  style="width:100%;">
                 <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
@@ -911,5 +1093,5 @@
                 </div>
             </div>
         </aura:if>
-	</div>
+    </div>
 </aura:component>
