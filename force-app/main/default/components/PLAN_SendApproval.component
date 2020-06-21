@@ -68,6 +68,7 @@
                         quoteData.approvalPrimerEnvio = ctcUtils.app.approvalPrimerEnvio;
                         quoteData.approvalTarjetaStock = ctcUtils.app.approvalStock;
                         quoteData.approvalTarjetaStockPrimer = ctcUtils.app.approvalStockPrimerEnvio;
+                        quoteData.approvalCredito = ctcUtils.app.approvalCredito;//CEAM:3375
                         ctcUtils.guardaCotizacionConAprobacion(cotizacion, quoteData)
                 		vm.close(cotizacion)
                     } else {

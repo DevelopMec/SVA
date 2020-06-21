@@ -709,6 +709,15 @@
                             v1.disabled['TarjetaAsociada__c'] = disabled
                             v1.disabled['ClabeInterbancaria__c'] = disabled
                             v1.disabled['Bonificacion__c'] = disabled
+                            //CEAM:3375 >>>
+                            v1.disabled['PaymentMethod__c'] = disabled
+                            v1.disabled['ContractingItem__c'] = disabled
+                            v1.disabled['ReleasePeriod__c'] = disabled
+                            v1.disabled['OperatingLine__c'] = disabled
+                            v1.disabled['CreditDays__c'] = disabled
+                            v1.disabled['WarrantyType__c'] = disabled
+                            //CEAM:3375 <<<
+                            
                             $timeout(function() {
                                 if(v1.hasOwnProperty('productoConceptoInstancias')) {
                                     angular.forEach(Object.keys(v1.productoConceptoInstancias), function(v2, k2) {
@@ -939,7 +948,8 @@
                             vm.contacts = contacts
 
                             // Obtener QuoteLinetItem - Partidas de presupuesto - asociadas a la oportunidad
-                            return ctcUtils.query('SELECT Id, CantidadTarjetas__c,Package__c,regularTagQuantity__c,dualTagQuantity__c,virtualCardQuantity__c,physicalCardQuantity__c ,meanType__c,NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
+                            //CEAM:3375
+                            return ctcUtils.query('SELECT Id, CantidadTarjetas__c,Package__c,regularTagQuantity__c,dualTagQuantity__c,virtualCardQuantity__c,physicalCardQuantity__c ,meanType__c,NumberOfShipments__c, ComentariosCotizacion__c, FormaPago__c, OpcionesMetodoPago__c, OtroMetodoPago__c, TarjetaAsociada__c, TipoTarjeta__c, LineNumber, Subtotal, Quantity, Product2Id, PricebookEntryId, ServiceDate, UnitPrice, ClabeInterbancaria__c, TipoAmex__c, NivelConsumo__c, Product2.Name, Product2.Family, Product2.Red__c, Product2.Uso__c, Product2.Formato__c, Product2.ProductCode,Product2.AplicaSegmento__c, PaymentMethod__c, ContractingItem__c, ReleasePeriod__c, OperatingLine__c, CreditDays__c, WarrantyType__c, CreditWeeks__c, ReleasesNumber__c, TotalCreditDays__c, WarrantyValue__c FROM QuoteLineItem WHERE QuoteId=\'' + cotizacion.Id + '\' AND Escalonamiento__c = NULL ORDER BY Id ASC')
                         })
                         .then( function( res ) {
                             // Recibe y asigna a productos los QuoteLineItems encontrados
@@ -1379,6 +1389,9 @@
                     if (ctcUtils.app.checkSecondApproval == true && ctcUtils.app.quoteRejected == false) {
                         //If the quote has already been approved, it compares original values versus changed values.
                         finalApprovalLevels.push(1);
+                        if(ctcUtils.app.approvalCredito != undefined){//CEAM:3375
+                            finalApprovalLevels.push(ctcUtils.app.approvalCredito);//CEAM:3375 
+                        }//CEAM:3375
                             angular.forEach( cotizacion.productos, function( producto, index ) {
                                 angular.forEach( producto.conceptosUnicos, function( productoCon, index ) {
                                     if(productoCon.TipoCargo__c == 'Comisión por el servicio' && productoCon.PrecioFinal2__c < ctcUtils.app.ComisionOriginal && ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
@@ -1403,7 +1416,7 @@
                                         finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
                                     }
                                 })                            
-                            })
+                            })                            
                     } else {
                         //If the quote is not approved, it follows the normal path without compare values.
                         if(ctcUtils.app.conceptoAprobacion != undefined && ctcUtils.app.conceptoAprobacion.PrecioFinal__c__approvalLevel != undefined) {
@@ -1422,6 +1435,9 @@
                         }
                         if(ctcUtils.app.approvalStockPrimerEnvio != undefined) {
                             finalApprovalLevels.push(ctcUtils.app.approvalStockPrimerEnvio);
+                        }
+                        if(ctcUtils.app.approvalCredito != undefined) {//CEAM:3375
+                            finalApprovalLevels.push(ctcUtils.app.approvalCredito);
                         }
                     }
                     if (finalApprovalLevels != '' && finalApprovalLevels != null) {
@@ -1787,6 +1803,22 @@
                     ret.virtualCardQuantity__C          = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'virtualCard__c')['0'].cardsQuantity : '';
                     ret.dualTagQuantity__C              = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'DualTag__c')['0'].cardsQuantity : '';
                     ret.regularTagQuantity__C           = Array.isArray(ctcUtils.app.meanTypeValues) ? ctcUtils.app.meanTypeValues.filter(type => type.Field == 'RegularTag__c')['0'].cardsQuantity : '';
+
+                    //CEAM:3375 >>>
+                    //MODALIDAD DE PAGO: 
+                    ret.PaymentMethod__c                = producto.PaymentMethod__c;
+                    ret.ContractingItem__c              = producto.ContractingItem__c           && producto.PaymentMethod__c == 'Pospago' ? producto.ContractingItem__c         : null;
+                    ret.ReleasePeriod__c                = producto.ReleasePeriod__c             && producto.PaymentMethod__c == 'Pospago' ? producto.ReleasePeriod__c           : null;
+                    ret.OperatingLine__c                = producto.OperatingLine__c             && producto.PaymentMethod__c == 'Pospago' ? producto.OperatingLine__c           : null;
+                    ret.CreditDays__c                   = producto.CreditDays__c                && producto.PaymentMethod__c == 'Pospago' ? producto.CreditDays__c              : null;
+                    ret.WarrantyType__c                 = producto.WarrantyType__c              && producto.PaymentMethod__c == 'Pospago' ? producto.WarrantyType__c            : null;
+                    ret.CreditWeeks__c                  = producto.CreditWeeks__c               && producto.PaymentMethod__c == 'Pospago' ? producto.CreditWeeks__c             : null;
+                    ret.ReleasesNumber__c               = producto.ReleasesNumber__c            && producto.PaymentMethod__c == 'Pospago' ? producto.ReleasesNumber__c          : null;
+                    ret.TotalCreditDays__c              = producto.TotalCreditDays__c           && producto.PaymentMethod__c == 'Pospago' ? producto.TotalCreditDays__c         : null;
+                    ret.WarrantyValue__c                = producto.WarrantyValue__c             && producto.PaymentMethod__c == 'Pospago' ? producto.WarrantyValue__c           : null;
+                    ret.DocumentType__c                 = ctcUtils.app.docsAnalisiCreditoName   && producto.PaymentMethod__c == 'Pospago' ? ctcUtils.app.docsAnalisiCreditoName : null;
+                    //CEAM:3375 <<<<
+
                     /*if((!producto.ServiceDate || !producto.Id ) || producto.IsClone ) {
                         ret.ServiceDate = new Date(closeDate)
                         ret.ServiceDate = ret.ServiceDate.getFullYear() + '-' + (ret.ServiceDate.getMonth() + 1) + '-' + ret.ServiceDate.getUTCDate()
