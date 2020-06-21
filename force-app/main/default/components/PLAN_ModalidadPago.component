@@ -18,7 +18,7 @@
                                     <h3 class="panel-title">
                                         (
                                         <span ng-bind="cot.schema.QuoteLineItem.PaymentMethod__c.label"></span>
-                                        <span ng-bind="cotizacion.Name" /> /
+                                        <span ng-bind="mod.cotizacion.Name" /> /
                                         <span ng-bind="producto.Product2Id__o.Name" />)
                                     </h3>
                                 </div>
@@ -32,88 +32,96 @@
                     </h3>
                 </div>
                 <div class="panel-body" uib-collapse="mod.collapse">
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <div class="container">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <strong ng-bind="cot.schema.QuoteLineItem.PaymentMethod__c.label" ng-class="{'text-danger':cotizacion.formCotiza.PaymentMethod__c.$invalid}"></strong>
                                 <ul class="list-inline" ng-class="{'has-error': cotizacion.formCotiza.PaymentMethod__c.$invalid}">
                                     <i class="label label-danger  animated rubberBand ng-animate-disabled  msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza.PaymentMethod__c.$invalid">Requerido</i>
                                     <li ng-repeat="modalidad in cot.schema.QuoteLineItem.PaymentMethod__c.values">
-                                        <div class="radio" ng-if="!(mod.includeNectarFields && modalidad.label == 'Pospago') ">
+                                        <div class="radio">
                                             <label>
-                                                <input ng-change="mod.activateSaveButton()" ng-required="true" type="radio" ng-model="cotizacion.PaymentMethod__c" ng-disabled="disabledPaymentMethod__c"
-                                                    value="{{modalidad.value}}" name="PaymentMethod__c" />
+                                                <input ng-change="mod.activateSaveButton()" ng-required="true" type="radio" ng-model="producto.PaymentMethod__c" ng-disabled="producto.disabled.PaymentMethod__c"
+                                                    value="{{modalidad.value}}" name="producto.PaymentMethod__c" />
                                                 <span ng-bind="modalidad.label" />
                                             </label>
-                                            <a ng-if="modalidad.value=='Pospago'" class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" uib-tooltip="Rangos de Aprobación" tooltip-placement="right"><span class="fa fa-percent fa-fw" /></a>
+                                            &nbsp;<a ng-if="modalidad.value=='Pospago' && mod.visualizarRangosAprobacion" ng-click="mod.mostrarRangosAprobacion(producto)" class="btnb btnb-primary btnb-xs pull-right btn-comision-ss" uib-tooltip="Rangos de Aprobación" tooltip-placement="right"><span class="fa fa-percent fa-fw" /></a>
                                         </div>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                         <!-- POSPAGO -->
-                        <div class="container" ng-if="cotizacion.PaymentMethod__c == 'Pospago'">
+                        <div class="container" ng-if="producto.PaymentMethod__c == 'Pospago'">
+                            <hr/>
                             <!-- DATOS DE CREDITO -->
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-6">
                                     <div class="panel">
-                                        <div class="panel-heading">
-                                            <strong>Datos de Crédito</strong>
+                                        <div class="panel-heading text-center">
+                                            <strong class="lbl-th">Datos de Crédito</strong>
                                         </div>
                                         <div class="panel-body">
                                             <!--ITEM CONTRATACIÓN-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.ContractingItem__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
                                                 ctc-cols="[4, 6]" ctc-opts="cot.schema.QuoteLineItem.ContractingItem__c.values" ctc-label="['label']" ctc-tooltip-body="true"
-                                                ng-required="cot.schema.QuoteLineItem.ContractingItem__c.required" ng-keyup="mod.activateSaveButton()" ctc-hide-errors="false" />
+                                                ng-disabled="producto.disabled.ContractingItem__c" ng-required="cot.schema.QuoteLineItem.ContractingItem__c.required" ng-keyup="mod.activateSaveButton()" ctc-hide-errors="false" />
                                             <!--PERIODO LIBERACION-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.ReleasePeriod__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
                                                 ctc-cols="[4, 6]" ctc-opts="cot.schema.QuoteLineItem.ReleasePeriod__c.values" ctc-label="['label']" ctc-tooltip-body="true"
-                                                ng-required="cot.schema.QuoteLineItem.ReleasePeriod__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.calcularNumeroLiberaciones" />
+                                                ng-disabled="producto.disabled.ReleasePeriod__c" ng-required="cot.schema.QuoteLineItem.ReleasePeriod__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.calcularNumeroLiberaciones" />
                                             <!--LINEA OPERATIVA-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.OperatingLine__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
-                                                ctc-cols="[4, 6]" ctc-label="['label']" ctc-tooltip-body="true" ng-required="cot.schema.QuoteLineItem.OperatingLine__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.calcularValorGarantia" />
+                                            ng-disabled="producto.disabled.OperatingLine__c" ctc-cols="[4, 6]" ctc-label="['label']" ctc-tooltip-body="true" ng-required="cot.schema.QuoteLineItem.OperatingLine__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.calcularValorGarantia" />
                                             <!--DIAS DE CREDITO-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.CreditDays__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
                                                 ctc-cols="[4, 6]" ctc-label="['label']"  ctc-tooltip-body="true"
-                                                ng-required="cot.schema.QuoteLineItem.CreditDays__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.calcularSemanasCredito" />
+                                                ng-disabled="producto.disabled.CreditDays__c" ng-required="cot.schema.QuoteLineItem.CreditDays__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.calcularSemanasCredito" />
                                             <!--TIPO DE GARANTIA-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.WarrantyType__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
                                                 ctc-cols="[4, 6]" ctc-opts="cot.schema.QuoteLineItem.WarrantyType__c.values" ctc-label="['label']"  ctc-tooltip-body="true"
-                                                ng-required="cot.schema.QuoteLineItem.WarrantyType__c.required" ng-keyup="mod.activateSaveButton()" />
-                                                
-                                            <!--<div class="form-group row">
-                                                    <label for="colFormLabel" class="col-sm-4 col-form-label" ng-bind="cot.schema.QuoteLineItem.OperatingLine__c.label" />
-                                                    <div class="col-sm-6 ctc-input-base" ng-class="{'has-error': cotizacion.formCotiza['OperatingLine__c'  + '_' + producto.IdElement].$invalid}" >
-                                                        <input ng-keyup="mod.activateSaveButton()" type="text" class="form-control" ng-model="producto.OperatingLine__c" ctc-field="cot.schema.QuoteLineItem.OperatingLine__c" name="{{'OperatingLine__c' + producto.IdElement}}" id="{{'OperatingLine__c' + producto.IdElement}}" ng-disabled="producto.disabled.OperatingLine__c" required="true" />
-                                                        <i class="label label-danger animated rubberBand msg-error-input ng-animate-disabled" ng-if="cotizacion.formCotiza['OperatingLine__c'   + '_' +  producto.IdElement].$invalid" >Requerido</i>
-                                                    </div>
-                                                </div>
-                                            -->
+                                                ng-disabled="producto.disabled.WarrantyType__c" ng-required="cot.schema.QuoteLineItem.WarrantyType__c.required" ng-keyup="mod.activateSaveButton()" ctc-on-change="mod.listarDocumentos" />
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             <!-- PRE ANALISIS DE CREDITO -->
-                            <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-6">
                                     <div class="panel">
-                                        <div class="panel-heading">
-                                            <strong>Pré Analisis de Crédito</strong>
+                                        <div class="panel-heading text-center">
+                                            <strong class="lbl-th">Pré Analisis de Crédito</strong>
                                         </div>
                                         <div class="panel-body">
+                                            <!--PRE ANALISIS-->
+                                            <div class="form-group row">
+                                                <label for="colFormLabel" class="col-sm-4 col-form-label text-right" ng-bind="cot.schema.QuoteLineItem.PreAnalysis__c.label" />
+                                                <label ng-if="mod.approvalCredito == 1" for="colFormLabel" class="col-sm-6 col-form-label text-center"><span class="fa fa-circle greenCircle" /></label>
+                                                <label ng-if="mod.approvalCredito == 2" for="colFormLabel" class="col-sm-6 col-form-label text-center"><span class="fa fa-circle yellowCircle" /></label>
+                                                <label ng-if="mod.approvalCredito == 3" for="colFormLabel" class="col-sm-6 col-form-label text-center"><span class="fa fa-circle redCircle" /></label>
+                                                <label ng-if="mod.approvalCredito == 4" for="colFormLabel" class="col-sm-6 col-form-label text-center"><span class="fa fa-circle grayCircle" /></label>
+                                            </div>
                                             <!--SEMANAS DE CREDITO-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.CreditWeeks__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
                                                 ctc-cols="[4, 6]" ctc-label="['label']" ctc-tooltip-body="true"
                                                 ng-required="cot.schema.QuoteLineItem.CreditWeeks__c.required" ng-keyup="mod.activateSaveButton()" ng-disabled="producto.disabled.CreditWeeks__c" />
                                             <!--NUMERO DE LIBERACIONES-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.ReleasesNumber__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
-                                                ctc-cols="[4, 6]" ctc-label="['label']" />
+                                                ctc-cols="[4, 6]" ctc-label="['label']" ng-disabled="producto.disabled.ReleasesNumber__c" />
                                             <!--TOTAL DE DIAS DE CREDITO-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.TotalCreditDays__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
-                                                ctc-cols="[4, 6]" ctc-label="['label']" />
+                                                ctc-cols="[4, 6]" ctc-label="['label']" ng-disabled="producto.disabled.TotalCreditDays__c" />
                                             <!--VALOR DE LA GARANTIA-->
                                             <ctc-form-group ctc-field="cot.schema.QuoteLineItem.WarrantyValue__c" ctc-form="cotizacion.formCotiza" ctc-instance="producto"
-                                                ctc-cols="[4, 6]" ctc-label="['label']"  />
+                                                ctc-cols="[4, 6]" ctc-label="['label']" ng-disabled="producto.disabled.WarrantyValue__c" />
+                                            <!--DOCUMENTOS CLIENTES-->
+                                            <div class="form-group row">
+                                                <label for="colFormLabel" class="col-sm-4 col-form-label text-right">Doscumentos Requeridos Análisis de Crédito</label>
+                                                <p ng-if="mod.docsAnalisiCredito" for="colFormLabel" class="col-sm-6 col-form" ng-bind="mod.docsAnalisiCredito" />
+                                            </div>
+                                            <!--DOCUMENTOS ANALISIS CREDITO-->
+                                            <div class="form-group row">
+                                                <label for="colFormLabel" class="col-sm-4 col-form-label text-right">Documentos Requeridos Cliente</label>
+                                                <p ng-if="mod.docsCliente" for="colFormLabel" class="col-sm-6 col-form text-justify" ng-bind="mod.docsCliente" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -121,6 +129,7 @@
                         </div>
                     </div>
                 </div>
+                <c:PLAN_RangosAprobacionMP />
             </div>
         </div>
     </div>
@@ -138,7 +147,14 @@
                 vm.producto = {}
                 vm.numeroLiberaciones = {}
                 vm.semanasCredito = {}
-                vm.includeNectarFields =  ctcUtils.app.includeNectarFields;
+                vm.rangosAprobacion = {}
+                vm.tiposDocumentos = {}
+                vm.approvalCredito = null
+                vm.docsCliente = null;
+                vm.docsAnalisiCredito = '';
+                vm.visualizarRangosAprobacion = true;
+                vm.productCode = '';
+
                 vm.aplicarReglas = function (producto, oportunidad, schema, cotizacion) {
                     vm.schema = schema || {}
                     vm.cotizacion = cotizacion || {}
@@ -146,20 +162,47 @@
                     vm.productCode = vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : ''
                     vm.oportunidad = oportunidad
                     vm.funcionesDistantSale = false;
-                    $scope.cotizacion = { PaymentMethod__c: "Prepago" };
+                    vm.producto.PaymentMethod__c = vm.producto.PaymentMethod__c ? vm.producto.PaymentMethod__c : 'Prepago';
                     
                     if (oportunidad.Familia__c == 'Empresarial') {
+                        vm.visualizarRangosAprobacion = false;
                         return;
                     }
-                    
-                    //vm.desactivarPospago(vm.productCode); //TODO: DESCOMENTAR BYPASS
-
+                    vm.desactivarCampos(null, null);
+                    vm.desactivarPospago(vm.productCode); //TODO: DESCOMENTAR BYPASS
                     vm.obtenerNumeroLiberaciones();
                     vm.obtenerSemanasCredito();
+                    vm.obtenerRangosAprobacion();
+                    vm.obtenerTiposDocumentos();
+                }
+
+                vm.desactivarCampos = function(campo, valor) {
+                    vm.schema.QuoteLineItem.ContractingItem__c.required = true;
+                    vm.schema.QuoteLineItem.ReleasePeriod__c.required = true;
+                    vm.schema.QuoteLineItem.OperatingLine__c.required = true;
+                    vm.schema.QuoteLineItem.CreditDays__c.required = true;
+                    vm.schema.QuoteLineItem.WarrantyType__c.required = true;
+
+                    angular.forEach(vm.cotizacion.productos, function(prods, k1) {
+                            if(!prods.hasOwnProperty('disabled')) {
+                                prods.disabled = {}
+                            }
+                            prods.disabled['CreditWeeks__c'] = true;
+                            prods.disabled['ReleasesNumber__c'] = true;
+                            prods.disabled['TotalCreditDays__c'] = true;
+                            prods.disabled['WarrantyValue__c'] = true;
+                    
+                            if(campo == 'PaymentMethod__c' && valor) {
+                                prods.disabled['PaymentMethod__c'] = valor;
+                            }
+                            if(campo == 'PaymentMethod__c' && !valor) {
+                                prods.disabled['PaymentMethod__c'] = valor;
+                            }
+                    })
                 }
 
                 vm.desactivarPospago = function (productCode) {
-                    // SE OBTIENEN LAS FUNCIONES DE DISTANT SALE DESDE METADATA Y SE COMPARA CON EL PROPIETARIO DE LA OPP
+                    vm.visualizarRangosAprobacion = true;
                     ctcUtils.query('SELECT Funciones__c FROM FuncionesModalidadPago__mdt where QualifiedApiName = \'DistantSaleEjecutivos\' limit 1')
                         .then(function (res) {
                             if (res && res.length > 0) {
@@ -175,12 +218,12 @@
                         })
                         .then(function (res) {
                             // SE VALIDAN LAS REGLAS GENERALES Y SE  DESACTIVA EL CHECK PARA POSPAGO
-                            console.log('>>> FAMILIA:: '        + vm.oportunidad.Familia__c);
-                            console.log('>>> FUNCION:: '        + vm.oportunidad.Owner.Role__c);
-                            console.log('>>> SEGMENTO:: '       + vm.oportunidad.Account.SegmentoComercial);
-                            console.log('>>> TIPOVENTA:: '      + vm.oportunidad.TipoVenta__c);
-                            console.log('>>> PRODUCTOCODE:: '   + productCode);
-                            console.log('>>> RESPUESTA-DS:: '   + vm.funcionesDistantSale);
+                            //console.log('>>> FAMILIA:: '        + vm.oportunidad.Familia__c);
+                            //console.log('>>> FUNCION:: '        + vm.oportunidad.Owner.Role__c);
+                            //console.log('>>> SEGMENTO:: '       + vm.oportunidad.Account.SegmentoComercial);
+                            //console.log('>>> TIPOVENTA:: '      + vm.oportunidad.TipoVenta__c);
+                            //onsole.log('>>> PRODUCTOCODE:: '   + productCode);
+                            //console.log('>>> RESPUESTA-DS:: '   + vm.funcionesDistantSale);
 
                             if (vm.oportunidad.Familia__c == 'Empresarial' ||
                                 (vm.oportunidad.Account.SegmentoComercial == 'Small-S1' && productCode != '30-B') ||
@@ -190,10 +233,16 @@
                                 vm.funcionesDistantSale ||
                                 vm.oportunidad.TipoVenta__c == 'Navideños'
                             ) {
-                                $scope.cotizacion = { PaymentMethod__c: "Prepago" };
+                                vm.producto.PaymentMethod__c = 'Prepago';
                                 console.log('NO APLICA POSPAGO :(');
-                                $scope.disabledPaymentMethod__c = true;
-                                vm.funcionesDistantSale = false;  
+                                vm.desactivarCampos('PaymentMethod__c', true);
+                                vm.funcionesDistantSale = false;
+                                vm.visualizarRangosAprobacion = false;
+                            } else {
+                                console.log('COTIZACION EDITABLE: '+vm.cotizacion.Editable);
+                                if(vm.cotizacion.Editable) {
+                                    vm.desactivarCampos('PaymentMethod__c', false);
+                                }
                             }
                         })
                         .catch(function (err) {
@@ -205,11 +254,13 @@
 
                 vm.calcularSemanasCredito = function () {
                     var existenValores = false;
-                    if(!vm.producto.CreditDays__c) {
+                    
+                    if(!vm.producto.CreditDays__c || vm.producto.CreditDays__c < 1) {
                         vm.producto.CreditWeeks__c = null;
                         vm.producto.ReleasesNumber__c = null;
                         vm.producto.TotalCreditDays__c = null;
                         vm.producto.WarrantyValue__c = null;
+                        vm.approvalCredito = null;
                         return;
                     }
 
@@ -231,13 +282,17 @@
                             vm.producto.WarrantyValue__c = null;
                         }
                         existenValores = false;
-                    }                    
+                    }
+                    $timeout(function() {
+                        vm.calcularPreAnalisis();
+                    },1000);
+                    
                 }
 
                 vm.calcularNumeroLiberaciones = function () {
                     var existenValores = false;
 
-                    if($('#ReleasePeriod__c_' + vm.producto.IdElement + ' option:selected').val() == '' || !vm.producto.CreditWeeks__c || !vm.producto.CreditDays__c) {
+                    if($('#ReleasePeriod__c_' + vm.producto.IdElement + ' option:selected').val() == '' || !vm.producto.CreditWeeks__c || !vm.producto.CreditDays__c || vm.producto.CreditDays__c < 1) {
                         vm.producto.ReleasesNumber__c = null;
                         vm.producto.TotalCreditDays__c = null;
                         vm.producto.WarrantyValue__c = null;
@@ -268,8 +323,9 @@
                     var periodoLiberacion;
                     vm.producto.TotalCreditDays__c = null;
                     
-                    if(!vm.producto.CreditDays__c) {
+                    if(!vm.producto.CreditDays__c || vm.producto.CreditDays__c < 1) {
                         vm.producto.TotalCreditDays__c = null;
+                        vm.approvalCredito = null;
                     }
 
                     if($('#ReleasePeriod__c_' + vm.producto.IdElement + ' option:selected').val() == '' || !vm.producto.CreditDays__c) {
@@ -287,14 +343,87 @@
                     }
 
                     vm.producto.WarrantyValue__c = parseFloat(vm.producto.OperatingLine__c) * parseInt(vm.producto.ReleasesNumber__c);
+                    $timeout(function() {
+                        vm.listarDocumentos();
+                    },1000);
                 }
 
-                vm.listarDocumentosAnalisisCredito = function () {
+                vm.calcularPreAnalisis = function () {
+                    ctcUtils.app.approvalCredito = null;
 
+                    //onsole.log('>> SEGMENTO COMERCIAL: '+vm.oportunidad.Account.SegmentoComercial);
+                    //console.log('>> PRODUCT CPDE: '+vm.productCode);
+                    //console.log('>> FAMILIA: '+vm.oportunidad.Familia__c);
+                    //console.log('>> CREDIT DAYS: '+vm.producto.CreditDays__c);
+
+                    if(!vm.rangosAprobacion || !vm.oportunidad.Account.SegmentoComercial || !vm.productCode || !vm.oportunidad.Familia__c || !vm.producto.CreditDays__c || vm.producto.CreditDays__c < 1){
+                        vm.approvalCredito = null;
+                        return;
+                    }
+                    if (vm.rangosAprobacion && vm.rangosAprobacion.length > 0) {
+                        angular.forEach(vm.rangosAprobacion, function (rango, index) {
+                            if(
+                                vm.oportunidad.Account.SegmentoComercial == rango.Segmento__c && 
+                                (
+                                    rango.CodigoProducto__c == vm.productCode && 
+                                    rango.Solucion__c       != vm.oportunidad.Familia__c || 
+                                    rango.productCodeOmitir != vm.productCode && 
+                                    rango.Solucion__c       == vm.oportunidad.Familia__c
+                                ) &&
+                                (vm.producto.CreditDays__c >= rango.DiaCreditoInicio__c && vm.producto.CreditDays__c <= rango.DiaCreditoFin__c || vm.producto.CreditDays__c >= rango.DiaCreditoInicio__c)
+
+                            ) {
+                                vm.approvalCredito = rango.NivelAprobacion__c;
+                                ctcUtils.app.approvalCredito = vm.approvalCredito;
+                            }
+                        })
+                    }
                 }
 
-                vm.listarDocumentosCliente = function () {
+                vm.listarDocumentos = function () {
+                    ctcUtils.app.docsAnalisiCreditoName = null;
+                    vm.docsAnalisiCredito = '';
+                    if($('#WarrantyType__c_' + vm.producto.IdElement + ' option:selected').val() == '') {
+                        vm.docsAnalisiCredito = '';
+                        vm.docsCliente = null;
+                        return;
+                    }
 
+                    if (vm.tiposDocumentos && vm.tiposDocumentos.length > 0) {
+                        angular.forEach(vm.tiposDocumentos, function (tdoc, index) {
+                            if(tdoc.Label.includes('MPago_ACredito') && vm.producto.WarrantyType__c == tdoc.TipoGarantia__c && 
+                                ((vm.producto.WarrantyValue__c > tdoc.ValorGarantiaInicio__c || vm.producto.WarrantyValue__c <= tdoc.ValorGarantiaFin__c && vm.producto.WarrantyValue__c > 0) || 
+                                    (!tdoc.ValorGarantiaInicio__c && !tdoc.ValorGarantiaFin__c)) 
+                            ) {
+                                vm.docsAnalisiCreditoName = tdoc.Label;
+                                vm.docsAnalisiCredito += tdoc.FormatoBuroOriginal__c ? ' Formato de Buro en Original,' : ''; 
+                                vm.docsAnalisiCredito += tdoc.CartaStandBy__c ? ' Carta Stand By,' : '';
+                                vm.docsAnalisiCredito += tdoc.EstadosFinancieros__c ? ' Edos. Financieros Int. Anterior y Actual,' : '';
+                                vm.docsAnalisiCredito += tdoc.DeclaracionesHacienda__c ? ' Últimas Dos Declaraciones de Hda.,' : '';
+                                vm.docsAnalisiCredito += tdoc.EstudioRiesgo__c ? ' Estudio de Riesgo A. Crédito,' : '';
+                                vm.docsAnalisiCredito += tdoc.FianzaCredito__c ? ' Fianza de Crédito,' : '';
+                            }
+
+                            if(tdoc.Label.includes('MPago_SCliente') && vm.producto.WarrantyType__c == tdoc.TipoGarantia__c) {
+                                vm.docsCliente = tdoc.Texto__c;
+                            }
+                        })
+                        vm.docsAnalisiCredito = vm.docsAnalisiCredito.slice(0, -1);
+                        ctcUtils.app.docsAnalisiCreditoName = vm.docsAnalisiCreditoName;
+                        console.log(ctcUtils.app.docsAnalisiCreditoName);
+                    }
+                }
+
+                vm.mostrarRangosAprobacion = function (producto) {
+                    var rangoAprobacion = vm.rangosAprobacion;
+                    var oportunidad = vm.oportunidad;
+                    ctcUtils.openModal('rangosAprobacionMP', {
+                        producto: function () {return producto }, 
+                        oportunidad : function () {return oportunidad },  
+                        rangoAprobacion : function () {return rangoAprobacion } 
+                    }, 'md', 'com')
+                    .then( function( res ) { 
+                    }).catch( function( err ) {})
                 }
 
                 vm.obtenerNumeroLiberaciones  = function () {
@@ -311,11 +440,39 @@
                         })
                 }
 
-                vm.obtenerSemanasCredito  = function () {
-                    ctcUtils.query('SELECT Id, Label, DiaCreditoInicio__c, DiaCreditoFin__c, SemanaCredito__c FROM SemanaCredito__mdt')
+                vm.obtenerSemanasCredito = function () {
+                    ctcUtils.query('SELECT DiaCreditoInicio__c, DiaCreditoFin__c, SemanaCredito__c FROM SemanaCredito__mdt')
                         .then(function (res) {
                             if (res && res.length > 0) {
                                 vm.semanasCredito = res;
+                            }
+                        })
+                        .catch(function (err) {
+                            vm.errors = [err]
+                            vm.loading = false
+                            vm.processing = false
+                        })
+                }
+
+                vm.obtenerRangosAprobacion = function () {
+                    ctcUtils.query('SELECT Solucion__c, CodigoProducto__c, Modalidad__c, DiaCreditoInicio__c, DiaCreditoFin__c, Segmento__c, NivelAprobacion__c, Acelerador__c FROM RangoAprobacionModalidadPago__mdt ORDER BY DiaCreditoInicio__c ASC')
+                        .then(function (res) {
+                            if (res && res.length > 0) {
+                                vm.rangosAprobacion = res;
+                            }
+                        })
+                        .catch(function (err) {
+                            vm.errors = [err]
+                            vm.loading = false
+                            vm.processing = false
+                        })
+                }
+
+                vm.obtenerTiposDocumentos = function () {
+                    ctcUtils.query('SELECT Id, Label, FormatoBuroOriginal__c, CartaStandBy__c, EstadosFinancieros__c, DeclaracionesHacienda__c, EstudioRiesgo__c, FianzaCredito__c, TipoGarantia__c, ValorGarantiaInicio__c, ValorGarantiaFin__c, Texto__c FROM DocumentosModalidadPago__mdt Where Label LIKE \'%MPago%\'')
+                        .then(function (res) {
+                            if (res && res.length > 0) {
+                                vm.tiposDocumentos = res;
                             }
                         })
                         .catch(function (err) {
@@ -332,7 +489,8 @@
                 $scope.$watch('mod.producto.Product2Id__o.Name', function(newval, oldval) {
                     if( newval) {
                         $timeout(function() {
-                            //vm.desactivarPospago(vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : ''); //TODO: DESCOMENTAR BYPASS
+                            vm.productCode = vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : '';
+                            vm.desactivarPospago(vm.producto && vm.producto.Product2Id__o && vm.producto.Product2Id__o.ProductCode ? vm.producto.Product2Id__o.ProductCode : ''); //TODO: DESCOMENTAR BYPASS
                         }, 700)
                     }
                 })

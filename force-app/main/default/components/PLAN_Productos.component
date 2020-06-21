@@ -284,13 +284,14 @@
                 vm.checkedCard = function( model, producto ) {
                     if(model.Checked) {
                         ctcUtils.app.selectedMeans.includes(model.value) ? '' : ctcUtils.app.selectedMeans.push(model.value);
-                        if(model.Field == "virtualCard__c") {
+                    } else {
+                        ctcUtils.app.selectedMeans.includes(model.value) ? ctcUtils.app.selectedMeans.splice(ctcUtils.app.selectedMeans.indexOf(model.value),1) : '' ;
+                    }
+                    if(ctcUtils.app.selectedMeans.includes ("Tarjetas Virtuales") &&  ctcUtils.app.selectedMeans.length <= 1) {
                             producto.NumberOfShipments__c = '';
                             producto.disabled.NumberOfShipments__c = true;
                             ctcUtils.app.schema.QuoteLineItem.NumberOfShipments__c.required = false;
-                        }
                     } else {
-                        ctcUtils.app.selectedMeans.includes(model.value) ? ctcUtils.app.selectedMeans.splice(ctcUtils.app.selectedMeans.indexOf(model.value),1) : '' ;
                         producto.disabled.NumberOfShipments__c = false;
                         ctcUtils.app.schema.QuoteLineItem.NumberOfShipments__c.required = true;
                     }

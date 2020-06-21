@@ -92,12 +92,17 @@
         //console.log("del::"+JSON.stringify(listEcDisp));
     },
     setDefaultPickList : function(component,idPickList) {
+    
         setTimeout(()=>{
             let pickListFields = component.find(idPickList);
             if(Array.isArray(pickListFields) && pickListFields.length > 0) {
                 pickListFields.forEach( (field) => {
-                    if(field.get('v.options').length = 1){
+                    if(field.get('v.options').length == 1){
                         field.set('v.value',field.get('v.options')[0].value);
+                    } else if(field.get('v.label') == 'Empresa Principal') {
+                        field.set('v.value','Prime');
+                    } else if(field.get('v.label') == 'Paquete') {
+                        field.set('v.value',component.get("v.data").headerData.Package__c);
                     }
                 });
             }

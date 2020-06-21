@@ -84,7 +84,6 @@
 								</tr>
 							</thead>
 							<thead class="headerTable">
-
 								<tr class="headerFontSizeTable">
 									<th class="headerLeftBorder anchoTipoConTarjeta" ng-style="solucion.titlePipe" colspan="3"></th>
 
@@ -290,7 +289,7 @@
 						<div class="col-sm-12">
 							<div ng-style="solucion.titlePipe" id="wallet-mxn-bar" class="pipeDiferencial"></div>
 							<span class="tituloSeccion">DIFERENCIALES</span>
-							<span class="subtituloSeccion">NECTAR&reg;</span>
+							<span class="subtituloSeccion">TICKET CAR&reg;</span>
 						</div>
 					</div>
 
@@ -308,8 +307,7 @@
 								<tbody class="tablePDFValores">
 
 									<tr ng-repeat="diferencial in seccion.listaContenido | limitTo: 1000">
-										<td width="90%" ng-bind="diferencial.CaracteristicasSolucion__c">
-										</td>
+										<td width="90%" ng-bind="diferencial.CaracteristicasSolucion__c"></td>
 										<td class="text-center">
 											<span class="fa fa-check text-green" ng-style="solucion.fontColor"></span>
 										</td>

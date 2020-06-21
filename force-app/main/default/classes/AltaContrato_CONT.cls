@@ -391,7 +391,7 @@ public without sharing class AltaContrato_CONT {
                    Quote.Opportunity.Entidad_Cuenta__r.EntidadLegal__c, Quote.OpportunityId,Quote.Opportunity.Familia__c,
                    Quote.Opportunity.Name, Quote.Opportunity.Id, Quote.Opportunity.Account.Id, Quote.Opportunity.Account.Name,
                    Product2.SendToSIGLO__c,
-                   ContractingItem__c, PaymentMethod__c, OperatingLine__c, ReleasePeriod__c, WarrantyValue__c, CreditDays__c //CEAM:3375
+                   ContractingItem__c, PaymentMethod__c, OperatingLine__c, ReleasePeriod__c, WarrantyValue__c, CreditDays__c,Package__c //CEAM:3375
               from QuoteLineItem
              where Id=:idQli
         ];
